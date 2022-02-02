@@ -80,6 +80,11 @@ class IslandsDrawableInterface {
     virtual mat44 Transformation() const = 0;
 
     /**
+     * @brief BoundingBox An AABB bounding box surrounding the drawable's geometry.
+     */
+    virtual aabb BoundingBox() const = 0;
+
+    /**
      * @brief Vertices A list of vertices defining the geomeotry of this drawable.
      */
     virtual std::vector<PrimitiveVertex> const &Vertices() const = 0;
