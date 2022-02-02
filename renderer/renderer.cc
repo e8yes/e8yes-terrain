@@ -15,13 +15,15 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QVulkanWindow>
 #include <QVulkanWindowRenderer>
+#include <iostream>
 
 #include "renderer/renderer.h"
 
 namespace e8 {
 
-IslandsRenderer::IslandsRenderer() {}
+IslandsRenderer::IslandsRenderer(QVulkanWindow *display_window) : display_window_(display_window) {}
 
 IslandsRenderer::~IslandsRenderer() {}
 
@@ -33,6 +35,9 @@ void IslandsRenderer::releaseSwapChainResources() {}
 
 void IslandsRenderer::releaseResources() {}
 
-void IslandsRenderer::startNextFrame() {}
+void IslandsRenderer::startNextFrame() {
+    display_window_->frameReady();
+    display_window_->requestUpdate();
+}
 
 } // namespace e8

@@ -33,7 +33,9 @@ IslandsRendererDisplay::IslandsRendererDisplay() {}
 
 IslandsRendererDisplay::~IslandsRendererDisplay() {}
 
-QVulkanWindowRenderer *IslandsRendererDisplay::createRenderer() { return new IslandsRenderer(); }
+QVulkanWindowRenderer *IslandsRendererDisplay::createRenderer() {
+    return new IslandsRenderer(this);
+}
 
 std::unique_ptr<IslandsRendererContext> CreateRendererContext() {
     std::unique_ptr<IslandsRendererContext> context = std::make_unique<IslandsRendererContext>();

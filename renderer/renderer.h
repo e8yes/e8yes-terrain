@@ -18,6 +18,7 @@
 #ifndef ISLANDS_RENDERER_H
 #define ISLANDS_RENDERER_H
 
+#include <QVulkanWindow>
 #include <QVulkanWindowRenderer>
 
 namespace e8 {
@@ -27,7 +28,7 @@ namespace e8 {
  */
 class IslandsRenderer : public QVulkanWindowRenderer {
   public:
-    IslandsRenderer();
+    IslandsRenderer(QVulkanWindow *display_window);
     ~IslandsRenderer();
 
     void initResources() override;
@@ -38,6 +39,7 @@ class IslandsRenderer : public QVulkanWindowRenderer {
     void startNextFrame() override;
 
   private:
+    QVulkanWindow *display_window_;
 };
 
 } // namespace e8
