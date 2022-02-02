@@ -15,20 +15,31 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QMainWindow>
-#include <QWidget>
-#include <memory>
+#ifndef RENDERER_H
+#define RENDERER_H
 
-#include "renderer/display.h"
-#include "terrain_editor_window.h"
-#include "ui_terrain_editor_window.h"
+#include <QVulkanWindowRenderer>
 
-TerrainEditorWindow::TerrainEditorWindow(e8::RendererContext *context, QWidget *parent)
-    : QMainWindow(parent), context_(context), ui_(std::make_unique<Ui::TerrainEditorWindow>()) {
-    ui_->setupUi(this);
+namespace e8 {
 
-    QWidget *display_wrapper = QWidget::createWindowContainer(context_->display);
-    ui_->central_layout->addWidget(display_wrapper, 5);
-}
+/**
+ * @brief The VulkanRenderer class Responsible for 3D graphics rendering.
+ */
+class VulkanRenderer : public QVulkanWindowRenderer {
+  public:
+    VulkanRenderer();
+    ~VulkanRenderer();
 
-TerrainEditorWindow::~TerrainEditorWindow() {}
+    void initResources() override;
+    void initSwapChainResources() override;
+    void releaseSwapChainResources() override;
+    void releaseResources() override;
+
+    void startNextFrame() override;
+
+  private:
+};
+
+} // namespace e8
+
+#endif // RENDERER_H

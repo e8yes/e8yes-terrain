@@ -15,10 +15,14 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TERRAINEDITORWINDOW_H
-#define TERRAINEDITORWINDOW_H
+#ifndef TERRAIN_EDITOR_WINDOW_H
+#define TERRAIN_EDITOR_WINDOW_H
 
 #include <QMainWindow>
+#include <QWidget>
+#include <memory>
+
+#include "renderer/display.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -33,10 +37,11 @@ class TerrainEditorWindow : public QMainWindow {
     Q_OBJECT
 
   public:
-    TerrainEditorWindow(QWidget *parent = nullptr);
+    TerrainEditorWindow(e8::RendererContext *context, QWidget *parent = nullptr);
     ~TerrainEditorWindow();
 
   private:
-    Ui::TerrainEditorWindow *ui;
+    e8::RendererContext *context_;
+    std::unique_ptr<Ui::TerrainEditorWindow> ui_;
 };
-#endif // TERRAINEDITORWINDOW_H
+#endif // TERRAIN_EDITOR_WINDOW_H
