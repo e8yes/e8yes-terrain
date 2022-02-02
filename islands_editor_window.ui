@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>TerrainEditorWindow</class>
- <widget class="QMainWindow" name="TerrainEditorWindow">
+ <class>IslandsEditorWindow</class>
+ <widget class="QMainWindow" name="IslandsEditorWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>e8 terrain</string>
+   <string>e8yes islands</string>
   </property>
   <widget class="QWidget" name="central_widget">
    <widget class="QWidget" name="horizontalLayoutWidget">

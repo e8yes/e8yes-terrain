@@ -15,33 +15,20 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TERRAIN_EDITOR_WINDOW_H
-#define TERRAIN_EDITOR_WINDOW_H
-
 #include <QMainWindow>
 #include <QWidget>
 #include <memory>
 
 #include "renderer/display.h"
+#include "islands_editor_window.h"
+#include "ui_terrain_editor_window.h"
 
-QT_BEGIN_NAMESPACE
-namespace Ui {
-class TerrainEditorWindow;
+IslandsEditorWindow::IslandsEditorWindow(e8::RendererContext *context, QWidget *parent)
+    : QMainWindow(parent), context_(context), ui_(std::make_unique<Ui::IslandsEditorWindow>()) {
+    ui_->setupUi(this);
+
+    QWidget *display_wrapper = QWidget::createWindowContainer(context_->display);
+    ui_->central_layout->addWidget(display_wrapper, 5);
 }
-QT_END_NAMESPACE
 
-/**
- * @brief The TerrainEditorWindow class
- */
-class TerrainEditorWindow : public QMainWindow {
-    Q_OBJECT
-
-  public:
-    TerrainEditorWindow(e8::RendererContext *context, QWidget *parent = nullptr);
-    ~TerrainEditorWindow();
-
-  private:
-    e8::RendererContext *context_;
-    std::unique_ptr<Ui::TerrainEditorWindow> ui_;
-};
-#endif // TERRAIN_EDITOR_WINDOW_H
+IslandsEditorWindow::~IslandsEditorWindow() {}

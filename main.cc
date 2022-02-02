@@ -19,14 +19,14 @@
 #include <memory>
 
 #include "renderer/display.h"
-#include "terrain_editor_window.h"
+#include "islands_editor_window.h"
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
     std::unique_ptr<e8::RendererContext> renderer_context = e8::CreateRendererContext();
 
-    TerrainEditorWindow w(renderer_context.get());
+    IslandsEditorWindow w(renderer_context.get());
     w.show();
 
     return a.exec();
