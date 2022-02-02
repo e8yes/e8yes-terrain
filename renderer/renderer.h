@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef RENDERER_H
-#define RENDERER_H
+#ifndef ISLANDS_RENDERER_H
+#define ISLANDS_RENDERER_H
 
 #include <QVulkanWindowRenderer>
 
@@ -42,4 +42,4 @@ class VulkanRenderer : public QVulkanWindowRenderer {
 
 } // namespace e8
 
-#endif // RENDERER_H
+#endif // ISLANDS_RENDERER_H

@@ -15,20 +15,19 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QMainWindow>
-#include <QWidget>
+#include <QApplication>
 #include <memory>
 
+#include "gui/islands_editor_window.h"
 #include "renderer/display.h"
-#include "islands_editor_window.h"
-#include "ui_terrain_editor_window.h"
 
-IslandsEditorWindow::IslandsEditorWindow(e8::RendererContext *context, QWidget *parent)
-    : QMainWindow(parent), context_(context), ui_(std::make_unique<Ui::IslandsEditorWindow>()) {
-    ui_->setupUi(this);
+int main(int argc, char *argv[]) {
+    QApplication a(argc, argv);
 
-    QWidget *display_wrapper = QWidget::createWindowContainer(context_->display);
-    ui_->central_layout->addWidget(display_wrapper, 5);
+    std::unique_ptr<e8::RendererContext> renderer_context = e8::CreateRendererContext();
+
+    IslandsEditorWindow w(renderer_context.get());
+    w.show();
+
+    return a.exec();
 }
-
-IslandsEditorWindow::~IslandsEditorWindow() {}
