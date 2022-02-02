@@ -24,7 +24,7 @@
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
-    std::unique_ptr<e8::RendererContext> renderer_context = e8::CreateRendererContext();
+    std::unique_ptr<e8::IslandsRendererContext> renderer_context = e8::CreateRendererContext();
 
     IslandsEditorWindow w(renderer_context.get());
     w.show();

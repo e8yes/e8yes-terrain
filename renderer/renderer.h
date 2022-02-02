@@ -23,12 +23,12 @@
 namespace e8 {
 
 /**
- * @brief The VulkanRenderer class Responsible for 3D graphics rendering.
+ * @brief The IslandsRenderer class Responsible for 3D graphics rendering.
  */
-class VulkanRenderer : public QVulkanWindowRenderer {
+class IslandsRenderer : public QVulkanWindowRenderer {
   public:
-    VulkanRenderer();
-    ~VulkanRenderer();
+    IslandsRenderer();
+    ~IslandsRenderer();
 
     void initResources() override;
     void initSwapChainResources() override;

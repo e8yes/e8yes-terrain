@@ -37,11 +37,11 @@ class IslandsEditorWindow : public QMainWindow {
     Q_OBJECT
 
   public:
-    IslandsEditorWindow(e8::RendererContext *context, QWidget *parent = nullptr);
+    IslandsEditorWindow(e8::IslandsRendererContext *context, QWidget *parent = nullptr);
     ~IslandsEditorWindow();
 
   private:
-    e8::RendererContext *context_;
+    e8::IslandsRendererContext *context_;
     std::unique_ptr<Ui::IslandsEditorWindow> ui_;
 };
 #endif // ISLANDS_EDITOR_WINDOW_H

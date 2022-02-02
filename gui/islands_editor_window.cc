@@ -23,7 +23,7 @@
 #include "renderer/display.h"
 #include "ui_islands_editor_window.h"
 
-IslandsEditorWindow::IslandsEditorWindow(e8::RendererContext *context, QWidget *parent)
+IslandsEditorWindow::IslandsEditorWindow(e8::IslandsRendererContext *context, QWidget *parent)
     : QMainWindow(parent), context_(context), ui_(std::make_unique<Ui::IslandsEditorWindow>()) {
     ui_->setupUi(this);
 

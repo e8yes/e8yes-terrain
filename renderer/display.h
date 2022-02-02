@@ -28,14 +28,14 @@
 namespace e8 {
 
 /**
- * @brief The RendererDisplay class A Qt-compatible window for displaying rendering result.
+ * @brief The IslandsRendererDisplay class A Qt-compatible window for displaying rendering result.
  */
-class RendererDisplay : public QVulkanWindow {
+class IslandsRendererDisplay : public QVulkanWindow {
     Q_OBJECT
 
   public:
-    RendererDisplay();
-    ~RendererDisplay();
+    IslandsRendererDisplay();
+    ~IslandsRendererDisplay();
 
     QVulkanWindowRenderer *createRenderer() override;
 };
@@ -44,18 +44,18 @@ class RendererDisplay : public QVulkanWindow {
  * @brief The RendererContext struct All rendering procedures will be derived from a renderer
  * context.
  */
-struct RendererContext {
+struct IslandsRendererContext {
     // For interacting with the vulkan API.
     std::unique_ptr<QVulkanInstance> vulkan_instance;
 
     // For displaying the rendering result.
-    RendererDisplay *display;
+    IslandsRendererDisplay *display;
 };
 
 /**
  * @brief CreateRendererContext See above for what a renderer context contains.
  */
-std::unique_ptr<RendererContext> CreateRendererContext();
+std::unique_ptr<IslandsRendererContext> CreateRendererContext();
 
 } // namespace e8
 

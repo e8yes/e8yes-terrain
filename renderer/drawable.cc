@@ -15,24 +15,19 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QVulkanWindowRenderer>
+#include <string>
+#include <vector>
 
-#include "renderer/renderer.h"
+#include "common/tensor.h"
+#include "renderer/drawable.h"
 
 namespace e8 {
 
-IslandsRenderer::IslandsRenderer() {}
+IslandsDrawableInterface::IslandsDrawableInterface(std::string const &human_readable_name)
+    : human_readable_name_(human_readable_name) {}
 
-IslandsRenderer::~IslandsRenderer() {}
+IslandsDrawableInterface::~IslandsDrawableInterface() {}
 
-void IslandsRenderer::initResources() {}
-
-void IslandsRenderer::initSwapChainResources() {}
-
-void IslandsRenderer::releaseSwapChainResources() {}
-
-void IslandsRenderer::releaseResources() {}
-
-void IslandsRenderer::startNextFrame() {}
+std::string IslandsDrawableInterface::HumanReadableName() const { return human_readable_name_; }
 
 } // namespace e8

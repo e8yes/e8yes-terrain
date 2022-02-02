@@ -29,14 +29,14 @@
 
 namespace e8 {
 
-RendererDisplay::RendererDisplay() {}
+IslandsRendererDisplay::IslandsRendererDisplay() {}
 
-RendererDisplay::~RendererDisplay() {}
+IslandsRendererDisplay::~IslandsRendererDisplay() {}
 
-QVulkanWindowRenderer *RendererDisplay::createRenderer() { return new VulkanRenderer(); }
+QVulkanWindowRenderer *IslandsRendererDisplay::createRenderer() { return new IslandsRenderer(); }
 
-std::unique_ptr<RendererContext> CreateRendererContext() {
-    std::unique_ptr<RendererContext> context = std::make_unique<RendererContext>();
+std::unique_ptr<IslandsRendererContext> CreateRendererContext() {
+    std::unique_ptr<IslandsRendererContext> context = std::make_unique<IslandsRendererContext>();
 
     context->vulkan_instance = std::make_unique<QVulkanInstance>();
     context->vulkan_instance->setLayers(QByteArrayList() << "VK_LAYER_GOOGLE_threading"
@@ -49,7 +49,7 @@ std::unique_ptr<RendererContext> CreateRendererContext() {
     bool instance_created = context->vulkan_instance->create();
     assert(instance_created);
 
-    context->display = new RendererDisplay();
+    context->display = new IslandsRendererDisplay();
     context->display->setVulkanInstance(context->vulkan_instance.get());
 
     return context;
