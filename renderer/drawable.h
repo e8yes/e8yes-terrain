@@ -18,6 +18,7 @@
 #ifndef ISLANDS_RENDERER_DRAWABLE_H
 #define ISLANDS_RENDERER_DRAWABLE_H
 
+#include <memory>
 #include <optional>
 #include <string>
 #include <vector>
@@ -26,32 +27,26 @@
 
 namespace e8 {
 
+// It uniquely identifies a drawable design with its LOD series.
+using DrawableId = std::string;
+
 // A 3D coordinate defining the position of a primitive's vertex.
 using PrimitiveVertex = vec3;
 
 // Defines a normalized coordinate on a 2D image.
-using PrimitiveTextureCoordinate = vec2;
+using TextureCoordinate = vec2;
 
 // Defines a triangle by referencing from the PrimitiveVertex list.
 using PrimitiveIndices = vec<3, unsigned>;
 
 /**
- * @brief The IslandsDrawableInterface class Represents an object that can be rendered by the
- * renderer. It provides all the information about the object for it to be efficiently processed by
- * the rendering pipeline.
+ * @brief The IslandsDrawable struct Represents an object that can be rendered by the renderer. It
+ * provides all the information about the object for it to be efficiently processed by the rendering
+ * pipeline.
  */
-class IslandsDrawableInterface {
-  public:
-    /**
-     * @brief IslandsDrawableInterface The name should be provided for debugging purposes.
-     */
-    IslandsDrawableInterface(std::string const &human_readable_name);
-    ~IslandsDrawableInterface();
-
-    /**
-     * @brief HumanReadableName The human readable name of this drawable.
-     */
-    std::string HumanReadableName() const;
+struct IslandsDrawable {
+    // The human readable name of this drawable, provided for debugging purposes.
+    std::string human_readable_name;
 
     /**
      * @brief The RigidityType enum The type of rigidity to be expected for this drawable.
@@ -68,42 +63,68 @@ class IslandsDrawableInterface {
         TEARABLE
     };
 
-    /**
-     * @brief Rigidity The type of rigidity to be expected for this drawable.
-     */
-    virtual RigidityType Rigidity() const = 0;
+    // The type of rigidity to be expected for this drawable.
+    RigidityType rigidity;
 
-    /**
-     * @brief Transformation The homogeneous transformation to be applied to this drawable's
-     * geometry.
-     */
-    virtual mat44 Transformation() const = 0;
+    // A list of vertices defining the geomeotry of this drawable.
+    std::vector<PrimitiveVertex> vertices;
 
-    /**
-     * @brief BoundingBox An AABB bounding box surrounding the drawable's geometry.
-     */
-    virtual aabb BoundingBox() const = 0;
+    // This list is optional if the material doesn't require a texture. It defines the normalized 2D
+    // coordinates in a texture image for each vertex to make the texture image wrap around the
+    // drawable.
+    std::optional<std::vector<TextureCoordinate>> texture_coords;
 
-    /**
-     * @brief Vertices A list of vertices defining the geomeotry of this drawable.
-     */
-    virtual std::vector<PrimitiveVertex> const &Vertices() const = 0;
+    // Defines triangle primitives by referencing the vertices of each triangle from the vertex list
+    // returned by the above function.
+    std::vector<PrimitiveIndices> indices;
+};
 
-    /**
-     * @brief TextureCoordinates This list is optional if the material doesn't require a texture. It
-     * defines the normalized 2D coordinates in a texture image for each vertex to make the texture
-     * image wrap around the drawable.
-     */
-    virtual std::vector<PrimitiveTextureCoordinate> const &TextureCoordinates() const = 0;
+/**
+ * @brief The IslandsDrawableLod struct Allows complex drawable to be represented with less  detail
+ * at distance.
+ */
+struct IslandsDrawableLod {
+    // ID of this drawable design.
+    DrawableId id;
 
-    /**
-     * @brief Indices Defines triangle primitives by referencing the vertices of each triangle from
-     * the vertex list returned by the above function.
-     */
-    virtual std::vector<PrimitiveIndices> const &Indices() const = 0;
+    // An AABB bounding box surrounding the drawable's geometry.
+    aabb bounding_box;
 
-  private:
-    std::string const human_readable_name_;
+    // LOD of this drawable design in descending level of detail.
+    std::vector<IslandsDrawable> drawable_lod;
+
+    // A list the same length as the drawable_lod specifying the minimum distance the drawble LOD is
+    // from the viewer before it can be applied to the rendering process. Therefore, the distances
+    // are expected to be in ascending order. The renderer will pick the drawable with the least
+    // possible detail when possible.
+    std::vector<float> min_distances;
+};
+
+/**
+ * @brief The IslandsDrawableLodInstance struct An object with information derived from a drawable.
+ * This is what actually gets rendered. It allows a large number of same objects to be placed at
+ * different location of the scene with sharing the same information.
+ */
+struct IslandsDrawableLodInstance {
+    // The drawable information the instance is derived from.
+    std::shared_ptr<IslandsDrawableLod> drawable;
+
+    // The homogeneous transformation to be applied to the drawable's geometry.
+    mat44 transform;
+};
+
+// Uniquely identifies a scene object.
+using SceneObjectId = std::string;
+
+/**
+ * @brief The SceneObject struct It logically groups a set of drawable instances.
+ */
+struct SceneObject {
+    // ID of this scene object.
+    SceneObjectId id;
+
+    // The drawable group that constitutes this scene object.
+    std::vector<std::unique_ptr<IslandsDrawableLodInstance>> drawables;
 };
 
 } // namespace e8

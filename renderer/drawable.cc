@@ -21,13 +21,4 @@
 #include "common/tensor.h"
 #include "renderer/drawable.h"
 
-namespace e8 {
-
-IslandsDrawableInterface::IslandsDrawableInterface(std::string const &human_readable_name)
-    : human_readable_name_(human_readable_name) {}
-
-IslandsDrawableInterface::~IslandsDrawableInterface() {}
-
-std::string IslandsDrawableInterface::HumanReadableName() const { return human_readable_name_; }
-
-} // namespace e8
+namespace e8 {} // namespace e8
