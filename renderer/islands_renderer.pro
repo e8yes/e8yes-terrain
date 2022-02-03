@@ -19,12 +19,14 @@ INCLUDEPATH += ../
 SOURCES += \
     display.cc \
     drawable.cc \
-    renderer.cc
+    renderer.cc \
+    scene.cc
 
 HEADERS += \
     display.h \
     drawable.h \
-    renderer.h
+    renderer.h \
+    scene.h
 
 # Default rules for deployment.
 unix {
