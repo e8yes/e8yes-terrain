@@ -52,7 +52,11 @@ struct IslandsDrawable {
      * @brief The RigidityType enum The type of rigidity to be expected for this drawable.
      */
     enum RigidityType {
-        // The geometry of this drawable can never change.
+        // This drawable's geometry can neither be moved nor changed.
+        STATIC,
+
+        // The geometry of this drawable can never change though it can be moved around through
+        // homogeneous transformation.
         RIGID,
 
         // The vertices of this drawable can be changed at any moment. However, the topology stays
