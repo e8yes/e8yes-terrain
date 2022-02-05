@@ -14,24 +14,20 @@
    <string>e8yes islands</string>
   </property>
   <widget class="QWidget" name="central_widget">
-   <widget class="QWidget" name="horizontalLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>791</width>
-      <height>551</height>
-     </rect>
+   <layout class="QHBoxLayout" name="central_layout">
+    <property name="leftMargin">
+     <number>0</number>
     </property>
-    <layout class="QHBoxLayout" name="central_layout">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <property name="sizeConstraint">
-      <enum>QLayout::SetDefaultConstraint</enum>
-     </property>
-    </layout>
-   </widget>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

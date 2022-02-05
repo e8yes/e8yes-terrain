@@ -41,21 +41,19 @@ class IslandsRendererDisplay : public QVulkanWindow {
 };
 
 /**
- * @brief The RendererContext struct All rendering procedures will be derived from a renderer
+ * @brief The IslandsRendererContext struct All rendering procedures will be derived from a renderer
  * context.
  */
 struct IslandsRendererContext {
-    // For interacting with the vulkan API.
-    std::unique_ptr<QVulkanInstance> vulkan_instance;
-
-    // For displaying the rendering result.
-    IslandsRendererDisplay *display;
+    // A Qt-compatible window for displaying rendering result. Also, it internally contains a
+    // renderer that responds to changes to the camera view and scene view.
+    IslandsRendererDisplay display;
 };
 
 /**
- * @brief CreateRendererContext See above for what a renderer context contains.
+ * @brief CreateIslandsRendererContext See above for what a renderer context contains.
  */
-std::unique_ptr<IslandsRendererContext> CreateRendererContext();
+std::unique_ptr<IslandsRendererContext> CreateIslandsRendererContext();
 
 } // namespace e8
 

@@ -41,7 +41,8 @@ class IslandsEditorWindow : public QMainWindow {
     ~IslandsEditorWindow();
 
   private:
-    e8::IslandsRendererContext *context_;
     std::unique_ptr<Ui::IslandsEditorWindow> ui_;
+
+    e8::IslandsRendererContext *context_;
 };
 #endif // ISLANDS_EDITOR_WINDOW_H

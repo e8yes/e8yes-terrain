@@ -24,10 +24,10 @@
 #include "ui_islands_editor_window.h"
 
 IslandsEditorWindow::IslandsEditorWindow(e8::IslandsRendererContext *context, QWidget *parent)
-    : QMainWindow(parent), context_(context), ui_(std::make_unique<Ui::IslandsEditorWindow>()) {
+    : QMainWindow(parent), ui_(std::make_unique<Ui::IslandsEditorWindow>()), context_(context) {
     ui_->setupUi(this);
 
-    QWidget *display_wrapper = QWidget::createWindowContainer(context_->display);
+    QWidget *display_wrapper = QWidget::createWindowContainer(&context_->display);
     ui_->central_layout->addWidget(display_wrapper, 5);
 }
 

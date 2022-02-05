@@ -16,6 +16,7 @@
  */
 
 #include <QApplication>
+#include <QVulkanWindow>
 #include <memory>
 
 #include "gui/islands_editor_window.h"
@@ -24,9 +25,8 @@
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
-    std::unique_ptr<e8::IslandsRendererContext> renderer_context = e8::CreateRendererContext();
-
-    IslandsEditorWindow w(renderer_context.get());
+    std::unique_ptr<e8::IslandsRendererContext> context = e8::CreateIslandsRendererContext();
+    IslandsEditorWindow w(context.get());
     w.show();
 
     return a.exec();
