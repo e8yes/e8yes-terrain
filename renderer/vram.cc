@@ -72,10 +72,11 @@ class GeometryVramTransfer::GeometryVramTransferImpl {
     std::unordered_map<IslandsDrawable const *, UploadResult>::iterator
     Fetch(IslandsDrawable const *drawable);
 
-    bool UploadVertices(std::vector<PrimitiveVertex> const &vertices, UploadResult *upload_result);
+    bool UploadVertices(std::vector<PrimitiveVertex> const &vertices,
+                        std::optional<BufferUploadResult> *vertex_upload_result);
 
     bool UploadIndices(std::vector<PrimitiveIndices> const &indices, size_t num_vertices,
-                       UploadResult *upload_result);
+                       std::optional<BufferUploadResult> *index_upload_result);
 
   private:
     bool AllocateBuffer(unsigned new_size, VkBufferUsageFlags usage,
@@ -103,14 +104,14 @@ GeometryVramTransfer::GeometryVramTransferImpl::Fetch(IslandsDrawable const *dra
 bool GeometryVramTransfer::GeometryVramTransferImpl::AllocateBuffer(
     unsigned new_size, VkBufferUsageFlags usage,
     std::optional<BufferUploadResult> *buffer_upload_result) {
-    if (new_size == buffer_upload_result->value().size) {
+    if (buffer_upload_result->has_value() && new_size == buffer_upload_result->value().size) {
         // The size of the requested memory region remains the same. Returns the old memory region.
         assert(buffer_upload_result->value().buffer != nullptr);
         assert(buffer_upload_result->value().allocation != nullptr);
         return true;
     }
 
-    if (buffer_upload_result->value().size > 0) {
+    if (buffer_upload_result->has_value()) {
         // An old memory region has been allocated. We need to re-allocate a region since the vertex
         // array is of different size now.
         assert(buffer_upload_result->value().buffer != nullptr);
@@ -124,10 +125,18 @@ bool GeometryVramTransfer::GeometryVramTransferImpl::AllocateBuffer(
         buffer_upload_result->reset();
     }
 
+    if (new_size == 0) {
+        // Can't allocate for an empty geometry.
+        return false;
+    }
+
     if (used_ + new_size > capacity_) {
         // TODO: Destroys LRU items to make room for new objects.
         return false;
     }
+
+    // Allocates a new memory region of new_size.
+    *buffer_upload_result = BufferUploadResult();
 
     VkBufferCreateInfo vertex_buffer_info = {};
     vertex_buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -144,47 +153,47 @@ bool GeometryVramTransfer::GeometryVramTransferImpl::AllocateBuffer(
         return false;
     }
 
+    buffer_upload_result->value().size = new_size;
     used_ += new_size;
     return true;
 }
 
 bool GeometryVramTransfer::GeometryVramTransferImpl::UploadVertices(
-    std::vector<PrimitiveVertex> const &vertices, UploadResult *upload_result) {
+    std::vector<PrimitiveVertex> const &vertices,
+    std::optional<BufferUploadResult> *vertex_upload_result) {
     unsigned new_size = VertexBufferSize(vertices);
-    if (!this->AllocateBuffer(new_size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                              &upload_result->vertex_buffer)) {
+    if (!this->AllocateBuffer(new_size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, vertex_upload_result)) {
         return false;
     }
 
     // Copies vertex data from CPU.
     void *vertex_buffer_region;
     VkResult result =
-        vmaMapMemory(allocator_, upload_result->vertex_buffer->allocation, &vertex_buffer_region);
+        vmaMapMemory(allocator_, vertex_upload_result->value().allocation, &vertex_buffer_region);
     if (result != VK_SUCCESS) {
         return false;
     }
 
     memcpy(vertex_buffer_region, vertices.data(), new_size);
 
-    vmaUnmapMemory(allocator_, upload_result->vertex_buffer->allocation);
+    vmaUnmapMemory(allocator_, vertex_upload_result->value().allocation);
 
     return true;
 }
 
 bool GeometryVramTransfer::GeometryVramTransferImpl::UploadIndices(
     std::vector<PrimitiveIndices> const &indices, size_t num_vertices,
-    UploadResult *upload_result) {
+    std::optional<BufferUploadResult> *index_upload_result) {
     unsigned index_size = OptimalIndexSize(num_vertices);
     unsigned new_size = IndexBufferSize(indices, index_size);
-    if (!this->AllocateBuffer(new_size, VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-                              &upload_result->vertex_buffer)) {
+    if (!this->AllocateBuffer(new_size, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, index_upload_result)) {
         return false;
     }
 
     // Copies index data from CPU.
     void *index_buffer_region;
     VkResult result =
-        vmaMapMemory(allocator_, upload_result->vertex_buffer->allocation, &index_buffer_region);
+        vmaMapMemory(allocator_, index_upload_result->value().allocation, &index_buffer_region);
     if (result != VK_SUCCESS) {
         return false;
     }
@@ -199,7 +208,7 @@ bool GeometryVramTransfer::GeometryVramTransferImpl::UploadIndices(
         assert(false);
     }
 
-    vmaUnmapMemory(allocator_, upload_result->vertex_buffer->allocation);
+    vmaUnmapMemory(allocator_, index_upload_result->value().allocation);
 
     return true;
 }
@@ -219,19 +228,21 @@ GeometryVramTransfer::UploadResult GeometryVramTransfer::Upload(IslandsDrawable 
     auto it = pimpl_->Fetch(drawable);
     if (!it->second.vertex_buffer.has_value() || !it->second.index_buffer.has_value()) {
         // Data has never been uploaded before.
-        pimpl_->UploadVertices(drawable->vertices, &it->second);
-        pimpl_->UploadIndices(drawable->indices, drawable->vertices.size(), &it->second);
+        pimpl_->UploadVertices(drawable->vertices, &it->second.vertex_buffer);
+        pimpl_->UploadIndices(drawable->indices, drawable->vertices.size(),
+                              &it->second.index_buffer);
         return it->second;
     }
 
     switch (drawable->rigidity) {
     case IslandsDrawable::DEFORMABLE: {
-        pimpl_->UploadVertices(drawable->vertices, &it->second);
+        pimpl_->UploadVertices(drawable->vertices, &it->second.vertex_buffer);
         break;
     }
     case IslandsDrawable::TEARABLE: {
-        pimpl_->UploadVertices(drawable->vertices, &it->second);
-        pimpl_->UploadIndices(drawable->indices, drawable->vertices.size(), &it->second);
+        pimpl_->UploadVertices(drawable->vertices, &it->second.vertex_buffer);
+        pimpl_->UploadIndices(drawable->indices, drawable->vertices.size(),
+                              &it->second.index_buffer);
         break;
     }
     case IslandsDrawable::STATIC:
