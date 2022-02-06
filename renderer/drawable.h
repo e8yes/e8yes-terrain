@@ -30,13 +30,22 @@ namespace e8 {
 // It uniquely identifies a drawable design with its LOD series.
 using DrawableId = std::string;
 
-// A 3D coordinate defining the position of a primitive's vertex.
-using PrimitiveVertex = vec3;
+/**
+ * @brief The PrimitiveVertex struct It defines the geometric attributes of a primitive's vertex.
+ */
+struct PrimitiveVertex {
+    // Defines the vertex's 3D position.
+    vec3 position;
 
-// Defines a normalized coordinate on a 2D image.
-using TextureCoordinate = vec2;
+    // Defines the normal vector for the vertex position.
+    vec3 normal;
 
-// Defines a triangle by referencing from the PrimitiveVertex list.
+    // Defines the normalized 2D coordinates of a texture image to make it wrap around the surface
+    // surrounding this vertex.
+    vec2 texcoord;
+};
+
+// Defines a triangle with vertices referencing from the PrimitiveVertex list.
 using PrimitiveIndices = vec<3, unsigned>;
 
 /**
@@ -70,13 +79,8 @@ struct IslandsDrawable {
     // The type of rigidity to be expected for this drawable.
     RigidityType rigidity;
 
-    // A list of vertices defining the geomeotry of this drawable.
+    // A list of vertices defining the geometry of this drawable.
     std::vector<PrimitiveVertex> vertices;
-
-    // This list is optional if the material doesn't require a texture. It defines the normalized 2D
-    // coordinates in a texture image for each vertex to make the texture image wrap around the
-    // drawable.
-    std::optional<std::vector<TextureCoordinate>> texture_coords;
 
     // Defines triangle primitives by referencing the vertices of each triangle from the vertex list
     // returned by the above function.
