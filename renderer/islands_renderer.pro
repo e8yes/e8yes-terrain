@@ -17,7 +17,7 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 INCLUDEPATH += ../
 
 SOURCES += \
-    display.cc \
+    context.cc \
     drawable.cc \
     projection.cc \
     renderer.cc \
@@ -25,7 +25,7 @@ SOURCES += \
     vram.cc
 
 HEADERS += \
-    display.h \
+    context.h \
     drawable.h \
     projection.h \
     renderer.h \

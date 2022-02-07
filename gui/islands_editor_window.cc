@@ -20,7 +20,7 @@
 #include <memory>
 
 #include "gui/islands_editor_window.h"
-#include "renderer/display.h"
+#include "renderer/context.h"
 #include "ui_islands_editor_window.h"
 
 IslandsEditorWindow::IslandsEditorWindow(e8::IslandsRendererContext *context, QWidget *parent)

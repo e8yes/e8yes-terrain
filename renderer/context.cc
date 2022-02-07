@@ -24,7 +24,7 @@
 #include <cassert>
 #include <memory>
 
-#include "renderer/display.h"
+#include "renderer/context.h"
 #include "renderer/renderer.h"
 
 namespace e8 {

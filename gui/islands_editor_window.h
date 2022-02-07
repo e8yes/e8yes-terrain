@@ -22,7 +22,7 @@
 #include <QWidget>
 #include <memory>
 
-#include "renderer/display.h"
+#include "renderer/context.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

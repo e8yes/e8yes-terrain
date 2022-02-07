@@ -20,7 +20,7 @@
 #include <memory>
 
 #include "gui/islands_editor_window.h"
-#include "renderer/display.h"
+#include "renderer/context.h"
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);

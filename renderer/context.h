@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_DISPLAY_H
-#define ISLANDS_RENDERER_DISPLAY_H
+#ifndef ISLANDS_RENDERER_CONTEXT_H
+#define ISLANDS_RENDERER_CONTEXT_H
 
 #include <QObject>
 #include <QString>
@@ -60,4 +60,4 @@ std::unique_ptr<IslandsRendererContext> CreateIslandsRendererContext();
 
 } // namespace e8
 
-#endif // ISLANDS_RENDERER_DISPLAY_H
+#endif // ISLANDS_RENDERER_CONTEXT_H
