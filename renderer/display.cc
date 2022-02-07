@@ -38,19 +38,19 @@ QVulkanWindowRenderer *IslandsRendererDisplay::createRenderer() {
 }
 
 std::unique_ptr<IslandsRendererContext> CreateIslandsRendererContext() {
-    QVulkanInstance vulkan_instance;
-    vulkan_instance.setLayers(QByteArrayList() << "VK_LAYER_GOOGLE_threading"
-                                               << "VK_LAYER_LUNARG_parameter_validation"
-                                               << "VK_LAYER_LUNARG_object_tracker"
-                                               << "VK_LAYER_LUNARG_core_validation"
-                                               << "VK_LAYER_LUNARG_image"
-                                               << "VK_LAYER_LUNARG_swapchain"
-                                               << "VK_LAYER_GOOGLE_unique_objects");
-    bool instance_created = vulkan_instance.create();
+    auto context = std::make_unique<IslandsRendererContext>();
+
+    context->vulkan_instance.setLayers(QByteArrayList() << "VK_LAYER_GOOGLE_threading"
+                                                        << "VK_LAYER_LUNARG_parameter_validation"
+                                                        << "VK_LAYER_LUNARG_object_tracker"
+                                                        << "VK_LAYER_LUNARG_core_validation"
+                                                        << "VK_LAYER_LUNARG_image"
+                                                        << "VK_LAYER_LUNARG_swapchain"
+                                                        << "VK_LAYER_GOOGLE_unique_objects");
+    bool instance_created = context->vulkan_instance.create();
     assert(instance_created);
 
-    auto context = std::make_unique<IslandsRendererContext>();
-    context->display.setVulkanInstance(&vulkan_instance);
+    context->display.setVulkanInstance(&context->vulkan_instance);
 
     return context;
 }

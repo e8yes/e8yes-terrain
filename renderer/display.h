@@ -45,6 +45,9 @@ class IslandsRendererDisplay : public QVulkanWindow {
  * context.
  */
 struct IslandsRendererContext {
+    // Stores the global states of Vulkan for this particular renderer.
+    QVulkanInstance vulkan_instance;
+
     // A Qt-compatible window for displaying rendering result. Also, it internally contains a
     // renderer that responds to changes to the camera view and scene view.
     IslandsRendererDisplay display;
