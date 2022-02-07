@@ -34,13 +34,13 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 # Dependencies
-# Islands generator
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../generator/release/ -lislands_generator
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../generator/debug/ -lislands_generator
-else:unix: LIBS += -L$$OUT_PWD/../generator/ -lislands_generator
+# Islands procedural generator
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../procedural/release/ -lislands_procedural
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../procedural/debug/ -lislands_procedural
+else:unix: LIBS += -L$$OUT_PWD/../procedural/ -lislands_procedural
 
-INCLUDEPATH += $$PWD/../generator
-DEPENDPATH += $$PWD/../generator
+INCLUDEPATH += $$PWD/../procedural
+DEPENDPATH += $$PWD/../procedural
 
 # Islands renderer
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../renderer/release/ -lislands_renderer
