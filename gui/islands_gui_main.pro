@@ -57,3 +57,5 @@ else:unix: LIBS += -L$$OUT_PWD/../common/ -lislands_common
 
 INCLUDEPATH += $$PWD/../common
 DEPENDPATH += $$PWD/../common
+
+LIBS += -lvulkan

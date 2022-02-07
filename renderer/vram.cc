@@ -27,9 +27,8 @@
 #include "renderer/drawable.h"
 #include "renderer/projection.h"
 #include "renderer/scene.h"
-#include "renderer/vram.h"
-#define VMA_IMPLEMENTATION
 #include "renderer/vma/vk_mem_alloc.h"
+#include "renderer/vram.h"
 
 namespace e8 {
 namespace {

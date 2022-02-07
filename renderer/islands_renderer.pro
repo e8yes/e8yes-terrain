@@ -22,6 +22,7 @@ SOURCES += \
     projection.cc \
     renderer.cc \
     scene.cc \
+    vma/vk_mem_alloc.cc \
     vram.cc
 
 HEADERS += \
