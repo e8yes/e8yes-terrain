@@ -49,8 +49,9 @@ struct IslandsRendererContext {
     QVulkanInstance vulkan_instance;
 
     // A Qt-compatible window for displaying rendering result. Also, it internally contains a
-    // renderer that responds to changes to the camera view and scene view.
-    IslandsRendererDisplay display;
+    // renderer that responds to changes to the camera view and scene view. Note, this context
+    // structure doesn't own the display. The client is responsible for deleting the display object.
+    IslandsRendererDisplay *display;
 };
 
 /**

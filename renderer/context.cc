@@ -50,7 +50,8 @@ std::unique_ptr<IslandsRendererContext> CreateIslandsRendererContext() {
     bool instance_created = context->vulkan_instance.create();
     assert(instance_created);
 
-    context->display.setVulkanInstance(&context->vulkan_instance);
+    context->display = new IslandsRendererDisplay();
+    context->display->setVulkanInstance(&context->vulkan_instance);
 
     return context;
 }

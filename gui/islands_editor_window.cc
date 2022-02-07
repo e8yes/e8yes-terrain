@@ -27,7 +27,7 @@ IslandsEditorWindow::IslandsEditorWindow(e8::IslandsRendererContext *context, QW
     : QMainWindow(parent), ui_(std::make_unique<Ui::IslandsEditorWindow>()), context_(context) {
     ui_->setupUi(this);
 
-    QWidget *display_wrapper = QWidget::createWindowContainer(&context_->display);
+    QWidget *display_wrapper = QWidget::createWindowContainer(context_->display);
     ui_->central_layout->addWidget(display_wrapper, 5);
 }
 
