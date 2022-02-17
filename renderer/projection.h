@@ -23,10 +23,32 @@
 namespace e8 {
 
 /**
- * @brief The PerspectiveProjection class Represents the geometry and view transform of a
- * perspective projection.
+ * @brief The ProjectionInterface class Represents a general projection operation, expressed in
+ * terms of homogeneous transformations.
  */
-class PerspectiveProjection {
+class ProjectionInterface {
+  public:
+    ProjectionInterface();
+    ~ProjectionInterface();
+
+    /**
+     * @brief ViewTransform Transforms world space coordinates to view space coordinates, where they
+     * project towards the origin in the direction opposite of z axis.
+     */
+    virtual mat44 ViewTransform() const = 0;
+
+    /**
+     * @brief ProjectiveTransform Transforms view space coordinates to clip space (homogeneous)
+     * coordinates.
+     */
+    virtual mat44 ProjectiveTransform() const = 0;
+};
+
+/**
+ * @brief The PerspectiveProjection class Defines the geometry as well as view and projective
+ * transform of a perspective projection.
+ */
+class PerspectiveProjection : public ProjectionInterface {
   public:
     /**
      * @brief PerspectiveProjection Constructs a perspective transform by specifying its geometry
@@ -43,15 +65,14 @@ class PerspectiveProjection {
                           vec3 const &location, vec3 const &direction);
     ~PerspectiveProjection();
 
+    mat44 ViewTransform() const override;
+
+    mat44 ProjectiveTransform() const override;
+
     /**
      * @brief Frustum The frustum geometry of the perspective projection.
      */
     frustum const &Frustum() const;
-
-    /**
-     * @brief Transform The view transform of the perspective projection.
-     */
-    mat44 const &Transform() const;
 
   private:
     frustum frustum_;

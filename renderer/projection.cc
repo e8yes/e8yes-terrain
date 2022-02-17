@@ -20,6 +20,10 @@
 
 namespace e8 {
 
+ProjectionInterface::ProjectionInterface() {}
+
+ProjectionInterface::~ProjectionInterface() {}
+
 PerspectiveProjection::PerspectiveProjection(float near_clip, float far_clip, float width,
                                              float height, vec3 const &location,
                                              vec3 const &direction)
@@ -29,8 +33,10 @@ PerspectiveProjection::PerspectiveProjection(float near_clip, float far_clip, fl
 
 PerspectiveProjection::~PerspectiveProjection() {}
 
-frustum const &PerspectiveProjection::Frustum() const { return frustum_; }
+mat44 PerspectiveProjection::ViewTransform() const { return view_transform_; }
 
-mat44 const &PerspectiveProjection::Transform() const { return view_transform_; }
+mat44 PerspectiveProjection::ProjectiveTransform() const { return frustum_.projective_transform(); }
+
+frustum const &PerspectiveProjection::Frustum() const { return frustum_; }
 
 } // namespace e8
