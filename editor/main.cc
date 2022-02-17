@@ -21,24 +21,17 @@
 #include <thread>
 
 #include "editor/display_window.h"
-#include "editor/islands_editor_window.h"
-#include "renderer/context.h"
+#include "editor/editor_window.h"
 
 int main(int argc, char *argv[]) {
+    std::thread editor_thread(e8::RunIslandsEditorWindow, argc, argv);
     bool quit_display = false;
     std::thread display_thread(e8::RunIslandsDisplay, /*width=*/1024, /*height=*/768,
                                &quit_display);
 
-    QApplication a(argc, argv);
-
-    std::unique_ptr<e8::IslandsRendererContext> context = e8::CreateIslandsRendererContext();
-    IslandsEditorWindow w(context.get());
-    w.show();
-
-    int result = a.exec();
-
+    editor_thread.join();
     quit_display = true;
     display_thread.join();
 
-    return result;
+    return 0;
 }

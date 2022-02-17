@@ -30,19 +30,28 @@ class IslandsEditorWindow;
 }
 QT_END_NAMESPACE
 
+namespace e8 {
+
 /**
- * @brief The TerrainEditorWindow class
+ * @brief The IslandsEditorWindow class The editor panel.
  */
 class IslandsEditorWindow : public QMainWindow {
     Q_OBJECT
 
   public:
-    IslandsEditorWindow(e8::IslandsRendererContext *context, QWidget *parent = nullptr);
+    IslandsEditorWindow(QWidget *parent = nullptr);
     ~IslandsEditorWindow();
 
   private:
     std::unique_ptr<Ui::IslandsEditorWindow> ui_;
-
-    e8::IslandsRendererContext *context_;
 };
+
+/**
+ * @brief RunIslandsEditorWindow Runs the editor window. This function blocks until the editor
+ * window is closed.
+ */
+void RunIslandsEditorWindow(int argc, char *argv[]);
+
+} // namespace e8
+
 #endif // ISLANDS_EDITOR_WINDOW_H

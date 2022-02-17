@@ -17,15 +17,15 @@ INCLUDEPATH += ../
 
 SOURCES += \
     display_window.cc \
-    islands_editor_window.cc \
+    editor_window.cc \
     main.cc
 
 HEADERS += \
     display_window.h \
-    islands_editor_window.h
+    editor_window.h
 
 FORMS += \
-    islands_editor_window.ui
+    editor_window.ui
 
 TRANSLATIONS += \
     e8terrain_en_US.ts

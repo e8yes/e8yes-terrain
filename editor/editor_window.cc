@@ -19,16 +19,25 @@
 #include <QWidget>
 #include <memory>
 
-#include "editor/islands_editor_window.h"
-#include "renderer/context.h"
-#include "ui_islands_editor_window.h"
+#include "editor/editor_window.h"
+#include "ui_editor_window.h"
 
-IslandsEditorWindow::IslandsEditorWindow(e8::IslandsRendererContext *context, QWidget *parent)
-    : QMainWindow(parent), ui_(std::make_unique<Ui::IslandsEditorWindow>()), context_(context) {
+namespace e8 {
+
+IslandsEditorWindow::IslandsEditorWindow(QWidget *parent)
+    : QMainWindow(parent), ui_(std::make_unique<Ui::IslandsEditorWindow>()) {
     ui_->setupUi(this);
-
-    QWidget *display_wrapper = QWidget::createWindowContainer(context_->display);
-    ui_->central_layout->addWidget(display_wrapper, 5);
 }
 
 IslandsEditorWindow::~IslandsEditorWindow() {}
+
+void RunIslandsEditorWindow(int argc, char *argv[]) {
+    QApplication a(argc, argv);
+
+    IslandsEditorWindow w;
+    w.show();
+
+    a.exec();
+}
+
+} // namespace e8
