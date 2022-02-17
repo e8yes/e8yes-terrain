@@ -16,7 +16,6 @@
  */
 
 #include <QApplication>
-#include <QVulkanWindow>
 #include <memory>
 #include <thread>
 

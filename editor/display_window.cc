@@ -43,7 +43,8 @@ void RunIslandsDisplay(unsigned window_width, unsigned window_height, bool *quit
 
     SDL_Window *display_window = SDL_CreateWindow(
         /*title=*/kIslandsDisplayWindowTitle, /*x=*/SDL_WINDOWPOS_UNDEFINED,
-        /*y=*/SDL_WINDOWPOS_UNDEFINED, window_width, window_height, /*flags=*/SDL_WINDOW_VULKAN);
+        /*y=*/SDL_WINDOWPOS_UNDEFINED, window_width, window_height,
+        /*flags=*/SDL_WINDOW_ALWAYS_ON_TOP | SDL_WINDOW_VULKAN);
     assert(display_window != nullptr);
 
     RunDisplayLoop(quit_display);
