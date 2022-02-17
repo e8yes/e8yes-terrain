@@ -904,7 +904,7 @@ class frustum {
   public:
     frustum(float left, float right, float bottom, float top, float z_near, float z_far);
 
-    mat44 projective_transform();
+    mat44 projective_transform() const;
 
   private:
     float left;
@@ -918,7 +918,7 @@ class frustum {
 inline frustum::frustum(float left, float right, float top, float bottom, float z_near, float z_far)
     : left(left), right(right), top(top), bottom(bottom), z_near(z_near), z_far(z_far) {}
 
-inline mat44 frustum::projective_transform() {
+inline mat44 frustum::projective_transform() const {
     float a = 2 * z_near;
     float width = right - left;
     float height = top - bottom;
