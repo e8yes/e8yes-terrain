@@ -24,6 +24,9 @@
 #include <QVulkanWindow>
 #include <QVulkanWindowRenderer>
 #include <memory>
+#include <vulkan/vulkan.h>
+
+#include "renderer/vma/vk_mem_alloc.h"
 
 namespace e8 {
 
@@ -38,6 +41,21 @@ class IslandsRendererDisplay : public QVulkanWindow {
     ~IslandsRendererDisplay();
 
     QVulkanWindowRenderer *createRenderer() override;
+};
+
+/**
+ * @brief The VulkanContext struct A collection of Vulkan handles usable by all parts of the
+ * renderer.
+ */
+struct VulkanContext {
+    VulkanContext();
+    ~VulkanContext();
+
+    QVulkanInstance instance;
+    QVulkanDeviceFunctions *funcs;
+    VkDevice device;
+    VkCommandPool command_pool;
+    VmaAllocator allocator;
 };
 
 /**

@@ -23,6 +23,7 @@
 #include <QVulkanWindowRenderer>
 #include <cassert>
 #include <memory>
+#include <vulkan/vulkan.h>
 
 #include "renderer/context.h"
 #include "renderer/renderer.h"
@@ -36,6 +37,12 @@ IslandsRendererDisplay::~IslandsRendererDisplay() {}
 QVulkanWindowRenderer *IslandsRendererDisplay::createRenderer() {
     return new IslandsRenderer(this);
 }
+
+VulkanContext::VulkanContext()
+    : funcs(nullptr), device(VK_NULL_HANDLE), command_pool(VK_NULL_HANDLE),
+      allocator(VK_NULL_HANDLE) {}
+
+VulkanContext::~VulkanContext() {}
 
 std::unique_ptr<IslandsRendererContext> CreateIslandsRendererContext() {
     auto context = std::make_unique<IslandsRendererContext>();
