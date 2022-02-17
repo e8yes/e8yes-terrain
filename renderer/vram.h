@@ -68,11 +68,17 @@ class GeometryVramTransfer {
      * @brief The UploadResult struct Results of the Upload() call.
      */
     struct UploadResult {
+        UploadResult();
+        ~UploadResult();
+
         // A valid vertex buffer allocation if not null.
         std::optional<BufferUploadResult> vertex_buffer;
 
         // A valid index buffer allocation if not null.
         std::optional<BufferUploadResult> index_buffer;
+
+        // The integer type each index element uses in the upload.
+        VkIndexType index_element_type;
     };
 
     /**

@@ -75,7 +75,8 @@ class GeometryVramTransfer::GeometryVramTransferImpl {
                         std::optional<BufferUploadResult> *vertex_upload_result);
 
     bool UploadIndices(std::vector<PrimitiveIndices> const &indices, size_t num_vertices,
-                       std::optional<BufferUploadResult> *index_upload_result);
+                       std::optional<BufferUploadResult> *index_upload_result,
+                       VkIndexType *index_element_type);
 
   private:
     bool AllocateBuffer(unsigned new_size, VkBufferUsageFlags usage,
@@ -182,7 +183,7 @@ bool GeometryVramTransfer::GeometryVramTransferImpl::UploadVertices(
 
 bool GeometryVramTransfer::GeometryVramTransferImpl::UploadIndices(
     std::vector<PrimitiveIndices> const &indices, size_t num_vertices,
-    std::optional<BufferUploadResult> *index_upload_result) {
+    std::optional<BufferUploadResult> *index_upload_result, VkIndexType *index_element_type) {
     unsigned index_size = OptimalIndexSize(num_vertices);
     unsigned new_size = IndexBufferSize(indices, index_size);
     if (!this->AllocateBuffer(new_size, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, index_upload_result)) {
@@ -199,10 +200,13 @@ bool GeometryVramTransfer::GeometryVramTransferImpl::UploadIndices(
 
     if (index_size == sizeof(uint8_t)) {
         CopyIndices<uint8_t>(indices, index_buffer_region);
+        *index_element_type = VkIndexType::VK_INDEX_TYPE_UINT8_EXT;
     } else if (index_size == sizeof(uint16_t)) {
         CopyIndices<uint16_t>(indices, index_buffer_region);
+        *index_element_type = VkIndexType::VK_INDEX_TYPE_UINT16;
     } else if (index_size == sizeof(uint32_t)) {
         CopyIndices<uint32_t>(indices, index_buffer_region);
+        *index_element_type = VkIndexType::VK_INDEX_TYPE_UINT32;
     } else {
         assert(false);
     }
@@ -223,25 +227,30 @@ GeometryVramTransfer::GeometryVramTransfer(VmaAllocator allocator, unsigned capa
 
 GeometryVramTransfer::~GeometryVramTransfer() {}
 
+GeometryVramTransfer::UploadResult::UploadResult()
+    : index_element_type(VkIndexType::VK_INDEX_TYPE_MAX_ENUM) {}
+
+GeometryVramTransfer::UploadResult::~UploadResult() {}
+
 GeometryVramTransfer::UploadResult GeometryVramTransfer::Upload(IslandsDrawable const *drawable) {
-    auto it = pimpl_->Fetch(drawable);
-    if (!it->second.vertex_buffer.has_value() || !it->second.index_buffer.has_value()) {
+    auto &[_, cached_upload] = *pimpl_->Fetch(drawable);
+    if (!cached_upload.vertex_buffer.has_value() || !cached_upload.index_buffer.has_value()) {
         // Data has never been uploaded before.
-        pimpl_->UploadVertices(drawable->vertices, &it->second.vertex_buffer);
+        pimpl_->UploadVertices(drawable->vertices, &cached_upload.vertex_buffer);
         pimpl_->UploadIndices(drawable->indices, drawable->vertices.size(),
-                              &it->second.index_buffer);
-        return it->second;
+                              &cached_upload.index_buffer, &cached_upload.index_element_type);
+        return cached_upload;
     }
 
     switch (drawable->rigidity) {
     case IslandsDrawable::DEFORMABLE: {
-        pimpl_->UploadVertices(drawable->vertices, &it->second.vertex_buffer);
+        pimpl_->UploadVertices(drawable->vertices, &cached_upload.vertex_buffer);
         break;
     }
     case IslandsDrawable::TEARABLE: {
-        pimpl_->UploadVertices(drawable->vertices, &it->second.vertex_buffer);
+        pimpl_->UploadVertices(drawable->vertices, &cached_upload.vertex_buffer);
         pimpl_->UploadIndices(drawable->indices, drawable->vertices.size(),
-                              &it->second.index_buffer);
+                              &cached_upload.index_buffer, &cached_upload.index_element_type);
         break;
     }
     case IslandsDrawable::STATIC:
@@ -251,7 +260,7 @@ GeometryVramTransfer::UploadResult GeometryVramTransfer::Upload(IslandsDrawable 
     }
     }
 
-    return it->second;
+    return cached_upload;
 }
 
 } // namespace e8
