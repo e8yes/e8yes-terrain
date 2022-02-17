@@ -19,7 +19,7 @@
 #include <QVulkanWindow>
 #include <memory>
 
-#include "gui/islands_editor_window.h"
+#include "editor/islands_editor_window.h"
 #include "renderer/context.h"
 
 int main(int argc, char *argv[]) {
