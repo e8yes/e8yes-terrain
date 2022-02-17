@@ -121,6 +121,17 @@ struct IslandsDrawableLodInstance {
     mat44 transform;
 };
 
+/**
+ * @brief The IslandsDrawableInstance struct Stores references to a IslandsDrawableLodInstance.
+ */
+struct IslandsDrawableInstance {
+    // The drawable selected from a series of LODs.
+    IslandsDrawable const *drawable;
+
+    // The homogeneous transformation to be applied to the drawable's geometry.
+    mat44 const *transform;
+};
+
 // Uniquely identifies a scene object.
 using SceneObjectId = std::string;
 
