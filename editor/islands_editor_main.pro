@@ -16,10 +16,12 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 INCLUDEPATH += ../
 
 SOURCES += \
+    display_window.cc \
     islands_editor_window.cc \
     main.cc
 
 HEADERS += \
+    display_window.h \
     islands_editor_window.h
 
 FORMS += \
@@ -59,3 +61,4 @@ INCLUDEPATH += $$PWD/../common
 DEPENDPATH += $$PWD/../common
 
 LIBS += -lvulkan
+LIBS += -lSDL2

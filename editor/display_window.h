@@ -15,30 +15,21 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QApplication>
-#include <QVulkanWindow>
-#include <memory>
-#include <thread>
+#ifndef ISLANDS_EDITOR_DISPLAY_WINDOW_H
+#define ISLANDS_EDITOR_DISPLAY_WINDOW_H
 
-#include "editor/display_window.h"
-#include "editor/islands_editor_window.h"
-#include "renderer/context.h"
+namespace e8 {
 
-int main(int argc, char *argv[]) {
-    bool quit_display = false;
-    std::thread display_thread(e8::RunIslandsDisplay, /*width=*/1024, /*height=*/768,
-                               &quit_display);
+/**
+ * @brief RunIslandsDisplay Creates and runs a display task for visual presentation of the editor's
+ * current scene state. Note, this function blocks until quit_display is set to true.
+ *
+ * @param window_width The width of the display window.
+ * @param window_height The height of the display window.
+ * @param quit_display Allows to be set by a different thread to close the display.
+ */
+void RunIslandsDisplay(unsigned window_width, unsigned window_height, bool *quit_display);
 
-    QApplication a(argc, argv);
+} // namespace e8
 
-    std::unique_ptr<e8::IslandsRendererContext> context = e8::CreateIslandsRendererContext();
-    IslandsEditorWindow w(context.get());
-    w.show();
-
-    int result = a.exec();
-
-    quit_display = true;
-    display_thread.join();
-
-    return result;
-}
+#endif // ISLANDS_EDITOR_DISPLAY_WINDOW_H
