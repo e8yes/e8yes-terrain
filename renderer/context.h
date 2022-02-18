@@ -36,6 +36,8 @@ struct VulkanContext {
     VulkanContext();
     ~VulkanContext();
 
+    VulkanContext(VulkanContext const &) = delete;
+
     VkInstance instance;
     VkSurfaceKHR surface;
     std::vector<VkPhysicalDevice> physical_devices;
