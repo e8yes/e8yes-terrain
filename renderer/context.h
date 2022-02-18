@@ -18,30 +18,15 @@
 #ifndef ISLANDS_RENDERER_CONTEXT_H
 #define ISLANDS_RENDERER_CONTEXT_H
 
-#include <QObject>
-#include <QString>
-#include <QVulkanInstance>
-#include <QVulkanWindow>
-#include <QVulkanWindowRenderer>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_vulkan.h>
 #include <memory>
+#include <vector>
 #include <vulkan/vulkan.h>
 
 #include "renderer/vma/vk_mem_alloc.h"
 
 namespace e8 {
-
-/**
- * @brief The IslandsRendererDisplay class A Qt-compatible window for displaying rendering result.
- */
-class IslandsRendererDisplay : public QVulkanWindow {
-    Q_OBJECT
-
-  public:
-    IslandsRendererDisplay();
-    ~IslandsRendererDisplay();
-
-    QVulkanWindowRenderer *createRenderer() override;
-};
 
 /**
  * @brief The VulkanContext struct A collection of Vulkan handles usable by all parts of the
@@ -51,31 +36,31 @@ struct VulkanContext {
     VulkanContext();
     ~VulkanContext();
 
-    QVulkanInstance instance;
-    QVulkanDeviceFunctions *funcs;
+    VkInstance instance;
+    VkSurfaceKHR surface;
+    std::vector<VkPhysicalDevice> physical_devices;
+    VkPhysicalDevice selected_physical_device;
     VkDevice device;
+    VkQueue graphics_queue;
+    VkQueue present_queue;
+    VkSwapchainKHR swap_chain;
+    VkSurfaceFormatKHR swap_chain_image_format;
+    VkExtent2D swap_chain_image_extent;
+    std::vector<VkImage> swap_chain_images;
+    std::vector<VkImageView> swap_chain_image_views;
     VkCommandPool command_pool;
     VmaAllocator allocator;
+    VkFence frame_fence;
 };
 
 /**
- * @brief The IslandsRendererContext struct All rendering procedures will be derived from a renderer
- * context.
+ * @brief CreateVulkanContext Creates a collection of Vulkan handles with resonable configurations
+ * usable by all parts of the renderer.
+ *
+ * @param target_window The target window where the rendering result will be directed to.
+ * @return The context to be kept alive throughout the rendering process.
  */
-struct IslandsRendererContext {
-    // Stores the global states of Vulkan for this particular renderer.
-    QVulkanInstance vulkan_instance;
-
-    // A Qt-compatible window for displaying rendering result. Also, it internally contains a
-    // renderer that responds to changes to the camera view and scene view. Note, this context
-    // structure doesn't own the display. The client is responsible for deleting the display object.
-    IslandsRendererDisplay *display;
-};
-
-/**
- * @brief CreateIslandsRendererContext See above for what a renderer context contains.
- */
-std::unique_ptr<IslandsRendererContext> CreateIslandsRendererContext();
+std::unique_ptr<VulkanContext> CreateVulkanContext(SDL_Window *target_window);
 
 } // namespace e8
 
