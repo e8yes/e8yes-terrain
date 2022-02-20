@@ -18,8 +18,6 @@
 #ifndef ISLANDS_RENDERER_PIPELINE_COMMON_H
 #define ISLANDS_RENDERER_PIPELINE_COMMON_H
 
-#include <chrono>
-#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
@@ -27,9 +25,7 @@
 #include <vulkan/vulkan.h>
 
 #include "renderer/context.h"
-#include "renderer/drawable.h"
 #include "renderer/vma/vk_mem_alloc.h"
-#include "renderer/vram.h"
 
 namespace e8 {
 
@@ -282,8 +278,6 @@ struct RenderPass {
  * always return a valid RenderPass structure. Any failure occurs during the render pass creation
  * will make it fail.
  *
- * @param output_width  The width, in pixels, of the target rendering area.
- * @param output_height The height, in pixels, of the target rendering area.
  * @param color_attachment_descs Color attachments that will receive outputs of a render pass.
  * @param depth_attachment_desc The depth attachment for depth buffering. This argument is required
  * when depth test is enabled in the FixedStageConfig.
@@ -301,7 +295,7 @@ CreateRenderPass(std::vector<VkAttachmentDescription> const &color_attachment_de
  */
 struct GraphicsPipeline {
     /**
-     * @brief Pipeline Should be created only by calling CreatePipeline().
+     * @brief GraphicsPipeline Should be created only by calling CreatePipeline().
      */
     explicit GraphicsPipeline(VulkanContext *context);
     ~GraphicsPipeline();
@@ -333,6 +327,55 @@ std::unique_ptr<GraphicsPipeline>
 CreateGraphicsPipeline(RenderPass const &render_pass, ShaderStages const &shader_stages,
                        ShaderUniformLayout const &uniform_layout, VertexInputInfo const &inputs,
                        FixedStageConfig const &fixed_stage_config, VulkanContext *context);
+
+/**
+ * @brief The FrameBuffer struct A frame buffer stores the output of a render pass. It
+ * will clean up the frame buffer resource by the end of its lifecycle.
+ */
+struct FrameBuffer {
+    /**
+     * @brief FrameBuffer Should be created only by calling CreateFrameBuffer().
+     */
+    FrameBuffer(unsigned width, unsigned height, VulkanContext *context);
+    ~FrameBuffer();
+
+    FrameBuffer(FrameBuffer const &) = delete;
+    FrameBuffer(FrameBuffer &&) = delete;
+
+    // A full Vulkan object storing information of a frame buffer.
+    VkFramebuffer buffer;
+
+    // The dimension of the frame buffer.
+    unsigned width;
+    unsigned height;
+
+    // The values frame buffer attachments will be initialized to at the beginning of a render pass.
+    std::vector<VkClearValue> clear_values;
+
+    // Contextual Vulkan handles.
+    VulkanContext *context_;
+};
+
+/**
+ * @brief CreateFrameBuffer Creates a frame buffer for storing the output of a render pass. This
+ * function will always return a valid FrameBuffer structure. Any failure occurs during the frame
+ * buffer creation will make it fail.
+ *
+ * @param render_pass The render pass where the frame buffer associates to.
+ * @param width The width, in pixels, of the target rendering area.
+ * @param height The height, in pixels, of the target rendering area.
+ * @param color_attachments The set of image view of the color attachments the frame buffer
+ * contains.
+ * @param depth_attachment The image view of the depth attachment, if there is any, the frame buffer
+ * contains.
+ * @param context Contextual Vulkan handles.
+ * @return A valid unique pointer to the FrameBuffer structure.
+ */
+std::unique_ptr<FrameBuffer> CreateFrameBuffer(RenderPass const &render_pass, unsigned width,
+                                               unsigned height,
+                                               std::vector<VkImageView> const &color_attachments,
+                                               std::optional<VkImageView> const &depth_attachment,
+                                               VulkanContext *context);
 
 } // namespace e8
 
