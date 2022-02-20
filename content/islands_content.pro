@@ -1,7 +1,7 @@
-QT += widgets
+CONFIG -= qt
 
 TEMPLATE = lib
-DEFINES += ISLANDS_RENDERER_LIBRARY
+DEFINES += ISLANDS_CONTENT_LIBRARY
 
 CONFIG += c++17
 
@@ -17,25 +17,10 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 INCLUDEPATH += ../
 
 SOURCES += \
-    context.cc \
-    pipeline_common.cc \
-    pipeline_depth_map.cc \
-    projection.cc \
-    render_pass.cc \
-    renderer_solid_color.cc \
-    scene.cc \
-    vma/vk_mem_alloc.cc \
-    vram.cc
+    drawable.cc
 
 HEADERS += \
-    context.h \
-    pipeline_common.h \
-    pipeline_depth_map.h \
-    projection.h \
-    render_pass.h \
-    renderer_solid_color.h \
-    scene.h \
-    vram.h
+    drawable.h
 
 # Default rules for deployment.
 unix {

@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_DRAWABLE_H
-#define ISLANDS_RENDERER_DRAWABLE_H
+#ifndef ISLANDS_CONTENT_DRAWABLE_H
+#define ISLANDS_CONTENT_DRAWABLE_H
 
 #include <memory>
 #include <optional>
@@ -148,4 +148,4 @@ struct SceneObject {
 
 } // namespace e8
 
-#endif // ISLANDS_RENDERER_DRAWABLE_H
+#endif // ISLANDS_CONTENT_DRAWABLE_H

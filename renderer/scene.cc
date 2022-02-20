@@ -17,7 +17,7 @@
 
 #include "renderer/scene.h"
 #include "common/tensor.h"
-#include "renderer/drawable.h"
+#include "content/drawable.h"
 
 namespace e8 {
 

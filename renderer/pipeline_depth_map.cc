@@ -24,8 +24,8 @@
 #include <vulkan/vulkan.h>
 
 #include "common/tensor.h"
+#include "content/drawable.h"
 #include "renderer/context.h"
-#include "renderer/drawable.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/pipeline_depth_map.h"
 #include "renderer/projection.h"
@@ -136,18 +136,17 @@ DepthMapPipeline::FutureResult::FutureResult(FrameBufferAttachment const &depth_
 
 DepthMapPipeline::FutureResult::~FutureResult() {}
 
-DepthMapPipeline::FutureResult
-DepthMapPipeline::Run(std::vector<DrawableInstance> const &drawables,
-                      ProjectionInterface const &projection, GpuBarrier const &barrier,
-                      GeometryVramTransfer *geo_vram) {
+DepthMapPipeline::FutureResult DepthMapPipeline::Run(std::vector<DrawableInstance> const &drawables,
+                                                     ProjectionInterface const &projection,
+                                                     GpuBarrier const &barrier,
+                                                     GeometryVramTransfer *geo_vram) {
     VkCommandBuffer cmds =
         StartRenderPass(pimpl_->GetRenderPass(), pimpl_->GetFrameBuffer(), pimpl_->context);
 
     ShaderUniformLayout const &uniform_layout = pimpl_->GetUniformLayout();
     RenderDrawables(
         drawables, pimpl_->GetGraphicsPipeline(),
-        [&projection, &uniform_layout](DrawableInstance const &drawable,
-                                       VkCommandBuffer cmds) {
+        [&projection, &uniform_layout](DrawableInstance const &drawable, VkCommandBuffer cmds) {
             mat44 model_view_proj = projection.ProjectiveTransform() * projection.ViewTransform() *
                                     (*drawable.transform);
             PushConstants push_constants(model_view_proj);

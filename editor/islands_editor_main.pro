@@ -52,6 +52,14 @@ else:unix: LIBS += -L$$OUT_PWD/../renderer/ -lislands_renderer
 INCLUDEPATH += $$PWD/../renderer
 DEPENDPATH += $$PWD/../renderer
 
+# Islands content.
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../content/release/ -lislands_content
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../content/debug/ -lislands_content
+else:unix: LIBS += -L$$OUT_PWD/../content/ -lislands_content
+
+INCLUDEPATH += $$PWD/../content
+DEPENDPATH += $$PWD/../content
+
 # Islands common
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../common/release/ -lislands_common
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../common/debug/ -lislands_common
@@ -60,5 +68,5 @@ else:unix: LIBS += -L$$OUT_PWD/../common/ -lislands_common
 INCLUDEPATH += $$PWD/../common
 DEPENDPATH += $$PWD/../common
 
-LIBS += -lvulkan
 LIBS += -lSDL2
+LIBS += -lvulkan

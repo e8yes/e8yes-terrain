@@ -135,8 +135,7 @@ std::unique_ptr<GpuBarrier> FinishRenderPass(VkCommandBuffer cmds, GpuBarrier co
 
 // Represents a function which sets the value of uniform variables for drawing the particular
 // drawable.
-using SetUniformsFn =
-    std::function<void(IslandsDrawableInstance const &drawable, VkCommandBuffer cmds)>;
+using SetUniformsFn = std::function<void(DrawableInstance const &drawable, VkCommandBuffer cmds)>;
 
 /**
  * @brief RenderDrawables Renders an array of drawables with the specified graphics pipeline. Note,

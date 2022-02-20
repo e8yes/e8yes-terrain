@@ -15,6 +15,6 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "renderer/drawable.h"
+#include "content/drawable.h"
 
 namespace e8 {} // namespace e8

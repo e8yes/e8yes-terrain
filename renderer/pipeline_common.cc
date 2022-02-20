@@ -24,8 +24,8 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
+#include "content/drawable.h"
 #include "renderer/context.h"
-#include "renderer/drawable.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/vma/vk_mem_alloc.h"
 

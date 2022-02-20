@@ -24,8 +24,8 @@
 #include <vector>
 
 #include "common/tensor.h"
+#include "content/drawable.h"
 #include "renderer/context.h"
-#include "renderer/drawable.h"
 #include "renderer/projection.h"
 #include "renderer/scene.h"
 #include "renderer/vram.h"
@@ -68,8 +68,7 @@ class GeometryVramTransfer::GeometryVramTransferImpl {
   public:
     GeometryVramTransferImpl(unsigned capacity, VulkanContext *context);
 
-    std::unordered_map<Drawable const *, UploadResult>::iterator
-    Fetch(Drawable const *drawable);
+    std::unordered_map<Drawable const *, UploadResult>::iterator Fetch(Drawable const *drawable);
 
     bool UploadVertices(std::vector<PrimitiveVertex> const &vertices,
                         std::optional<BufferUploadResult> *vertex_upload_result);

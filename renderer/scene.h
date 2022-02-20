@@ -19,7 +19,7 @@
 #define ISLANDS_RENDERER_SCENE_H
 
 #include "common/tensor.h"
-#include "renderer/drawable.h"
+#include "content/drawable.h"
 
 namespace e8 {
 
