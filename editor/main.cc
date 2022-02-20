@@ -19,13 +19,16 @@
 #include <memory>
 #include <thread>
 
+#include "content/scene_linear.h"
 #include "editor/display_window.h"
 #include "editor/editor_window.h"
 
 int main(int argc, char *argv[]) {
+    auto scene = std::make_unique<e8::LinearScene>();
+
     std::thread editor_thread(e8::RunIslandsEditorWindow, argc, argv);
     bool quit_display = false;
-    std::thread display_thread(e8::RunIslandsDisplay, /*width=*/1024, /*height=*/768,
+    std::thread display_thread(e8::RunIslandsDisplay, *scene, /*width=*/1024, /*height=*/768,
                                &quit_display);
 
     editor_thread.join();

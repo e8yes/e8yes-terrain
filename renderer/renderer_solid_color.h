@@ -21,6 +21,7 @@
 #include <memory>
 
 #include "common/tensor.h"
+#include "content/scene.h"
 #include "renderer/context.h"
 
 namespace e8 {
@@ -40,10 +41,10 @@ class SolidColorRenderer {
     ~SolidColorRenderer();
 
     /**
-     * @brief DrawFrame Draws a new frame filled with the specified color to the currently available
-     * swap chain image.
+     * @brief DrawFrame Draws a new frame filled with the scene's background color to the currently
+     * available swap chain image.
      */
-    void DrawFrame(vec3 const &color);
+    void DrawFrame(SceneInterface const &scene);
 
   private:
     class SolidColorRendererImpl;

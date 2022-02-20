@@ -19,12 +19,14 @@ INCLUDEPATH += ../
 SOURCES += \
     drawable.cc \
     entity.cc \
-    scene.cc
+    scene.cc \
+    scene_linear.cc
 
 HEADERS += \
     drawable.h \
     entity.h \
-    scene.h
+    scene.h \
+    scene_linear.h
 
 # Default rules for deployment.
 unix {

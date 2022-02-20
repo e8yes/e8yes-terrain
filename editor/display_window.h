@@ -18,17 +18,21 @@
 #ifndef ISLANDS_EDITOR_DISPLAY_WINDOW_H
 #define ISLANDS_EDITOR_DISPLAY_WINDOW_H
 
+#include "content/scene.h"
+
 namespace e8 {
 
 /**
  * @brief RunIslandsDisplay Creates and runs a display task for visual presentation of the editor's
  * current scene state. Note, this function blocks until quit_display is set to true.
  *
+ * @param scene The content source the display draws from and renders.
  * @param window_width The width of the display window.
  * @param window_height The height of the display window.
  * @param quit_display Allows to be set by a different thread to close the display.
  */
-void RunIslandsDisplay(unsigned window_width, unsigned window_height, bool *quit_display);
+void RunIslandsDisplay(SceneInterface const &scene, unsigned window_width, unsigned window_height,
+                       bool *quit_display);
 
 } // namespace e8
 
