@@ -109,20 +109,8 @@ struct DrawableLod {
 };
 
 /**
- * @brief The DrawableLodInstance struct An object with information derived from a drawable. This is
- * what actually gets rendered. It allows a large number of same objects to be placed at different
- * location of the scene with sharing the same information.
- */
-struct DrawableLodInstance {
-    // The drawable information the instance is derived from.
-    std::shared_ptr<DrawableLod> drawable;
-
-    // The homogeneous transformation to be applied to the drawable's geometry.
-    mat44 transform;
-};
-
-/**
- * @brief The DrawableInstance struct Stores references to a DrawableLodInstance.
+ * @brief The DrawableInstance struct Stores references to a drawable. This instanced drawable is
+ * what get actually rendered.
  */
 struct DrawableInstance {
     // The drawable selected from a series of LODs.

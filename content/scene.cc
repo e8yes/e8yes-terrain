@@ -15,14 +15,30 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "content/scene.h"
-#include "common/tensor.h"
+#include <functional>
+#include <unordered_map>
+#include <vector>
+
 #include "content/drawable.h"
+#include "content/entity.h"
+#include "content/scene.h"
 
 namespace e8 {
 
 SceneInterface::SceneInterface() {}
 
 SceneInterface::~SceneInterface() {}
+
+bool SceneInterface::AddSceneObject(SceneObject const &scene_object) {
+    return scene_objects_.insert(std::make_pair(scene_object.id, scene_object)).second;
+}
+
+bool SceneInterface::DeleteSceneObject(SceneObjectId const &id) {
+    return 1 == scene_objects_.erase(id);
+}
+
+std::unordered_map<SceneObjectId, SceneObject> const &SceneInterface::AllSceneObjects() const {
+    return scene_objects_;
+}
 
 } // namespace e8

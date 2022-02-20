@@ -18,56 +18,79 @@
 #ifndef ISLANDS_RENDERER_SCENE_H
 #define ISLANDS_RENDERER_SCENE_H
 
+#include <functional>
+#include <unordered_map>
+#include <vector>
+
 #include "common/tensor.h"
 #include "content/entity.h"
 
 namespace e8 {
 
 /**
- * @brief The SceneInterface class Represents a thread-safe container for efficient scene object
- * storage and query.
+ * @brief The SceneInterface class a container for efficient scene object storage and query. This
+ * container isn't thread-safe.
  */
 class SceneInterface {
   public:
     SceneInterface();
-    ~SceneInterface();
+    virtual ~SceneInterface();
 
     /**
-     * @brief AddDrawable Adds a new drawable to the scene.
+     * @brief AddEntity Adds a new entity to the scene.
      *
-     * @param drawable The drawable to be added.
-     * @return true only if the drawable has not been added to the scene.
+     * @param entity The entity to be added.
+     * @return true only if the entity has not been added to the scene.
      */
-    virtual bool AddDrawable(std::shared_ptr<DrawableLod> const &drawable) = 0;
+    virtual bool AddEntity(SceneEntity const &entity) const = 0;
 
     /**
-     * @brief Drawable Finds drawable by ID. If the drawable doesn't exist, it returns a nullptr.
+     * @brief DeleteEntity Deletes a scene entity by its ID. It returns true only when the entity
+     * exists.
      */
-    virtual std::shared_ptr<DrawableLod> FindDrawable(DrawableId const &id) const = 0;
+    virtual bool DeleteEntity(SceneEntityId const &id) = 0;
+
+    /**
+     * @brief FindEntity Finds a scene entity by its ID. It return a nullptr if it doesn't exist.
+     */
+    virtual SceneEntity const *FindEntity(SceneEntityId const &id) const = 0;
+
+    // Defines a query function which judges upon the bounding box to determine whether the content
+    // in the box should be included in the result list.
+    using QueryFn = std::function<bool(aabb const &bounding_box, mat44 const &transform)>;
+
+    /**
+     * @brief QueryEntities Selects the entities that satisfy the query function.
+     *
+     * @param query_fn See above for its definition.
+     * @return An array of entities selected.
+     */
+    virtual std::vector<SceneEntity const *> QueryEntities(QueryFn query_fn) const = 0;
 
     /**
      * @brief AddSceneObject Adds a new scene object to the scene if it has not already been added.
-     * Otherwise, it will do nothing.
+     * Otherwise, it will do nothing. The caller must ensures the entities grouped by the scene
+     * object must have been added to the scene via the AddEntity() call, or else, this function
+     * will fail.
      *
      * @param scene_object The scene object to be moved into the scene.
      * @return true only if the scene object has not been added to the scene.
      */
-    virtual bool AddSceneObject(SceneObject &&scene_object) = 0;
+    bool AddSceneObject(SceneObject const &scene_object);
 
     /**
-     * @brief FindDrawableInstances Filters drawable instances by the frustum area specified. A
-     * drawable instance' bounding box must fall within the frustum for it to be selected.
-     *
-     * @param f Defines the frustum area.
-     * @return All the selected instances.
+     * @brief DeleteSceneObject Deletes a scene object by ID. It returns true if the scene object
+     * exists.
      */
-    virtual std::vector<DrawableLodInstance *> FindDrawableInstances(frustum const &f) const = 0;
+    bool DeleteSceneObject(SceneObjectId const &id);
 
     /**
-     * @brief AllDrawableInstances Returns all the drawable instances that have been added to this
-     * scene.
+     * @brief AllSceneObjects Returns a list of all scene objects added to the scene.
      */
-    virtual std::vector<DrawableLodInstance *> AllDrawableInstances() const = 0;
+    std::unordered_map<SceneObjectId, SceneObject> const &AllSceneObjects() const;
+
+  private:
+    std::unordered_map<SceneObjectId, SceneObject> scene_objects_;
 };
 
 } // namespace e8

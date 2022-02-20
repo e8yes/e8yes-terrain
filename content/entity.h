@@ -15,18 +15,23 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ENTITY_H
-#define ENTITY_H
+#ifndef ISLANDS_CONTENT_ENTITY_H
+#define ISLANDS_CONTENT_ENTITY_H
 
+#include <memory>
 #include <optional>
 #include <string>
 
+#include "common/tensor.h"
 #include "content/drawable.h"
 
 namespace e8 {
 
 // Uniquely identifies a scene entity.
 using SceneEntityId = std::string;
+
+// Represents a descriptive human readable name of a scene entity.
+using SceneEntityName = std::string;
 
 /**
  * @brief The SceneEntity struct A scene entity is the smallest unit of information holder that
@@ -41,12 +46,26 @@ struct SceneEntity {
     // ID of this scene entity.
     SceneEntityId id;
 
-    // The drawable information.
-    std::unique_ptr<DrawableLodInstance> drawable_lod_instance;
+    // Human readable name of this scene entity.
+    SceneEntityName name;
+
+    // Indicates if the entity is movable.
+    bool movable;
+
+    // The homogeneous transformation to be applied to this entity's geometry.
+    mat44 transform;
+
+    // A drawable instance with information derived from a drawable. A shared pointer allows a large
+    // number of same drawables to be placed at different location of the scene with shared
+    // information.
+    std::shared_ptr<DrawableLod> drawable_lod_instance;
 };
 
 // Uniquely identifies a scene object.
 using SceneObjectId = std::string;
+
+// Represents a descriptive human readable name of a scene object.
+using SceneObjectName = std::string;
 
 /**
  * @brief The SceneObject struct It logically groups a set of entities.
@@ -55,10 +74,13 @@ struct SceneObject {
     // ID of this scene object.
     SceneObjectId id;
 
+    // Human readable name of this scene object.
+    SceneObjectName name;
+
     // The entity group that constitutes this scene object.
-    std::vector<SceneEntity *> entities;
+    std::vector<SceneObjectId> entities;
 };
 
 } // namespace e8
 
-#endif // ENTITY_H
+#endif // ISLANDS_CONTENT_ENTITY_H
