@@ -199,6 +199,61 @@ std::unique_ptr<FixedStageConfig> CreateFixedStageConfig(VkPolygonMode polygon_m
                                                          unsigned render_target_width,
                                                          unsigned render_target_height);
 
+/**
+ * @brief The FrameBufferAttachment struct Stores the content of a frame buffer attachment,
+ * including its memory block.
+ */
+struct FrameBufferAttachment {
+    /**
+     * @brief FrameBufferAttachmentInfo Should be created only by calling
+     * CreateColorAttachmentsForSwapChain() or CreateDepthAttachment.
+     */
+    FrameBufferAttachment(bool swap_chain_image, VulkanContext *context);
+    ~FrameBufferAttachment();
+
+    FrameBufferAttachment(FrameBufferAttachment const &) = delete;
+    FrameBufferAttachment(FrameBufferAttachment &&) = delete;
+
+    // Indicates if the underlying image is created along with the swap chain.
+    bool swap_chain_image;
+
+    // The memory block which holds the actual image data.
+    VkImage image;
+    VmaAllocation allocation;
+
+    // Allows the attachment to be referred to in a frame buffer.
+    VkImageView view;
+
+    // Allows the attachment to be referred to in a render pass.
+    VkAttachmentDescription desc;
+
+    // Contextual Vulkan handles.
+    VulkanContext *context_;
+};
+
+/**
+ * @brief CreateColorAttachmentsForSwapChain Creates a series of frame buffer color attachments for
+ * swap chain images.
+ *
+ * @param context Contextual Vulkan handles.
+ * @return An array of frame buffer attachments each of which points to an image in the swap chain,
+ * indexed by swap chain image index.
+ */
+std::vector<std::unique_ptr<FrameBufferAttachment>>
+CreateColorAttachmentsForSwapChain(VulkanContext *context);
+
+/**
+ * @brief CreateDepthAttachment Creates a depth attachment and allocates an image for depth
+ * buffering.
+ *
+ * @param width The width, in pixels, of the depth buffer.
+ * @param height The height, in pixels, of the depth buffer.
+ * @param context Contextual Vulkan handles.
+ * @return A valid unique pointer to the FrameBufferAttachment structure.
+ */
+std::unique_ptr<FrameBufferAttachment> CreateDepthAttachment(unsigned width, unsigned height,
+                                                             VulkanContext *context);
+
 } // namespace e8
 
 #endif // ISLANDS_RENDERER_PIPELINE_COMMON_H
