@@ -328,4 +328,62 @@ std::unique_ptr<FrameBufferAttachment> CreateDepthAttachment(unsigned width, uns
     return info;
 }
 
+RenderPass::RenderPass(VulkanContext *context) : pass(VK_NULL_HANDLE), context_(context) {}
+
+RenderPass::~RenderPass() { vkDestroyRenderPass(context_->device, pass, /*pAllocator=*/nullptr); }
+
+std::unique_ptr<RenderPass>
+CreateRenderPass(std::vector<VkAttachmentDescription> const &color_attachment_descs,
+                 std::optional<VkAttachmentDescription> const &depth_attachment_desc,
+                 VulkanContext *context) {
+    auto info = std::make_unique<RenderPass>(context);
+
+    // Creates render pass & subpass.
+    VkSubpassDescription subpass{};
+    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+
+    // Collects and sets attachment references.
+    std::vector<VkAttachmentReference> color_attachment_refs;
+    for (unsigned i = 0; i < color_attachment_descs.size(); ++i) {
+        VkAttachmentReference color_attachment_ref{};
+        color_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        color_attachment_ref.attachment = i;
+
+        color_attachment_refs.push_back(color_attachment_ref);
+    }
+    if (!color_attachment_refs.empty()) {
+        subpass.pColorAttachments = color_attachment_refs.data();
+        subpass.colorAttachmentCount = color_attachment_refs.size();
+    }
+
+    VkAttachmentReference depth_attachment_ref{};
+    if (depth_attachment_desc.has_value()) {
+        depth_attachment_ref.attachment = color_attachment_descs.size();
+        depth_attachment_ref.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+        subpass.pDepthStencilAttachment = &depth_attachment_ref;
+    }
+
+    VkRenderPassCreateInfo render_pass_info{};
+    render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    render_pass_info.pSubpasses = &subpass;
+    render_pass_info.subpassCount = 1;
+
+    // Collects and sets attachment descriptions.
+    std::vector<VkAttachmentDescription> attachment_descs(color_attachment_descs.begin(),
+                                                          color_attachment_descs.end());
+    if (depth_attachment_desc.has_value()) {
+        attachment_descs.push_back(*depth_attachment_desc);
+    }
+    if (!attachment_descs.empty()) {
+        render_pass_info.pAttachments = attachment_descs.data();
+        render_pass_info.attachmentCount = attachment_descs.size();
+    }
+
+    assert(VK_SUCCESS == vkCreateRenderPass(context->device, &render_pass_info,
+                                            /*pAllocator=*/nullptr, &info->pass));
+
+    return info;
+}
+
 } // namespace e8

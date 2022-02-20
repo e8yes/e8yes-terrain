@@ -201,7 +201,8 @@ std::unique_ptr<FixedStageConfig> CreateFixedStageConfig(VkPolygonMode polygon_m
 
 /**
  * @brief The FrameBufferAttachment struct Stores the content of a frame buffer attachment,
- * including its memory block.
+ * including its memory block. It will clean up the attachment image and image view resources by the
+ * end of its lifecycle.
  */
 struct FrameBufferAttachment {
     /**
@@ -233,7 +234,7 @@ struct FrameBufferAttachment {
 
 /**
  * @brief CreateColorAttachmentsForSwapChain Creates a series of frame buffer color attachments for
- * swap chain images.
+ * swap chain images. This function will always return a valid FrameBufferAttachment structure.
  *
  * @param context Contextual Vulkan handles.
  * @return An array of frame buffer attachments each of which points to an image in the swap chain,
@@ -244,7 +245,8 @@ CreateColorAttachmentsForSwapChain(VulkanContext *context);
 
 /**
  * @brief CreateDepthAttachment Creates a depth attachment and allocates an image for depth
- * buffering.
+ * buffering. This function will always return a valid FrameBufferAttachment structure. Any failure
+ * occurs during depth image/image view allocation will make it fail.
  *
  * @param width The width, in pixels, of the depth buffer.
  * @param height The height, in pixels, of the depth buffer.
@@ -253,6 +255,43 @@ CreateColorAttachmentsForSwapChain(VulkanContext *context);
  */
 std::unique_ptr<FrameBufferAttachment> CreateDepthAttachment(unsigned width, unsigned height,
                                                              VulkanContext *context);
+
+/**
+ * @brief The RenderPassInfo struct Stores a Vulkan object describing the render pass in a graphics
+ * pipeline. It will clean up the render pass resource by the end of its lifecycle.
+ */
+struct RenderPass {
+    /**
+     * @brief RenderPassInfo Should be created only by calling CreateRenderPass().
+     */
+    explicit RenderPass(VulkanContext *context);
+    ~RenderPass();
+
+    RenderPass(RenderPass const &) = delete;
+    RenderPass(RenderPass &&) = delete;
+
+    // A full Vulkan object storing information of a render pass.
+    VkRenderPass pass;
+
+    // Contextual Vulkan handles.
+    VulkanContext *context_;
+};
+
+/**
+ * @brief CreateRenderPass Creates a render pass that has exactly one sub-pass.
+ *
+ * @param output_width  The width, in pixels, of the target rendering area.
+ * @param output_height The height, in pixels, of the target rendering area.
+ * @param color_attachment_descs Color attachments that will receive outputs of a render pass.
+ * @param depth_attachment_desc The depth attachment for depth buffering. This argument is required
+ * when depth test is enabled in the FixedStageConfig.
+ * @param context Contextual Vulkan handles
+ * @return A valid unique pointer to the FrameBufferAttachment structure.
+ */
+std::unique_ptr<RenderPass>
+CreateRenderPass(std::vector<VkAttachmentDescription> const &color_attachment_descs,
+                 std::optional<VkAttachmentDescription> const &depth_attachment_desc,
+                 VulkanContext *context);
 
 } // namespace e8
 
