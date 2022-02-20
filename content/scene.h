@@ -20,6 +20,7 @@
 
 #include <functional>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "common/tensor.h"
@@ -42,7 +43,7 @@ class SceneInterface {
      * @param entity The entity to be added.
      * @return true only if the entity has not been added to the scene.
      */
-    virtual bool AddEntity(SceneEntity const &entity) const = 0;
+    virtual bool AddEntity(SceneEntity const &entity) = 0;
 
     /**
      * @brief DeleteEntity Deletes a scene entity by its ID. It returns true only when the entity
@@ -52,6 +53,8 @@ class SceneInterface {
 
     /**
      * @brief FindEntity Finds a scene entity by its ID. It return a nullptr if it doesn't exist.
+     * When it returns a non-null pointer, it's only valid before the next AddEntity() and
+     * DeleteEntity() call.
      */
     virtual SceneEntity const *FindEntity(SceneEntityId const &id) const = 0;
 
@@ -60,7 +63,8 @@ class SceneInterface {
     using QueryFn = std::function<bool(aabb const &bounding_box, mat44 const &transform)>;
 
     /**
-     * @brief QueryEntities Selects the entities that satisfy the query function.
+     * @brief QueryEntities Selects the entities that satisfy the query function. The pointers in
+     * the result array is only valid before the next AddEntity() and DeleteEntity() call.
      *
      * @param query_fn See above for its definition.
      * @return An array of entities selected.
@@ -98,6 +102,9 @@ class SceneInterface {
      * @brief BackgroundColor Returns the scene's current background color.
      */
     vec3 BackgroundColor() const;
+
+  protected:
+    std::unordered_set<SceneEntityId> _scene_entity_ids;
 
   private:
     std::unordered_map<SceneObjectId, SceneObject> scene_objects_;
