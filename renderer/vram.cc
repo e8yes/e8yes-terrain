@@ -27,7 +27,6 @@
 #include "content/drawable.h"
 #include "renderer/context.h"
 #include "renderer/projection.h"
-#include "renderer/scene.h"
 #include "renderer/vram.h"
 
 namespace e8 {

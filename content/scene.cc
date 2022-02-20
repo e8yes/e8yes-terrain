@@ -15,7 +15,7 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "renderer/scene.h"
+#include "content/scene.h"
 #include "common/tensor.h"
 #include "content/drawable.h"
 

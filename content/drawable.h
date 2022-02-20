@@ -132,20 +132,6 @@ struct DrawableInstance {
     mat44 const *transform;
 };
 
-// Uniquely identifies a scene object.
-using SceneObjectId = std::string;
-
-/**
- * @brief The SceneObject struct It logically groups a set of drawable instances.
- */
-struct SceneObject {
-    // ID of this scene object.
-    SceneObjectId id;
-
-    // The drawable group that constitutes this scene object.
-    std::vector<std::unique_ptr<DrawableLodInstance>> drawables;
-};
-
 } // namespace e8
 
 #endif // ISLANDS_CONTENT_DRAWABLE_H

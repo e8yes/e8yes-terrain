@@ -23,7 +23,6 @@ SOURCES += \
     projection.cc \
     render_pass.cc \
     renderer_solid_color.cc \
-    scene.cc \
     vma/vk_mem_alloc.cc \
     vram.cc
 
@@ -34,7 +33,6 @@ HEADERS += \
     projection.h \
     render_pass.h \
     renderer_solid_color.h \
-    scene.h \
     vram.h
 
 # Default rules for deployment.

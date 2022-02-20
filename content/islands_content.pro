@@ -17,10 +17,14 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 INCLUDEPATH += ../
 
 SOURCES += \
-    drawable.cc
+    drawable.cc \
+    entity.cc \
+    scene.cc
 
 HEADERS += \
-    drawable.h
+    drawable.h \
+    entity.h \
+    scene.h
 
 # Default rules for deployment.
 unix {
