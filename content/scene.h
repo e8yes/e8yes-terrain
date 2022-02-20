@@ -89,8 +89,19 @@ class SceneInterface {
      */
     std::unordered_map<SceneObjectId, SceneObject> const &AllSceneObjects() const;
 
+    /**
+     * @brief UpdateBackgroundColor Sets a new background color for the scene.
+     */
+    void UpdateBackgroundColor(vec3 const &color);
+
+    /**
+     * @brief BackgroundColor Returns the scene's current background color.
+     */
+    vec3 BackgroundColor() const;
+
   private:
     std::unordered_map<SceneObjectId, SceneObject> scene_objects_;
+    vec3 background_color_;
 };
 
 } // namespace e8

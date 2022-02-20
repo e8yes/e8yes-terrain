@@ -19,6 +19,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "common/tensor.h"
 #include "content/drawable.h"
 #include "content/entity.h"
 #include "content/scene.h"
@@ -40,5 +41,9 @@ bool SceneInterface::DeleteSceneObject(SceneObjectId const &id) {
 std::unordered_map<SceneObjectId, SceneObject> const &SceneInterface::AllSceneObjects() const {
     return scene_objects_;
 }
+
+void SceneInterface::UpdateBackgroundColor(vec3 const &color) { background_color_ = color; }
+
+vec3 SceneInterface::BackgroundColor() const { return background_color_; }
 
 } // namespace e8
