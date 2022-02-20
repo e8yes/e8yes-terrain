@@ -108,6 +108,50 @@ std::unique_ptr<StartFrameResult> StartFrame(VulkanContext *context);
 void EndFrame(GpuBarrier const &final_tasks, unsigned swap_chain_image_index,
               std::chrono::nanoseconds const &max_frame_duration, VulkanContext *context);
 
+/**
+ * @brief StartRenderPass Allocates a command buffer and makes preparation for the render pass.
+ *
+ * @param pass The render pass to run.
+ * @param frame_buffer The frame buffer to store the output of this render pass.
+ * @param context Contextual Vulkan handles.
+ * @return The allocated command buffer.
+ */
+VkCommandBuffer StartRenderPass(RenderPass const &pass, FrameBuffer const &frame_buffer,
+                                VulkanContext *context);
+
+/**
+ * @brief FinishRenderPass Submits the command buffer to the graphics queue and returns a barrier
+ * for this render pass.
+ *
+ * @param cmds The command buffer to be submitted.
+ * @param barrier Previous tasks' barrier to allow this render pass to be placed after.
+ * @param final Indicates if this render pass is the final task to wait for. This ensures
+ * EndFrame() ends the frame only after this render pass is finished.
+ * @param context Contextual Vulkan handles.
+ * @return The task barrier for this render pass.
+ */
+std::unique_ptr<GpuBarrier> FinishRenderPass(VkCommandBuffer cmds, GpuBarrier const &barrier,
+                                             bool final, VulkanContext *context);
+
+// Represents a function which sets the value of uniform variables for drawing the particular
+// drawable.
+using SetUniformsFn =
+    std::function<void(IslandsDrawableInstance const &drawable, VkCommandBuffer cmds)>;
+
+/**
+ * @brief RenderDrawables Renders an array of drawables with the specified graphics pipeline. Note,
+ * it doesn't actually draw the drawables but only adds Vulkan commands to the command buffer.
+ *
+ * @param drawables The array of drawables to be rendered.
+ * @param pipeline The graphics pipeline to use for the rendering.
+ * @param set_uniforms_fn A custom function to set uniform variables for drawing a drawable.
+ * @param geo_vram The geometry VRAM transferer.
+ * @param cmds The command buffer to which draw commands will be added.
+ */
+void RenderDrawables(std::vector<IslandsDrawableInstance> const &drawables,
+                     GraphicsPipeline const &pipeline, SetUniformsFn const &set_uniforms_fn,
+                     GeometryVramTransfer *geo_vram, VkCommandBuffer cmds);
+
 } // namespace e8
 
 #endif // ISLANDS_RENDERER_RENDER_PASS_H
