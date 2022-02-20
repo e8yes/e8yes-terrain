@@ -278,20 +278,61 @@ struct RenderPass {
 };
 
 /**
- * @brief CreateRenderPass Creates a render pass that has exactly one sub-pass.
+ * @brief CreateRenderPass Creates a render pass that has exactly one sub-pass. This function will
+ * always return a valid RenderPass structure. Any failure occurs during the render pass creation
+ * will make it fail.
  *
  * @param output_width  The width, in pixels, of the target rendering area.
  * @param output_height The height, in pixels, of the target rendering area.
  * @param color_attachment_descs Color attachments that will receive outputs of a render pass.
  * @param depth_attachment_desc The depth attachment for depth buffering. This argument is required
  * when depth test is enabled in the FixedStageConfig.
- * @param context Contextual Vulkan handles
+ * @param context Contextual Vulkan handles.
  * @return A valid unique pointer to the FrameBufferAttachment structure.
  */
 std::unique_ptr<RenderPass>
 CreateRenderPass(std::vector<VkAttachmentDescription> const &color_attachment_descs,
                  std::optional<VkAttachmentDescription> const &depth_attachment_desc,
                  VulkanContext *context);
+
+/**
+ * @brief The GraphicsPipeline struct Stores a Vulkan object describing the graphics pipeline. It
+ * will clean up the pipeline resource by the end of its lifecycle.
+ */
+struct GraphicsPipeline {
+    /**
+     * @brief Pipeline Should be created only by calling CreatePipeline().
+     */
+    explicit GraphicsPipeline(VulkanContext *context);
+    ~GraphicsPipeline();
+
+    GraphicsPipeline(GraphicsPipeline const &) = delete;
+    GraphicsPipeline(GraphicsPipeline &&) = delete;
+
+    // A full Vulkan object storing information of a graphics pipeline.
+    VkPipeline pipeline;
+
+    // Contextual Vulkan handles.
+    VulkanContext *context_;
+};
+
+/**
+ * @brief CreatePipeline Creates a graphics pipeline. This function will always return a valid
+ * GraphicsPipeline structure. Any failure occurs during the graphics pipeline creation will make it
+ * fail.
+ *
+ * @param render_pass The render pass which will be run after binding the pipeline.
+ * @param shader_stages The shader programs and stage description.
+ * @param inputs Description about the inputs to the vertex shader program.
+ * @param layout Layout of the uniform variables declared in the shader programs.
+ * @param fixed_stage_config Configurations of the fixed function stages.
+ * @param context Contextual Vulkan handles.
+ * @return A valid unique pointer to the GraphicsPipeline structure.
+ */
+std::unique_ptr<GraphicsPipeline>
+CreateGraphicsPipeline(RenderPass const &render_pass, ShaderStages const &shader_stages,
+                       ShaderUniformLayout const &uniform_layout, VertexInputInfo const &inputs,
+                       FixedStageConfig const &fixed_stage_config, VulkanContext *context);
 
 } // namespace e8
 
