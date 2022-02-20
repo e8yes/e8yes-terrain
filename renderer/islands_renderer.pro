@@ -19,8 +19,11 @@ INCLUDEPATH += ../
 SOURCES += \
     context.cc \
     drawable.cc \
+    pipeline_common.cc \
+    pipeline_depth_map.cc \
     projection.cc \
-    renderer.cc \
+    render_pass.cc \
+    renderer_solid_color.cc \
     scene.cc \
     vma/vk_mem_alloc.cc \
     vram.cc
@@ -28,8 +31,11 @@ SOURCES += \
 HEADERS += \
     context.h \
     drawable.h \
+    pipeline_common.h \
+    pipeline_depth_map.h \
     projection.h \
-    renderer.h \
+    render_pass.h \
+    renderer_solid_color.h \
     scene.h \
     vram.h
 
