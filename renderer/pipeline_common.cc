@@ -105,4 +105,39 @@ CreateShaderStages(std::string const &vertex_shader_file_path,
     return info;
 }
 
+ShaderUniformLayout::ShaderUniformLayout(VulkanContext *context)
+    : layout(VK_NULL_HANDLE), context_(context) {}
+
+ShaderUniformLayout::~ShaderUniformLayout() {
+    vkDestroyPipelineLayout(context_->device, layout, /*pAllocator=*/nullptr);
+}
+
+std::unique_ptr<ShaderUniformLayout>
+CreateShaderUniformLayout(std::optional<unsigned> const &push_constant_size,
+                          std::optional<VkShaderStageFlags> const &push_constant_accessible_stage,
+                          VulkanContext *context) {
+    auto info = std::make_unique<ShaderUniformLayout>(context);
+
+    VkPipelineLayoutCreateInfo layout_info{};
+    layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    layout_info.setLayoutCount = 0;
+    layout_info.pSetLayouts = nullptr;
+
+    VkPushConstantRange push_constant_range{};
+    if (push_constant_size.has_value()) {
+        assert(*push_constant_size > 0);
+        push_constant_range.offset = 0;
+        push_constant_range.size = *push_constant_size;
+        push_constant_range.stageFlags = *push_constant_accessible_stage;
+
+        layout_info.pPushConstantRanges = &push_constant_range;
+        layout_info.pushConstantRangeCount = 1;
+    }
+
+    assert(VK_SUCCESS == vkCreatePipelineLayout(context->device, &layout_info,
+                                                /*pAllocator=*/nullptr, &info->layout));
+
+    return info;
+}
+
 } // namespace e8

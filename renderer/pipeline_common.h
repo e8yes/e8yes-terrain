@@ -76,6 +76,47 @@ CreateShaderStages(std::string const &vertex_shader_file_path,
                    std::optional<std::string> const &fragment_shader_file_path,
                    VulkanContext *context);
 
+/**
+ * @brief The ShaderUniformLayoutInfo struct Stores a Vulkan object describing the layout of the
+ * uniform variables declared in the shader programs in a graphics pipeline.
+ */
+struct ShaderUniformLayout {
+    /**
+     * @brief ShaderUniformLayoutInfo Should be created only by calling CreateShaderUniformLayout().
+     */
+    explicit ShaderUniformLayout(VulkanContext *context);
+    ~ShaderUniformLayout();
+
+    ShaderUniformLayout(ShaderUniformLayout const &) = delete;
+    ShaderUniformLayout(ShaderUniformLayout &&) = delete;
+
+    // A full Vulkan object storing the layout of shader uniform variables.
+    VkPipelineLayout layout;
+
+    // Contextual Vulkan handles.
+    VulkanContext *context_;
+};
+
+/**
+ * @brief CreateShaderUniformLayout Gathers information about the layout of uniform variables
+ * declared in the shader programs in a graphics pipeline. Two types of uniform layouts are
+ * available: push constants and descriptor sets. In particular, only one push constant uniform
+ * variable is allowed, though it may be shared in both vertex and fragment shader programs.
+ *
+ * TODO: Allows descriptor set layout to be specified.
+ *
+ * @param push_constant_size The size (in bytes) of the push constant uniform variable if there is
+ * one. It must be greater than zero when specified.
+ * @param push_constant_accessible_stage If the argument push_constant_size is specified, the caller
+ * must also provide the stages where the uniform push constant variable is accessible.
+ * @param context Contextual Vulkan handles.
+ * @return A valid unique pointer to the ShaderUniformLayout structure.
+ */
+std::unique_ptr<ShaderUniformLayout>
+CreateShaderUniformLayout(std::optional<unsigned> const &push_constant_size,
+                          std::optional<VkShaderStageFlags> const &push_constant_accessible_stage,
+                          VulkanContext *context);
+
 } // namespace e8
 
 #endif // ISLANDS_RENDERER_PIPELINE_COMMON_H
