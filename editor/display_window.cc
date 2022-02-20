@@ -17,16 +17,21 @@
 
 #include <SDL2/SDL.h>
 #include <cassert>
+#include <memory>
 
 #include "editor/display_window.h"
+#include "renderer/context.h"
+#include "renderer/renderer_solid_color.h"
 
 namespace e8 {
 namespace {
 
 constexpr char const *kIslandsDisplayWindowTitle = "e8 islands display";
 
-void RunDisplayLoop(bool *quit_display) {
+void RunDisplayLoop(SolidColorRenderer *renderer, bool *quit_display) {
     while (!*quit_display) {
+        renderer->DrawFrame(vec3{1.0f, 0.0f, 0.0f});
+
         SDL_Event event;
         if (!SDL_PollEvent(&event)) {
             continue;
@@ -47,7 +52,13 @@ void RunIslandsDisplay(unsigned window_width, unsigned window_height, bool *quit
         /*flags=*/SDL_WINDOW_ALWAYS_ON_TOP | SDL_WINDOW_VULKAN);
     assert(display_window != nullptr);
 
-    RunDisplayLoop(quit_display);
+    {
+        // Initializes a renderer and renders the scene state continually.
+        std::unique_ptr<VulkanContext> context = CreateVulkanContext(display_window);
+        SolidColorRenderer renderer(context.get());
+
+        RunDisplayLoop(&renderer, quit_display);
+    }
 
     SDL_DestroyWindow(display_window);
 }
