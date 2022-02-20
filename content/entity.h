@@ -55,6 +55,9 @@ struct SceneEntity {
     // The homogeneous transformation to be applied to this entity's geometry.
     mat44 transform;
 
+    // An AABB bounding box surrounding the entity's geometry.
+    aabb bounding_box;
+
     // A drawable instance with information derived from a drawable. A shared pointer allows a large
     // number of same drawables to be placed at different location of the scene with shared
     // information.

@@ -95,9 +95,6 @@ struct DrawableLod {
     // ID of this drawable design.
     DrawableId id;
 
-    // An AABB bounding box surrounding the drawable's geometry.
-    aabb bounding_box;
-
     // LOD of this drawable design in descending level of detail.
     std::vector<Drawable> drawable_lod;
 
