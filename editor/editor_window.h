@@ -18,11 +18,12 @@
 #ifndef ISLANDS_EDITOR_WINDOW_H
 #define ISLANDS_EDITOR_WINDOW_H
 
+#include <QKeyEvent>
 #include <QMainWindow>
 #include <QWidget>
 #include <memory>
 
-#include "renderer/context.h"
+#include "content/scene.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -39,18 +40,22 @@ class IslandsEditorWindow : public QMainWindow {
     Q_OBJECT
 
   public:
-    IslandsEditorWindow(QWidget *parent = nullptr);
+    IslandsEditorWindow(SceneInterface *scene, QWidget *parent = nullptr);
     ~IslandsEditorWindow();
+
+    void keyPressEvent(QKeyEvent *event) override;
 
   private:
     std::unique_ptr<Ui::IslandsEditorWindow> ui_;
+
+    SceneInterface *scene_;
 };
 
 /**
  * @brief RunIslandsEditorWindow Runs the editor window. This function blocks until the editor
  * window is closed.
  */
-void RunIslandsEditorWindow(int argc, char *argv[]);
+void RunIslandsEditorWindow(SceneInterface *scene, int argc, char *argv[]);
 
 } // namespace e8
 

@@ -26,9 +26,9 @@
 int main(int argc, char *argv[]) {
     auto scene = std::make_unique<e8::LinearScene>();
 
-    std::thread editor_thread(e8::RunIslandsEditorWindow, argc, argv);
+    std::thread editor_thread(e8::RunIslandsEditorWindow, scene.get(), argc, argv);
     bool quit_display = false;
-    std::thread display_thread(e8::RunIslandsDisplay, *scene, /*width=*/1024, /*height=*/768,
+    std::thread display_thread(e8::RunIslandsDisplay, scene.get(), /*width=*/1024, /*height=*/768,
                                &quit_display);
 
     editor_thread.join();

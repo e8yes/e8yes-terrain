@@ -17,24 +17,62 @@
 
 #include <QMainWindow>
 #include <QWidget>
+#include <algorithm>
 #include <memory>
 
+#include "common/tensor.h"
 #include "editor/editor_window.h"
 #include "ui_editor_window.h"
 
 namespace e8 {
 
-IslandsEditorWindow::IslandsEditorWindow(QWidget *parent)
-    : QMainWindow(parent), ui_(std::make_unique<Ui::IslandsEditorWindow>()) {
+IslandsEditorWindow::IslandsEditorWindow(SceneInterface *scene, QWidget *parent)
+    : QMainWindow(parent), ui_(std::make_unique<Ui::IslandsEditorWindow>()), scene_(scene) {
     ui_->setupUi(this);
 }
 
 IslandsEditorWindow::~IslandsEditorWindow() {}
 
-void RunIslandsEditorWindow(int argc, char *argv[]) {
+void IslandsEditorWindow::keyPressEvent(QKeyEvent *event) {
+    vec3 current_color = scene_->BackgroundColor();
+
+    switch (event->key()) {
+    case Qt::Key_Up: {
+        current_color(0) = std::min(1.0f, current_color(0) + 0.01f);
+        break;
+    }
+    case Qt::Key_Down: {
+        current_color(0) = std::max(0.0f, current_color(0) - 0.01f);
+        break;
+    }
+    case Qt::Key_Right: {
+        current_color(1) = std::min(1.0f, current_color(1) + 0.01f);
+        break;
+    }
+    case Qt::Key_Left: {
+        current_color(1) = std::max(0.0f, current_color(1) - 0.01f);
+        break;
+    }
+    case Qt::Key_PageUp: {
+        current_color(2) = std::min(1.0f, current_color(2) + 0.01f);
+        break;
+    }
+    case Qt::Key_PageDown: {
+        current_color(2) = std::max(0.0f, current_color(2) - 0.01f);
+        break;
+    }
+    default: {
+        break;
+    }
+    }
+
+    scene_->UpdateBackgroundColor(current_color);
+}
+
+void RunIslandsEditorWindow(SceneInterface *scene, int argc, char *argv[]) {
     QApplication a(argc, argv);
 
-    IslandsEditorWindow w;
+    IslandsEditorWindow w(scene);
     w.show();
 
     a.exec();
