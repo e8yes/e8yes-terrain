@@ -24,10 +24,10 @@
 #include <vector>
 
 #include "common/tensor.h"
+#include "renderer/context.h"
 #include "renderer/drawable.h"
 #include "renderer/projection.h"
 #include "renderer/scene.h"
-#include "renderer/vma/vk_mem_alloc.h"
 #include "renderer/vram.h"
 
 namespace e8 {
@@ -66,7 +66,7 @@ void CopyIndices(std::vector<PrimitiveIndices> const &indices, void *target_memo
 
 class GeometryVramTransfer::GeometryVramTransferImpl {
   public:
-    GeometryVramTransferImpl(unsigned capacity, VmaAllocator allocator);
+    GeometryVramTransferImpl(unsigned capacity, VulkanContext *context);
 
     std::unordered_map<IslandsDrawable const *, UploadResult>::iterator
     Fetch(IslandsDrawable const *drawable);
@@ -83,14 +83,14 @@ class GeometryVramTransfer::GeometryVramTransferImpl {
                         std::optional<BufferUploadResult> *buffer_upload_result);
 
     std::unordered_map<IslandsDrawable const *, UploadResult> cache_;
-    VmaAllocator allocator_;
+    VulkanContext *context_;
     unsigned used_;
     unsigned const capacity_;
 };
 
 GeometryVramTransfer::GeometryVramTransferImpl::GeometryVramTransferImpl(unsigned capacity,
-                                                                         VmaAllocator allocator)
-    : allocator_(allocator), used_(0), capacity_(capacity) {}
+                                                                         VulkanContext *context)
+    : context_(context), used_(0), capacity_(capacity) {}
 
 std::unordered_map<IslandsDrawable const *, GeometryVramTransfer::UploadResult>::iterator
 GeometryVramTransfer::GeometryVramTransferImpl::Fetch(IslandsDrawable const *drawable) {
@@ -117,7 +117,7 @@ bool GeometryVramTransfer::GeometryVramTransferImpl::AllocateBuffer(
         assert(buffer_upload_result->value().buffer != nullptr);
         assert(buffer_upload_result->value().allocation != nullptr);
 
-        vmaDestroyBuffer(allocator_, buffer_upload_result->value().buffer,
+        vmaDestroyBuffer(context_->allocator, buffer_upload_result->value().buffer,
                          buffer_upload_result->value().allocation);
 
         used_ -= buffer_upload_result->value().size;
@@ -147,8 +147,8 @@ bool GeometryVramTransfer::GeometryVramTransferImpl::AllocateBuffer(
     allocation_info.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
 
     VkResult allocation_result = vmaCreateBuffer(
-        allocator_, &vertex_buffer_info, &allocation_info, &buffer_upload_result->value().buffer,
-        &buffer_upload_result->value().allocation, nullptr);
+        context_->allocator, &vertex_buffer_info, &allocation_info,
+        &buffer_upload_result->value().buffer, &buffer_upload_result->value().allocation, nullptr);
     if (allocation_result != VK_SUCCESS) {
         return false;
     }
@@ -168,15 +168,15 @@ bool GeometryVramTransfer::GeometryVramTransferImpl::UploadVertices(
 
     // Copies vertex data from CPU.
     void *vertex_buffer_region;
-    VkResult result =
-        vmaMapMemory(allocator_, vertex_upload_result->value().allocation, &vertex_buffer_region);
+    VkResult result = vmaMapMemory(context_->allocator, vertex_upload_result->value().allocation,
+                                   &vertex_buffer_region);
     if (result != VK_SUCCESS) {
         return false;
     }
 
     memcpy(vertex_buffer_region, vertices.data(), new_size);
 
-    vmaUnmapMemory(allocator_, vertex_upload_result->value().allocation);
+    vmaUnmapMemory(context_->allocator, vertex_upload_result->value().allocation);
 
     return true;
 }
@@ -192,8 +192,8 @@ bool GeometryVramTransfer::GeometryVramTransferImpl::UploadIndices(
 
     // Copies index data from CPU.
     void *index_buffer_region;
-    VkResult result =
-        vmaMapMemory(allocator_, index_upload_result->value().allocation, &index_buffer_region);
+    VkResult result = vmaMapMemory(context_->allocator, index_upload_result->value().allocation,
+                                   &index_buffer_region);
     if (result != VK_SUCCESS) {
         return false;
     }
@@ -211,7 +211,7 @@ bool GeometryVramTransfer::GeometryVramTransferImpl::UploadIndices(
         assert(false);
     }
 
-    vmaUnmapMemory(allocator_, index_upload_result->value().allocation);
+    vmaUnmapMemory(context_->allocator, index_upload_result->value().allocation);
 
     return true;
 }
@@ -221,9 +221,8 @@ GeometryVramTransfer::BufferUploadResult::BufferUploadResult()
 
 GeometryVramTransfer::BufferUploadResult::~BufferUploadResult() {}
 
-GeometryVramTransfer::GeometryVramTransfer(VmaAllocator allocator, unsigned capacity)
-    : pimpl_(
-          std::make_unique<GeometryVramTransfer::GeometryVramTransferImpl>(capacity, allocator)) {}
+GeometryVramTransfer::GeometryVramTransfer(VulkanContext *context, unsigned capacity)
+    : pimpl_(std::make_unique<GeometryVramTransfer::GeometryVramTransferImpl>(capacity, context)) {}
 
 GeometryVramTransfer::~GeometryVramTransfer() {}
 

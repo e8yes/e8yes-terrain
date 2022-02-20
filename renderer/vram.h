@@ -18,15 +18,14 @@
 #ifndef ISLANDS_RENDERER_VRAM_H
 #define ISLANDS_RENDERER_VRAM_H
 
-#include <QVulkanWindow>
 #include <limits>
 #include <memory>
 #include <optional>
 
+#include "renderer/context.h"
 #include "renderer/drawable.h"
 #include "renderer/projection.h"
 #include "renderer/scene.h"
-#include "renderer/vma/vk_mem_alloc.h"
 
 namespace e8 {
 
@@ -39,11 +38,11 @@ class GeometryVramTransfer {
     /**
      * @brief GeometryVramTransfer Constructs a VRAM transferer.
      *
-     * @param allocator A VMA allocator pointing to the GPU device where data will transferred.
+     * @param context A vulkan context pointing to the GPU device where data will transferred.
      * @param capacity Optionally specifies the maximum number of bytes the transferer will use on
      * the GPU device.
      */
-    GeometryVramTransfer(VmaAllocator allocator,
+    GeometryVramTransfer(VulkanContext *context,
                          unsigned capacity = std::numeric_limits<unsigned>::max());
     ~GeometryVramTransfer();
 
