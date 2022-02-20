@@ -68,8 +68,8 @@ class GeometryVramTransfer::GeometryVramTransferImpl {
   public:
     GeometryVramTransferImpl(unsigned capacity, VulkanContext *context);
 
-    std::unordered_map<IslandsDrawable const *, UploadResult>::iterator
-    Fetch(IslandsDrawable const *drawable);
+    std::unordered_map<Drawable const *, UploadResult>::iterator
+    Fetch(Drawable const *drawable);
 
     bool UploadVertices(std::vector<PrimitiveVertex> const &vertices,
                         std::optional<BufferUploadResult> *vertex_upload_result);
@@ -82,7 +82,7 @@ class GeometryVramTransfer::GeometryVramTransferImpl {
     bool AllocateBuffer(unsigned new_size, VkBufferUsageFlags usage,
                         std::optional<BufferUploadResult> *buffer_upload_result);
 
-    std::unordered_map<IslandsDrawable const *, UploadResult> cache_;
+    std::unordered_map<Drawable const *, UploadResult> cache_;
     VulkanContext *context_;
     unsigned used_;
     unsigned const capacity_;
@@ -92,8 +92,8 @@ GeometryVramTransfer::GeometryVramTransferImpl::GeometryVramTransferImpl(unsigne
                                                                          VulkanContext *context)
     : context_(context), used_(0), capacity_(capacity) {}
 
-std::unordered_map<IslandsDrawable const *, GeometryVramTransfer::UploadResult>::iterator
-GeometryVramTransfer::GeometryVramTransferImpl::Fetch(IslandsDrawable const *drawable) {
+std::unordered_map<Drawable const *, GeometryVramTransfer::UploadResult>::iterator
+GeometryVramTransfer::GeometryVramTransferImpl::Fetch(Drawable const *drawable) {
     auto it = cache_.find(drawable);
     if (it == cache_.end()) {
         it = cache_.insert(std::make_pair(drawable, UploadResult())).first;
@@ -231,7 +231,7 @@ GeometryVramTransfer::UploadResult::UploadResult()
 
 GeometryVramTransfer::UploadResult::~UploadResult() {}
 
-GeometryVramTransfer::UploadResult GeometryVramTransfer::Upload(IslandsDrawable const *drawable) {
+GeometryVramTransfer::UploadResult GeometryVramTransfer::Upload(Drawable const *drawable) {
     auto &[_, cached_upload] = *pimpl_->Fetch(drawable);
     if (!cached_upload.vertex_buffer.has_value() || !cached_upload.index_buffer.has_value()) {
         // Data has never been uploaded before.
@@ -242,18 +242,18 @@ GeometryVramTransfer::UploadResult GeometryVramTransfer::Upload(IslandsDrawable 
     }
 
     switch (drawable->rigidity) {
-    case IslandsDrawable::DEFORMABLE: {
+    case Drawable::DEFORMABLE: {
         pimpl_->UploadVertices(drawable->vertices, &cached_upload.vertex_buffer);
         break;
     }
-    case IslandsDrawable::TEARABLE: {
+    case Drawable::TEARABLE: {
         pimpl_->UploadVertices(drawable->vertices, &cached_upload.vertex_buffer);
         pimpl_->UploadIndices(drawable->indices, drawable->vertices.size(),
                               &cached_upload.index_buffer, &cached_upload.index_element_type);
         break;
     }
-    case IslandsDrawable::STATIC:
-    case IslandsDrawable::RIGID: {
+    case Drawable::STATIC:
+    case Drawable::RIGID: {
         // Nothing needs to be updated, supposedly.
         break;
     }

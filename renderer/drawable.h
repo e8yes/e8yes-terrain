@@ -49,11 +49,11 @@ struct PrimitiveVertex {
 using PrimitiveIndices = vec<3, unsigned>;
 
 /**
- * @brief The IslandsDrawable struct Represents an object that can be rendered by the renderer. It
- * provides all the information about the object for it to be efficiently processed by the rendering
+ * @brief The Drawable struct Represents an object that can be rendered by the renderer. It provides
+ * all the information about the object for it to be efficiently processed by the rendering
  * pipeline.
  */
-struct IslandsDrawable {
+struct Drawable {
     // The human readable name of this drawable, provided for debugging purposes.
     std::string human_readable_name;
 
@@ -88,10 +88,10 @@ struct IslandsDrawable {
 };
 
 /**
- * @brief The IslandsDrawableLod struct Allows complex drawable to be represented with less  detail
- * at distance.
+ * @brief The DrawableLod struct Allows complex drawable to be represented with less detail at
+ * distance.
  */
-struct IslandsDrawableLod {
+struct DrawableLod {
     // ID of this drawable design.
     DrawableId id;
 
@@ -99,7 +99,7 @@ struct IslandsDrawableLod {
     aabb bounding_box;
 
     // LOD of this drawable design in descending level of detail.
-    std::vector<IslandsDrawable> drawable_lod;
+    std::vector<Drawable> drawable_lod;
 
     // A list the same length as the drawable_lod specifying the minimum distance the drawble LOD is
     // from the viewer before it can be applied to the rendering process. Therefore, the distances
@@ -109,24 +109,24 @@ struct IslandsDrawableLod {
 };
 
 /**
- * @brief The IslandsDrawableLodInstance struct An object with information derived from a drawable.
- * This is what actually gets rendered. It allows a large number of same objects to be placed at
- * different location of the scene with sharing the same information.
+ * @brief The DrawableLodInstance struct An object with information derived from a drawable. This is
+ * what actually gets rendered. It allows a large number of same objects to be placed at different
+ * location of the scene with sharing the same information.
  */
-struct IslandsDrawableLodInstance {
+struct DrawableLodInstance {
     // The drawable information the instance is derived from.
-    std::shared_ptr<IslandsDrawableLod> drawable;
+    std::shared_ptr<DrawableLod> drawable;
 
     // The homogeneous transformation to be applied to the drawable's geometry.
     mat44 transform;
 };
 
 /**
- * @brief The IslandsDrawableInstance struct Stores references to a IslandsDrawableLodInstance.
+ * @brief The DrawableInstance struct Stores references to a DrawableLodInstance.
  */
-struct IslandsDrawableInstance {
+struct DrawableInstance {
     // The drawable selected from a series of LODs.
-    IslandsDrawable const *drawable;
+    Drawable const *drawable;
 
     // The homogeneous transformation to be applied to the drawable's geometry.
     mat44 const *transform;
@@ -143,7 +143,7 @@ struct SceneObject {
     SceneObjectId id;
 
     // The drawable group that constitutes this scene object.
-    std::vector<std::unique_ptr<IslandsDrawableLodInstance>> drawables;
+    std::vector<std::unique_ptr<DrawableLodInstance>> drawables;
 };
 
 } // namespace e8

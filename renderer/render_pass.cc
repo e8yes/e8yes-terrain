@@ -173,7 +173,7 @@ std::unique_ptr<GpuBarrier> FinishRenderPass(VkCommandBuffer cmds, GpuBarrier co
     return std::make_unique<GpuBarrier>(done_signal, cmds, context);
 }
 
-void RenderDrawables(std::vector<IslandsDrawableInstance> const &drawables,
+void RenderDrawables(std::vector<DrawableInstance> const &drawables,
                      GraphicsPipeline const &pipeline, SetUniformsFn const &set_uniforms_fn,
                      GeometryVramTransfer *geo_vram, VkCommandBuffer cmds) {
     vkCmdBindPipeline(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline);

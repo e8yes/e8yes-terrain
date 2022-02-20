@@ -137,7 +137,7 @@ DepthMapPipeline::FutureResult::FutureResult(FrameBufferAttachment const &depth_
 DepthMapPipeline::FutureResult::~FutureResult() {}
 
 DepthMapPipeline::FutureResult
-DepthMapPipeline::Run(std::vector<IslandsDrawableInstance> const &drawables,
+DepthMapPipeline::Run(std::vector<DrawableInstance> const &drawables,
                       ProjectionInterface const &projection, GpuBarrier const &barrier,
                       GeometryVramTransfer *geo_vram) {
     VkCommandBuffer cmds =
@@ -146,7 +146,7 @@ DepthMapPipeline::Run(std::vector<IslandsDrawableInstance> const &drawables,
     ShaderUniformLayout const &uniform_layout = pimpl_->GetUniformLayout();
     RenderDrawables(
         drawables, pimpl_->GetGraphicsPipeline(),
-        [&projection, &uniform_layout](IslandsDrawableInstance const &drawable,
+        [&projection, &uniform_layout](DrawableInstance const &drawable,
                                        VkCommandBuffer cmds) {
             mat44 model_view_proj = projection.ProjectiveTransform() * projection.ViewTransform() *
                                     (*drawable.transform);

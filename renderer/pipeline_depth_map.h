@@ -76,7 +76,7 @@ class DepthMapPipeline {
      * @param geo_vram The geometry VRAM transferrer.
      * @return A rendering result future.
      */
-    FutureResult Run(std::vector<IslandsDrawableInstance> const &drawables,
+    FutureResult Run(std::vector<DrawableInstance> const &drawables,
                      ProjectionInterface const &projection, GpuBarrier const &barrier,
                      GeometryVramTransfer *geo_vram);
 

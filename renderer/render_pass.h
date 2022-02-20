@@ -148,7 +148,7 @@ using SetUniformsFn =
  * @param geo_vram The geometry VRAM transferer.
  * @param cmds The command buffer to which draw commands will be added.
  */
-void RenderDrawables(std::vector<IslandsDrawableInstance> const &drawables,
+void RenderDrawables(std::vector<DrawableInstance> const &drawables,
                      GraphicsPipeline const &pipeline, SetUniformsFn const &set_uniforms_fn,
                      GeometryVramTransfer *geo_vram, VkCommandBuffer cmds);
 

@@ -89,7 +89,7 @@ class GeometryVramTransfer {
      * @param drawable The drawable whose geometry is to transfer/update.
      * @return See the UploadResult structure above.
      */
-    UploadResult Upload(IslandsDrawable const *drawable);
+    UploadResult Upload(Drawable const *drawable);
 
   private:
     class GeometryVramTransferImpl;

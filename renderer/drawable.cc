@@ -15,10 +15,6 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string>
-#include <vector>
-
-#include "common/tensor.h"
 #include "renderer/drawable.h"
 
 namespace e8 {} // namespace e8

@@ -38,12 +38,12 @@ class SceneInterface {
      * @param drawable The drawable to be added.
      * @return true only if the drawable has not been added to the scene.
      */
-    virtual bool AddDrawable(std::shared_ptr<IslandsDrawableLod> const &drawable) = 0;
+    virtual bool AddDrawable(std::shared_ptr<DrawableLod> const &drawable) = 0;
 
     /**
      * @brief Drawable Finds drawable by ID. If the drawable doesn't exist, it returns a nullptr.
      */
-    virtual std::shared_ptr<IslandsDrawableLod> FindDrawable(DrawableId const &id) const = 0;
+    virtual std::shared_ptr<DrawableLod> FindDrawable(DrawableId const &id) const = 0;
 
     /**
      * @brief AddSceneObject Adds a new scene object to the scene if it has not already been added.
@@ -61,14 +61,13 @@ class SceneInterface {
      * @param f Defines the frustum area.
      * @return All the selected instances.
      */
-    virtual std::vector<IslandsDrawableLodInstance *>
-    FindDrawableInstances(frustum const &f) const = 0;
+    virtual std::vector<DrawableLodInstance *> FindDrawableInstances(frustum const &f) const = 0;
 
     /**
      * @brief AllDrawableInstances Returns all the drawable instances that have been added to this
      * scene.
      */
-    virtual std::vector<IslandsDrawableLodInstance *> AllDrawableInstances() const = 0;
+    virtual std::vector<DrawableLodInstance *> AllDrawableInstances() const = 0;
 };
 
 } // namespace e8
