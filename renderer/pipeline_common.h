@@ -117,6 +117,41 @@ CreateShaderUniformLayout(std::optional<unsigned> const &push_constant_size,
                           std::optional<VkShaderStageFlags> const &push_constant_accessible_stage,
                           VulkanContext *context);
 
+/**
+ * @brief The VertexInputInfo struct Stores information about the input attributes of a vertex
+ * shader program in a graphics pipeline.
+ */
+struct VertexInputInfo {
+    /**
+     * @brief VertexInputInfo Should be created only by calling VertexInputState().
+     */
+    explicit VertexInputInfo(
+        std::vector<VkVertexInputAttributeDescription> const &input_attributes);
+    ~VertexInputInfo();
+
+    VertexInputInfo(VertexInputInfo const &) = delete;
+    VertexInputInfo(VertexInputInfo &&) = delete;
+
+    // Primary vertex attribute Vulkan description.
+    VkPipelineVertexInputStateCreateInfo state;
+
+    // These information needs to be kept alive in order for the state to hold valid memory
+    // pointers.
+    VkVertexInputBindingDescription input_binding;
+    std::vector<VkVertexInputAttributeDescription> input_attributes;
+};
+
+/**
+ * @brief VertexInputState Creates a structure storing the information about the input attributes of
+ * a vertex shader program in a graphics pipeline. In particular, it describes how an attribute
+ * associates with data in the vertex buffer.
+ *
+ * @param input_attributes An array describing all the vertex shader program's input attributes.
+ * @return
+ */
+std::unique_ptr<VertexInputInfo>
+CreateVertexInputState(std::vector<VkVertexInputAttributeDescription> const &input_attributes);
+
 } // namespace e8
 
 #endif // ISLANDS_RENDERER_PIPELINE_COMMON_H
