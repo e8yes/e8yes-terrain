@@ -78,7 +78,8 @@ CreateShaderStages(std::string const &vertex_shader_file_path,
 
 /**
  * @brief The ShaderUniformLayoutInfo struct Stores a Vulkan object describing the layout of the
- * uniform variables declared in the shader programs in a graphics pipeline.
+ * uniform variables declared in the shader programs in a graphics pipeline. It will clean up layout
+ * resources by the end of its lifecycle.
  */
 struct ShaderUniformLayout {
     /**
@@ -102,6 +103,9 @@ struct ShaderUniformLayout {
  * declared in the shader programs in a graphics pipeline. Two types of uniform layouts are
  * available: push constants and descriptor sets. In particular, only one push constant uniform
  * variable is allowed, though it may be shared in both vertex and fragment shader programs.
+ *
+ * This function will always return a valid ShaderUniformLayout structure. Any failure occurs during
+ * layout creation will make it fail.
  *
  * TODO: Allows descriptor set layout to be specified.
  *
@@ -147,10 +151,53 @@ struct VertexInputInfo {
  * associates with data in the vertex buffer.
  *
  * @param input_attributes An array describing all the vertex shader program's input attributes.
- * @return
+ * @return A valid unique pointer to the VertexInputInfo structure.
  */
 std::unique_ptr<VertexInputInfo>
 CreateVertexInputState(std::vector<VkVertexInputAttributeDescription> const &input_attributes);
+
+/**
+ * @brief The FixedStageConfig struct Stores the configuration of the fixed function stages
+ * (clipping & rasterization).
+ */
+struct FixedStageConfig {
+    /**
+     * @brief FixedStageConfig Should be created only by calling CreateFixedStageConfig().
+     */
+    FixedStageConfig();
+    ~FixedStageConfig();
+
+    FixedStageConfig(FixedStageConfig const &) = delete;
+    FixedStageConfig(FixedStageConfig &&) = delete;
+
+    VkPipelineInputAssemblyStateCreateInfo input_assembly;
+    VkPipelineRasterizationStateCreateInfo rasterizer;
+    VkPipelineMultisampleStateCreateInfo multisampling;
+    VkPipelineDepthStencilStateCreateInfo depth_stencil;
+    VkPipelineColorBlendStateCreateInfo color_blending;
+    VkPipelineViewportStateCreateInfo viewport_state;
+
+    VkPipelineColorBlendAttachmentState color_blending_attachment;
+    VkViewport viewport;
+    VkRect2D scissor;
+};
+
+/**
+ * @brief CreateFixedStageConfig Creates a configuration describing the behavior of fixed function
+ * stages (clipping & rasterization).
+ *
+ * @param polygon_mode Specifies how a polygon should be rasterized.
+ * @param cull_mode Specifies if the back/front faces should be excluded.
+ * @param enable_depth_test Specifies if a depth rejection should be employed.
+ * @param render_target_width The width, in pixels, of the target rendering area.
+ * @param render_target_height The height, in pixels, of the target rendering area.
+ * @return A valid unique pointer to the FixedStageConfig structure.
+ */
+std::unique_ptr<FixedStageConfig> CreateFixedStageConfig(VkPolygonMode polygon_mode,
+                                                         VkCullModeFlags cull_mode,
+                                                         bool enable_depth_test,
+                                                         unsigned render_target_width,
+                                                         unsigned render_target_height);
 
 } // namespace e8
 
