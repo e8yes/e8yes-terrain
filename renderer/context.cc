@@ -40,11 +40,22 @@ constexpr char const *kEngineName = "e8 islands renderer";
 uint32_t const kVersion = VK_MAKE_API_VERSION(0, 0, 0, 1);
 uint32_t const kMinimumVulkanApiVersion = VK_API_VERSION_1_2;
 
-ValidationLayers kDebugModeValidationLayers{
-    "VK_LAYER_GOOGLE_threading",      "VK_LAYER_LUNARG_parameter_validation",
-    "VK_LAYER_LUNARG_object_tracker", "VK_LAYER_LUNARG_core_validation",
-    "VK_LAYER_LUNARG_image",          "VK_LAYER_LUNARG_swapchain",
-    "VK_LAYER_GOOGLE_unique_objects"};
+ValidationLayers const kDebugModeValidationLayers{
+    //"VK_LAYER_VALVE_steam_overlay_32",
+    // "VK_LAYER_VALVE_steam_fossilize_32",
+    // "VK_LAYER_VALVE_steam_overlay_64",
+    // "VK_LAYER_VALVE_steam_fossilize_64",
+    //"VK_LAYER_MESA_device_select",
+    // "VK_LAYER_LUNARG_screenshot",
+    // "VK_LAYER_LUNARG_monitor",
+    // "VK_LAYER_LUNARG_gfxreconstruct",
+    // "VK_LAYER_LUNARG_api_dump",
+    // "VK_LAYER_KHRONOS_synchronization2",
+    // "VK_LAYER_KHRONOS_profiles",
+    "VK_LAYER_KHRONOS_validation",
+    // "VK_LAYER_LUNARG_device_simulation",
+    // "VK_LAYER_MESA_overlay"
+};
 
 SdlExtensions RequiredExtensions(SDL_Window *target_window) {
     unsigned extension_count = 0;
@@ -68,6 +79,9 @@ VkInstance CreateVulkanInstance(SDL_Window *target_window) {
     VkInstanceCreateInfo instance_info{};
     instance_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     instance_info.pApplicationInfo = &app_info;
+    instance_info.ppEnabledLayerNames = kDebugModeValidationLayers.data();
+    instance_info.enabledLayerCount = kDebugModeValidationLayers.size();
+
     SdlExtensions sdl_extensions = RequiredExtensions(target_window);
     instance_info.ppEnabledExtensionNames = sdl_extensions.data();
     instance_info.enabledExtensionCount = sdl_extensions.size();
@@ -220,10 +234,10 @@ VkDevice CreateDevice(VkPhysicalDevice physical_device,
     device_info.pEnabledFeatures = &device_features;
     device_info.enabledExtensionCount = device_extensions.size();
     device_info.ppEnabledExtensionNames = device_extensions.data();
-    if (!kDebugModeValidationLayers.empty()) {
-        device_info.ppEnabledLayerNames = kDebugModeValidationLayers.data();
-        device_info.enabledLayerCount = kDebugModeValidationLayers.size();
-    }
+    //    if (!kDebugModeValidationLayers.empty()) {
+    //        device_info.ppEnabledLayerNames = kDebugModeValidationLayers.data();
+    //        device_info.enabledLayerCount = kDebugModeValidationLayers.size();
+    //    }
 
     VkDevice device;
     assert(VK_SUCCESS ==
@@ -376,7 +390,7 @@ VkFence CreateFrameFence(VkDevice device) {
 } // namespace
 
 VulkanContext::VulkanContext()
-    : instance(VK_NULL_HANDLE), surface(VK_NULL_HANDLE), selected_physical_device(VK_NULL_HANDLE),
+    : instance(VK_NULL_HANDLE), selected_physical_device(VK_NULL_HANDLE), surface(VK_NULL_HANDLE),
       device(VK_NULL_HANDLE), graphics_queue(VK_NULL_HANDLE), present_queue(VK_NULL_HANDLE),
       swap_chain(VK_NULL_HANDLE), swap_chain_image_format{}, swap_chain_image_extent{},
       command_pool(VK_NULL_HANDLE), allocator(VK_NULL_HANDLE), frame_fence(VK_NULL_HANDLE) {}
@@ -390,6 +404,7 @@ VulkanContext::~VulkanContext() {
     }
     vkDestroySwapchainKHR(device, swap_chain, /*pAllocator=*/nullptr);
     vkDestroyDevice(device, /*pAllocator=*/nullptr);
+    vkDestroySurfaceKHR(instance, surface, /*pAllocator=*/nullptr);
     vkDestroyInstance(instance, /*pAllocator=*/nullptr);
 }
 
