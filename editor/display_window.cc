@@ -29,9 +29,9 @@ namespace {
 
 constexpr char const *kIslandsDisplayWindowTitle = "e8 islands display";
 
-void RunDisplayLoop(SceneInterface const *scene, SolidColorRenderer *renderer, bool *quit_display) {
+void RunDisplayLoop(SceneInterface *scene, SolidColorRenderer *renderer, bool *quit_display) {
     while (!*quit_display) {
-        renderer->DrawFrame(*scene);
+        renderer->DrawFrame(scene);
 
         SDL_Event event;
         if (!SDL_PollEvent(&event)) {
@@ -44,7 +44,7 @@ void RunDisplayLoop(SceneInterface const *scene, SolidColorRenderer *renderer, b
 
 } // namespace
 
-void RunIslandsDisplay(SceneInterface const *scene, unsigned window_width, unsigned window_height,
+void RunIslandsDisplay(SceneInterface *scene, unsigned window_width, unsigned window_height,
                        bool *quit_display) {
     assert(0 == SDL_Init(SDL_INIT_VIDEO));
 

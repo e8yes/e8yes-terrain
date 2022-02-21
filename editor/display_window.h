@@ -31,7 +31,7 @@ namespace e8 {
  * @param window_height The height of the display window.
  * @param quit_display Allows to be set by a different thread to close the display.
  */
-void RunIslandsDisplay(SceneInterface const *scene, unsigned window_width, unsigned window_height,
+void RunIslandsDisplay(SceneInterface *scene, unsigned window_width, unsigned window_height,
                        bool *quit_display);
 
 } // namespace e8

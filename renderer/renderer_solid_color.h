@@ -19,6 +19,7 @@
 #define ISLANDS_RENDERER_SOLID_COLOR_H
 
 #include <memory>
+#include <optional>
 
 #include "common/tensor.h"
 #include "content/scene.h"
@@ -44,7 +45,7 @@ class SolidColorRenderer {
      * @brief DrawFrame Draws a new frame filled with the scene's background color to the currently
      * available swap chain image.
      */
-    void DrawFrame(SceneInterface const &scene);
+    void DrawFrame(SceneInterface *scene);
 
   private:
     class SolidColorRendererImpl;
