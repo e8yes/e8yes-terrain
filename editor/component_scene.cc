@@ -15,26 +15,12 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_EDITOR_DISPLAY_WINDOW_H
-#define ISLANDS_EDITOR_DISPLAY_WINDOW_H
-
-#include <memory>
-
 #include "editor/component_scene.h"
 
 namespace e8 {
 
-/**
- * @brief RunIslandsDisplay Creates and runs a display task for visual presentation of the editor's
- * current scene state. Note, this function blocks until quit_display is set to true.
- *
- * @param editor_context The content source the display draws from and renders.
- * @param window_width The width of the display window.
- * @param window_height The height of the display window.
- */
-void RunIslandsDisplay(std::shared_ptr<EditorContext> editor_context, unsigned window_width,
-                       unsigned window_height);
+EditorContext::EditorContext() : running(true) {}
+
+EditorContext::~EditorContext() {}
 
 } // namespace e8
-
-#endif // ISLANDS_EDITOR_DISPLAY_WINDOW_H

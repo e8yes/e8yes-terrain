@@ -15,26 +15,29 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_EDITOR_DISPLAY_WINDOW_H
-#define ISLANDS_EDITOR_DISPLAY_WINDOW_H
+#ifndef ISLANDS_EDITOR_COMPONENT_SCENE_H
+#define ISLANDS_EDITOR_COMPONENT_SCENE_H
 
 #include <memory>
 
-#include "editor/component_scene.h"
+#include "content/scene.h"
 
 namespace e8 {
 
 /**
- * @brief RunIslandsDisplay Creates and runs a display task for visual presentation of the editor's
- * current scene state. Note, this function blocks until quit_display is set to true.
- *
- * @param editor_context The content source the display draws from and renders.
- * @param window_width The width of the display window.
- * @param window_height The height of the display window.
+ * @brief The EditorContext struct Stores the editor's global states.
  */
-void RunIslandsDisplay(std::shared_ptr<EditorContext> editor_context, unsigned window_width,
-                       unsigned window_height);
+struct EditorContext {
+    EditorContext();
+    ~EditorContext();
+
+    // The scene the editor is currently working on, it may be null.
+    std::unique_ptr<SceneInterface> scene;
+
+    // Indicates if the editor is running.
+    bool running;
+};
 
 } // namespace e8
 
-#endif // ISLANDS_EDITOR_DISPLAY_WINDOW_H
+#endif // ISLANDS_EDITOR_COMPONENT_SCENE_H

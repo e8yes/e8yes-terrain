@@ -19,7 +19,7 @@
 #include <cassert>
 #include <memory>
 
-#include "content/scene.h"
+#include "editor/component_scene.h"
 #include "editor/window_display.h"
 #include "renderer/context.h"
 #include "renderer/renderer_solid_color.h"
@@ -29,10 +29,11 @@ namespace {
 
 constexpr char const *kIslandsDisplayWindowTitle = "e8 islands display";
 
-void RunDisplayLoop(SceneInterface *scene, SolidColorRenderer *renderer, bool *quit_display) {
-    while (!*quit_display) {
-        if (scene != nullptr) {
-            renderer->DrawFrame(scene);
+void RunDisplayLoop(std::shared_ptr<EditorContext> const &editor_context,
+                    SolidColorRenderer *renderer) {
+    while (editor_context->running) {
+        if (editor_context->scene != nullptr) {
+            renderer->DrawFrame(editor_context->scene.get());
         }
 
         SDL_Event event;
@@ -40,14 +41,18 @@ void RunDisplayLoop(SceneInterface *scene, SolidColorRenderer *renderer, bool *q
             continue;
         }
 
-        switch (event.type) {}
+        switch (event.type) {
+        case SDL_QUIT: {
+            break;
+        }
+        }
     }
 }
 
 } // namespace
 
-void RunIslandsDisplay(SceneInterface *scene, unsigned window_width, unsigned window_height,
-                       bool *quit_display) {
+void RunIslandsDisplay(std::shared_ptr<EditorContext> editor_context, unsigned window_width,
+                       unsigned window_height) {
     assert(0 == SDL_Init(SDL_INIT_VIDEO));
 
     SDL_Window *display_window = SDL_CreateWindow(
@@ -61,7 +66,7 @@ void RunIslandsDisplay(SceneInterface *scene, unsigned window_width, unsigned wi
         std::unique_ptr<VulkanContext> context = CreateVulkanContext(display_window);
         SolidColorRenderer renderer(context.get());
 
-        RunDisplayLoop(scene, &renderer, quit_display);
+        RunDisplayLoop(editor_context, &renderer);
     }
 
     SDL_DestroyWindow(display_window);

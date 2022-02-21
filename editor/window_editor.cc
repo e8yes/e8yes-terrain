@@ -26,15 +26,17 @@
 
 namespace e8 {
 
-IslandsEditorWindow::IslandsEditorWindow(SceneInterface *scene, QWidget *parent)
-    : QMainWindow(parent), ui_(std::make_unique<Ui::IslandsEditorWindow>()), scene_(scene) {
+IslandsEditorWindow::IslandsEditorWindow(std::shared_ptr<EditorContext> const &editor_context,
+                                         QWidget *parent)
+    : QMainWindow(parent), ui_(std::make_unique<Ui::IslandsEditorWindow>()),
+      editor_context_(editor_context) {
     ui_->setupUi(this);
 }
 
 IslandsEditorWindow::~IslandsEditorWindow() {}
 
 void IslandsEditorWindow::keyPressEvent(QKeyEvent *event) {
-    vec3 current_color = scene_->BackgroundColor();
+    vec3 current_color = editor_context_->scene->BackgroundColor();
 
     switch (event->key()) {
     case Qt::Key_Up: {
@@ -66,16 +68,18 @@ void IslandsEditorWindow::keyPressEvent(QKeyEvent *event) {
     }
     }
 
-    scene_->UpdateBackgroundColor(current_color);
+    editor_context_->scene->UpdateBackgroundColor(current_color);
 }
 
-void RunIslandsEditorWindow(SceneInterface *scene, int argc, char *argv[]) {
+void RunIslandsEditorWindow(std::shared_ptr<EditorContext> editor_context, int argc, char *argv[]) {
     QApplication a(argc, argv);
 
-    IslandsEditorWindow w(scene);
+    IslandsEditorWindow w(editor_context);
     w.show();
 
     a.exec();
+
+    editor_context->running = false;
 }
 
 } // namespace e8
