@@ -16,13 +16,13 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 INCLUDEPATH += ../
 
 SOURCES += \
-    component_scene.cc \
+    component_editor_context.cc \
     main.cc \
     window_display.cc \
     window_editor.cc
 
 HEADERS += \
-    component_scene.h \
+    component_editor_context.h \
     window_display.h \
     window_editor.h
 

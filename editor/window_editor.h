@@ -23,7 +23,7 @@
 #include <QWidget>
 #include <memory>
 
-#include "editor/component_scene.h"
+#include "editor/component_editor_context.h"
 
 namespace e8 {
 

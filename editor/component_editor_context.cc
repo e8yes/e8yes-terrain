@@ -15,39 +15,16 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_EDITOR_COMPONENT_SCENE_H
-#define ISLANDS_EDITOR_COMPONENT_SCENE_H
-
 #include <QWidget>
 #include <memory>
 
-#include "content/scene.h"
-
-QT_BEGIN_NAMESPACE
-namespace Ui {
-class IslandsEditorWindow;
-}
-QT_END_NAMESPACE
+#include "editor/component_editor_context.h"
+#include "ui_window_editor.h"
 
 namespace e8 {
 
-/**
- * @brief The EditorContext struct Stores the editor's global states.
- */
-struct EditorContext {
-    EditorContext();
-    ~EditorContext();
+EditorContext::EditorContext() : ui(std::make_unique<Ui::IslandsEditorWindow>()), running(true) {}
 
-    // The editor's UI.
-    std::unique_ptr<Ui::IslandsEditorWindow> ui;
-
-    // The scene the editor is currently working on, it may be null.
-    std::unique_ptr<SceneInterface> scene;
-
-    // Indicates if the editor is running.
-    bool running;
-};
+EditorContext::~EditorContext() {}
 
 } // namespace e8
-
-#endif // ISLANDS_EDITOR_COMPONENT_SCENE_H

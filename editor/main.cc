@@ -19,7 +19,7 @@
 #include <memory>
 #include <thread>
 
-#include "editor/component_scene.h"
+#include "editor/component_editor_context.h"
 #include "editor/window_display.h"
 #include "editor/window_editor.h"
 
