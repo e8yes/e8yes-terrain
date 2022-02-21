@@ -21,8 +21,8 @@
 #include <memory>
 
 #include "common/tensor.h"
-#include "editor/editor_window.h"
-#include "ui_editor_window.h"
+#include "editor/window_editor.h"
+#include "ui_window_editor.h"
 
 namespace e8 {
 

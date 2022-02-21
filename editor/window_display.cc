@@ -20,7 +20,7 @@
 #include <memory>
 
 #include "content/scene.h"
-#include "editor/display_window.h"
+#include "editor/window_display.h"
 #include "renderer/context.h"
 #include "renderer/renderer_solid_color.h"
 
@@ -31,7 +31,9 @@ constexpr char const *kIslandsDisplayWindowTitle = "e8 islands display";
 
 void RunDisplayLoop(SceneInterface *scene, SolidColorRenderer *renderer, bool *quit_display) {
     while (!*quit_display) {
-        renderer->DrawFrame(scene);
+        if (scene != nullptr) {
+            renderer->DrawFrame(scene);
+        }
 
         SDL_Event event;
         if (!SDL_PollEvent(&event)) {

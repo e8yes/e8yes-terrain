@@ -20,8 +20,8 @@
 #include <thread>
 
 #include "content/scene_linear.h"
-#include "editor/display_window.h"
-#include "editor/editor_window.h"
+#include "editor/window_display.h"
+#include "editor/window_editor.h"
 
 int main(int argc, char *argv[]) {
     auto scene = std::make_unique<e8::LinearScene>();

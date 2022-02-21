@@ -16,16 +16,16 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 INCLUDEPATH += ../
 
 SOURCES += \
-    display_window.cc \
-    editor_window.cc \
-    main.cc
+    main.cc \
+    window_display.cc \
+    window_editor.cc
 
 HEADERS += \
-    display_window.h \
-    editor_window.h
+    window_display.h \
+    window_editor.h
 
 FORMS += \
-    editor_window.ui
+    window_editor.ui
 
 TRANSLATIONS += \
     e8terrain_en_US.ts
