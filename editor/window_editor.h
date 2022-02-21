@@ -25,12 +25,6 @@
 
 #include "editor/component_scene.h"
 
-QT_BEGIN_NAMESPACE
-namespace Ui {
-class IslandsEditorWindow;
-}
-QT_END_NAMESPACE
-
 namespace e8 {
 
 /**
@@ -47,8 +41,6 @@ class IslandsEditorWindow : public QMainWindow {
     void keyPressEvent(QKeyEvent *event) override;
 
   private:
-    std::unique_ptr<Ui::IslandsEditorWindow> ui_;
-
     std::shared_ptr<EditorContext> editor_context_;
 };
 

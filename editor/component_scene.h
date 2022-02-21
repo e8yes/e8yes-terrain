@@ -18,9 +18,16 @@
 #ifndef ISLANDS_EDITOR_COMPONENT_SCENE_H
 #define ISLANDS_EDITOR_COMPONENT_SCENE_H
 
+#include <QWidget>
 #include <memory>
 
 #include "content/scene.h"
+
+QT_BEGIN_NAMESPACE
+namespace Ui {
+class IslandsEditorWindow;
+}
+QT_END_NAMESPACE
 
 namespace e8 {
 
@@ -30,6 +37,9 @@ namespace e8 {
 struct EditorContext {
     EditorContext();
     ~EditorContext();
+
+    // The editor's UI.
+    std::unique_ptr<Ui::IslandsEditorWindow> ui;
 
     // The scene the editor is currently working on, it may be null.
     std::unique_ptr<SceneInterface> scene;

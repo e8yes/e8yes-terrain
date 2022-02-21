@@ -28,9 +28,8 @@ namespace e8 {
 
 IslandsEditorWindow::IslandsEditorWindow(std::shared_ptr<EditorContext> const &editor_context,
                                          QWidget *parent)
-    : QMainWindow(parent), ui_(std::make_unique<Ui::IslandsEditorWindow>()),
-      editor_context_(editor_context) {
-    ui_->setupUi(this);
+    : QMainWindow(parent), editor_context_(editor_context) {
+    editor_context_->ui->setupUi(this);
 }
 
 IslandsEditorWindow::~IslandsEditorWindow() {}

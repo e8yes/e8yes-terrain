@@ -15,11 +15,15 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QWidget>
+#include <memory>
+
 #include "editor/component_scene.h"
+#include "ui_window_editor.h"
 
 namespace e8 {
 
-EditorContext::EditorContext() : running(true) {}
+EditorContext::EditorContext() : ui(std::make_unique<Ui::IslandsEditorWindow>()), running(true) {}
 
 EditorContext::~EditorContext() {}
 
