@@ -35,7 +35,11 @@
      </widget>
     </item>
     <item>
-     <widget class="QGraphicsView" name="image_input_graphics_view"/>
+     <widget class="QGraphicsView" name="image_input_graphics_view">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -89,6 +93,9 @@
     <layout class="QVBoxLayout" name="verticalLayout_3">
      <item>
       <widget class="QTabWidget" name="design_nav_tabs">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="currentIndex">
         <number>0</number>
        </property>
@@ -98,7 +105,11 @@
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
-          <widget class="QTreeView" name="scene_view_tree"/>
+          <widget class="QTreeView" name="scene_view_tree">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -894,21 +905,33 @@
    </property>
   </action>
   <action name="action_save_scene">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Save Scene</string>
    </property>
   </action>
   <action name="action_close_scene">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Close Scene</string>
    </property>
   </action>
   <action name="action_load_gltf_scene_object">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Load glTF Scene Object</string>
    </property>
   </action>
   <action name="action_load_cornell_box_scene_object">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Load Cornell Box Scene Object</string>
    </property>
