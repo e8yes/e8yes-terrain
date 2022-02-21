@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>800</height>
+    <width>1000</width>
+    <height>719</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>e8 islands editor</string>
   </property>
   <widget class="QWidget" name="central_widget">
-   <layout class="QHBoxLayout" name="central_layout">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
     <property name="leftMargin">
      <number>0</number>
     </property>
@@ -27,6 +27,16 @@
     <property name="bottomMargin">
      <number>0</number>
     </property>
+    <item>
+     <widget class="QLabel" name="image_input_label">
+      <property name="text">
+       <string>Image Input</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGraphicsView" name="image_input_graphics_view"/>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -34,27 +44,830 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>400</width>
+     <width>1000</width>
      <height>22</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
+   <widget class="QMenu" name="menu_file">
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionNew_Scene"/>
-    <addaction name="actionOpen_Scene"/>
-    <addaction name="actionSave_Scene"/>
-    <addaction name="actionClose_Scene_2"/>
+    <widget class="QMenu" name="action_new_scene">
+     <property name="title">
+      <string>New Scene</string>
+     </property>
+     <addaction name="action_new_scene_flat"/>
+     <addaction name="action_new_scene_octree"/>
+    </widget>
+    <addaction name="action_new_scene"/>
+    <addaction name="action_open_scene"/>
+    <addaction name="action_save_scene"/>
+    <addaction name="action_close_scene"/>
     <addaction name="separator"/>
-    <addaction name="actionLoad_glTF_Scene_Object"/>
-    <addaction name="actionLoad_Cornell_Box_Scene_Object"/>
+    <addaction name="action_load_gltf_scene_object"/>
+    <addaction name="action_load_cornell_box_scene_object"/>
     <addaction name="separator"/>
-    <addaction name="actionExit_3"/>
+    <addaction name="action_exit"/>
    </widget>
-   <addaction name="menuFile"/>
+   <addaction name="menu_file"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="status_bar"/>
+  <widget class="QDockWidget" name="design_nav_dock">
+   <property name="features">
+    <set>QDockWidget::DockWidgetMovable</set>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Design Navigation</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="design_nav_dock_content">
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <item>
+      <widget class="QTabWidget" name="design_nav_tabs">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="scene_view_tab">
+        <attribute name="title">
+         <string>Scene View</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QTreeView" name="scene_view_tree"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="environment_tab">
+        <attribute name="title">
+         <string>Environment</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_7">
+         <item>
+          <widget class="QScrollArea" name="environment_scroll">
+           <property name="widgetResizable">
+            <bool>true</bool>
+           </property>
+           <widget class="QWidget" name="environment_scroll_content">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>367</width>
+              <height>719</height>
+             </rect>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_13">
+             <item>
+              <widget class="QGroupBox" name="ambient_group">
+               <property name="title">
+                <string>Ambient</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_11">
+                <item>
+                 <widget class="QGroupBox" name="background_color_group">
+                  <property name="title">
+                   <string>Background Color</string>
+                  </property>
+                  <layout class="QFormLayout" name="formLayout_4">
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="bg_color_red_label">
+                     <property name="text">
+                      <string>Red</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QSlider" name="bg_color_red_slider">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="bg_color_green_label">
+                     <property name="text">
+                      <string>Green</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QSlider" name="bg_color_green_slider">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QLabel" name="bg_color_blue_label">
+                     <property name="text">
+                      <string>Blue</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="1">
+                    <widget class="QSlider" name="bg_color_blue_slider">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QGroupBox" name="sky_box_group">
+                  <property name="title">
+                   <string>Sky Box</string>
+                  </property>
+                  <layout class="QHBoxLayout" name="horizontalLayout">
+                   <item>
+                    <widget class="QCheckBox" name="checkBox">
+                     <property name="text">
+                      <string>Enabled</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="sky_box_open_button">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="text">
+                      <string>Open</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="sky_box_path_edit">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="camera_group">
+               <property name="title">
+                <string>Camera</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_12">
+                <item>
+                 <widget class="QGroupBox" name="camera_pos_group">
+                  <property name="title">
+                   <string>Position (m)</string>
+                  </property>
+                  <layout class="QFormLayout" name="formLayout_5">
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="camera_pos_x_label">
+                     <property name="text">
+                      <string>X</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="camera_pos_y_label">
+                     <property name="text">
+                      <string>Y</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QLabel" name="camera_pos_z_label">
+                     <property name="text">
+                      <string>Z</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QLineEdit" name="camera_pos_x_edit">
+                     <property name="text">
+                      <string>0.0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QLineEdit" name="camera_pos_y_edit">
+                     <property name="text">
+                      <string>0.0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="1">
+                    <widget class="QLineEdit" name="camera_pos_z_edit">
+                     <property name="text">
+                      <string>0.0</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QGroupBox" name="camera_rot_group">
+                  <property name="title">
+                   <string>Rotation (degree)</string>
+                  </property>
+                  <layout class="QFormLayout" name="formLayout_6">
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="camera_rot_roll_label">
+                     <property name="text">
+                      <string>Roll</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="camera_rot_pitch_label">
+                     <property name="text">
+                      <string>Pitch</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QLabel" name="camera_rot_yaw_label">
+                     <property name="text">
+                      <string>Yaw</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QLineEdit" name="camera_rot_roll_edit">
+                     <property name="text">
+                      <string>0.0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QLineEdit" name="camera_rot_pitch_edit">
+                     <property name="text">
+                      <string>0.0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="1">
+                    <widget class="QLineEdit" name="camera_rot_yaw_edit">
+                     <property name="text">
+                      <string>0.0</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QFormLayout" name="camera_form_layout">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="camera_focal_len_label">
+                    <property name="text">
+                     <string>Focal Length (mm)</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QLineEdit" name="camera_focal_len_edit">
+                    <property name="text">
+                     <string>35</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="camera_sensor_width_label">
+                    <property name="text">
+                     <string>Sensor Width (mm)</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLineEdit" name="camera_sensor_width_edit">
+                    <property name="text">
+                     <string>36</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QLabel" name="camera_max_dist_label">
+                    <property name="text">
+                     <string>Max Distance (m)</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QLineEdit" name="camera_max_dist_edit">
+                    <property name="text">
+                     <string>1000</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="camera_sensor_height_label">
+                    <property name="text">
+                     <string>Sensor Height (mm)</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLineEdit" name="camera_sensor_height_edit">
+                    <property name="text">
+                     <string>24</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="0">
+                   <widget class="QLabel" name="camera_image_width_label">
+                    <property name="text">
+                     <string>Image Width (pixel)</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="1">
+                   <widget class="QLineEdit" name="camera_image_width_edit">
+                    <property name="text">
+                     <string>1024</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="procedural_tab">
+        <attribute name="title">
+         <string>Procedural</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_5"/>
+       </widget>
+       <widget class="QWidget" name="entity_tab">
+        <attribute name="title">
+         <string>Entity</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QScrollArea" name="scrollArea">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="widgetResizable">
+            <bool>true</bool>
+           </property>
+           <widget class="QWidget" name="scrollAreaWidgetContents">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>381</width>
+              <height>587</height>
+             </rect>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_16">
+             <item>
+              <widget class="QGroupBox" name="entity_id_group">
+               <property name="title">
+                <string>Identity</string>
+               </property>
+               <layout class="QFormLayout" name="formLayout_7">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="entity_id_label">
+                  <property name="text">
+                   <string>ID</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="entity_name_label">
+                  <property name="text">
+                   <string>Name</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QPushButton" name="entity_open_file_button">
+                  <property name="text">
+                   <string>Open</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QLineEdit" name="entity_id_edit">
+                  <property name="readOnly">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QLineEdit" name="entity_name_edit"/>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QLineEdit" name="entity_file_path_edit"/>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="entity_trans_group">
+               <property name="title">
+                <string>Transform</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_17">
+                <item>
+                 <widget class="QGroupBox" name="entity_pos_group">
+                  <property name="title">
+                   <string>Position (m)</string>
+                  </property>
+                  <layout class="QFormLayout" name="formLayout_8">
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="entity_pos_x_label">
+                     <property name="text">
+                      <string>X</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QLineEdit" name="entity_pos_x_edit">
+                     <property name="text">
+                      <string>0.0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="entity_pos_y_label">
+                     <property name="text">
+                      <string>Y</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QLabel" name="entity_pos_z_label">
+                     <property name="text">
+                      <string>Z</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QLineEdit" name="entity_pos_y_edit">
+                     <property name="text">
+                      <string>0.0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="1">
+                    <widget class="QLineEdit" name="entity_pos_z_edit">
+                     <property name="text">
+                      <string>0.0</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QGroupBox" name="entity_rot_group">
+                  <property name="title">
+                   <string>Rotation (degree)</string>
+                  </property>
+                  <layout class="QFormLayout" name="formLayout_9">
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="entity_rot_roll_label">
+                     <property name="text">
+                      <string>Roll</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QLineEdit" name="entity_rot_roll_edit">
+                     <property name="text">
+                      <string>0.0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="entity_rot_pitch_label">
+                     <property name="text">
+                      <string>Pitch</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QLabel" name="entity_rot_yaw_label">
+                     <property name="text">
+                      <string>Yaw</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QLineEdit" name="entity_rot_pitch_edit">
+                     <property name="text">
+                      <string>0.0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="1">
+                    <widget class="QLineEdit" name="entity_rot_yaw_edit">
+                     <property name="text">
+                      <string>0.0</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="entity_appearance_group">
+               <property name="title">
+                <string>Appearance</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="entity_physics_group">
+               <property name="title">
+                <string>Physics</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_18">
+                <item>
+                 <widget class="QCheckBox" name="entity_phy_movable_checkbox">
+                  <property name="text">
+                   <string>Movable</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="precomp_tab">
+        <attribute name="title">
+         <string>Pre-compute</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_6">
+         <item>
+          <widget class="QScrollArea" name="precomp_scroll">
+           <property name="widgetResizable">
+            <bool>true</bool>
+           </property>
+           <widget class="QWidget" name="precomp_scroll_content">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>381</width>
+              <height>587</height>
+             </rect>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_14">
+             <item>
+              <widget class="QGroupBox" name="scene_struct_config_group">
+               <property name="title">
+                <string>Scene Structure</string>
+               </property>
+               <layout class="QFormLayout" name="formLayout_3"/>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="bake_config_group">
+               <property name="title">
+                <string>Bake</string>
+               </property>
+               <layout class="QFormLayout" name="formLayout">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="bake_resolution_label">
+                  <property name="text">
+                   <string>Resolution</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QSlider" name="bake_resolution_slider">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="bake_iteration_label">
+                  <property name="text">
+                   <string>Iteration</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QSlider" name="bake_iteration_slider">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="precomp_progress_group">
+               <property name="title">
+                <string>Progress</string>
+               </property>
+               <layout class="QFormLayout" name="formLayout_2">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="scene_structure_progress_label">
+                  <property name="text">
+                   <string>Scene Structure</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QProgressBar" name="scene_structure_progress">
+                  <property name="value">
+                   <number>0</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="bake_progress_label">
+                  <property name="text">
+                   <string>Bake</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QProgressBar" name="bake_progress">
+                  <property name="value">
+                   <number>0</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="precomp_button">
+               <property name="text">
+                <string>Compute</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="display_tab">
+        <attribute name="title">
+         <string>Display</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_8">
+         <item>
+          <widget class="QScrollArea" name="display_scroll">
+           <property name="widgetResizable">
+            <bool>true</bool>
+           </property>
+           <widget class="QWidget" name="display_scroll_content">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>381</width>
+              <height>587</height>
+             </rect>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_15">
+             <item>
+              <widget class="QGroupBox" name="renderer_group">
+               <property name="title">
+                <string>Renderer</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_9">
+                <item>
+                 <widget class="QRadioButton" name="solid_color_rend_radial">
+                  <property name="text">
+                   <string>Solid Color</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="depth_rend_radial">
+                  <property name="text">
+                   <string>Depth</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="position_rend_radial">
+                  <property name="text">
+                   <string>Position</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="normal_rend_radial">
+                  <property name="text">
+                   <string>Normal</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="albedo_rend_radial">
+                  <property name="text">
+                   <string>Albedo</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="radiance_residual_rend_radial">
+                  <property name="text">
+                   <string>Radiance Residual</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="roughness_rend_radial">
+                  <property name="text">
+                   <string>Roughness</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="metalness_rend_radial">
+                  <property name="text">
+                   <string>Metalness</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="mat_idx_rend_radial">
+                  <property name="text">
+                   <string>Per Object Material Index</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="scene_struct_rend_radial">
+                  <property name="text">
+                   <string>Scene Structure Result</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="bake_result_rend_radial">
+                  <property name="text">
+                   <string>Bake Result</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="combined_result_rend_radial">
+                  <property name="text">
+                   <string>Combined Result</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="display_param_group">
+               <property name="title">
+                <string>Parameters</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_10"/>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
   <action name="actionLoad_glTF_scene_object">
    <property name="text">
     <string>Load glTF scene object</string>
@@ -70,12 +883,7 @@
     <string>Exit</string>
    </property>
   </action>
-  <action name="actionNew_Scene">
-   <property name="text">
-    <string>New Scene</string>
-   </property>
-  </action>
-  <action name="actionOpen_Scene">
+  <action name="action_open_scene">
    <property name="text">
     <string>Open Scene</string>
    </property>
@@ -85,29 +893,39 @@
     <string>Close Scene</string>
    </property>
   </action>
-  <action name="actionSave_Scene">
+  <action name="action_save_scene">
    <property name="text">
     <string>Save Scene</string>
    </property>
   </action>
-  <action name="actionClose_Scene_2">
+  <action name="action_close_scene">
    <property name="text">
     <string>Close Scene</string>
    </property>
   </action>
-  <action name="actionLoad_glTF_Scene_Object">
+  <action name="action_load_gltf_scene_object">
    <property name="text">
     <string>Load glTF Scene Object</string>
    </property>
   </action>
-  <action name="actionLoad_Cornell_Box_Scene_Object">
+  <action name="action_load_cornell_box_scene_object">
    <property name="text">
     <string>Load Cornell Box Scene Object</string>
    </property>
   </action>
-  <action name="actionExit_3">
+  <action name="action_exit">
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="action_new_scene_flat">
+   <property name="text">
+    <string>Linear (Flat)</string>
+   </property>
+  </action>
+  <action name="action_new_scene_octree">
+   <property name="text">
+    <string>Octree</string>
    </property>
   </action>
  </widget>
