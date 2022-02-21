@@ -37,6 +37,8 @@ class SceneInterface {
     SceneInterface();
     virtual ~SceneInterface();
 
+    SceneInterface(SceneInterface const &) = delete;
+
     /**
      * @brief AddEntity Adds a new entity to the scene.
      *
