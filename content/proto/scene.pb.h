@@ -31,8 +31,8 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
-#include "drawable.pb.h"
 #include "entity.pb.h"
 #include "scene_object.pb.h"
 // @@protoc_insertion_point(includes)
@@ -67,6 +67,32 @@ template<> ::e8::SceneProto* Arena::CreateMaybeMessage<::e8::SceneProto>(Arena*)
 PROTOBUF_NAMESPACE_CLOSE
 namespace e8 {
 
+enum SceneProto_StructureType : int {
+  SceneProto_StructureType_INVALID = 0,
+  SceneProto_StructureType_LINEAR = 1,
+  SceneProto_StructureType_OCTREE = 2,
+  SceneProto_StructureType_SceneProto_StructureType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
+  SceneProto_StructureType_SceneProto_StructureType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
+};
+bool SceneProto_StructureType_IsValid(int value);
+constexpr SceneProto_StructureType SceneProto_StructureType_StructureType_MIN = SceneProto_StructureType_INVALID;
+constexpr SceneProto_StructureType SceneProto_StructureType_StructureType_MAX = SceneProto_StructureType_OCTREE;
+constexpr int SceneProto_StructureType_StructureType_ARRAYSIZE = SceneProto_StructureType_StructureType_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* SceneProto_StructureType_descriptor();
+template<typename T>
+inline const std::string& SceneProto_StructureType_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, SceneProto_StructureType>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function SceneProto_StructureType_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    SceneProto_StructureType_descriptor(), enum_t_value);
+}
+inline bool SceneProto_StructureType_Parse(
+    const std::string& name, SceneProto_StructureType* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<SceneProto_StructureType>(
+    SceneProto_StructureType_descriptor(), name, value);
+}
 // ===================================================================
 
 class SceneProto PROTOBUF_FINAL :
@@ -179,15 +205,71 @@ class SceneProto PROTOBUF_FINAL :
 
   // nested types ----------------------------------------------------
 
+  typedef SceneProto_StructureType StructureType;
+  static constexpr StructureType INVALID =
+    SceneProto_StructureType_INVALID;
+  static constexpr StructureType LINEAR =
+    SceneProto_StructureType_LINEAR;
+  static constexpr StructureType OCTREE =
+    SceneProto_StructureType_OCTREE;
+  static inline bool StructureType_IsValid(int value) {
+    return SceneProto_StructureType_IsValid(value);
+  }
+  static constexpr StructureType StructureType_MIN =
+    SceneProto_StructureType_StructureType_MIN;
+  static constexpr StructureType StructureType_MAX =
+    SceneProto_StructureType_StructureType_MAX;
+  static constexpr int StructureType_ARRAYSIZE =
+    SceneProto_StructureType_StructureType_ARRAYSIZE;
+  static inline const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor*
+  StructureType_descriptor() {
+    return SceneProto_StructureType_descriptor();
+  }
+  template<typename T>
+  static inline const std::string& StructureType_Name(T enum_t_value) {
+    static_assert(::std::is_same<T, StructureType>::value ||
+      ::std::is_integral<T>::value,
+      "Incorrect type passed to function StructureType_Name.");
+    return SceneProto_StructureType_Name(enum_t_value);
+  }
+  static inline bool StructureType_Parse(const std::string& name,
+      StructureType* value) {
+    return SceneProto_StructureType_Parse(name, value);
+  }
+
   // accessors -------------------------------------------------------
 
   enum : int {
-    kObjectsFieldNumber = 3,
-    kEntitiesFieldNumber = 4,
+    kBackgroundColorFieldNumber = 4,
+    kObjectsFieldNumber = 5,
     kIdFieldNumber = 1,
     kNameFieldNumber = 2,
+    kEntitiesFieldNumber = 6,
+    kStructureTypeFieldNumber = 3,
   };
-  // repeated .e8.SceneObject objects = 3;
+  // repeated float background_color = 4;
+  int background_color_size() const;
+  private:
+  int _internal_background_color_size() const;
+  public:
+  void clear_background_color();
+  private:
+  float _internal_background_color(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      _internal_background_color() const;
+  void _internal_add_background_color(float value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      _internal_mutable_background_color();
+  public:
+  float background_color(int index) const;
+  void set_background_color(int index, float value);
+  void add_background_color(float value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      background_color() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      mutable_background_color();
+
+  // repeated .e8.SceneObject objects = 5;
   int objects_size() const;
   private:
   int _internal_objects_size() const;
@@ -204,24 +286,6 @@ class SceneProto PROTOBUF_FINAL :
   ::e8::SceneObject* add_objects();
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneObject >&
       objects() const;
-
-  // repeated .e8.SceneEntityCollection entities = 4;
-  int entities_size() const;
-  private:
-  int _internal_entities_size() const;
-  public:
-  void clear_entities();
-  ::e8::SceneEntityCollection* mutable_entities(int index);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneEntityCollection >*
-      mutable_entities();
-  private:
-  const ::e8::SceneEntityCollection& _internal_entities(int index) const;
-  ::e8::SceneEntityCollection* _internal_add_entities();
-  public:
-  const ::e8::SceneEntityCollection& entities(int index) const;
-  ::e8::SceneEntityCollection* add_entities();
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneEntityCollection >&
-      entities() const;
 
   // string id = 1;
   void clear_id();
@@ -273,6 +337,33 @@ class SceneProto PROTOBUF_FINAL :
   std::string* _internal_mutable_name();
   public:
 
+  // .e8.SceneEntityCollection entities = 6;
+  bool has_entities() const;
+  private:
+  bool _internal_has_entities() const;
+  public:
+  void clear_entities();
+  const ::e8::SceneEntityCollection& entities() const;
+  ::e8::SceneEntityCollection* release_entities();
+  ::e8::SceneEntityCollection* mutable_entities();
+  void set_allocated_entities(::e8::SceneEntityCollection* entities);
+  private:
+  const ::e8::SceneEntityCollection& _internal_entities() const;
+  ::e8::SceneEntityCollection* _internal_mutable_entities();
+  public:
+  void unsafe_arena_set_allocated_entities(
+      ::e8::SceneEntityCollection* entities);
+  ::e8::SceneEntityCollection* unsafe_arena_release_entities();
+
+  // .e8.SceneProto.StructureType structure_type = 3;
+  void clear_structure_type();
+  ::e8::SceneProto_StructureType structure_type() const;
+  void set_structure_type(::e8::SceneProto_StructureType value);
+  private:
+  ::e8::SceneProto_StructureType _internal_structure_type() const;
+  void _internal_set_structure_type(::e8::SceneProto_StructureType value);
+  public:
+
   // @@protoc_insertion_point(class_scope:e8.SceneProto)
  private:
   class _Internal;
@@ -280,10 +371,13 @@ class SceneProto PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > background_color_;
+  mutable std::atomic<int> _background_color_cached_byte_size_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneObject > objects_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneEntityCollection > entities_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr id_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
+  ::e8::SceneEntityCollection* entities_;
+  int structure_type_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_scene_2eproto;
 };
@@ -460,7 +554,74 @@ inline void SceneProto::unsafe_arena_set_allocated_name(
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneProto.name)
 }
 
-// repeated .e8.SceneObject objects = 3;
+// .e8.SceneProto.StructureType structure_type = 3;
+inline void SceneProto::clear_structure_type() {
+  structure_type_ = 0;
+}
+inline ::e8::SceneProto_StructureType SceneProto::_internal_structure_type() const {
+  return static_cast< ::e8::SceneProto_StructureType >(structure_type_);
+}
+inline ::e8::SceneProto_StructureType SceneProto::structure_type() const {
+  // @@protoc_insertion_point(field_get:e8.SceneProto.structure_type)
+  return _internal_structure_type();
+}
+inline void SceneProto::_internal_set_structure_type(::e8::SceneProto_StructureType value) {
+  
+  structure_type_ = value;
+}
+inline void SceneProto::set_structure_type(::e8::SceneProto_StructureType value) {
+  _internal_set_structure_type(value);
+  // @@protoc_insertion_point(field_set:e8.SceneProto.structure_type)
+}
+
+// repeated float background_color = 4;
+inline int SceneProto::_internal_background_color_size() const {
+  return background_color_.size();
+}
+inline int SceneProto::background_color_size() const {
+  return _internal_background_color_size();
+}
+inline void SceneProto::clear_background_color() {
+  background_color_.Clear();
+}
+inline float SceneProto::_internal_background_color(int index) const {
+  return background_color_.Get(index);
+}
+inline float SceneProto::background_color(int index) const {
+  // @@protoc_insertion_point(field_get:e8.SceneProto.background_color)
+  return _internal_background_color(index);
+}
+inline void SceneProto::set_background_color(int index, float value) {
+  background_color_.Set(index, value);
+  // @@protoc_insertion_point(field_set:e8.SceneProto.background_color)
+}
+inline void SceneProto::_internal_add_background_color(float value) {
+  background_color_.Add(value);
+}
+inline void SceneProto::add_background_color(float value) {
+  _internal_add_background_color(value);
+  // @@protoc_insertion_point(field_add:e8.SceneProto.background_color)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+SceneProto::_internal_background_color() const {
+  return background_color_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+SceneProto::background_color() const {
+  // @@protoc_insertion_point(field_list:e8.SceneProto.background_color)
+  return _internal_background_color();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+SceneProto::_internal_mutable_background_color() {
+  return &background_color_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+SceneProto::mutable_background_color() {
+  // @@protoc_insertion_point(field_mutable_list:e8.SceneProto.background_color)
+  return _internal_mutable_background_color();
+}
+
+// repeated .e8.SceneObject objects = 5;
 inline int SceneProto::_internal_objects_size() const {
   return objects_.size();
 }
@@ -496,40 +657,79 @@ SceneProto::objects() const {
   return objects_;
 }
 
-// repeated .e8.SceneEntityCollection entities = 4;
-inline int SceneProto::_internal_entities_size() const {
-  return entities_.size();
+// .e8.SceneEntityCollection entities = 6;
+inline bool SceneProto::_internal_has_entities() const {
+  return this != internal_default_instance() && entities_ != nullptr;
 }
-inline int SceneProto::entities_size() const {
-  return _internal_entities_size();
+inline bool SceneProto::has_entities() const {
+  return _internal_has_entities();
 }
-inline ::e8::SceneEntityCollection* SceneProto::mutable_entities(int index) {
-  // @@protoc_insertion_point(field_mutable:e8.SceneProto.entities)
-  return entities_.Mutable(index);
+inline const ::e8::SceneEntityCollection& SceneProto::_internal_entities() const {
+  const ::e8::SceneEntityCollection* p = entities_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::e8::SceneEntityCollection*>(
+      &::e8::_SceneEntityCollection_default_instance_);
 }
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneEntityCollection >*
-SceneProto::mutable_entities() {
-  // @@protoc_insertion_point(field_mutable_list:e8.SceneProto.entities)
-  return &entities_;
-}
-inline const ::e8::SceneEntityCollection& SceneProto::_internal_entities(int index) const {
-  return entities_.Get(index);
-}
-inline const ::e8::SceneEntityCollection& SceneProto::entities(int index) const {
+inline const ::e8::SceneEntityCollection& SceneProto::entities() const {
   // @@protoc_insertion_point(field_get:e8.SceneProto.entities)
-  return _internal_entities(index);
+  return _internal_entities();
 }
-inline ::e8::SceneEntityCollection* SceneProto::_internal_add_entities() {
-  return entities_.Add();
+inline void SceneProto::unsafe_arena_set_allocated_entities(
+    ::e8::SceneEntityCollection* entities) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(entities_);
+  }
+  entities_ = entities;
+  if (entities) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneProto.entities)
 }
-inline ::e8::SceneEntityCollection* SceneProto::add_entities() {
-  // @@protoc_insertion_point(field_add:e8.SceneProto.entities)
-  return _internal_add_entities();
+inline ::e8::SceneEntityCollection* SceneProto::release_entities() {
+  auto temp = unsafe_arena_release_entities();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
 }
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneEntityCollection >&
-SceneProto::entities() const {
-  // @@protoc_insertion_point(field_list:e8.SceneProto.entities)
+inline ::e8::SceneEntityCollection* SceneProto::unsafe_arena_release_entities() {
+  // @@protoc_insertion_point(field_release:e8.SceneProto.entities)
+  
+  ::e8::SceneEntityCollection* temp = entities_;
+  entities_ = nullptr;
+  return temp;
+}
+inline ::e8::SceneEntityCollection* SceneProto::_internal_mutable_entities() {
+  
+  if (entities_ == nullptr) {
+    auto* p = CreateMaybeMessage<::e8::SceneEntityCollection>(GetArena());
+    entities_ = p;
+  }
   return entities_;
+}
+inline ::e8::SceneEntityCollection* SceneProto::mutable_entities() {
+  // @@protoc_insertion_point(field_mutable:e8.SceneProto.entities)
+  return _internal_mutable_entities();
+}
+inline void SceneProto::set_allocated_entities(::e8::SceneEntityCollection* entities) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(entities_);
+  }
+  if (entities) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(entities)->GetArena();
+    if (message_arena != submessage_arena) {
+      entities = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, entities, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  entities_ = entities;
+  // @@protoc_insertion_point(field_set_allocated:e8.SceneProto.entities)
 }
 
 #ifdef __GNUC__
@@ -539,6 +739,16 @@ SceneProto::entities() const {
 // @@protoc_insertion_point(namespace_scope)
 
 }  // namespace e8
+
+PROTOBUF_NAMESPACE_OPEN
+
+template <> struct is_proto_enum< ::e8::SceneProto_StructureType> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::e8::SceneProto_StructureType>() {
+  return ::e8::SceneProto_StructureType_descriptor();
+}
+
+PROTOBUF_NAMESPACE_CLOSE
 
 // @@protoc_insertion_point(global_scope)
 

@@ -21,12 +21,16 @@
 #include <vector>
 
 #include "content/entity.h"
+#include "content/proto/scene.pb.h"
 #include "content/scene.h"
 #include "content/scene_linear.h"
 
 namespace e8 {
 
 LinearScene::LinearScene(std::string const &name) : SceneInterface(name) {}
+
+LinearScene::LinearScene(SceneProto const &proto)
+    : SceneInterface(proto), entities_(ToSceneEntities(proto.entities())) {}
 
 LinearScene::~LinearScene() {}
 
@@ -74,6 +78,13 @@ std::vector<SceneEntity const *> LinearScene::QueryEntities(QueryFn query_fn) co
     }
 
     return result;
+}
+
+SceneProto LinearScene::ToProto() const {
+    SceneProto proto = this->_ToBaseProto();
+    proto.set_structure_type(SceneProto::LINEAR);
+    *proto.mutable_entities() = e8::ToProto(entities_);
+    return proto;
 }
 
 } // namespace e8

@@ -19,6 +19,7 @@
 #define ISLANDS_RENDERER_SCENE_H
 
 #include <functional>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -26,6 +27,7 @@
 
 #include "common/tensor.h"
 #include "content/entity.h"
+#include "content/proto/scene.pb.h"
 #include "content/proto/scene_object.pb.h"
 
 namespace e8 {
@@ -46,9 +48,18 @@ using SceneId = std::string;
 class SceneInterface {
   public:
     /**
-     * @brief SceneInterface Constructs a scene with a human readable name.
+     * @brief SceneInterface Constructs an empty scene.
+     *
+     * @param name A descriptive human readable name for the scene.
      */
     explicit SceneInterface(std::string const &name);
+
+    /**
+     * @brief SceneInterface Constructs a scene base class with content provided by the proto
+     * object.
+     */
+    explicit SceneInterface(SceneProto const &proto);
+
     virtual ~SceneInterface();
 
     SceneInterface(SceneInterface const &) = delete;
@@ -88,10 +99,15 @@ class SceneInterface {
     virtual std::vector<SceneEntity const *> QueryEntities(QueryFn query_fn) const = 0;
 
     /**
-     * @brief AddSceneObject Adds a new scene object to the scene if it has not already been added.
-     * Otherwise, it will do nothing. The caller must ensures the entities grouped by the scene
-     * object must have been added to the scene via the AddEntity() call, or else, this function
-     * will fail.
+     * @brief ToProto Turns scene content into a protobuf object.
+     */
+    virtual SceneProto ToProto() const = 0;
+
+    /**
+     * @brief AddSceneObject Adds a new scene object to the scene if it has not already been
+     * added. Otherwise, it will do nothing. The caller must ensures the entities grouped by the
+     * scene object must have been added to the scene via the AddEntity() call, or else, this
+     * function will fail.
      *
      * @param scene_object The scene object to be moved into the scene.
      * @return true only if the scene object has not been added to the scene.
@@ -127,12 +143,19 @@ class SceneInterface {
     std::string name;
 
   protected:
+    SceneProto _ToBaseProto() const;
+
     std::unordered_set<SceneEntityId> _scene_entity_ids;
 
   private:
     std::unordered_map<SceneObjectId, SceneObject> scene_objects_;
     vec3 background_color_;
 };
+
+/**
+ * @brief ToScene Turns a scene proto object back to an in-memory scene sub-class.
+ */
+std::unique_ptr<SceneInterface> ToScene(SceneProto const &proto);
 
 } // namespace e8
 

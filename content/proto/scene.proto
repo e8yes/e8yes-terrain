@@ -19,23 +19,41 @@ syntax = "proto3";
 
 package e8;
 
-import "drawable.proto";
 import "entity.proto";
 import "scene_object.proto";
 
 /*
- * @brief The SceneProto message This is a serializable version of the SceneInterface subclasses.
+ * @brief The SceneProto message This is a serializable version of the SceneInterface sub-classes.
  */
 message SceneProto {
+    /**
+     * @brief The StructureType enum Possible data structures for organizing the scene content.
+     */
+    enum StructureType {
+        INVALID = 0;
+
+        // A linear (flat) scene structure.
+        LINEAR = 1;
+
+        // An octree scene structure.
+        OCTREE = 2;
+    }
+
     // Id of the scene.
     string id = 1;
 
     // A descriptive human readable name of the scene.
     string name = 2;
 
+    // To distinguish which scene sub-class should be used for the content.
+    StructureType structure_type = 3;
+
+    // The backgr0und color of the scene. The array has exactly 3 elements.
+    repeated float background_color = 4;
+
     // A collection of all scene objects.
-    repeated SceneObject objects = 3;
+    repeated SceneObject objects = 5;
 
     // A collection of scene entities.
-    repeated SceneEntityCollection entities = 4;
+    SceneEntityCollection entities = 6;
 }

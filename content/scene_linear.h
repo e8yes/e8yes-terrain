@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "content/entity.h"
+#include "content/proto/scene.pb.h"
 #include "content/scene.h"
 
 namespace e8 {
@@ -32,9 +33,17 @@ namespace e8 {
 class LinearScene : public SceneInterface {
   public:
     /**
-     * @brief LinearScene Constructs a linear scene with a human readable name.
+     * @brief LinearScene Constructs a empty linear scene.
+     *
+     * @param name A descriptive human readable name for the scene.
      */
     explicit LinearScene(std::string const &name);
+
+    /**
+     * @brief LinearScene Constructs a linear scene with content provided by the proto object.
+     */
+    explicit LinearScene(SceneProto const &proto);
+
     ~LinearScene() override;
 
     /**
@@ -59,6 +68,8 @@ class LinearScene : public SceneInterface {
      * the scene.
      */
     std::vector<SceneEntity const *> QueryEntities(QueryFn query_fn) const override;
+
+    SceneProto ToProto() const override;
 
   private:
     std::vector<SceneEntity> entities_;

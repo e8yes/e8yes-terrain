@@ -26,6 +26,7 @@
 #include "content/entity.h"
 #include "content/proto/scene_object.pb.h"
 #include "content/scene.h"
+#include "content/scene_linear.h"
 #include "third_party/uuid/uuid4.h"
 
 namespace e8 {
@@ -56,6 +57,16 @@ SceneId GenerateSceneId() {
 
 SceneInterface::SceneInterface(std::string const &name) : id(GenerateSceneId()), name(name) {}
 
+SceneInterface::SceneInterface(SceneProto const &proto) : id(proto.id()), name(proto.name()) {
+    for (auto const &scene_object : proto.objects()) {
+        scene_objects_[scene_object.id()] = scene_object;
+    }
+
+    for (unsigned i = 0; i < 3; ++i) {
+        background_color_(i) = proto.background_color(i);
+    }
+}
+
 SceneInterface::~SceneInterface() {}
 
 bool SceneInterface::AddSceneObject(SceneObject const &scene_object) {
@@ -73,5 +84,34 @@ std::unordered_map<SceneObjectId, SceneObject> const &SceneInterface::AllSceneOb
 void SceneInterface::UpdateBackgroundColor(vec3 const &color) { background_color_ = color; }
 
 vec3 SceneInterface::BackgroundColor() const { return background_color_; }
+
+SceneProto SceneInterface::_ToBaseProto() const {
+    SceneProto proto;
+
+    proto.set_id(id);
+    proto.set_name(name);
+
+    for (auto const &[id, scene_object] : scene_objects_) {
+        *proto.add_objects() = scene_object;
+    }
+
+    for (unsigned i = 0; i < 3; ++i) {
+        proto.set_background_color(/*index=*/i, background_color_(i));
+    }
+
+    return proto;
+}
+
+std::unique_ptr<SceneInterface> ToScene(SceneProto const &proto) {
+    switch (proto.structure_type()) {
+    case SceneProto::LINEAR: {
+        return std::make_unique<LinearScene>(proto);
+    }
+    default: {
+        // TODO: Creates octree scene when it's implemented.
+        assert(false);
+    }
+    }
+}
 
 } // namespace e8
