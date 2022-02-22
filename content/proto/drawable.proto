@@ -1,0 +1,81 @@
+/**
+ * e8yes demo web server.
+ *
+ * <p>Copyright (C) 2020 Chifeng Wen {daviesx66@gmail.com}
+ *
+ * <p>This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * <p>You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
+ */
+
+syntax = "proto3";
+
+package e8;
+
+import "primitive.proto";
+
+/**
+ * @brief The Drawable message Represents an object that can be rendered by the renderer. It
+ * provides all the information about the object for it to be efficiently processed by the
+ * rendering pipeline.
+ */
+message Drawable {
+    /**
+     * @brief The RigidityType enum The type of rigidity to be expected for this drawable.
+     */
+    enum RigidityType {
+        INVALID = 0;
+
+        // This drawable's geometry can neither be moved nor changed.
+        STATIC = 1;
+
+        // The geometry of this drawable can never change though it can be moved around through
+        // homogeneous transformation.
+        RIGID = 2;
+
+        // The vertices of this drawable can be changed at any moment. However, the topology stays
+        // the same.
+        DEFORMABLE = 3;
+
+        // Even the topology of this drawable can be changed at any moment.
+        TEARABLE = 4;
+    };
+
+    // The human readable name of this drawable, provided for debugging purposes.
+    string human_readable_name = 1;
+
+    // The type of rigidity to be expected for this drawable.
+    RigidityType rigidity = 2;
+
+    // A list of vertices defining the geometry of this drawable.
+    repeated PrimitiveVertex vertices = 3;
+
+    // Defines triangle primitives by referencing the vertices of each triangle from the vertex 
+    // list returned by the above function.
+    repeated PrimitiveIndices primitives = 4;
+};
+
+/**
+ * @brief The DrawableLod message Allows complex drawable to be represented with less detail at
+ * distance.
+ */
+message DrawableLod {
+    // ID of this drawable design.
+    string id = 1;
+
+    // LOD of this drawable design in descending level of detail.
+    repeated Drawable drawable_lod = 2;
+
+    // A list the same length as the drawable_lod specifying the minimum distance the drawble LOD is
+    // from the viewer before it can be applied to the rendering process. Therefore, the distances
+    // are expected to be in ascending order. The renderer will pick the drawable with the least
+    // possible detail when possible.
+    repeated float min_distances = 3;
+};

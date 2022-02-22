@@ -19,12 +19,16 @@ INCLUDEPATH += ../
 SOURCES += \
     drawable.cc \
     entity.cc \
+    proto/drawable.pb.cc \
+    proto/primitive.pb.cc \
     scene.cc \
     scene_linear.cc
 
 HEADERS += \
     drawable.h \
     entity.h \
+    proto/drawable.pb.h \
+    proto/primitive.pb.h \
     scene.h \
     scene_linear.h
 

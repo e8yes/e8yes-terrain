@@ -18,13 +18,13 @@
 #include <QVulkanWindow>
 #include <cassert>
 #include <cstdint>
+#include <google/protobuf/repeated_field.h>
 #include <memory>
 #include <optional>
 #include <unordered_map>
-#include <vector>
 
 #include "common/tensor.h"
-#include "content/drawable.h"
+#include "content/proto/drawable.pb.h"
 #include "renderer/context.h"
 #include "renderer/projection.h"
 #include "renderer/vram.h"
@@ -32,7 +32,7 @@
 namespace e8 {
 namespace {
 
-unsigned VertexBufferSize(std::vector<PrimitiveVertex> const &vertices) {
+unsigned VertexBufferSize(google::protobuf::RepeatedPtrField<PrimitiveVertex> const &vertices) {
     return vertices.size() * sizeof(vec3);
 }
 
@@ -48,15 +48,18 @@ unsigned OptimalIndexSize(size_t num_vertices) {
     }
 }
 
-unsigned IndexBufferSize(std::vector<PrimitiveIndices> const &indices, unsigned index_size) {
+unsigned IndexBufferSize(google::protobuf::RepeatedPtrField<PrimitiveIndices> const &indices,
+                         unsigned index_size) {
     return indices.size() * 3 * index_size;
 }
 
 template <typename TargetMemoryIndexType>
-void CopyIndices(std::vector<PrimitiveIndices> const &indices, void *target_memory) {
-    for (unsigned i = 0; i < indices.size(); ++i) {
+void CopyIndices(google::protobuf::RepeatedPtrField<PrimitiveIndices> const &primitives,
+                 void *target_memory) {
+    for (int i = 0; i < primitives.size(); ++i) {
         for (unsigned j = 0; j < 3; ++j) {
-            *(reinterpret_cast<TargetMemoryIndexType *>(target_memory) + 3 * i + j) = indices[i](j);
+            *(reinterpret_cast<TargetMemoryIndexType *>(target_memory) + 3 * i + j) =
+                static_cast<TargetMemoryIndexType>(primitives.at(i).indices(j));
         }
     }
 }
@@ -69,11 +72,11 @@ class GeometryVramTransfer::GeometryVramTransferImpl {
 
     std::unordered_map<Drawable const *, UploadResult>::iterator Fetch(Drawable const *drawable);
 
-    bool UploadVertices(std::vector<PrimitiveVertex> const &vertices,
+    bool UploadVertices(google::protobuf::RepeatedPtrField<PrimitiveVertex> const &vertices,
                         std::optional<BufferUploadResult> *vertex_upload_result);
 
-    bool UploadIndices(std::vector<PrimitiveIndices> const &indices, size_t num_vertices,
-                       std::optional<BufferUploadResult> *index_upload_result,
+    bool UploadIndices(google::protobuf::RepeatedPtrField<PrimitiveIndices> const &indices,
+                       size_t num_vertices, std::optional<BufferUploadResult> *index_upload_result,
                        VkIndexType *index_element_type);
 
   private:
@@ -157,7 +160,7 @@ bool GeometryVramTransfer::GeometryVramTransferImpl::AllocateBuffer(
 }
 
 bool GeometryVramTransfer::GeometryVramTransferImpl::UploadVertices(
-    std::vector<PrimitiveVertex> const &vertices,
+    google::protobuf::RepeatedPtrField<PrimitiveVertex> const &vertices,
     std::optional<BufferUploadResult> *vertex_upload_result) {
     unsigned new_size = VertexBufferSize(vertices);
     if (!this->AllocateBuffer(new_size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, vertex_upload_result)) {
@@ -180,7 +183,7 @@ bool GeometryVramTransfer::GeometryVramTransferImpl::UploadVertices(
 }
 
 bool GeometryVramTransfer::GeometryVramTransferImpl::UploadIndices(
-    std::vector<PrimitiveIndices> const &indices, size_t num_vertices,
+    google::protobuf::RepeatedPtrField<PrimitiveIndices> const &indices, size_t num_vertices,
     std::optional<BufferUploadResult> *index_upload_result, VkIndexType *index_element_type) {
     unsigned index_size = OptimalIndexSize(num_vertices);
     unsigned new_size = IndexBufferSize(indices, index_size);
@@ -233,26 +236,30 @@ GeometryVramTransfer::UploadResult GeometryVramTransfer::Upload(Drawable const *
     auto &[_, cached_upload] = *pimpl_->Fetch(drawable);
     if (!cached_upload.vertex_buffer.has_value() || !cached_upload.index_buffer.has_value()) {
         // Data has never been uploaded before.
-        pimpl_->UploadVertices(drawable->vertices, &cached_upload.vertex_buffer);
-        pimpl_->UploadIndices(drawable->indices, drawable->vertices.size(),
+        pimpl_->UploadVertices(drawable->vertices(), &cached_upload.vertex_buffer);
+        pimpl_->UploadIndices(drawable->primitives(), drawable->vertices().size(),
                               &cached_upload.index_buffer, &cached_upload.index_element_type);
         return cached_upload;
     }
 
-    switch (drawable->rigidity) {
+    switch (drawable->rigidity()) {
     case Drawable::DEFORMABLE: {
-        pimpl_->UploadVertices(drawable->vertices, &cached_upload.vertex_buffer);
+        pimpl_->UploadVertices(drawable->vertices(), &cached_upload.vertex_buffer);
         break;
     }
     case Drawable::TEARABLE: {
-        pimpl_->UploadVertices(drawable->vertices, &cached_upload.vertex_buffer);
-        pimpl_->UploadIndices(drawable->indices, drawable->vertices.size(),
+        pimpl_->UploadVertices(drawable->vertices(), &cached_upload.vertex_buffer);
+        pimpl_->UploadIndices(drawable->primitives(), drawable->vertices().size(),
                               &cached_upload.index_buffer, &cached_upload.index_element_type);
         break;
     }
     case Drawable::STATIC:
     case Drawable::RIGID: {
         // Nothing needs to be updated, supposedly.
+        break;
+    }
+    default: {
+        assert(false);
         break;
     }
     }

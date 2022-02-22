@@ -81,7 +81,7 @@ struct SceneObject {
     SceneObjectName name;
 
     // The entity group that constitutes this scene object.
-    std::vector<SceneObjectId> entities;
+    std::vector<SceneEntityId> entities;
 };
 
 } // namespace e8

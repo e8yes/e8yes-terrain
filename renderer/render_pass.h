@@ -25,6 +25,7 @@
 #include <vulkan/vulkan.h>
 
 #include "renderer/context.h"
+#include "renderer/drawable_instance.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/vram.h"
 

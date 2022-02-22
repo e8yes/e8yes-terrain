@@ -15,22 +15,6 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_CONTENT_DRAWABLE_H
-#define ISLANDS_CONTENT_DRAWABLE_H
+#include "renderer/drawable_instance.h"
 
-#include <memory>
-#include <optional>
-#include <string>
-#include <vector>
-
-#include "common/tensor.h"
-#include "content/proto/drawable.pb.h"
-
-namespace e8 {
-
-// It uniquely identifies a drawable design with its LOD series.
-using DrawableId = std::string;
-
-} // namespace e8
-
-#endif // ISLANDS_CONTENT_DRAWABLE_H
+namespace e8 {} // namespace e8

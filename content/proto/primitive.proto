@@ -1,0 +1,45 @@
+/**
+ * e8yes demo web server.
+ *
+ * <p>Copyright (C) 2020 Chifeng Wen {daviesx66@gmail.com}
+ *
+ * <p>This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * <p>You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
+ */
+
+syntax = "proto3";
+
+package e8;
+
+/**
+ * @brief The PrimitiveVertex message It defines the geometric attributes of a primitive's vertex.
+ */
+message PrimitiveVertex {
+    // Defines the vertex's 3D position. This array has exactly 3 elements.
+    repeated float position = 1;
+
+    // Defines the 3D normal vector for the vertex position. This array has exactly 3 elements.
+    repeated float normal = 2;
+
+    // Defines the normalized 2D coordinates of a texture image to make it wrap around the surface
+    // surrounding this vertex. This array has exactly 2 elements.
+    repeated float texcoord = 3;
+}
+
+/*
+ * @brief PrimitiveIndices message Defines a triangle with vertices referencing from the
+ * PrimitiveVertex list.
+ */
+message PrimitiveIndices {
+    // 3 vertices of a triangle face with attributes referenced from PrimitiveVertex. This array
+    // has exactly 3 elements.
+    repeated int32 indices = 1;
+}

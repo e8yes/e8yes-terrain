@@ -18,6 +18,7 @@ INCLUDEPATH += ../
 
 SOURCES += \
     context.cc \
+    drawable_instance.cc \
     pipeline_common.cc \
     pipeline_depth_map.cc \
     projection.cc \
@@ -27,6 +28,7 @@ SOURCES += \
 
 HEADERS += \
     context.h \
+    drawable_instance.h \
     pipeline_common.h \
     pipeline_depth_map.h \
     projection.h \

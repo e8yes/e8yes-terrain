@@ -92,5 +92,6 @@ DEPENDPATH += $$PWD/../third_party/uuid
 
 LIBS += -lboost_log
 LIBS += -lboost_thread
+LIBS += -lprotobuf
 LIBS += -lSDL2
 LIBS += -lvulkan

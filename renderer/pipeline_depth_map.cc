@@ -24,8 +24,9 @@
 #include <vulkan/vulkan.h>
 
 #include "common/tensor.h"
-#include "content/drawable.h"
+#include "content/proto/primitive.pb.h"
 #include "renderer/context.h"
+#include "renderer/drawable_instance.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/pipeline_depth_map.h"
 #include "renderer/projection.h"
@@ -47,7 +48,7 @@ std::vector<VkVertexInputAttributeDescription> VertexShaderInputAttributes() {
     position_attribute.binding = 0;
     position_attribute.location = 0;
     position_attribute.format = VK_FORMAT_R32G32B32_SFLOAT;
-    position_attribute.offset = offsetof(PrimitiveVertex, position);
+    position_attribute.offset = kPrimitiveVertexPositionOffset;
 
     return std::vector<VkVertexInputAttributeDescription>{position_attribute};
 }

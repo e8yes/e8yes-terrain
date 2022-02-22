@@ -22,8 +22,8 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
-#include "content/drawable.h"
 #include "renderer/context.h"
+#include "renderer/drawable_instance.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/render_pass.h"
 #include "renderer/vram.h"
@@ -192,7 +192,7 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
                                /*pOffsets=*/&offset);
         vkCmdBindIndexBuffer(cmds, result.index_buffer->buffer, /*offset=*/0,
                              result.index_element_type);
-        vkCmdDrawIndexed(cmds, instance.drawable->indices.size() * 3,
+        vkCmdDrawIndexed(cmds, instance.drawable->primitives().size() * 3,
                          /*instanceCount=*/1, /*firstIndex=*/0, /*vertexOffset=*/0,
                          /*firstInstance=*/0);
     }

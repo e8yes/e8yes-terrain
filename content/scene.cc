@@ -23,7 +23,6 @@
 #include <vector>
 
 #include "common/tensor.h"
-#include "content/drawable.h"
 #include "content/entity.h"
 #include "content/scene.h"
 #include "third_party/uuid/uuid4.h"

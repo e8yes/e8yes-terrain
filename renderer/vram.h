@@ -22,7 +22,7 @@
 #include <memory>
 #include <optional>
 
-#include "content/drawable.h"
+#include "content/proto/drawable.pb.h"
 #include "renderer/context.h"
 #include "renderer/projection.h"
 
