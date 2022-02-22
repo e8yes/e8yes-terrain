@@ -18,6 +18,7 @@
 #ifndef ISLANDS_CONTENT_SCENE_LINEAR_H
 #define ISLANDS_CONTENT_SCENE_LINEAR_H
 
+#include <string>
 #include <vector>
 
 #include "content/entity.h"
@@ -30,7 +31,10 @@ namespace e8 {
  */
 class LinearScene : public SceneInterface {
   public:
-    LinearScene();
+    /**
+     * @brief LinearScene Constructs a linear scene with a human readable name.
+     */
+    explicit LinearScene(std::string const &name);
     ~LinearScene() override;
 
     /**

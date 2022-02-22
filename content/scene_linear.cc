@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <string>
 #include <vector>
 
 #include "content/entity.h"
@@ -25,7 +26,7 @@
 
 namespace e8 {
 
-LinearScene::LinearScene() {}
+LinearScene::LinearScene(std::string const &name) : SceneInterface(name) {}
 
 LinearScene::~LinearScene() {}
 

@@ -16,6 +16,8 @@
  */
 
 #include <functional>
+#include <mutex>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -24,10 +26,35 @@
 #include "content/drawable.h"
 #include "content/entity.h"
 #include "content/scene.h"
+#include "third_party/uuid/uuid4.h"
 
 namespace e8 {
+namespace {
 
-SceneInterface::SceneInterface() {}
+std::mutex gUuidGenMutex;
+bool gUuidInitialized = false;
+UUID4_STATE_T gUuidGenState;
+
+SceneId GenerateSceneId() {
+    std::lock_guard guard(gUuidGenMutex);
+
+    if (!gUuidInitialized) {
+        uuid4_seed(&gUuidGenState);
+        gUuidInitialized = true;
+    }
+
+    UUID4_T uuid;
+    uuid4_gen(&gUuidGenState, &uuid);
+
+    char uuid_string[UUID4_STR_BUFFER_SIZE];
+    uuid4_to_s(uuid, uuid_string, sizeof(uuid_string));
+
+    return SceneId(uuid_string);
+}
+
+} // namespace
+
+SceneInterface::SceneInterface(std::string const &name) : id(GenerateSceneId()), name(name) {}
 
 SceneInterface::~SceneInterface() {}
 

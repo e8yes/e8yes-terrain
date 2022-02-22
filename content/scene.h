@@ -19,6 +19,7 @@
 #define ISLANDS_RENDERER_SCENE_H
 
 #include <functional>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -28,13 +29,19 @@
 
 namespace e8 {
 
+// Uniquely identifies a scene.
+using SceneId = std::string;
+
 /**
  * @brief The SceneInterface class a container for efficient scene object storage and query. This
  * container isn't thread-safe.
  */
 class SceneInterface {
   public:
-    SceneInterface();
+    /**
+     * @brief SceneInterface Constructs a scene with a human readable name.
+     */
+    explicit SceneInterface(std::string const &name);
     virtual ~SceneInterface();
 
     SceneInterface(SceneInterface const &) = delete;
@@ -104,6 +111,13 @@ class SceneInterface {
      * @brief BackgroundColor Returns the scene's current background color.
      */
     vec3 BackgroundColor() const;
+
+  public:
+    // Id of the scene.
+    SceneId id;
+
+    // A descriptive human readable name of the scene.
+    std::string name;
 
   protected:
     std::unordered_set<SceneEntityId> _scene_entity_ids;
