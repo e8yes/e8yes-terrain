@@ -20,14 +20,10 @@
 
 #include <QWidget>
 #include <memory>
+#include <vector>
 
 #include "content/scene.h"
-
-QT_BEGIN_NAMESPACE
-namespace Ui {
-class IslandsEditorWindow;
-}
-QT_END_NAMESPACE
+#include "ui_window_editor.h"
 
 namespace e8 {
 
@@ -47,6 +43,12 @@ struct EditorContext {
     // Indicates if the editor is running.
     bool running;
 };
+
+/**
+ * @brief DeepScanWidget Returns a list of Qt widget including the target as well as all of its
+ * children.
+ */
+void DeepScanWidget(QWidget *target, std::vector<QWidget *> *result);
 
 } // namespace e8
 

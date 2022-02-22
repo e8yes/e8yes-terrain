@@ -15,6 +15,7 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QList>
 #include <QWidget>
 #include <memory>
 
@@ -26,5 +27,18 @@ namespace e8 {
 EditorContext::EditorContext() : ui(std::make_unique<Ui::IslandsEditorWindow>()), running(true) {}
 
 EditorContext::~EditorContext() {}
+
+void DeepScanWidget(QWidget *target, std::vector<QWidget *> *result) {
+    if (target == nullptr) {
+        return;
+    }
+
+    result->push_back(target);
+
+    QList<QWidget *> children = target->findChildren<QWidget *>();
+    for (auto child : children) {
+        result->push_back(child);
+    }
+}
 
 } // namespace e8
