@@ -10,6 +10,9 @@ Installation command ```apt install -y qt-creator```
 ### Boost Log & Thread
 Installation command ```apt install -y libboost-log-dev libboost-thread-dev```
 
+### C++ Protocol Buffer
+Installation command ```apt install -y protobuf-compiler libprotobuf-dev```
+
 ### SDL2
 Installation command ```apt install -y libsdl2-dev```
 
