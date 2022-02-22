@@ -15,42 +15,34 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_EDITOR_WINDOW_H
-#define ISLANDS_EDITOR_WINDOW_H
+#ifndef ISLANDS_EDITOR_COMPONENT_SCENE_H
+#define ISLANDS_EDITOR_COMPONENT_SCENE_H
 
-#include <QMainWindow>
-#include <QWidget>
-#include <memory>
+#include <QObject>
 
 #include "editor/component_editor_context.h"
-#include "editor/component_scene.h"
 
 namespace e8 {
 
 /**
- * @brief The IslandsEditorWindow class The editor panel.
+ * @brief The SceneComponent class Handles logic with UIs related to scene management.
  */
-class IslandsEditorWindow : public QMainWindow {
+class SceneComponent : public QObject {
     Q_OBJECT
 
   public:
-    IslandsEditorWindow(std::shared_ptr<EditorContext> const &editor_context,
-                        QWidget *parent = nullptr);
-    ~IslandsEditorWindow();
+    SceneComponent(EditorContext *context);
+    ~SceneComponent();
 
-    void keyPressEvent(QKeyEvent *event) override;
+  public slots:
+    void OnClickNewSceneLinear();
+
+    void OnClickNewSceneOctree();
 
   private:
-    std::shared_ptr<EditorContext> editor_context_;
-    std::unique_ptr<SceneComponent> scene_component_;
+    EditorContext *context_;
 };
-
-/**
- * @brief RunIslandsEditorWindow Runs the editor window. This function blocks until the editor
- * window is closed.
- */
-void RunIslandsEditorWindow(std::shared_ptr<EditorContext> editor_context, int argc, char *argv[]);
 
 } // namespace e8
 
-#endif // ISLANDS_EDITOR_WINDOW_H
+#endif // ISLANDS_EDITOR_COMPONENT_SCENE_H

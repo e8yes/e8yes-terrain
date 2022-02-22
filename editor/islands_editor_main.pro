@@ -17,12 +17,14 @@ INCLUDEPATH += ../
 
 SOURCES += \
     component_editor_context.cc \
+    component_scene.cc \
     main.cc \
     window_display.cc \
     window_editor.cc
 
 HEADERS += \
     component_editor_context.h \
+    component_scene.h \
     window_display.h \
     window_editor.h
 
@@ -70,5 +72,15 @@ else:unix: LIBS += -L$$OUT_PWD/../common/ -lislands_common
 INCLUDEPATH += $$PWD/../common
 DEPENDPATH += $$PWD/../common
 
+# Third party UUID.
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../third_party/uuid/release/ -lislands_common
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../third_party/uuid/debug/ -lislands_common
+else:unix: LIBS += -L$$OUT_PWD/../third_party/uuid/ -luuid4
+
+INCLUDEPATH += $$PWD/../common
+DEPENDPATH += $$PWD/../third_party/uuid
+
+LIBS += -lboost_log
+LIBS += -lboost_thread
 LIBS += -lSDL2
 LIBS += -lvulkan

@@ -15,14 +15,15 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QKeyEvent>
 #include <QMainWindow>
 #include <QWidget>
-#include <algorithm>
 #include <memory>
 
 #include "common/tensor.h"
+#include "editor/component_editor_context.h"
+#include "editor/component_scene.h"
 #include "editor/window_editor.h"
-#include "ui_window_editor.h"
 
 namespace e8 {
 
@@ -30,6 +31,7 @@ IslandsEditorWindow::IslandsEditorWindow(std::shared_ptr<EditorContext> const &e
                                          QWidget *parent)
     : QMainWindow(parent), editor_context_(editor_context) {
     editor_context_->ui->setupUi(this);
+    scene_component_ = std::make_unique<SceneComponent>(editor_context.get());
 }
 
 IslandsEditorWindow::~IslandsEditorWindow() {}
@@ -71,12 +73,12 @@ void IslandsEditorWindow::keyPressEvent(QKeyEvent *event) {
 }
 
 void RunIslandsEditorWindow(std::shared_ptr<EditorContext> editor_context, int argc, char *argv[]) {
-    QApplication a(argc, argv);
+    QApplication application(argc, argv);
 
-    IslandsEditorWindow w(editor_context);
-    w.show();
+    IslandsEditorWindow editor_window(editor_context);
+    editor_window.show();
 
-    a.exec();
+    application.exec();
 
     editor_context->running = false;
 }
