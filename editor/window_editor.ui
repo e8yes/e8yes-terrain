@@ -183,8 +183,17 @@
                    </item>
                    <item row="0" column="1">
                     <widget class="QSlider" name="bg_color_red_slider">
+                     <property name="maximum">
+                      <number>255</number>
+                     </property>
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="tickPosition">
+                      <enum>QSlider::NoTicks</enum>
+                     </property>
+                     <property name="tickInterval">
+                      <number>0</number>
                      </property>
                     </widget>
                    </item>
@@ -197,6 +206,9 @@
                    </item>
                    <item row="1" column="1">
                     <widget class="QSlider" name="bg_color_green_slider">
+                     <property name="maximum">
+                      <number>255</number>
+                     </property>
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
                      </property>
@@ -211,6 +223,9 @@
                    </item>
                    <item row="2" column="1">
                     <widget class="QSlider" name="bg_color_blue_slider">
+                     <property name="maximum">
+                      <number>255</number>
+                     </property>
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
                      </property>

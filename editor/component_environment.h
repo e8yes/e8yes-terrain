@@ -15,36 +15,34 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_EDITOR_COMPONENT_SCENE_H
-#define ISLANDS_EDITOR_COMPONENT_SCENE_H
+#ifndef ISLANDS_EDITOR_COMPONENT_ENVIRONMENT_H
+#define ISLANDS_EDITOR_COMPONENT_ENVIRONMENT_H
 
 #include <QObject>
 
 #include "editor/component_editor_context.h"
-#include "editor/component_environment.h"
 
 namespace e8 {
 
 /**
- * @brief The SceneComponent class Handles logic with UIs related to scene management.
+ * @brief The EnvironmentComponent class Handles logic with UIs related to environment management.
  */
-class SceneComponent : public QObject {
+class EnvironmentComponent : public QObject {
     Q_OBJECT
 
   public:
-    SceneComponent(EnvironmentComponent *environment_component, EditorContext *context);
-    ~SceneComponent();
+    EnvironmentComponent(EditorContext *context);
+    ~EnvironmentComponent();
 
   public slots:
-    void OnClickNewSceneLinear();
+    void OnChangeScene();
 
-    void OnClickNewSceneOctree();
+    void OnChangeBackgroundColor(int value);
 
   private:
-    EnvironmentComponent *environment_component_;
     EditorContext *context_;
 };
 
 } // namespace e8
 
-#endif // ISLANDS_EDITOR_COMPONENT_SCENE_H
+#endif // ISLANDS_EDITOR_COMPONENT_ENVIRONMENT_H

@@ -26,6 +26,7 @@
 
 #include "content/scene_linear.h"
 #include "editor/component_editor_context.h"
+#include "editor/component_environment.h"
 #include "editor/component_scene.h"
 #include "ui_window_editor.h"
 
@@ -83,7 +84,8 @@ void InitSceneView(SceneInterface const *scene, QTreeWidget *scene_view_tree_wid
     scene_view_tree_widget->addTopLevelItem(scene_root);
 }
 
-bool CreateNewScene(EditorSceneType scene_type, EditorContext *context) {
+bool CreateNewScene(EditorSceneType scene_type, EnvironmentComponent *environment_component,
+                    EditorContext *context) {
     if (context->scene != nullptr) {
         BOOST_LOG_TRIVIAL(error)
             << "CreateNewScene(): A non-null scene object is in the current editor context.";
@@ -110,12 +112,15 @@ bool CreateNewScene(EditorSceneType scene_type, EditorContext *context) {
     SetEditorWidgetsEnabled(/*enabled=*/true, context->ui.get());
     InitSceneView(context->scene.get(), context->ui->scene_view_tree_widget);
 
+    environment_component->OnChangeScene();
+
     return true;
 }
 
 } // namespace
 
-SceneComponent::SceneComponent(EditorContext *context) : context_(context) {
+SceneComponent::SceneComponent(EnvironmentComponent *environment_component, EditorContext *context)
+    : environment_component_(environment_component), context_(context) {
     context_->ui->scene_view_tree_widget->setHeaderLabels(QStringList{"Name", "ID"});
 
     QAction::connect(context_->ui->action_new_scene_flat, &QAction::triggered, this,
@@ -127,11 +132,11 @@ SceneComponent::SceneComponent(EditorContext *context) : context_(context) {
 SceneComponent::~SceneComponent() {}
 
 void SceneComponent::OnClickNewSceneLinear() {
-    CreateNewScene(/*scene_type=*/EST_LINEAR_SCENE, context_);
+    CreateNewScene(/*scene_type=*/EST_LINEAR_SCENE, environment_component_, context_);
 }
 
 void SceneComponent::OnClickNewSceneOctree() {
-    CreateNewScene(/*scene_type=*/EST_OCTREE_SCENE, context_);
+    CreateNewScene(/*scene_type=*/EST_OCTREE_SCENE, environment_component_, context_);
 }
 
 } // namespace e8

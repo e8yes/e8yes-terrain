@@ -23,6 +23,7 @@
 #include <memory>
 
 #include "editor/component_editor_context.h"
+#include "editor/component_environment.h"
 #include "editor/component_scene.h"
 
 namespace e8 {
@@ -38,10 +39,9 @@ class IslandsEditorWindow : public QMainWindow {
                         QWidget *parent = nullptr);
     ~IslandsEditorWindow();
 
-    void keyPressEvent(QKeyEvent *event) override;
-
   private:
     std::shared_ptr<EditorContext> editor_context_;
+    std::unique_ptr<EnvironmentComponent> environment_component_;
     std::unique_ptr<SceneComponent> scene_component_;
 };
 

@@ -17,6 +17,7 @@ INCLUDEPATH += ../
 
 SOURCES += \
     component_editor_context.cc \
+    component_environment.cc \
     component_scene.cc \
     main.cc \
     window_display.cc \
@@ -24,6 +25,7 @@ SOURCES += \
 
 HEADERS += \
     component_editor_context.h \
+    component_environment.h \
     component_scene.h \
     window_display.h \
     window_editor.h

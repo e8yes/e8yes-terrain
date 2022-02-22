@@ -22,6 +22,7 @@
 
 #include "common/tensor.h"
 #include "editor/component_editor_context.h"
+#include "editor/component_environment.h"
 #include "editor/component_scene.h"
 #include "editor/window_editor.h"
 
@@ -31,46 +32,12 @@ IslandsEditorWindow::IslandsEditorWindow(std::shared_ptr<EditorContext> const &e
                                          QWidget *parent)
     : QMainWindow(parent), editor_context_(editor_context) {
     editor_context_->ui->setupUi(this);
-    scene_component_ = std::make_unique<SceneComponent>(editor_context.get());
+    environment_component_ = std::make_unique<EnvironmentComponent>(editor_context.get());
+    scene_component_ =
+        std::make_unique<SceneComponent>(environment_component_.get(), editor_context.get());
 }
 
 IslandsEditorWindow::~IslandsEditorWindow() {}
-
-void IslandsEditorWindow::keyPressEvent(QKeyEvent *event) {
-    vec3 current_color = editor_context_->scene->BackgroundColor();
-
-    switch (event->key()) {
-    case Qt::Key_Up: {
-        current_color(0) = std::min(1.0f, current_color(0) + 0.01f);
-        break;
-    }
-    case Qt::Key_Down: {
-        current_color(0) = std::max(0.0f, current_color(0) - 0.01f);
-        break;
-    }
-    case Qt::Key_Right: {
-        current_color(1) = std::min(1.0f, current_color(1) + 0.01f);
-        break;
-    }
-    case Qt::Key_Left: {
-        current_color(1) = std::max(0.0f, current_color(1) - 0.01f);
-        break;
-    }
-    case Qt::Key_PageUp: {
-        current_color(2) = std::min(1.0f, current_color(2) + 0.01f);
-        break;
-    }
-    case Qt::Key_PageDown: {
-        current_color(2) = std::max(0.0f, current_color(2) - 0.01f);
-        break;
-    }
-    default: {
-        break;
-    }
-    }
-
-    editor_context_->scene->UpdateBackgroundColor(current_color);
-}
 
 void RunIslandsEditorWindow(std::shared_ptr<EditorContext> editor_context, int argc, char *argv[]) {
     QApplication application(argc, argv);
