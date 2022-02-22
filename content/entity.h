@@ -19,11 +19,15 @@
 #define ISLANDS_CONTENT_ENTITY_H
 
 #include <memory>
-#include <optional>
 #include <string>
+#include <unordered_map>
+#include <vector>
 
 #include "common/tensor.h"
 #include "content/drawable.h"
+#include "content/proto/drawable.pb.h"
+#include "content/proto/entity.pb.h"
+#include "content/proto/physical_shape.pb.h"
 
 namespace e8 {
 
@@ -43,6 +47,26 @@ using SceneEntityName = std::string;
  * 5. and how it signals an observer function.
  */
 struct SceneEntity {
+    /**
+     * @brief SceneEntity Constructs an empty entity, with an automatically assigned unique ID.
+     */
+    SceneEntity();
+
+    /**
+     * @brief SceneEntity Constructs an entity from proto message. Since the proto references the
+     * drawable and physical shape information by only IDs, it requires two maps of actually
+     * instances to correctly fill the entity up.
+     */
+    SceneEntity(SceneEntityProto const &proto,
+                std::unordered_map<DrawableId, std::shared_ptr<DrawableLod>> const &drawables);
+
+    ~SceneEntity();
+
+    /**
+     * @brief ToProto Returns a proto description of the entity.
+     */
+    SceneEntityProto ToProto() const;
+
     // ID of this scene entity.
     SceneEntityId id;
 
@@ -62,27 +86,21 @@ struct SceneEntity {
     // number of same drawables to be placed at different location of the scene with shared
     // information.
     std::shared_ptr<DrawableLod> drawable_lod_instance;
+
+    // TODO: Adds physical shape instance once it's implemented.
 };
-
-// Uniquely identifies a scene object.
-using SceneObjectId = std::string;
-
-// Represents a descriptive human readable name of a scene object.
-using SceneObjectName = std::string;
 
 /**
- * @brief The SceneObject struct It logically groups a set of entities.
+ * @brief ToProto Transforms a collection of scene entities to a SceneEntityCollection message. See
+ * the proto definition for what it is.
  */
-struct SceneObject {
-    // ID of this scene object.
-    SceneObjectId id;
+SceneEntityCollection ToProto(std::vector<SceneEntity> const &entities);
 
-    // Human readable name of this scene object.
-    SceneObjectName name;
-
-    // The entity group that constitutes this scene object.
-    std::vector<SceneEntityId> entities;
-};
+/**
+ * @brief ToSceneEntities Transforms a proto description of a collection of entities back to an
+ * in-memory SceneEntity collection.
+ */
+std::vector<SceneEntity> ToSceneEntities(SceneEntityCollection const &proto);
 
 } // namespace e8
 

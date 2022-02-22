@@ -20,7 +20,11 @@ SOURCES += \
     drawable.cc \
     entity.cc \
     proto/drawable.pb.cc \
+    proto/entity.pb.cc \
+    proto/physical_shape.pb.cc \
     proto/primitive.pb.cc \
+    proto/scene_object.pb.cc \
+    proto/scene.pb.cc \
     scene.cc \
     scene_linear.cc
 
@@ -28,7 +32,11 @@ HEADERS += \
     drawable.h \
     entity.h \
     proto/drawable.pb.h \
+    proto/entity.pb.h \
+    proto/physical_shape.pb.h \
     proto/primitive.pb.h \
+    proto/scene_object.pb.h \
+    proto/scene.pb.h \
     scene.h \
     scene_linear.h
 

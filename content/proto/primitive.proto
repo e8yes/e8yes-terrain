@@ -43,3 +43,13 @@ message PrimitiveIndices {
     // has exactly 3 elements.
     repeated int32 indices = 1;
 }
+
+
+/*
+ * @brief AABB message Defines an axis-aligned bounding box.
+ */
+message AABB {
+    // Two diagonal vertices defining the bounding box.
+    repeated float min = 1;
+    repeated float max = 2;
+}

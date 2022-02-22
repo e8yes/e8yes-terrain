@@ -1,0 +1,73 @@
+/**
+ * e8yes demo web server.
+ *
+ * <p>Copyright (C) 2020 Chifeng Wen {daviesx66@gmail.com}
+ *
+ * <p>This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *reset
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * <p>You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
+ */
+
+syntax = "proto3";
+
+package e8;
+
+import "drawable.proto";
+import "primitive.proto";
+import "physical_shape.proto";
+
+/**
+ * @brief The SceneEntityProto message This is a serializable version of the SceneEntity structure.
+ * A scene entity is the smallest unit of information holder that describes
+ * 1. how it is displayed;
+ * 2. how it animates;
+ * 3. how it interacts with other scene entities;
+ * 4. how it acts;
+ * 5. and how it signals an observer function.
+ */
+message SceneEntityProto {
+    // ID of this scene entity.
+    string id = 1;
+
+    // Human readable name of this scene entity.
+    string name = 2;
+
+    // Indicates if the entity is movable.
+    bool movable = 3;
+
+    // The homogeneous transformation to be applied to this entity's geometry.
+    repeated float transform = 4;
+
+    // An AABB bounding box surrounding the entity's geometry.
+    AABB bounding_box = 5;
+
+    // A drawable instance with information derived from a drawable. A shared pointer allows a large
+    // number of same drawables to be placed at different location of the scene with shared
+    // information.
+    string drawable_id = 6;
+
+    // Like above, A physical shape instance with information derived from a physical shape.
+    string physical_shape_id = 7;
+}
+
+/*
+ * @brief The SceneEntityCollection message Encapsulates full information about a collection of
+ * entities.
+ */
+message SceneEntityCollection {
+    // A collection of entities.
+    repeated SceneEntityProto entities = 1;
+
+    // A collection of all drawables referenced by the entities.
+    map<string, DrawableLod> drawables = 2;
+
+    // A collection of all physical shapes referenced by the entities.
+    map<string, PhysicalShapeProto> physical_shapes = 3;
+}

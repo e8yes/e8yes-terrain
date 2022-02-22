@@ -24,6 +24,7 @@
 
 #include "common/tensor.h"
 #include "content/entity.h"
+#include "content/proto/scene_object.pb.h"
 #include "content/scene.h"
 #include "third_party/uuid/uuid4.h"
 
@@ -58,7 +59,7 @@ SceneInterface::SceneInterface(std::string const &name) : id(GenerateSceneId()),
 SceneInterface::~SceneInterface() {}
 
 bool SceneInterface::AddSceneObject(SceneObject const &scene_object) {
-    return scene_objects_.insert(std::make_pair(scene_object.id, scene_object)).second;
+    return scene_objects_.insert(std::make_pair(scene_object.id(), scene_object)).second;
 }
 
 bool SceneInterface::DeleteSceneObject(SceneObjectId const &id) {

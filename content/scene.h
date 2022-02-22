@@ -26,8 +26,15 @@
 
 #include "common/tensor.h"
 #include "content/entity.h"
+#include "content/proto/scene_object.pb.h"
 
 namespace e8 {
+
+// Uniquely identifies a scene object.
+using SceneObjectId = std::string;
+
+// Represents a descriptive human readable name of a scene object.
+using SceneObjectName = std::string;
 
 // Uniquely identifies a scene.
 using SceneId = std::string;
