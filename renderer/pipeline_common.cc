@@ -27,7 +27,7 @@
 #include "content/drawable.h"
 #include "renderer/context.h"
 #include "renderer/pipeline_common.h"
-#include "renderer/vma/vk_mem_alloc.h"
+#include "third_party/vma/vk_mem_alloc.h"
 
 namespace e8 {
 namespace {

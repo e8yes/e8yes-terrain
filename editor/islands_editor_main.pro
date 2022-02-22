@@ -74,6 +74,14 @@ else:unix: LIBS += -L$$OUT_PWD/../common/ -lislands_common
 INCLUDEPATH += $$PWD/../common
 DEPENDPATH += $$PWD/../common
 
+# Third party VMA.
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../third_party/vma/release/ -lislands_common
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../third_party/vma/debug/ -lislands_common
+else:unix: LIBS += -L$$OUT_PWD/../third_party/vma/ -lvma
+
+INCLUDEPATH += $$PWD/../common
+DEPENDPATH += $$PWD/../third_party/vma
+
 # Third party UUID.
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../third_party/uuid/release/ -lislands_common
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../third_party/uuid/debug/ -lislands_common
