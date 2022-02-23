@@ -15,37 +15,43 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_EDITOR_COMPONENT_ENVIRONMENT_H
-#define ISLANDS_EDITOR_COMPONENT_ENVIRONMENT_H
+#ifndef COMPONENT_SCENE_SAVER_H
+#define COMPONENT_SCENE_SAVER_H
 
 #include <QObject>
+#include <optional>
+#include <string>
 
 #include "editor/component_editor_context.h"
 #include "editor/component_modification_monitor.h"
+#include "editor/component_scene_view.h"
 
 namespace e8 {
 
 /**
- * @brief The EnvironmentComponent class Handles logic with UIs related to environment management.
+ * @brief The SceneSaverComponent class It's responsible for the scene saving interactions.
  */
-class EnvironmentComponent : public QObject {
+class SceneSaverComponent : public QObject {
     Q_OBJECT
 
   public:
-    EnvironmentComponent(ModificationMonitorComponent *modification_monitor_comp,
-                         EditorContext *context);
-    ~EnvironmentComponent();
+    SceneSaverComponent(ModificationMonitorComponent *modification_monitor_comp,
+                        SceneViewComponent *scene_view_comp, EditorContext *context);
+    ~SceneSaverComponent();
 
   public slots:
-    void OnChangeScene();
-
-    void OnChangeBackgroundColor(int value);
+    void OnChangeLoadPath(std::optional<std::string> const &load_path);
+    void OnClickSaveScene();
 
   private:
-    EditorContext *context_;
     ModificationMonitorComponent *modification_monitor_comp_;
+    SceneViewComponent *scene_view_comp_;
+    EditorContext *context_;
+
+    bool unsaved_modifications_;
+    std::optional<std::string> load_path_;
 };
 
 } // namespace e8
 
-#endif // ISLANDS_EDITOR_COMPONENT_ENVIRONMENT_H
+#endif // COMPONENT_SCENE_SAVER_H

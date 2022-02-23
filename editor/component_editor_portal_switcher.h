@@ -15,42 +15,31 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_EDITOR_COMPONENT_SCENE_H
-#define ISLANDS_EDITOR_COMPONENT_SCENE_H
+#ifndef ISLANDS_EDITOR_COMPONENT_EDITOR_PORTAL_SWITCHER_H
+#define ISLANDS_EDITOR_COMPONENT_EDITOR_PORTAL_SWITCHER_H
 
 #include <QObject>
 
 #include "editor/component_editor_context.h"
-#include "editor/component_environment.h"
 
 namespace e8 {
 
 /**
- * @brief The SceneComponent class Handles logic with UIs related to scene management.
+ * @brief The EditorPortalSwitcherComponent class
  */
-class SceneComponent : public QObject {
+class EditorPortalSwitcherComponent : public QObject {
     Q_OBJECT
 
   public:
-    SceneComponent(EnvironmentComponent *environment_component, EditorContext *context);
-    ~SceneComponent();
+    EditorPortalSwitcherComponent(EditorContext *context);
+    ~EditorPortalSwitcherComponent();
 
-  public slots:
-    void OnClickNewSceneLinear();
-
-    void OnClickNewSceneOctree();
-
-    void OnClickOpenScene();
-
-    void OnClickSaveScene();
-
-    void OnClickCloseScene();
+    void SetEditorPortalEnabled(bool enabled);
 
   private:
-    EnvironmentComponent *environment_component_;
     EditorContext *context_;
 };
 
 } // namespace e8
 
-#endif // ISLANDS_EDITOR_COMPONENT_SCENE_H
+#endif // ISLANDS_EDITOR_COMPONENT_EDITOR_PORTAL_SWITCHER_H

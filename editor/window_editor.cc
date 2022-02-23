@@ -15,15 +15,20 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QKeyEvent>
 #include <QMainWindow>
 #include <QWidget>
 #include <memory>
 
 #include "common/tensor.h"
 #include "editor/component_editor_context.h"
+#include "editor/component_editor_portal_switcher.h"
 #include "editor/component_environment.h"
-#include "editor/component_scene.h"
+#include "editor/component_modification_monitor.h"
+#include "editor/component_scene_closer.h"
+#include "editor/component_scene_loader.h"
+#include "editor/component_scene_saver.h"
+#include "editor/component_scene_view.h"
+#include "editor/component_status.h"
 #include "editor/window_editor.h"
 
 namespace e8 {
@@ -32,9 +37,24 @@ IslandsEditorWindow::IslandsEditorWindow(std::shared_ptr<EditorContext> const &e
                                          QWidget *parent)
     : QMainWindow(parent), editor_context_(editor_context) {
     editor_context_->ui->setupUi(this);
-    environment_component_ = std::make_unique<EnvironmentComponent>(editor_context.get());
-    scene_component_ =
-        std::make_unique<SceneComponent>(environment_component_.get(), editor_context.get());
+
+    status_comp_ = std::make_unique<StatusComponent>(editor_context.get());
+    modification_monitor_comp_ =
+        std::make_unique<ModificationMonitorComponent>(editor_context.get());
+    editor_portal_switcher_comp_ =
+        std::make_unique<EditorPortalSwitcherComponent>(editor_context.get());
+    environment_comp_ = std::make_unique<EnvironmentComponent>(modification_monitor_comp_.get(),
+                                                               editor_context.get());
+    scene_view_comp_ = std::make_unique<SceneViewComponent>(editor_context.get());
+    scene_saver_comp_ = std::make_unique<SceneSaverComponent>(
+        modification_monitor_comp_.get(), scene_view_comp_.get(), editor_context.get());
+    scene_closer_comp_ = std::make_unique<SceneCloserComponent>(
+        editor_portal_switcher_comp_.get(), modification_monitor_comp_.get(),
+        scene_saver_comp_.get(), scene_view_comp_.get(), editor_context.get());
+    scene_loader_comp_ = std::make_unique<SceneLoaderComponent>(
+        editor_portal_switcher_comp_.get(), environment_comp_.get(),
+        modification_monitor_comp_.get(), scene_saver_comp_.get(), scene_view_comp_.get(),
+        editor_context.get());
 }
 
 IslandsEditorWindow::~IslandsEditorWindow() {}

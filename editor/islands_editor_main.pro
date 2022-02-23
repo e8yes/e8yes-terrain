@@ -17,16 +17,28 @@ INCLUDEPATH += ../
 
 SOURCES += \
     component_editor_context.cc \
+    component_editor_portal_switcher.cc \
     component_environment.cc \
-    component_scene.cc \
+    component_modification_monitor.cc \
+    component_scene_closer.cc \
+    component_scene_loader.cc \
+    component_scene_saver.cc \
+    component_scene_view.cc \
+    component_status.cc \
     main.cc \
     window_display.cc \
     window_editor.cc
 
 HEADERS += \
     component_editor_context.h \
+    component_editor_portal_switcher.h \
     component_environment.h \
-    component_scene.h \
+    component_modification_monitor.h \
+    component_scene_closer.h \
+    component_scene_loader.h \
+    component_scene_saver.h \
+    component_scene_view.h \
+    component_status.h \
     window_display.h \
     window_editor.h
 

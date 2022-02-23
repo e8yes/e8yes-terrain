@@ -21,6 +21,7 @@
 #include "common/tensor.h"
 #include "editor/component_editor_context.h"
 #include "editor/component_environment.h"
+#include "editor/component_modification_monitor.h"
 
 namespace e8 {
 namespace {
@@ -44,7 +45,9 @@ void SetSceneBackgroundColor(QSlider const *red, QSlider const *green, QSlider c
 
 } // namespace
 
-EnvironmentComponent::EnvironmentComponent(EditorContext *context) : context_(context) {
+EnvironmentComponent::EnvironmentComponent(ModificationMonitorComponent *modification_monitor_comp,
+                                           EditorContext *context)
+    : context_(context), modification_monitor_comp_(modification_monitor_comp) {
     QObject::connect(context->ui->bg_color_red_slider, &QSlider::valueChanged, this,
                      &EnvironmentComponent::OnChangeBackgroundColor);
     QObject::connect(context->ui->bg_color_green_slider, &QSlider::valueChanged, this,
@@ -64,6 +67,8 @@ void EnvironmentComponent::OnChangeScene() {
 void EnvironmentComponent::OnChangeBackgroundColor(int /*value*/) {
     SetSceneBackgroundColor(context_->ui->bg_color_red_slider, context_->ui->bg_color_green_slider,
                             context_->ui->bg_color_blue_slider, context_->scene.get());
+
+    modification_monitor_comp_->OnModifyScene();
 }
 
 } // namespace e8

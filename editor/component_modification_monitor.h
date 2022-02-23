@@ -15,37 +15,40 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_EDITOR_COMPONENT_ENVIRONMENT_H
-#define ISLANDS_EDITOR_COMPONENT_ENVIRONMENT_H
+#ifndef ISLANDS_EDITOR_COMPONENT_MODIFICATION_MONITOR_H
+#define ISLANDS_EDITOR_COMPONENT_MODIFICATION_MONITOR_H
 
 #include <QObject>
 
 #include "editor/component_editor_context.h"
-#include "editor/component_modification_monitor.h"
 
 namespace e8 {
 
 /**
- * @brief The EnvironmentComponent class Handles logic with UIs related to environment management.
+ * @brief The ModificationMonitorComponent class It responds to scene modification and reset events.
  */
-class EnvironmentComponent : public QObject {
+class ModificationMonitorComponent : public QObject {
     Q_OBJECT
 
   public:
-    EnvironmentComponent(ModificationMonitorComponent *modification_monitor_comp,
-                         EditorContext *context);
-    ~EnvironmentComponent();
+    ModificationMonitorComponent(EditorContext *context);
+    ~ModificationMonitorComponent();
+
+    /**
+     * @brief UnsavedModifications Checks if there are any currently unsaved modifications to the
+     * scene.
+     */
+    bool UnsavedModifications() const;
 
   public slots:
-    void OnChangeScene();
-
-    void OnChangeBackgroundColor(int value);
+    void OnReset();
+    void OnModifyScene();
 
   private:
     EditorContext *context_;
-    ModificationMonitorComponent *modification_monitor_comp_;
+    bool unsaved_modifications_;
 };
 
 } // namespace e8
 
-#endif // ISLANDS_EDITOR_COMPONENT_ENVIRONMENT_H
+#endif // ISLANDS_EDITOR_COMPONENT_MODIFICATION_MONITOR_H

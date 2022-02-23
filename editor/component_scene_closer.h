@@ -15,37 +15,44 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_EDITOR_COMPONENT_ENVIRONMENT_H
-#define ISLANDS_EDITOR_COMPONENT_ENVIRONMENT_H
+#ifndef COMPONENT_SCENE_CLOSER_H
+#define COMPONENT_SCENE_CLOSER_H
 
 #include <QObject>
 
 #include "editor/component_editor_context.h"
+#include "editor/component_editor_portal_switcher.h"
 #include "editor/component_modification_monitor.h"
+#include "editor/component_scene_saver.h"
+#include "editor/component_scene_view.h"
 
 namespace e8 {
 
 /**
- * @brief The EnvironmentComponent class Handles logic with UIs related to environment management.
+ * @brief The SceneCloserComponent class It's responsible for scene closing interactions.
  */
-class EnvironmentComponent : public QObject {
+class SceneCloserComponent : public QObject {
     Q_OBJECT
 
   public:
-    EnvironmentComponent(ModificationMonitorComponent *modification_monitor_comp,
+    SceneCloserComponent(EditorPortalSwitcherComponent *editor_portal_switcher_comp,
+                         ModificationMonitorComponent *modification_monitor_comp,
+                         SceneSaverComponent *scene_saver_comp, SceneViewComponent *scene_view_comp,
                          EditorContext *context);
-    ~EnvironmentComponent();
+    ~SceneCloserComponent();
 
   public slots:
-    void OnChangeScene();
-
-    void OnChangeBackgroundColor(int value);
+    void OnClickCloseScene();
 
   private:
-    EditorContext *context_;
+    EditorPortalSwitcherComponent *editor_portal_switcher_comp_;
     ModificationMonitorComponent *modification_monitor_comp_;
+    SceneSaverComponent *scene_saver_comp_;
+    SceneViewComponent *scene_view_comp_;
+
+    EditorContext *context_;
 };
 
 } // namespace e8
 
-#endif // ISLANDS_EDITOR_COMPONENT_ENVIRONMENT_H
+#endif // COMPONENT_SCENE_CLOSER_H

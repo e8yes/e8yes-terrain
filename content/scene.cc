@@ -95,6 +95,7 @@ SceneProto SceneInterface::_ToBaseProto() const {
         *proto.add_objects() = scene_object;
     }
 
+    proto.mutable_background_color()->Resize(/*new_size=*/3, /*value=*/0.0f);
     for (unsigned i = 0; i < 3; ++i) {
         proto.set_background_color(/*index=*/i, background_color_(i));
     }

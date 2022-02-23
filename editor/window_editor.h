@@ -23,8 +23,14 @@
 #include <memory>
 
 #include "editor/component_editor_context.h"
+#include "editor/component_editor_portal_switcher.h"
 #include "editor/component_environment.h"
-#include "editor/component_scene.h"
+#include "editor/component_modification_monitor.h"
+#include "editor/component_scene_closer.h"
+#include "editor/component_scene_loader.h"
+#include "editor/component_scene_saver.h"
+#include "editor/component_scene_view.h"
+#include "editor/component_status.h"
 
 namespace e8 {
 
@@ -41,8 +47,14 @@ class IslandsEditorWindow : public QMainWindow {
 
   private:
     std::shared_ptr<EditorContext> editor_context_;
-    std::unique_ptr<EnvironmentComponent> environment_component_;
-    std::unique_ptr<SceneComponent> scene_component_;
+    std::unique_ptr<StatusComponent> status_comp_;
+    std::unique_ptr<ModificationMonitorComponent> modification_monitor_comp_;
+    std::unique_ptr<EditorPortalSwitcherComponent> editor_portal_switcher_comp_;
+    std::unique_ptr<EnvironmentComponent> environment_comp_;
+    std::unique_ptr<SceneViewComponent> scene_view_comp_;
+    std::unique_ptr<SceneSaverComponent> scene_saver_comp_;
+    std::unique_ptr<SceneCloserComponent> scene_closer_comp_;
+    std::unique_ptr<SceneLoaderComponent> scene_loader_comp_;
 };
 
 /**
