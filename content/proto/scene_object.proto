@@ -20,15 +20,41 @@ syntax = "proto3";
 package e8;
 
 /**
- * @brief The SceneObject message It logically groups a set of entities, by referencing their ID.
+ * @brief The SceneObject message It logically groups a set of entities into a hierarchy (tree).
  */
 message SceneObject {
+    /*
+     * @brief The SceneObjectChildren message An internal tree node.
+     */
+    message SceneObjectChildren {
+        // Child scene objects, referenced by their ID.
+        repeated string scene_object_ids = 1;
+    }
+
+    /*
+     * @brief The SceneEntityChildren message An external tree node.
+     */
+    message SceneEntityChildren {
+        // Child scene entities, referenced by their ID.
+        repeated string scene_entity_ids = 1;
+    }
+
     // ID of this scene object.
     string id = 1;
 
     // Human readable name of this scene object.
     string name = 2;
 
-    // The entity group that constitutes this scene object.
-    repeated string entity_ids = 3;
+    // If this field isn't null, it indicates that this scene object is generated procedural
+    // process. The process is fully specified by the procedural object referenced by this ID.
+    string procedural_object_id = 3;
+
+    // Child nodes.
+    oneof children {
+        // Internal child nodes pointing to a sub-scene-object.
+        SceneObjectChildren scene_object_children = 4;
+
+        // External child nodes pointing to a list of scene entities.
+        SceneEntityChildren scene_entity_children = 5;
+    }
 };

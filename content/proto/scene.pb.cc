@@ -15,7 +15,7 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 extern PROTOBUF_INTERNAL_EXPORT_entity_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<3> scc_info_SceneEntityCollection_entity_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_scene_5fobject_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_SceneObject_scene_5fobject_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_scene_5fobject_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_SceneObject_scene_5fobject_2eproto;
 namespace e8 {
 class SceneProtoDefaultTypeInternal {
  public:

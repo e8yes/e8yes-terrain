@@ -47,7 +47,7 @@ struct TableStruct_scene_5fobject_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[1]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[3]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -58,13 +58,325 @@ namespace e8 {
 class SceneObject;
 class SceneObjectDefaultTypeInternal;
 extern SceneObjectDefaultTypeInternal _SceneObject_default_instance_;
+class SceneObject_SceneEntityChildren;
+class SceneObject_SceneEntityChildrenDefaultTypeInternal;
+extern SceneObject_SceneEntityChildrenDefaultTypeInternal _SceneObject_SceneEntityChildren_default_instance_;
+class SceneObject_SceneObjectChildren;
+class SceneObject_SceneObjectChildrenDefaultTypeInternal;
+extern SceneObject_SceneObjectChildrenDefaultTypeInternal _SceneObject_SceneObjectChildren_default_instance_;
 }  // namespace e8
 PROTOBUF_NAMESPACE_OPEN
 template<> ::e8::SceneObject* Arena::CreateMaybeMessage<::e8::SceneObject>(Arena*);
+template<> ::e8::SceneObject_SceneEntityChildren* Arena::CreateMaybeMessage<::e8::SceneObject_SceneEntityChildren>(Arena*);
+template<> ::e8::SceneObject_SceneObjectChildren* Arena::CreateMaybeMessage<::e8::SceneObject_SceneObjectChildren>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace e8 {
 
 // ===================================================================
+
+class SceneObject_SceneObjectChildren PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:e8.SceneObject.SceneObjectChildren) */ {
+ public:
+  inline SceneObject_SceneObjectChildren() : SceneObject_SceneObjectChildren(nullptr) {};
+  virtual ~SceneObject_SceneObjectChildren();
+
+  SceneObject_SceneObjectChildren(const SceneObject_SceneObjectChildren& from);
+  SceneObject_SceneObjectChildren(SceneObject_SceneObjectChildren&& from) noexcept
+    : SceneObject_SceneObjectChildren() {
+    *this = ::std::move(from);
+  }
+
+  inline SceneObject_SceneObjectChildren& operator=(const SceneObject_SceneObjectChildren& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline SceneObject_SceneObjectChildren& operator=(SceneObject_SceneObjectChildren&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const SceneObject_SceneObjectChildren& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const SceneObject_SceneObjectChildren* internal_default_instance() {
+    return reinterpret_cast<const SceneObject_SceneObjectChildren*>(
+               &_SceneObject_SceneObjectChildren_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    0;
+
+  friend void swap(SceneObject_SceneObjectChildren& a, SceneObject_SceneObjectChildren& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(SceneObject_SceneObjectChildren* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(SceneObject_SceneObjectChildren* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline SceneObject_SceneObjectChildren* New() const final {
+    return CreateMaybeMessage<SceneObject_SceneObjectChildren>(nullptr);
+  }
+
+  SceneObject_SceneObjectChildren* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<SceneObject_SceneObjectChildren>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const SceneObject_SceneObjectChildren& from);
+  void MergeFrom(const SceneObject_SceneObjectChildren& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(SceneObject_SceneObjectChildren* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "e8.SceneObject.SceneObjectChildren";
+  }
+  protected:
+  explicit SceneObject_SceneObjectChildren(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_scene_5fobject_2eproto);
+    return ::descriptor_table_scene_5fobject_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kSceneObjectIdsFieldNumber = 1,
+  };
+  // repeated string scene_object_ids = 1;
+  int scene_object_ids_size() const;
+  private:
+  int _internal_scene_object_ids_size() const;
+  public:
+  void clear_scene_object_ids();
+  const std::string& scene_object_ids(int index) const;
+  std::string* mutable_scene_object_ids(int index);
+  void set_scene_object_ids(int index, const std::string& value);
+  void set_scene_object_ids(int index, std::string&& value);
+  void set_scene_object_ids(int index, const char* value);
+  void set_scene_object_ids(int index, const char* value, size_t size);
+  std::string* add_scene_object_ids();
+  void add_scene_object_ids(const std::string& value);
+  void add_scene_object_ids(std::string&& value);
+  void add_scene_object_ids(const char* value);
+  void add_scene_object_ids(const char* value, size_t size);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& scene_object_ids() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_scene_object_ids();
+  private:
+  const std::string& _internal_scene_object_ids(int index) const;
+  std::string* _internal_add_scene_object_ids();
+  public:
+
+  // @@protoc_insertion_point(class_scope:e8.SceneObject.SceneObjectChildren)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> scene_object_ids_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_scene_5fobject_2eproto;
+};
+// -------------------------------------------------------------------
+
+class SceneObject_SceneEntityChildren PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:e8.SceneObject.SceneEntityChildren) */ {
+ public:
+  inline SceneObject_SceneEntityChildren() : SceneObject_SceneEntityChildren(nullptr) {};
+  virtual ~SceneObject_SceneEntityChildren();
+
+  SceneObject_SceneEntityChildren(const SceneObject_SceneEntityChildren& from);
+  SceneObject_SceneEntityChildren(SceneObject_SceneEntityChildren&& from) noexcept
+    : SceneObject_SceneEntityChildren() {
+    *this = ::std::move(from);
+  }
+
+  inline SceneObject_SceneEntityChildren& operator=(const SceneObject_SceneEntityChildren& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline SceneObject_SceneEntityChildren& operator=(SceneObject_SceneEntityChildren&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const SceneObject_SceneEntityChildren& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const SceneObject_SceneEntityChildren* internal_default_instance() {
+    return reinterpret_cast<const SceneObject_SceneEntityChildren*>(
+               &_SceneObject_SceneEntityChildren_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    1;
+
+  friend void swap(SceneObject_SceneEntityChildren& a, SceneObject_SceneEntityChildren& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(SceneObject_SceneEntityChildren* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(SceneObject_SceneEntityChildren* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline SceneObject_SceneEntityChildren* New() const final {
+    return CreateMaybeMessage<SceneObject_SceneEntityChildren>(nullptr);
+  }
+
+  SceneObject_SceneEntityChildren* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<SceneObject_SceneEntityChildren>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const SceneObject_SceneEntityChildren& from);
+  void MergeFrom(const SceneObject_SceneEntityChildren& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(SceneObject_SceneEntityChildren* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "e8.SceneObject.SceneEntityChildren";
+  }
+  protected:
+  explicit SceneObject_SceneEntityChildren(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_scene_5fobject_2eproto);
+    return ::descriptor_table_scene_5fobject_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kSceneEntityIdsFieldNumber = 1,
+  };
+  // repeated string scene_entity_ids = 1;
+  int scene_entity_ids_size() const;
+  private:
+  int _internal_scene_entity_ids_size() const;
+  public:
+  void clear_scene_entity_ids();
+  const std::string& scene_entity_ids(int index) const;
+  std::string* mutable_scene_entity_ids(int index);
+  void set_scene_entity_ids(int index, const std::string& value);
+  void set_scene_entity_ids(int index, std::string&& value);
+  void set_scene_entity_ids(int index, const char* value);
+  void set_scene_entity_ids(int index, const char* value, size_t size);
+  std::string* add_scene_entity_ids();
+  void add_scene_entity_ids(const std::string& value);
+  void add_scene_entity_ids(std::string&& value);
+  void add_scene_entity_ids(const char* value);
+  void add_scene_entity_ids(const char* value, size_t size);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& scene_entity_ids() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_scene_entity_ids();
+  private:
+  const std::string& _internal_scene_entity_ids(int index) const;
+  std::string* _internal_add_scene_entity_ids();
+  public:
+
+  // @@protoc_insertion_point(class_scope:e8.SceneObject.SceneEntityChildren)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> scene_entity_ids_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_scene_5fobject_2eproto;
+};
+// -------------------------------------------------------------------
 
 class SceneObject PROTOBUF_FINAL :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:e8.SceneObject) */ {
@@ -102,13 +414,19 @@ class SceneObject PROTOBUF_FINAL :
   }
   static const SceneObject& default_instance();
 
+  enum ChildrenCase {
+    kSceneObjectChildren = 4,
+    kSceneEntityChildren = 5,
+    CHILDREN_NOT_SET = 0,
+  };
+
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
   static inline const SceneObject* internal_default_instance() {
     return reinterpret_cast<const SceneObject*>(
                &_SceneObject_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    0;
+    2;
 
   friend void swap(SceneObject& a, SceneObject& b) {
     a.Swap(&b);
@@ -176,37 +494,18 @@ class SceneObject PROTOBUF_FINAL :
 
   // nested types ----------------------------------------------------
 
+  typedef SceneObject_SceneObjectChildren SceneObjectChildren;
+  typedef SceneObject_SceneEntityChildren SceneEntityChildren;
+
   // accessors -------------------------------------------------------
 
   enum : int {
-    kEntityIdsFieldNumber = 3,
     kIdFieldNumber = 1,
     kNameFieldNumber = 2,
+    kProceduralObjectIdFieldNumber = 3,
+    kSceneObjectChildrenFieldNumber = 4,
+    kSceneEntityChildrenFieldNumber = 5,
   };
-  // repeated string entity_ids = 3;
-  int entity_ids_size() const;
-  private:
-  int _internal_entity_ids_size() const;
-  public:
-  void clear_entity_ids();
-  const std::string& entity_ids(int index) const;
-  std::string* mutable_entity_ids(int index);
-  void set_entity_ids(int index, const std::string& value);
-  void set_entity_ids(int index, std::string&& value);
-  void set_entity_ids(int index, const char* value);
-  void set_entity_ids(int index, const char* value, size_t size);
-  std::string* add_entity_ids();
-  void add_entity_ids(const std::string& value);
-  void add_entity_ids(std::string&& value);
-  void add_entity_ids(const char* value);
-  void add_entity_ids(const char* value, size_t size);
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& entity_ids() const;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_entity_ids();
-  private:
-  const std::string& _internal_entity_ids(int index) const;
-  std::string* _internal_add_entity_ids();
-  public:
-
   // string id = 1;
   void clear_id();
   const std::string& id() const;
@@ -257,17 +556,92 @@ class SceneObject PROTOBUF_FINAL :
   std::string* _internal_mutable_name();
   public:
 
+  // string procedural_object_id = 3;
+  void clear_procedural_object_id();
+  const std::string& procedural_object_id() const;
+  void set_procedural_object_id(const std::string& value);
+  void set_procedural_object_id(std::string&& value);
+  void set_procedural_object_id(const char* value);
+  void set_procedural_object_id(const char* value, size_t size);
+  std::string* mutable_procedural_object_id();
+  std::string* release_procedural_object_id();
+  void set_allocated_procedural_object_id(std::string* procedural_object_id);
+  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  std::string* unsafe_arena_release_procedural_object_id();
+  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  void unsafe_arena_set_allocated_procedural_object_id(
+      std::string* procedural_object_id);
+  private:
+  const std::string& _internal_procedural_object_id() const;
+  void _internal_set_procedural_object_id(const std::string& value);
+  std::string* _internal_mutable_procedural_object_id();
+  public:
+
+  // .e8.SceneObject.SceneObjectChildren scene_object_children = 4;
+  bool has_scene_object_children() const;
+  private:
+  bool _internal_has_scene_object_children() const;
+  public:
+  void clear_scene_object_children();
+  const ::e8::SceneObject_SceneObjectChildren& scene_object_children() const;
+  ::e8::SceneObject_SceneObjectChildren* release_scene_object_children();
+  ::e8::SceneObject_SceneObjectChildren* mutable_scene_object_children();
+  void set_allocated_scene_object_children(::e8::SceneObject_SceneObjectChildren* scene_object_children);
+  private:
+  const ::e8::SceneObject_SceneObjectChildren& _internal_scene_object_children() const;
+  ::e8::SceneObject_SceneObjectChildren* _internal_mutable_scene_object_children();
+  public:
+  void unsafe_arena_set_allocated_scene_object_children(
+      ::e8::SceneObject_SceneObjectChildren* scene_object_children);
+  ::e8::SceneObject_SceneObjectChildren* unsafe_arena_release_scene_object_children();
+
+  // .e8.SceneObject.SceneEntityChildren scene_entity_children = 5;
+  bool has_scene_entity_children() const;
+  private:
+  bool _internal_has_scene_entity_children() const;
+  public:
+  void clear_scene_entity_children();
+  const ::e8::SceneObject_SceneEntityChildren& scene_entity_children() const;
+  ::e8::SceneObject_SceneEntityChildren* release_scene_entity_children();
+  ::e8::SceneObject_SceneEntityChildren* mutable_scene_entity_children();
+  void set_allocated_scene_entity_children(::e8::SceneObject_SceneEntityChildren* scene_entity_children);
+  private:
+  const ::e8::SceneObject_SceneEntityChildren& _internal_scene_entity_children() const;
+  ::e8::SceneObject_SceneEntityChildren* _internal_mutable_scene_entity_children();
+  public:
+  void unsafe_arena_set_allocated_scene_entity_children(
+      ::e8::SceneObject_SceneEntityChildren* scene_entity_children);
+  ::e8::SceneObject_SceneEntityChildren* unsafe_arena_release_scene_entity_children();
+
+  void clear_children();
+  ChildrenCase children_case() const;
   // @@protoc_insertion_point(class_scope:e8.SceneObject)
  private:
   class _Internal;
+  void set_has_scene_object_children();
+  void set_has_scene_entity_children();
+
+  inline bool has_children() const;
+  inline void clear_has_children();
 
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> entity_ids_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr id_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr procedural_object_id_;
+  union ChildrenUnion {
+    ChildrenUnion() {}
+    ::e8::SceneObject_SceneObjectChildren* scene_object_children_;
+    ::e8::SceneObject_SceneEntityChildren* scene_entity_children_;
+  } children_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
+
   friend struct ::TableStruct_scene_5fobject_2eproto;
 };
 // ===================================================================
@@ -279,6 +653,162 @@ class SceneObject PROTOBUF_FINAL :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
+// SceneObject_SceneObjectChildren
+
+// repeated string scene_object_ids = 1;
+inline int SceneObject_SceneObjectChildren::_internal_scene_object_ids_size() const {
+  return scene_object_ids_.size();
+}
+inline int SceneObject_SceneObjectChildren::scene_object_ids_size() const {
+  return _internal_scene_object_ids_size();
+}
+inline void SceneObject_SceneObjectChildren::clear_scene_object_ids() {
+  scene_object_ids_.Clear();
+}
+inline std::string* SceneObject_SceneObjectChildren::add_scene_object_ids() {
+  // @@protoc_insertion_point(field_add_mutable:e8.SceneObject.SceneObjectChildren.scene_object_ids)
+  return _internal_add_scene_object_ids();
+}
+inline const std::string& SceneObject_SceneObjectChildren::_internal_scene_object_ids(int index) const {
+  return scene_object_ids_.Get(index);
+}
+inline const std::string& SceneObject_SceneObjectChildren::scene_object_ids(int index) const {
+  // @@protoc_insertion_point(field_get:e8.SceneObject.SceneObjectChildren.scene_object_ids)
+  return _internal_scene_object_ids(index);
+}
+inline std::string* SceneObject_SceneObjectChildren::mutable_scene_object_ids(int index) {
+  // @@protoc_insertion_point(field_mutable:e8.SceneObject.SceneObjectChildren.scene_object_ids)
+  return scene_object_ids_.Mutable(index);
+}
+inline void SceneObject_SceneObjectChildren::set_scene_object_ids(int index, const std::string& value) {
+  // @@protoc_insertion_point(field_set:e8.SceneObject.SceneObjectChildren.scene_object_ids)
+  scene_object_ids_.Mutable(index)->assign(value);
+}
+inline void SceneObject_SceneObjectChildren::set_scene_object_ids(int index, std::string&& value) {
+  // @@protoc_insertion_point(field_set:e8.SceneObject.SceneObjectChildren.scene_object_ids)
+  scene_object_ids_.Mutable(index)->assign(std::move(value));
+}
+inline void SceneObject_SceneObjectChildren::set_scene_object_ids(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  scene_object_ids_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:e8.SceneObject.SceneObjectChildren.scene_object_ids)
+}
+inline void SceneObject_SceneObjectChildren::set_scene_object_ids(int index, const char* value, size_t size) {
+  scene_object_ids_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:e8.SceneObject.SceneObjectChildren.scene_object_ids)
+}
+inline std::string* SceneObject_SceneObjectChildren::_internal_add_scene_object_ids() {
+  return scene_object_ids_.Add();
+}
+inline void SceneObject_SceneObjectChildren::add_scene_object_ids(const std::string& value) {
+  scene_object_ids_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:e8.SceneObject.SceneObjectChildren.scene_object_ids)
+}
+inline void SceneObject_SceneObjectChildren::add_scene_object_ids(std::string&& value) {
+  scene_object_ids_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:e8.SceneObject.SceneObjectChildren.scene_object_ids)
+}
+inline void SceneObject_SceneObjectChildren::add_scene_object_ids(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  scene_object_ids_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:e8.SceneObject.SceneObjectChildren.scene_object_ids)
+}
+inline void SceneObject_SceneObjectChildren::add_scene_object_ids(const char* value, size_t size) {
+  scene_object_ids_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:e8.SceneObject.SceneObjectChildren.scene_object_ids)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
+SceneObject_SceneObjectChildren::scene_object_ids() const {
+  // @@protoc_insertion_point(field_list:e8.SceneObject.SceneObjectChildren.scene_object_ids)
+  return scene_object_ids_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
+SceneObject_SceneObjectChildren::mutable_scene_object_ids() {
+  // @@protoc_insertion_point(field_mutable_list:e8.SceneObject.SceneObjectChildren.scene_object_ids)
+  return &scene_object_ids_;
+}
+
+// -------------------------------------------------------------------
+
+// SceneObject_SceneEntityChildren
+
+// repeated string scene_entity_ids = 1;
+inline int SceneObject_SceneEntityChildren::_internal_scene_entity_ids_size() const {
+  return scene_entity_ids_.size();
+}
+inline int SceneObject_SceneEntityChildren::scene_entity_ids_size() const {
+  return _internal_scene_entity_ids_size();
+}
+inline void SceneObject_SceneEntityChildren::clear_scene_entity_ids() {
+  scene_entity_ids_.Clear();
+}
+inline std::string* SceneObject_SceneEntityChildren::add_scene_entity_ids() {
+  // @@protoc_insertion_point(field_add_mutable:e8.SceneObject.SceneEntityChildren.scene_entity_ids)
+  return _internal_add_scene_entity_ids();
+}
+inline const std::string& SceneObject_SceneEntityChildren::_internal_scene_entity_ids(int index) const {
+  return scene_entity_ids_.Get(index);
+}
+inline const std::string& SceneObject_SceneEntityChildren::scene_entity_ids(int index) const {
+  // @@protoc_insertion_point(field_get:e8.SceneObject.SceneEntityChildren.scene_entity_ids)
+  return _internal_scene_entity_ids(index);
+}
+inline std::string* SceneObject_SceneEntityChildren::mutable_scene_entity_ids(int index) {
+  // @@protoc_insertion_point(field_mutable:e8.SceneObject.SceneEntityChildren.scene_entity_ids)
+  return scene_entity_ids_.Mutable(index);
+}
+inline void SceneObject_SceneEntityChildren::set_scene_entity_ids(int index, const std::string& value) {
+  // @@protoc_insertion_point(field_set:e8.SceneObject.SceneEntityChildren.scene_entity_ids)
+  scene_entity_ids_.Mutable(index)->assign(value);
+}
+inline void SceneObject_SceneEntityChildren::set_scene_entity_ids(int index, std::string&& value) {
+  // @@protoc_insertion_point(field_set:e8.SceneObject.SceneEntityChildren.scene_entity_ids)
+  scene_entity_ids_.Mutable(index)->assign(std::move(value));
+}
+inline void SceneObject_SceneEntityChildren::set_scene_entity_ids(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  scene_entity_ids_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:e8.SceneObject.SceneEntityChildren.scene_entity_ids)
+}
+inline void SceneObject_SceneEntityChildren::set_scene_entity_ids(int index, const char* value, size_t size) {
+  scene_entity_ids_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:e8.SceneObject.SceneEntityChildren.scene_entity_ids)
+}
+inline std::string* SceneObject_SceneEntityChildren::_internal_add_scene_entity_ids() {
+  return scene_entity_ids_.Add();
+}
+inline void SceneObject_SceneEntityChildren::add_scene_entity_ids(const std::string& value) {
+  scene_entity_ids_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:e8.SceneObject.SceneEntityChildren.scene_entity_ids)
+}
+inline void SceneObject_SceneEntityChildren::add_scene_entity_ids(std::string&& value) {
+  scene_entity_ids_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:e8.SceneObject.SceneEntityChildren.scene_entity_ids)
+}
+inline void SceneObject_SceneEntityChildren::add_scene_entity_ids(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  scene_entity_ids_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:e8.SceneObject.SceneEntityChildren.scene_entity_ids)
+}
+inline void SceneObject_SceneEntityChildren::add_scene_entity_ids(const char* value, size_t size) {
+  scene_entity_ids_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:e8.SceneObject.SceneEntityChildren.scene_entity_ids)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
+SceneObject_SceneEntityChildren::scene_entity_ids() const {
+  // @@protoc_insertion_point(field_list:e8.SceneObject.SceneEntityChildren.scene_entity_ids)
+  return scene_entity_ids_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
+SceneObject_SceneEntityChildren::mutable_scene_entity_ids() {
+  // @@protoc_insertion_point(field_mutable_list:e8.SceneObject.SceneEntityChildren.scene_entity_ids)
+  return &scene_entity_ids_;
+}
+
+// -------------------------------------------------------------------
+
 // SceneObject
 
 // string id = 1;
@@ -443,83 +973,249 @@ inline void SceneObject::unsafe_arena_set_allocated_name(
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneObject.name)
 }
 
-// repeated string entity_ids = 3;
-inline int SceneObject::_internal_entity_ids_size() const {
-  return entity_ids_.size();
+// string procedural_object_id = 3;
+inline void SceneObject::clear_procedural_object_id() {
+  procedural_object_id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
-inline int SceneObject::entity_ids_size() const {
-  return _internal_entity_ids_size();
+inline const std::string& SceneObject::procedural_object_id() const {
+  // @@protoc_insertion_point(field_get:e8.SceneObject.procedural_object_id)
+  return _internal_procedural_object_id();
 }
-inline void SceneObject::clear_entity_ids() {
-  entity_ids_.Clear();
+inline void SceneObject::set_procedural_object_id(const std::string& value) {
+  _internal_set_procedural_object_id(value);
+  // @@protoc_insertion_point(field_set:e8.SceneObject.procedural_object_id)
 }
-inline std::string* SceneObject::add_entity_ids() {
-  // @@protoc_insertion_point(field_add_mutable:e8.SceneObject.entity_ids)
-  return _internal_add_entity_ids();
+inline std::string* SceneObject::mutable_procedural_object_id() {
+  // @@protoc_insertion_point(field_mutable:e8.SceneObject.procedural_object_id)
+  return _internal_mutable_procedural_object_id();
 }
-inline const std::string& SceneObject::_internal_entity_ids(int index) const {
-  return entity_ids_.Get(index);
+inline const std::string& SceneObject::_internal_procedural_object_id() const {
+  return procedural_object_id_.Get();
 }
-inline const std::string& SceneObject::entity_ids(int index) const {
-  // @@protoc_insertion_point(field_get:e8.SceneObject.entity_ids)
-  return _internal_entity_ids(index);
+inline void SceneObject::_internal_set_procedural_object_id(const std::string& value) {
+  
+  procedural_object_id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
-inline std::string* SceneObject::mutable_entity_ids(int index) {
-  // @@protoc_insertion_point(field_mutable:e8.SceneObject.entity_ids)
-  return entity_ids_.Mutable(index);
+inline void SceneObject::set_procedural_object_id(std::string&& value) {
+  
+  procedural_object_id_.Set(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:e8.SceneObject.procedural_object_id)
 }
-inline void SceneObject::set_entity_ids(int index, const std::string& value) {
-  // @@protoc_insertion_point(field_set:e8.SceneObject.entity_ids)
-  entity_ids_.Mutable(index)->assign(value);
-}
-inline void SceneObject::set_entity_ids(int index, std::string&& value) {
-  // @@protoc_insertion_point(field_set:e8.SceneObject.entity_ids)
-  entity_ids_.Mutable(index)->assign(std::move(value));
-}
-inline void SceneObject::set_entity_ids(int index, const char* value) {
+inline void SceneObject::set_procedural_object_id(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  entity_ids_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:e8.SceneObject.entity_ids)
+  
+  procedural_object_id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArena());
+  // @@protoc_insertion_point(field_set_char:e8.SceneObject.procedural_object_id)
 }
-inline void SceneObject::set_entity_ids(int index, const char* value, size_t size) {
-  entity_ids_.Mutable(index)->assign(
-    reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:e8.SceneObject.entity_ids)
+inline void SceneObject::set_procedural_object_id(const char* value,
+    size_t size) {
+  
+  procedural_object_id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:e8.SceneObject.procedural_object_id)
 }
-inline std::string* SceneObject::_internal_add_entity_ids() {
-  return entity_ids_.Add();
+inline std::string* SceneObject::_internal_mutable_procedural_object_id() {
+  
+  return procedural_object_id_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
-inline void SceneObject::add_entity_ids(const std::string& value) {
-  entity_ids_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:e8.SceneObject.entity_ids)
+inline std::string* SceneObject::release_procedural_object_id() {
+  // @@protoc_insertion_point(field_release:e8.SceneObject.procedural_object_id)
+  return procedural_object_id_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
-inline void SceneObject::add_entity_ids(std::string&& value) {
-  entity_ids_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:e8.SceneObject.entity_ids)
+inline void SceneObject::set_allocated_procedural_object_id(std::string* procedural_object_id) {
+  if (procedural_object_id != nullptr) {
+    
+  } else {
+    
+  }
+  procedural_object_id_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), procedural_object_id,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:e8.SceneObject.procedural_object_id)
 }
-inline void SceneObject::add_entity_ids(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  entity_ids_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:e8.SceneObject.entity_ids)
+inline std::string* SceneObject::unsafe_arena_release_procedural_object_id() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:e8.SceneObject.procedural_object_id)
+  GOOGLE_DCHECK(GetArena() != nullptr);
+  
+  return procedural_object_id_.UnsafeArenaRelease(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      GetArena());
 }
-inline void SceneObject::add_entity_ids(const char* value, size_t size) {
-  entity_ids_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:e8.SceneObject.entity_ids)
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
-SceneObject::entity_ids() const {
-  // @@protoc_insertion_point(field_list:e8.SceneObject.entity_ids)
-  return entity_ids_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
-SceneObject::mutable_entity_ids() {
-  // @@protoc_insertion_point(field_mutable_list:e8.SceneObject.entity_ids)
-  return &entity_ids_;
+inline void SceneObject::unsafe_arena_set_allocated_procedural_object_id(
+    std::string* procedural_object_id) {
+  GOOGLE_DCHECK(GetArena() != nullptr);
+  if (procedural_object_id != nullptr) {
+    
+  } else {
+    
+  }
+  procedural_object_id_.UnsafeArenaSetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      procedural_object_id, GetArena());
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneObject.procedural_object_id)
 }
 
+// .e8.SceneObject.SceneObjectChildren scene_object_children = 4;
+inline bool SceneObject::_internal_has_scene_object_children() const {
+  return children_case() == kSceneObjectChildren;
+}
+inline bool SceneObject::has_scene_object_children() const {
+  return _internal_has_scene_object_children();
+}
+inline void SceneObject::set_has_scene_object_children() {
+  _oneof_case_[0] = kSceneObjectChildren;
+}
+inline void SceneObject::clear_scene_object_children() {
+  if (_internal_has_scene_object_children()) {
+    if (GetArena() == nullptr) {
+      delete children_.scene_object_children_;
+    }
+    clear_has_children();
+  }
+}
+inline ::e8::SceneObject_SceneObjectChildren* SceneObject::release_scene_object_children() {
+  // @@protoc_insertion_point(field_release:e8.SceneObject.scene_object_children)
+  if (_internal_has_scene_object_children()) {
+    clear_has_children();
+      ::e8::SceneObject_SceneObjectChildren* temp = children_.scene_object_children_;
+    if (GetArena() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    children_.scene_object_children_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::e8::SceneObject_SceneObjectChildren& SceneObject::_internal_scene_object_children() const {
+  return _internal_has_scene_object_children()
+      ? *children_.scene_object_children_
+      : *reinterpret_cast< ::e8::SceneObject_SceneObjectChildren*>(&::e8::_SceneObject_SceneObjectChildren_default_instance_);
+}
+inline const ::e8::SceneObject_SceneObjectChildren& SceneObject::scene_object_children() const {
+  // @@protoc_insertion_point(field_get:e8.SceneObject.scene_object_children)
+  return _internal_scene_object_children();
+}
+inline ::e8::SceneObject_SceneObjectChildren* SceneObject::unsafe_arena_release_scene_object_children() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:e8.SceneObject.scene_object_children)
+  if (_internal_has_scene_object_children()) {
+    clear_has_children();
+    ::e8::SceneObject_SceneObjectChildren* temp = children_.scene_object_children_;
+    children_.scene_object_children_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void SceneObject::unsafe_arena_set_allocated_scene_object_children(::e8::SceneObject_SceneObjectChildren* scene_object_children) {
+  clear_children();
+  if (scene_object_children) {
+    set_has_scene_object_children();
+    children_.scene_object_children_ = scene_object_children;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneObject.scene_object_children)
+}
+inline ::e8::SceneObject_SceneObjectChildren* SceneObject::_internal_mutable_scene_object_children() {
+  if (!_internal_has_scene_object_children()) {
+    clear_children();
+    set_has_scene_object_children();
+    children_.scene_object_children_ = CreateMaybeMessage< ::e8::SceneObject_SceneObjectChildren >(GetArena());
+  }
+  return children_.scene_object_children_;
+}
+inline ::e8::SceneObject_SceneObjectChildren* SceneObject::mutable_scene_object_children() {
+  // @@protoc_insertion_point(field_mutable:e8.SceneObject.scene_object_children)
+  return _internal_mutable_scene_object_children();
+}
+
+// .e8.SceneObject.SceneEntityChildren scene_entity_children = 5;
+inline bool SceneObject::_internal_has_scene_entity_children() const {
+  return children_case() == kSceneEntityChildren;
+}
+inline bool SceneObject::has_scene_entity_children() const {
+  return _internal_has_scene_entity_children();
+}
+inline void SceneObject::set_has_scene_entity_children() {
+  _oneof_case_[0] = kSceneEntityChildren;
+}
+inline void SceneObject::clear_scene_entity_children() {
+  if (_internal_has_scene_entity_children()) {
+    if (GetArena() == nullptr) {
+      delete children_.scene_entity_children_;
+    }
+    clear_has_children();
+  }
+}
+inline ::e8::SceneObject_SceneEntityChildren* SceneObject::release_scene_entity_children() {
+  // @@protoc_insertion_point(field_release:e8.SceneObject.scene_entity_children)
+  if (_internal_has_scene_entity_children()) {
+    clear_has_children();
+      ::e8::SceneObject_SceneEntityChildren* temp = children_.scene_entity_children_;
+    if (GetArena() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    children_.scene_entity_children_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::e8::SceneObject_SceneEntityChildren& SceneObject::_internal_scene_entity_children() const {
+  return _internal_has_scene_entity_children()
+      ? *children_.scene_entity_children_
+      : *reinterpret_cast< ::e8::SceneObject_SceneEntityChildren*>(&::e8::_SceneObject_SceneEntityChildren_default_instance_);
+}
+inline const ::e8::SceneObject_SceneEntityChildren& SceneObject::scene_entity_children() const {
+  // @@protoc_insertion_point(field_get:e8.SceneObject.scene_entity_children)
+  return _internal_scene_entity_children();
+}
+inline ::e8::SceneObject_SceneEntityChildren* SceneObject::unsafe_arena_release_scene_entity_children() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:e8.SceneObject.scene_entity_children)
+  if (_internal_has_scene_entity_children()) {
+    clear_has_children();
+    ::e8::SceneObject_SceneEntityChildren* temp = children_.scene_entity_children_;
+    children_.scene_entity_children_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void SceneObject::unsafe_arena_set_allocated_scene_entity_children(::e8::SceneObject_SceneEntityChildren* scene_entity_children) {
+  clear_children();
+  if (scene_entity_children) {
+    set_has_scene_entity_children();
+    children_.scene_entity_children_ = scene_entity_children;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneObject.scene_entity_children)
+}
+inline ::e8::SceneObject_SceneEntityChildren* SceneObject::_internal_mutable_scene_entity_children() {
+  if (!_internal_has_scene_entity_children()) {
+    clear_children();
+    set_has_scene_entity_children();
+    children_.scene_entity_children_ = CreateMaybeMessage< ::e8::SceneObject_SceneEntityChildren >(GetArena());
+  }
+  return children_.scene_entity_children_;
+}
+inline ::e8::SceneObject_SceneEntityChildren* SceneObject::mutable_scene_entity_children() {
+  // @@protoc_insertion_point(field_mutable:e8.SceneObject.scene_entity_children)
+  return _internal_mutable_scene_entity_children();
+}
+
+inline bool SceneObject::has_children() const {
+  return children_case() != CHILDREN_NOT_SET;
+}
+inline void SceneObject::clear_has_children() {
+  _oneof_case_[0] = CHILDREN_NOT_SET;
+}
+inline SceneObject::ChildrenCase SceneObject::children_case() const {
+  return SceneObject::ChildrenCase(_oneof_case_[0]);
+}
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 
