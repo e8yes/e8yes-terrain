@@ -94,7 +94,6 @@
    </widget>
    <addaction name="menu_file"/>
   </widget>
-  <widget class="QStatusBar" name="status_bar"/>
   <widget class="QDockWidget" name="design_nav_dock">
    <property name="features">
     <set>QDockWidget::DockWidgetMovable</set>
@@ -486,7 +485,7 @@
               <x>0</x>
               <y>0</y>
               <width>381</width>
-              <height>587</height>
+              <height>609</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -686,7 +685,7 @@
               <x>0</x>
               <y>0</y>
               <width>381</width>
-              <height>587</height>
+              <height>609</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -801,7 +800,7 @@
               <x>0</x>
               <y>0</y>
               <width>381</width>
-              <height>587</height>
+              <height>609</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_15">

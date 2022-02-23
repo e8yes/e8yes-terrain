@@ -16,14 +16,20 @@
  */
 
 #include <QAction>
+#include <QDir>
+#include <QFileDialog>
+#include <QMessageBox>
 #include <QObject>
 #include <QStringList>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <boost/log/trivial.hpp>
+#include <fstream>
 #include <memory>
 #include <vector>
 
+#include "content/proto/scene.pb.h"
+#include "content/scene.h"
 #include "content/scene_linear.h"
 #include "editor/component_editor_context.h"
 #include "editor/component_environment.h"
@@ -117,6 +123,49 @@ bool CreateNewScene(EditorSceneType scene_type, EnvironmentComponent *environmen
     return true;
 }
 
+bool LoadScene(std::string const &scene_file, EnvironmentComponent *environment_component,
+               EditorContext *context) {
+    std::fstream file(scene_file, std::ios::in | std::ios::binary);
+    if (file.is_open()) {
+        BOOST_LOG_TRIVIAL(error) << "LoadScene(): Failed to open scene_file=[" << scene_file
+                                 << "].";
+        return false;
+    }
+
+    SceneProto proto;
+    if (!proto.ParseFromIstream(&file)) {
+        BOOST_LOG_TRIVIAL(error) << "LoadScene(): Failed to parse scene_file=[" << scene_file
+                                 << "].";
+        return false;
+    }
+
+    context->scene = ToScene(proto);
+    context->loaded_from = scene_file;
+    context->unsaved_modification = false;
+
+    environment_component->OnChangeScene();
+
+    return true;
+}
+
+bool SaveScene(SceneInterface const &scene, std::string const &target_file_path,
+               EditorContext *context) {
+    std::fstream file(target_file_path, std::ios::out | std::ios::binary);
+    if (!file.is_open()) {
+        return false;
+    }
+
+    SceneProto proto = scene.ToProto();
+    if (!proto.SerializeToOstream(&file)) {
+        return false;
+    }
+
+    context->loaded_from = target_file_path;
+    context->unsaved_modification = false;
+
+    return true;
+}
+
 } // namespace
 
 SceneComponent::SceneComponent(EnvironmentComponent *environment_component, EditorContext *context)
@@ -127,6 +176,12 @@ SceneComponent::SceneComponent(EnvironmentComponent *environment_component, Edit
                      &SceneComponent::OnClickNewSceneLinear);
     QAction::connect(context_->ui->action_new_scene_octree, &QAction::triggered, this,
                      &SceneComponent::OnClickNewSceneOctree);
+    QAction::connect(context_->ui->action_open_scene, &QAction::triggered, this,
+                     &SceneComponent::OnClickOpenScene);
+    QAction::connect(context_->ui->action_save_scene, &QAction::triggered, this,
+                     &SceneComponent::OnClickSaveScene);
+    QAction::connect(context_->ui->action_close_scene, &QAction::triggered, this,
+                     &SceneComponent::OnClickCloseScene);
 }
 
 SceneComponent::~SceneComponent() {}
@@ -136,7 +191,55 @@ void SceneComponent::OnClickNewSceneLinear() {
 }
 
 void SceneComponent::OnClickNewSceneOctree() {
-    CreateNewScene(/*scene_type=*/EST_OCTREE_SCENE, environment_component_, context_);
+    if (!CreateNewScene(/*scene_type=*/EST_OCTREE_SCENE, environment_component_, context_)) {
+        QMessageBox msg_box;
+        msg_box.setText("Failed to Create Scene");
+        msg_box.setInformativeText("Internal Error");
+        msg_box.setStandardButtons(QMessageBox::Ok);
+        msg_box.setDefaultButton(QMessageBox::Ok);
+        msg_box.exec();
+    }
 }
+
+void SceneComponent::OnClickOpenScene() {
+    QString scene_file = QFileDialog::getOpenFileName(
+        /*parent=*/nullptr, /*caption=*/tr("Open Scene"), QDir::homePath(),
+        /*filter=*/tr("e8 islands scene (*.pb)"));
+
+    if (!LoadScene(scene_file.toStdString(), environment_component_, context_)) {
+        QMessageBox msg_box;
+        msg_box.setText("Failed to Load Scene");
+        msg_box.setStandardButtons(QMessageBox::Ok);
+        msg_box.setDefaultButton(QMessageBox::Ok);
+        msg_box.exec();
+    }
+}
+
+void SceneComponent::OnClickSaveScene() {
+    if (!context_->unsaved_modification) {
+        BOOST_LOG_TRIVIAL(error) << "OnClickSaveScene(): Invoked wihtout unsaved modifications";
+        return;
+    }
+
+    std::string scene_file;
+    if (!context_->loaded_from.has_value()) {
+        QString file_name = QFileDialog::getSaveFileName(
+            /*parent=*/nullptr, /*capture=*/tr("Save Scene"), QDir::homePath(),
+            /*filter=*/tr("e8 islands scene (*.pb)"));
+        scene_file = file_name.toStdString();
+    } else {
+        scene_file = *context_->loaded_from;
+    }
+
+    if (!SaveScene(*context_->scene, *context_->loaded_from, context_)) {
+        QMessageBox msg_box;
+        msg_box.setText("Failed to Save Scene");
+        msg_box.setStandardButtons(QMessageBox::Ok);
+        msg_box.setDefaultButton(QMessageBox::Ok);
+        msg_box.exec();
+    }
+}
+
+void SceneComponent::OnClickCloseScene() {}
 
 } // namespace e8

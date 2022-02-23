@@ -20,6 +20,8 @@
 
 #include <QWidget>
 #include <memory>
+#include <optional>
+#include <string>
 #include <vector>
 
 #include "content/scene.h"
@@ -39,6 +41,12 @@ struct EditorContext {
 
     // The scene the editor is currently working on, it may be null.
     std::unique_ptr<SceneInterface> scene;
+
+    //
+    std::optional<std::string> loaded_from;
+
+    //
+    bool unsaved_modification;
 
     // Indicates if the editor is running.
     bool running;

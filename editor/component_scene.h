@@ -40,6 +40,12 @@ class SceneComponent : public QObject {
 
     void OnClickNewSceneOctree();
 
+    void OnClickOpenScene();
+
+    void OnClickSaveScene();
+
+    void OnClickCloseScene();
+
   private:
     EnvironmentComponent *environment_component_;
     EditorContext *context_;
