@@ -47,7 +47,7 @@ struct TableStruct_primitive_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[3]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[4]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -64,11 +64,15 @@ extern PrimitiveIndicesDefaultTypeInternal _PrimitiveIndices_default_instance_;
 class PrimitiveVertex;
 class PrimitiveVertexDefaultTypeInternal;
 extern PrimitiveVertexDefaultTypeInternal _PrimitiveVertex_default_instance_;
+class SrtTransform;
+class SrtTransformDefaultTypeInternal;
+extern SrtTransformDefaultTypeInternal _SrtTransform_default_instance_;
 }  // namespace e8
 PROTOBUF_NAMESPACE_OPEN
 template<> ::e8::AABB* Arena::CreateMaybeMessage<::e8::AABB>(Arena*);
 template<> ::e8::PrimitiveIndices* Arena::CreateMaybeMessage<::e8::PrimitiveIndices>(Arena*);
 template<> ::e8::PrimitiveVertex* Arena::CreateMaybeMessage<::e8::PrimitiveVertex>(Arena*);
+template<> ::e8::SrtTransform* Arena::CreateMaybeMessage<::e8::SrtTransform>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace e8 {
 
@@ -600,6 +604,207 @@ class AABB PROTOBUF_FINAL :
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_primitive_2eproto;
 };
+// -------------------------------------------------------------------
+
+class SrtTransform PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:e8.SrtTransform) */ {
+ public:
+  inline SrtTransform() : SrtTransform(nullptr) {};
+  virtual ~SrtTransform();
+
+  SrtTransform(const SrtTransform& from);
+  SrtTransform(SrtTransform&& from) noexcept
+    : SrtTransform() {
+    *this = ::std::move(from);
+  }
+
+  inline SrtTransform& operator=(const SrtTransform& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline SrtTransform& operator=(SrtTransform&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const SrtTransform& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const SrtTransform* internal_default_instance() {
+    return reinterpret_cast<const SrtTransform*>(
+               &_SrtTransform_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  friend void swap(SrtTransform& a, SrtTransform& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(SrtTransform* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(SrtTransform* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline SrtTransform* New() const final {
+    return CreateMaybeMessage<SrtTransform>(nullptr);
+  }
+
+  SrtTransform* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<SrtTransform>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const SrtTransform& from);
+  void MergeFrom(const SrtTransform& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(SrtTransform* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "e8.SrtTransform";
+  }
+  protected:
+  explicit SrtTransform(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_primitive_2eproto);
+    return ::descriptor_table_primitive_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kScalingFieldNumber = 1,
+    kRotationFieldNumber = 2,
+    kTranslationFieldNumber = 3,
+  };
+  // repeated float scaling = 1;
+  int scaling_size() const;
+  private:
+  int _internal_scaling_size() const;
+  public:
+  void clear_scaling();
+  private:
+  float _internal_scaling(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      _internal_scaling() const;
+  void _internal_add_scaling(float value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      _internal_mutable_scaling();
+  public:
+  float scaling(int index) const;
+  void set_scaling(int index, float value);
+  void add_scaling(float value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      scaling() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      mutable_scaling();
+
+  // repeated float rotation = 2;
+  int rotation_size() const;
+  private:
+  int _internal_rotation_size() const;
+  public:
+  void clear_rotation();
+  private:
+  float _internal_rotation(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      _internal_rotation() const;
+  void _internal_add_rotation(float value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      _internal_mutable_rotation();
+  public:
+  float rotation(int index) const;
+  void set_rotation(int index, float value);
+  void add_rotation(float value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      rotation() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      mutable_rotation();
+
+  // repeated float translation = 3;
+  int translation_size() const;
+  private:
+  int _internal_translation_size() const;
+  public:
+  void clear_translation();
+  private:
+  float _internal_translation(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      _internal_translation() const;
+  void _internal_add_translation(float value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      _internal_mutable_translation();
+  public:
+  float translation(int index) const;
+  void set_translation(int index, float value);
+  void add_translation(float value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      translation() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      mutable_translation();
+
+  // @@protoc_insertion_point(class_scope:e8.SrtTransform)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > scaling_;
+  mutable std::atomic<int> _scaling_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > rotation_;
+  mutable std::atomic<int> _rotation_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > translation_;
+  mutable std::atomic<int> _translation_cached_byte_size_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_primitive_2eproto;
+};
 // ===================================================================
 
 
@@ -901,9 +1106,156 @@ AABB::mutable_max() {
   return _internal_mutable_max();
 }
 
+// -------------------------------------------------------------------
+
+// SrtTransform
+
+// repeated float scaling = 1;
+inline int SrtTransform::_internal_scaling_size() const {
+  return scaling_.size();
+}
+inline int SrtTransform::scaling_size() const {
+  return _internal_scaling_size();
+}
+inline void SrtTransform::clear_scaling() {
+  scaling_.Clear();
+}
+inline float SrtTransform::_internal_scaling(int index) const {
+  return scaling_.Get(index);
+}
+inline float SrtTransform::scaling(int index) const {
+  // @@protoc_insertion_point(field_get:e8.SrtTransform.scaling)
+  return _internal_scaling(index);
+}
+inline void SrtTransform::set_scaling(int index, float value) {
+  scaling_.Set(index, value);
+  // @@protoc_insertion_point(field_set:e8.SrtTransform.scaling)
+}
+inline void SrtTransform::_internal_add_scaling(float value) {
+  scaling_.Add(value);
+}
+inline void SrtTransform::add_scaling(float value) {
+  _internal_add_scaling(value);
+  // @@protoc_insertion_point(field_add:e8.SrtTransform.scaling)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+SrtTransform::_internal_scaling() const {
+  return scaling_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+SrtTransform::scaling() const {
+  // @@protoc_insertion_point(field_list:e8.SrtTransform.scaling)
+  return _internal_scaling();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+SrtTransform::_internal_mutable_scaling() {
+  return &scaling_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+SrtTransform::mutable_scaling() {
+  // @@protoc_insertion_point(field_mutable_list:e8.SrtTransform.scaling)
+  return _internal_mutable_scaling();
+}
+
+// repeated float rotation = 2;
+inline int SrtTransform::_internal_rotation_size() const {
+  return rotation_.size();
+}
+inline int SrtTransform::rotation_size() const {
+  return _internal_rotation_size();
+}
+inline void SrtTransform::clear_rotation() {
+  rotation_.Clear();
+}
+inline float SrtTransform::_internal_rotation(int index) const {
+  return rotation_.Get(index);
+}
+inline float SrtTransform::rotation(int index) const {
+  // @@protoc_insertion_point(field_get:e8.SrtTransform.rotation)
+  return _internal_rotation(index);
+}
+inline void SrtTransform::set_rotation(int index, float value) {
+  rotation_.Set(index, value);
+  // @@protoc_insertion_point(field_set:e8.SrtTransform.rotation)
+}
+inline void SrtTransform::_internal_add_rotation(float value) {
+  rotation_.Add(value);
+}
+inline void SrtTransform::add_rotation(float value) {
+  _internal_add_rotation(value);
+  // @@protoc_insertion_point(field_add:e8.SrtTransform.rotation)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+SrtTransform::_internal_rotation() const {
+  return rotation_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+SrtTransform::rotation() const {
+  // @@protoc_insertion_point(field_list:e8.SrtTransform.rotation)
+  return _internal_rotation();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+SrtTransform::_internal_mutable_rotation() {
+  return &rotation_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+SrtTransform::mutable_rotation() {
+  // @@protoc_insertion_point(field_mutable_list:e8.SrtTransform.rotation)
+  return _internal_mutable_rotation();
+}
+
+// repeated float translation = 3;
+inline int SrtTransform::_internal_translation_size() const {
+  return translation_.size();
+}
+inline int SrtTransform::translation_size() const {
+  return _internal_translation_size();
+}
+inline void SrtTransform::clear_translation() {
+  translation_.Clear();
+}
+inline float SrtTransform::_internal_translation(int index) const {
+  return translation_.Get(index);
+}
+inline float SrtTransform::translation(int index) const {
+  // @@protoc_insertion_point(field_get:e8.SrtTransform.translation)
+  return _internal_translation(index);
+}
+inline void SrtTransform::set_translation(int index, float value) {
+  translation_.Set(index, value);
+  // @@protoc_insertion_point(field_set:e8.SrtTransform.translation)
+}
+inline void SrtTransform::_internal_add_translation(float value) {
+  translation_.Add(value);
+}
+inline void SrtTransform::add_translation(float value) {
+  _internal_add_translation(value);
+  // @@protoc_insertion_point(field_add:e8.SrtTransform.translation)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+SrtTransform::_internal_translation() const {
+  return translation_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+SrtTransform::translation() const {
+  // @@protoc_insertion_point(field_list:e8.SrtTransform.translation)
+  return _internal_translation();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+SrtTransform::_internal_mutable_translation() {
+  return &translation_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+SrtTransform::mutable_translation() {
+  // @@protoc_insertion_point(field_mutable_list:e8.SrtTransform.translation)
+  return _internal_mutable_translation();
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

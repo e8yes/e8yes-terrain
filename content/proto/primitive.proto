@@ -34,7 +34,7 @@ message PrimitiveVertex {
     repeated float texcoord = 3;
 }
 
-/*
+/**
  * @brief PrimitiveIndices message Defines a triangle with vertices referencing from the
  * PrimitiveVertex list.
  */
@@ -45,11 +45,27 @@ message PrimitiveIndices {
 }
 
 
-/*
+/**
  * @brief AABB message Defines an axis-aligned bounding box.
  */
 message AABB {
     // Two diagonal vertices defining the bounding box.
     repeated float min = 1;
     repeated float max = 2;
+}
+
+/**
+ * @brief The SrtTransform message It specifies a class of homogeneous transformation by composing
+ * scaling, axial-rotations and translation.
+ */
+message SrtTransform {
+     // How much scaling transform should be applied to each axes in the model space.
+    repeated float scaling = 1;
+
+    // How much rotation, in degree, should be applied to each axes of rotation in the model space.
+    // Rotation will first apply to the z axis, then the y axis, finally the x axis.
+    repeated float rotation = 2;
+
+    // Where the entity should be placed in the world.
+    repeated float translation = 3;
 }
