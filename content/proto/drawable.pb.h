@@ -249,12 +249,11 @@ class Drawable PROTOBUF_FINAL :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kVerticesFieldNumber = 3,
-    kPrimitivesFieldNumber = 4,
-    kHumanReadableNameFieldNumber = 1,
-    kRigidityFieldNumber = 2,
+    kVerticesFieldNumber = 2,
+    kPrimitivesFieldNumber = 3,
+    kRigidityFieldNumber = 1,
   };
-  // repeated .e8.PrimitiveVertex vertices = 3;
+  // repeated .e8.PrimitiveVertex vertices = 2;
   int vertices_size() const;
   private:
   int _internal_vertices_size() const;
@@ -272,7 +271,7 @@ class Drawable PROTOBUF_FINAL :
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::PrimitiveVertex >&
       vertices() const;
 
-  // repeated .e8.PrimitiveIndices primitives = 4;
+  // repeated .e8.PrimitiveIndices primitives = 3;
   int primitives_size() const;
   private:
   int _internal_primitives_size() const;
@@ -290,32 +289,7 @@ class Drawable PROTOBUF_FINAL :
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::PrimitiveIndices >&
       primitives() const;
 
-  // string human_readable_name = 1;
-  void clear_human_readable_name();
-  const std::string& human_readable_name() const;
-  void set_human_readable_name(const std::string& value);
-  void set_human_readable_name(std::string&& value);
-  void set_human_readable_name(const char* value);
-  void set_human_readable_name(const char* value, size_t size);
-  std::string* mutable_human_readable_name();
-  std::string* release_human_readable_name();
-  void set_allocated_human_readable_name(std::string* human_readable_name);
-  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
-  std::string* unsafe_arena_release_human_readable_name();
-  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
-  void unsafe_arena_set_allocated_human_readable_name(
-      std::string* human_readable_name);
-  private:
-  const std::string& _internal_human_readable_name() const;
-  void _internal_set_human_readable_name(const std::string& value);
-  std::string* _internal_mutable_human_readable_name();
-  public:
-
-  // .e8.Drawable.RigidityType rigidity = 2;
+  // .e8.Drawable.RigidityType rigidity = 1;
   void clear_rigidity();
   ::e8::Drawable_RigidityType rigidity() const;
   void set_rigidity(::e8::Drawable_RigidityType value);
@@ -333,7 +307,6 @@ class Drawable PROTOBUF_FINAL :
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::PrimitiveVertex > vertices_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::PrimitiveIndices > primitives_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr human_readable_name_;
   int rigidity_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_drawable_2eproto;
@@ -453,11 +426,12 @@ class DrawableLod PROTOBUF_FINAL :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kDrawableLodFieldNumber = 2,
-    kMinDistancesFieldNumber = 3,
+    kDrawableLodFieldNumber = 3,
+    kMinDistancesFieldNumber = 4,
     kIdFieldNumber = 1,
+    kHumanReadableNameFieldNumber = 2,
   };
-  // repeated .e8.Drawable drawable_lod = 2;
+  // repeated .e8.Drawable drawable_lod = 3;
   int drawable_lod_size() const;
   private:
   int _internal_drawable_lod_size() const;
@@ -475,7 +449,7 @@ class DrawableLod PROTOBUF_FINAL :
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::Drawable >&
       drawable_lod() const;
 
-  // repeated float min_distances = 3;
+  // repeated float min_distances = 4;
   int min_distances_size() const;
   private:
   int _internal_min_distances_size() const;
@@ -522,6 +496,31 @@ class DrawableLod PROTOBUF_FINAL :
   std::string* _internal_mutable_id();
   public:
 
+  // string human_readable_name = 2;
+  void clear_human_readable_name();
+  const std::string& human_readable_name() const;
+  void set_human_readable_name(const std::string& value);
+  void set_human_readable_name(std::string&& value);
+  void set_human_readable_name(const char* value);
+  void set_human_readable_name(const char* value, size_t size);
+  std::string* mutable_human_readable_name();
+  std::string* release_human_readable_name();
+  void set_allocated_human_readable_name(std::string* human_readable_name);
+  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  std::string* unsafe_arena_release_human_readable_name();
+  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  void unsafe_arena_set_allocated_human_readable_name(
+      std::string* human_readable_name);
+  private:
+  const std::string& _internal_human_readable_name() const;
+  void _internal_set_human_readable_name(const std::string& value);
+  std::string* _internal_mutable_human_readable_name();
+  public:
+
   // @@protoc_insertion_point(class_scope:e8.DrawableLod)
  private:
   class _Internal;
@@ -533,6 +532,7 @@ class DrawableLod PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > min_distances_;
   mutable std::atomic<int> _min_distances_cached_byte_size_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr id_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr human_readable_name_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_drawable_2eproto;
 };
@@ -547,88 +547,7 @@ class DrawableLod PROTOBUF_FINAL :
 #endif  // __GNUC__
 // Drawable
 
-// string human_readable_name = 1;
-inline void Drawable::clear_human_readable_name() {
-  human_readable_name_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline const std::string& Drawable::human_readable_name() const {
-  // @@protoc_insertion_point(field_get:e8.Drawable.human_readable_name)
-  return _internal_human_readable_name();
-}
-inline void Drawable::set_human_readable_name(const std::string& value) {
-  _internal_set_human_readable_name(value);
-  // @@protoc_insertion_point(field_set:e8.Drawable.human_readable_name)
-}
-inline std::string* Drawable::mutable_human_readable_name() {
-  // @@protoc_insertion_point(field_mutable:e8.Drawable.human_readable_name)
-  return _internal_mutable_human_readable_name();
-}
-inline const std::string& Drawable::_internal_human_readable_name() const {
-  return human_readable_name_.Get();
-}
-inline void Drawable::_internal_set_human_readable_name(const std::string& value) {
-  
-  human_readable_name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
-}
-inline void Drawable::set_human_readable_name(std::string&& value) {
-  
-  human_readable_name_.Set(
-    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
-  // @@protoc_insertion_point(field_set_rvalue:e8.Drawable.human_readable_name)
-}
-inline void Drawable::set_human_readable_name(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  human_readable_name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
-              GetArena());
-  // @@protoc_insertion_point(field_set_char:e8.Drawable.human_readable_name)
-}
-inline void Drawable::set_human_readable_name(const char* value,
-    size_t size) {
-  
-  human_readable_name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
-      reinterpret_cast<const char*>(value), size), GetArena());
-  // @@protoc_insertion_point(field_set_pointer:e8.Drawable.human_readable_name)
-}
-inline std::string* Drawable::_internal_mutable_human_readable_name() {
-  
-  return human_readable_name_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline std::string* Drawable::release_human_readable_name() {
-  // @@protoc_insertion_point(field_release:e8.Drawable.human_readable_name)
-  return human_readable_name_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline void Drawable::set_allocated_human_readable_name(std::string* human_readable_name) {
-  if (human_readable_name != nullptr) {
-    
-  } else {
-    
-  }
-  human_readable_name_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), human_readable_name,
-      GetArena());
-  // @@protoc_insertion_point(field_set_allocated:e8.Drawable.human_readable_name)
-}
-inline std::string* Drawable::unsafe_arena_release_human_readable_name() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:e8.Drawable.human_readable_name)
-  GOOGLE_DCHECK(GetArena() != nullptr);
-  
-  return human_readable_name_.UnsafeArenaRelease(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      GetArena());
-}
-inline void Drawable::unsafe_arena_set_allocated_human_readable_name(
-    std::string* human_readable_name) {
-  GOOGLE_DCHECK(GetArena() != nullptr);
-  if (human_readable_name != nullptr) {
-    
-  } else {
-    
-  }
-  human_readable_name_.UnsafeArenaSetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      human_readable_name, GetArena());
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.Drawable.human_readable_name)
-}
-
-// .e8.Drawable.RigidityType rigidity = 2;
+// .e8.Drawable.RigidityType rigidity = 1;
 inline void Drawable::clear_rigidity() {
   rigidity_ = 0;
 }
@@ -648,7 +567,7 @@ inline void Drawable::set_rigidity(::e8::Drawable_RigidityType value) {
   // @@protoc_insertion_point(field_set:e8.Drawable.rigidity)
 }
 
-// repeated .e8.PrimitiveVertex vertices = 3;
+// repeated .e8.PrimitiveVertex vertices = 2;
 inline int Drawable::_internal_vertices_size() const {
   return vertices_.size();
 }
@@ -684,7 +603,7 @@ Drawable::vertices() const {
   return vertices_;
 }
 
-// repeated .e8.PrimitiveIndices primitives = 4;
+// repeated .e8.PrimitiveIndices primitives = 3;
 inline int Drawable::_internal_primitives_size() const {
   return primitives_.size();
 }
@@ -805,7 +724,88 @@ inline void DrawableLod::unsafe_arena_set_allocated_id(
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.DrawableLod.id)
 }
 
-// repeated .e8.Drawable drawable_lod = 2;
+// string human_readable_name = 2;
+inline void DrawableLod::clear_human_readable_name() {
+  human_readable_name_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline const std::string& DrawableLod::human_readable_name() const {
+  // @@protoc_insertion_point(field_get:e8.DrawableLod.human_readable_name)
+  return _internal_human_readable_name();
+}
+inline void DrawableLod::set_human_readable_name(const std::string& value) {
+  _internal_set_human_readable_name(value);
+  // @@protoc_insertion_point(field_set:e8.DrawableLod.human_readable_name)
+}
+inline std::string* DrawableLod::mutable_human_readable_name() {
+  // @@protoc_insertion_point(field_mutable:e8.DrawableLod.human_readable_name)
+  return _internal_mutable_human_readable_name();
+}
+inline const std::string& DrawableLod::_internal_human_readable_name() const {
+  return human_readable_name_.Get();
+}
+inline void DrawableLod::_internal_set_human_readable_name(const std::string& value) {
+  
+  human_readable_name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+}
+inline void DrawableLod::set_human_readable_name(std::string&& value) {
+  
+  human_readable_name_.Set(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:e8.DrawableLod.human_readable_name)
+}
+inline void DrawableLod::set_human_readable_name(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  human_readable_name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArena());
+  // @@protoc_insertion_point(field_set_char:e8.DrawableLod.human_readable_name)
+}
+inline void DrawableLod::set_human_readable_name(const char* value,
+    size_t size) {
+  
+  human_readable_name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:e8.DrawableLod.human_readable_name)
+}
+inline std::string* DrawableLod::_internal_mutable_human_readable_name() {
+  
+  return human_readable_name_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline std::string* DrawableLod::release_human_readable_name() {
+  // @@protoc_insertion_point(field_release:e8.DrawableLod.human_readable_name)
+  return human_readable_name_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void DrawableLod::set_allocated_human_readable_name(std::string* human_readable_name) {
+  if (human_readable_name != nullptr) {
+    
+  } else {
+    
+  }
+  human_readable_name_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), human_readable_name,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:e8.DrawableLod.human_readable_name)
+}
+inline std::string* DrawableLod::unsafe_arena_release_human_readable_name() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:e8.DrawableLod.human_readable_name)
+  GOOGLE_DCHECK(GetArena() != nullptr);
+  
+  return human_readable_name_.UnsafeArenaRelease(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      GetArena());
+}
+inline void DrawableLod::unsafe_arena_set_allocated_human_readable_name(
+    std::string* human_readable_name) {
+  GOOGLE_DCHECK(GetArena() != nullptr);
+  if (human_readable_name != nullptr) {
+    
+  } else {
+    
+  }
+  human_readable_name_.UnsafeArenaSetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      human_readable_name, GetArena());
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.DrawableLod.human_readable_name)
+}
+
+// repeated .e8.Drawable drawable_lod = 3;
 inline int DrawableLod::_internal_drawable_lod_size() const {
   return drawable_lod_.size();
 }
@@ -844,7 +844,7 @@ DrawableLod::drawable_lod() const {
   return drawable_lod_;
 }
 
-// repeated float min_distances = 3;
+// repeated float min_distances = 4;
 inline int DrawableLod::_internal_min_distances_size() const {
   return min_distances_.size();
 }

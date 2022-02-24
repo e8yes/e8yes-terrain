@@ -48,18 +48,15 @@ message Drawable {
         TEARABLE = 4;
     };
 
-    // The human readable name of this drawable, provided for debugging purposes.
-    string human_readable_name = 1;
-
     // The type of rigidity to be expected for this drawable.
-    RigidityType rigidity = 2;
+    RigidityType rigidity = 1;
 
     // A list of vertices defining the geometry of this drawable.
-    repeated PrimitiveVertex vertices = 3;
+    repeated PrimitiveVertex vertices = 2;
 
     // Defines triangle primitives by referencing the vertices of each triangle from the vertex 
     // list returned by the above function.
-    repeated PrimitiveIndices primitives = 4;
+    repeated PrimitiveIndices primitives = 3;
 };
 
 /**
@@ -70,12 +67,15 @@ message DrawableLod {
     // ID of this drawable design.
     string id = 1;
 
+    // A descriptive human readable name of this drawable.
+    string human_readable_name = 2;
+
     // LOD of this drawable design in descending level of detail.
-    repeated Drawable drawable_lod = 2;
+    repeated Drawable drawable_lod = 3;
 
     // A list the same length as the drawable_lod specifying the minimum distance the drawble LOD is
     // from the viewer before it can be applied to the rendering process. Therefore, the distances
     // are expected to be in ascending order. The renderer will pick the drawable with the least
     // possible detail when possible.
-    repeated float min_distances = 3;
+    repeated float min_distances = 4;
 };

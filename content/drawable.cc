@@ -15,6 +15,26 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "content/drawable.h"
+#include <google/protobuf/repeated_field.h>
+#include <memory>
+#include <string>
+#include <vector>
 
-namespace e8 {} // namespace e8
+#include "content/common.h"
+#include "content/drawable.h"
+#include "content/proto/drawable.pb.h"
+
+namespace e8 {
+
+std::shared_ptr<DrawableLod>
+CreateDrawable(DrawableName const &name, google::protobuf::RepeatedPtrField<Drawable> const &lod,
+               google::protobuf::RepeatedField<float> const &lod_min_distances) {
+    auto drawable_lod = std::make_unique<DrawableLod>();
+    drawable_lod->set_id(GenerateUuid());
+    drawable_lod->set_human_readable_name(name);
+    *drawable_lod->mutable_drawable_lod() = lod;
+    *drawable_lod->mutable_min_distances() = lod_min_distances;
+    return drawable_lod;
+}
+
+} // namespace e8

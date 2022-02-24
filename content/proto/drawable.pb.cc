@@ -68,7 +68,6 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_drawable_2eproto::offsets[] PR
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::e8::Drawable, human_readable_name_),
   PROTOBUF_FIELD_OFFSET(::e8::Drawable, rigidity_),
   PROTOBUF_FIELD_OFFSET(::e8::Drawable, vertices_),
   PROTOBUF_FIELD_OFFSET(::e8::Drawable, primitives_),
@@ -78,12 +77,13 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_drawable_2eproto::offsets[] PR
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::e8::DrawableLod, id_),
+  PROTOBUF_FIELD_OFFSET(::e8::DrawableLod, human_readable_name_),
   PROTOBUF_FIELD_OFFSET(::e8::DrawableLod, drawable_lod_),
   PROTOBUF_FIELD_OFFSET(::e8::DrawableLod, min_distances_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::e8::Drawable)},
-  { 9, -1, sizeof(::e8::DrawableLod)},
+  { 8, -1, sizeof(::e8::DrawableLod)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -92,16 +92,16 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_drawable_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\016drawable.proto\022\002e8\032\017primitive.proto\"\367\001"
-  "\n\010Drawable\022\033\n\023human_readable_name\030\001 \001(\t\022"
-  "+\n\010rigidity\030\002 \001(\0162\031.e8.Drawable.Rigidity"
-  "Type\022%\n\010vertices\030\003 \003(\0132\023.e8.PrimitiveVer"
-  "tex\022(\n\nprimitives\030\004 \003(\0132\024.e8.PrimitiveIn"
-  "dices\"P\n\014RigidityType\022\013\n\007INVALID\020\000\022\n\n\006ST"
-  "ATIC\020\001\022\t\n\005RIGID\020\002\022\016\n\nDEFORMABLE\020\003\022\014\n\010TEA"
-  "RABLE\020\004\"T\n\013DrawableLod\022\n\n\002id\030\001 \001(\t\022\"\n\014dr"
-  "awable_lod\030\002 \003(\0132\014.e8.Drawable\022\025\n\rmin_di"
-  "stances\030\003 \003(\002b\006proto3"
+  "\n\016drawable.proto\022\002e8\032\017primitive.proto\"\332\001"
+  "\n\010Drawable\022+\n\010rigidity\030\001 \001(\0162\031.e8.Drawab"
+  "le.RigidityType\022%\n\010vertices\030\002 \003(\0132\023.e8.P"
+  "rimitiveVertex\022(\n\nprimitives\030\003 \003(\0132\024.e8."
+  "PrimitiveIndices\"P\n\014RigidityType\022\013\n\007INVA"
+  "LID\020\000\022\n\n\006STATIC\020\001\022\t\n\005RIGID\020\002\022\016\n\nDEFORMAB"
+  "LE\020\003\022\014\n\010TEARABLE\020\004\"q\n\013DrawableLod\022\n\n\002id\030"
+  "\001 \001(\t\022\033\n\023human_readable_name\030\002 \001(\t\022\"\n\014dr"
+  "awable_lod\030\003 \003(\0132\014.e8.Drawable\022\025\n\rmin_di"
+  "stances\030\004 \003(\002b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_drawable_2eproto_deps[1] = {
   &::descriptor_table_primitive_2eproto,
@@ -176,18 +176,12 @@ Drawable::Drawable(const Drawable& from)
       vertices_(from.vertices_),
       primitives_(from.primitives_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  human_readable_name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from._internal_human_readable_name().empty()) {
-    human_readable_name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_human_readable_name(),
-      GetArena());
-  }
   rigidity_ = from.rigidity_;
   // @@protoc_insertion_point(copy_constructor:e8.Drawable)
 }
 
 void Drawable::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_Drawable_drawable_2eproto.base);
-  human_readable_name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   rigidity_ = 0;
 }
 
@@ -199,7 +193,6 @@ Drawable::~Drawable() {
 
 void Drawable::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
-  human_readable_name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 void Drawable::ArenaDtor(void* object) {
@@ -225,7 +218,6 @@ void Drawable::Clear() {
 
   vertices_.Clear();
   primitives_.Clear();
-  human_readable_name_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   rigidity_ = 0;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
@@ -238,45 +230,36 @@ const char* Drawable::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::i
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     CHK_(ptr);
     switch (tag >> 3) {
-      // string human_readable_name = 1;
+      // .e8.Drawable.RigidityType rigidity = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
-          auto str = _internal_mutable_human_readable_name();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "e8.Drawable.human_readable_name"));
-          CHK_(ptr);
-        } else goto handle_unusual;
-        continue;
-      // .e8.Drawable.RigidityType rigidity = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
           ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
           _internal_set_rigidity(static_cast<::e8::Drawable_RigidityType>(val));
         } else goto handle_unusual;
         continue;
-      // repeated .e8.PrimitiveVertex vertices = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+      // repeated .e8.PrimitiveVertex vertices = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
           ptr -= 1;
           do {
             ptr += 1;
             ptr = ctx->ParseMessage(_internal_add_vertices(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<26>(ptr));
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<18>(ptr));
         } else goto handle_unusual;
         continue;
-      // repeated .e8.PrimitiveIndices primitives = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+      // repeated .e8.PrimitiveIndices primitives = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
           ptr -= 1;
           do {
             ptr += 1;
             ptr = ctx->ParseMessage(_internal_add_primitives(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<34>(ptr));
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<26>(ptr));
         } else goto handle_unusual;
         continue;
       default: {
@@ -307,37 +290,27 @@ failure:
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string human_readable_name = 1;
-  if (this->human_readable_name().size() > 0) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->_internal_human_readable_name().data(), static_cast<int>(this->_internal_human_readable_name().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "e8.Drawable.human_readable_name");
-    target = stream->WriteStringMaybeAliased(
-        1, this->_internal_human_readable_name(), target);
-  }
-
-  // .e8.Drawable.RigidityType rigidity = 2;
+  // .e8.Drawable.RigidityType rigidity = 1;
   if (this->rigidity() != 0) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
-      2, this->_internal_rigidity(), target);
+      1, this->_internal_rigidity(), target);
   }
 
-  // repeated .e8.PrimitiveVertex vertices = 3;
+  // repeated .e8.PrimitiveVertex vertices = 2;
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->_internal_vertices_size()); i < n; i++) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(3, this->_internal_vertices(i), target, stream);
+      InternalWriteMessage(2, this->_internal_vertices(i), target, stream);
   }
 
-  // repeated .e8.PrimitiveIndices primitives = 4;
+  // repeated .e8.PrimitiveIndices primitives = 3;
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->_internal_primitives_size()); i < n; i++) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(4, this->_internal_primitives(i), target, stream);
+      InternalWriteMessage(3, this->_internal_primitives(i), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -356,28 +329,21 @@ size_t Drawable::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated .e8.PrimitiveVertex vertices = 3;
+  // repeated .e8.PrimitiveVertex vertices = 2;
   total_size += 1UL * this->_internal_vertices_size();
   for (const auto& msg : this->vertices_) {
     total_size +=
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
   }
 
-  // repeated .e8.PrimitiveIndices primitives = 4;
+  // repeated .e8.PrimitiveIndices primitives = 3;
   total_size += 1UL * this->_internal_primitives_size();
   for (const auto& msg : this->primitives_) {
     total_size +=
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
   }
 
-  // string human_readable_name = 1;
-  if (this->human_readable_name().size() > 0) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-        this->_internal_human_readable_name());
-  }
-
-  // .e8.Drawable.RigidityType rigidity = 2;
+  // .e8.Drawable.RigidityType rigidity = 1;
   if (this->rigidity() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_rigidity());
@@ -416,9 +382,6 @@ void Drawable::MergeFrom(const Drawable& from) {
 
   vertices_.MergeFrom(from.vertices_);
   primitives_.MergeFrom(from.primitives_);
-  if (from.human_readable_name().size() > 0) {
-    _internal_set_human_readable_name(from._internal_human_readable_name());
-  }
   if (from.rigidity() != 0) {
     _internal_set_rigidity(from._internal_rigidity());
   }
@@ -447,7 +410,6 @@ void Drawable::InternalSwap(Drawable* other) {
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   vertices_.InternalSwap(&other->vertices_);
   primitives_.InternalSwap(&other->primitives_);
-  human_readable_name_.Swap(&other->human_readable_name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   swap(rigidity_, other->rigidity_);
 }
 
@@ -482,12 +444,18 @@ DrawableLod::DrawableLod(const DrawableLod& from)
     id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_id(),
       GetArena());
   }
+  human_readable_name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_human_readable_name().empty()) {
+    human_readable_name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_human_readable_name(),
+      GetArena());
+  }
   // @@protoc_insertion_point(copy_constructor:e8.DrawableLod)
 }
 
 void DrawableLod::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_DrawableLod_drawable_2eproto.base);
   id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  human_readable_name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 DrawableLod::~DrawableLod() {
@@ -499,6 +467,7 @@ DrawableLod::~DrawableLod() {
 void DrawableLod::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
   id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  human_readable_name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 void DrawableLod::ArenaDtor(void* object) {
@@ -525,6 +494,7 @@ void DrawableLod::Clear() {
   drawable_lod_.Clear();
   min_distances_.Clear();
   id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  human_readable_name_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -545,24 +515,33 @@ const char* DrawableLod::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // repeated .e8.Drawable drawable_lod = 2;
+      // string human_readable_name = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          auto str = _internal_mutable_human_readable_name();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "e8.DrawableLod.human_readable_name"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // repeated .e8.Drawable drawable_lod = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
           ptr -= 1;
           do {
             ptr += 1;
             ptr = ctx->ParseMessage(_internal_add_drawable_lod(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<18>(ptr));
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<26>(ptr));
         } else goto handle_unusual;
         continue;
-      // repeated float min_distances = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+      // repeated float min_distances = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedFloatParser(_internal_mutable_min_distances(), ptr, ctx);
           CHK_(ptr);
-        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 29) {
+        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 37) {
           _internal_add_min_distances(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr));
           ptr += sizeof(float);
         } else goto handle_unusual;
@@ -605,17 +584,27 @@ failure:
         1, this->_internal_id(), target);
   }
 
-  // repeated .e8.Drawable drawable_lod = 2;
+  // string human_readable_name = 2;
+  if (this->human_readable_name().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_human_readable_name().data(), static_cast<int>(this->_internal_human_readable_name().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "e8.DrawableLod.human_readable_name");
+    target = stream->WriteStringMaybeAliased(
+        2, this->_internal_human_readable_name(), target);
+  }
+
+  // repeated .e8.Drawable drawable_lod = 3;
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->_internal_drawable_lod_size()); i < n; i++) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(2, this->_internal_drawable_lod(i), target, stream);
+      InternalWriteMessage(3, this->_internal_drawable_lod(i), target, stream);
   }
 
-  // repeated float min_distances = 3;
+  // repeated float min_distances = 4;
   if (this->_internal_min_distances_size() > 0) {
-    target = stream->WriteFixedPacked(3, _internal_min_distances(), target);
+    target = stream->WriteFixedPacked(4, _internal_min_distances(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -634,14 +623,14 @@ size_t DrawableLod::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated .e8.Drawable drawable_lod = 2;
+  // repeated .e8.Drawable drawable_lod = 3;
   total_size += 1UL * this->_internal_drawable_lod_size();
   for (const auto& msg : this->drawable_lod_) {
     total_size +=
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
   }
 
-  // repeated float min_distances = 3;
+  // repeated float min_distances = 4;
   {
     unsigned int count = static_cast<unsigned int>(this->_internal_min_distances_size());
     size_t data_size = 4UL * count;
@@ -661,6 +650,13 @@ size_t DrawableLod::ByteSizeLong() const {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_id());
+  }
+
+  // string human_readable_name = 2;
+  if (this->human_readable_name().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_human_readable_name());
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -699,6 +695,9 @@ void DrawableLod::MergeFrom(const DrawableLod& from) {
   if (from.id().size() > 0) {
     _internal_set_id(from._internal_id());
   }
+  if (from.human_readable_name().size() > 0) {
+    _internal_set_human_readable_name(from._internal_human_readable_name());
+  }
 }
 
 void DrawableLod::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
@@ -725,6 +724,7 @@ void DrawableLod::InternalSwap(DrawableLod* other) {
   drawable_lod_.InternalSwap(&other->drawable_lod_);
   min_distances_.InternalSwap(&other->min_distances_);
   id_.Swap(&other->id_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  human_readable_name_.Swap(&other->human_readable_name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata DrawableLod::GetMetadata() const {

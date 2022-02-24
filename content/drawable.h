@@ -18,18 +18,31 @@
 #ifndef ISLANDS_CONTENT_DRAWABLE_H
 #define ISLANDS_CONTENT_DRAWABLE_H
 
+#include <google/protobuf/repeated_field.h>
 #include <memory>
-#include <optional>
 #include <string>
-#include <vector>
 
-#include "common/tensor.h"
 #include "content/proto/drawable.pb.h"
 
 namespace e8 {
 
 // It uniquely identifies a drawable design with its LOD series.
 using DrawableId = std::string;
+
+// A descriptive human readable name of a drawable LOD series.
+using DrawableName = std::string;
+
+/**
+ * @brief CreateDrawable Creates a drawable with LOD. All DrawableLods should be created here.
+ *
+ * @param name A descriptive human readable name for the drawable.
+ * @param lod A series of drawable LOD in decreasing detail.
+ * @param lod_min_distances The minimum distance from the viewer the ith LOD can be used.
+ * @return A drawable with LOD.
+ */
+std::shared_ptr<DrawableLod>
+CreateDrawable(DrawableName const &name, google::protobuf::RepeatedPtrField<Drawable> const &lod,
+               google::protobuf::RepeatedField<float> const &lod_min_distances);
 
 } // namespace e8
 
