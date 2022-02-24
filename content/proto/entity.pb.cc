@@ -19,7 +19,8 @@ extern PROTOBUF_INTERNAL_EXPORT_drawable_2eproto ::PROTOBUF_NAMESPACE_ID::intern
 extern PROTOBUF_INTERNAL_EXPORT_physical_5fshape_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_PhysicalShapeProto_physical_5fshape_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_entity_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_SceneEntityCollection_DrawablesEntry_DoNotUse_entity_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_entity_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_SceneEntityCollection_PhysicalShapesEntry_DoNotUse_entity_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_entity_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_SceneEntityProto_entity_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_entity_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_SceneEntityProto_entity_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_primitive_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_SrtTransform_primitive_2eproto;
 namespace e8 {
 class SceneEntityProtoDefaultTypeInternal {
  public:
@@ -94,8 +95,9 @@ static void InitDefaultsscc_info_SceneEntityProto_entity_2eproto() {
   ::e8::SceneEntityProto::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_SceneEntityProto_entity_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_SceneEntityProto_entity_2eproto}, {
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_SceneEntityProto_entity_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 2, 0, InitDefaultsscc_info_SceneEntityProto_entity_2eproto}, {
+      &scc_info_SrtTransform_primitive_2eproto.base,
       &scc_info_AABB_primitive_2eproto.base,}};
 
 static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_entity_2eproto[4];
@@ -112,6 +114,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_entity_2eproto::offsets[] PROT
   PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, name_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, movable_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, transform_),
+  PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, srt_transform_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, bounding_box_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, drawable_id_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, physical_shape_id_),
@@ -144,9 +147,9 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_entity_2eproto::offsets[] PROT
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::e8::SceneEntityProto)},
-  { 12, 19, sizeof(::e8::SceneEntityCollection_DrawablesEntry_DoNotUse)},
-  { 21, 28, sizeof(::e8::SceneEntityCollection_PhysicalShapesEntry_DoNotUse)},
-  { 30, -1, sizeof(::e8::SceneEntityCollection)},
+  { 13, 20, sizeof(::e8::SceneEntityCollection_DrawablesEntry_DoNotUse)},
+  { 22, 29, sizeof(::e8::SceneEntityCollection_PhysicalShapesEntry_DoNotUse)},
+  { 31, -1, sizeof(::e8::SceneEntityCollection)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -158,20 +161,21 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 
 const char descriptor_table_protodef_entity_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\014entity.proto\022\002e8\032\016drawable.proto\032\017prim"
-  "itive.proto\032\024physical_shape.proto\"\240\001\n\020Sc"
+  "itive.proto\032\024physical_shape.proto\"\311\001\n\020Sc"
   "eneEntityProto\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t"
-  "\022\017\n\007movable\030\003 \001(\010\022\021\n\ttransform\030\004 \003(\002\022\036\n\014"
-  "bounding_box\030\005 \001(\0132\010.e8.AABB\022\023\n\013drawable"
-  "_id\030\006 \001(\t\022\031\n\021physical_shape_id\030\007 \001(\t\"\326\002\n"
-  "\025SceneEntityCollection\022&\n\010entities\030\001 \003(\013"
-  "2\024.e8.SceneEntityProto\022;\n\tdrawables\030\002 \003("
-  "\0132(.e8.SceneEntityCollection.DrawablesEn"
-  "try\022F\n\017physical_shapes\030\003 \003(\0132-.e8.SceneE"
-  "ntityCollection.PhysicalShapesEntry\032A\n\016D"
-  "rawablesEntry\022\013\n\003key\030\001 \001(\t\022\036\n\005value\030\002 \001("
-  "\0132\017.e8.DrawableLod:\0028\001\032M\n\023PhysicalShapes"
-  "Entry\022\013\n\003key\030\001 \001(\t\022%\n\005value\030\002 \001(\0132\026.e8.P"
-  "hysicalShapeProto:\0028\001b\006proto3"
+  "\022\017\n\007movable\030\003 \001(\010\022\021\n\ttransform\030\004 \003(\002\022\'\n\r"
+  "srt_transform\030\005 \001(\0132\020.e8.SrtTransform\022\036\n"
+  "\014bounding_box\030\006 \001(\0132\010.e8.AABB\022\023\n\013drawabl"
+  "e_id\030\007 \001(\t\022\031\n\021physical_shape_id\030\010 \001(\t\"\326\002"
+  "\n\025SceneEntityCollection\022&\n\010entities\030\001 \003("
+  "\0132\024.e8.SceneEntityProto\022;\n\tdrawables\030\002 \003"
+  "(\0132(.e8.SceneEntityCollection.DrawablesE"
+  "ntry\022F\n\017physical_shapes\030\003 \003(\0132-.e8.Scene"
+  "EntityCollection.PhysicalShapesEntry\032A\n\016"
+  "DrawablesEntry\022\013\n\003key\030\001 \001(\t\022\036\n\005value\030\002 \001"
+  "(\0132\017.e8.DrawableLod:\0028\001\032M\n\023PhysicalShape"
+  "sEntry\022\013\n\003key\030\001 \001(\t\022%\n\005value\030\002 \001(\0132\026.e8."
+  "PhysicalShapeProto:\0028\001b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_entity_2eproto_deps[3] = {
   &::descriptor_table_drawable_2eproto,
@@ -186,7 +190,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_ent
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_entity_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_entity_2eproto = {
-  false, false, descriptor_table_protodef_entity_2eproto, "entity.proto", 589,
+  false, false, descriptor_table_protodef_entity_2eproto, "entity.proto", 630,
   &descriptor_table_entity_2eproto_once, descriptor_table_entity_2eproto_sccs, descriptor_table_entity_2eproto_deps, 4, 3,
   schemas, file_default_instances, TableStruct_entity_2eproto::offsets,
   file_level_metadata_entity_2eproto, 4, file_level_enum_descriptors_entity_2eproto, file_level_service_descriptors_entity_2eproto,
@@ -199,17 +203,30 @@ namespace e8 {
 // ===================================================================
 
 void SceneEntityProto::InitAsDefaultInstance() {
+  ::e8::_SceneEntityProto_default_instance_._instance.get_mutable()->srt_transform_ = const_cast< ::e8::SrtTransform*>(
+      ::e8::SrtTransform::internal_default_instance());
   ::e8::_SceneEntityProto_default_instance_._instance.get_mutable()->bounding_box_ = const_cast< ::e8::AABB*>(
       ::e8::AABB::internal_default_instance());
 }
 class SceneEntityProto::_Internal {
  public:
+  static const ::e8::SrtTransform& srt_transform(const SceneEntityProto* msg);
   static const ::e8::AABB& bounding_box(const SceneEntityProto* msg);
 };
 
+const ::e8::SrtTransform&
+SceneEntityProto::_Internal::srt_transform(const SceneEntityProto* msg) {
+  return *msg->srt_transform_;
+}
 const ::e8::AABB&
 SceneEntityProto::_Internal::bounding_box(const SceneEntityProto* msg) {
   return *msg->bounding_box_;
+}
+void SceneEntityProto::clear_srt_transform() {
+  if (GetArena() == nullptr && srt_transform_ != nullptr) {
+    delete srt_transform_;
+  }
+  srt_transform_ = nullptr;
 }
 void SceneEntityProto::clear_bounding_box() {
   if (GetArena() == nullptr && bounding_box_ != nullptr) {
@@ -248,6 +265,11 @@ SceneEntityProto::SceneEntityProto(const SceneEntityProto& from)
     physical_shape_id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_physical_shape_id(),
       GetArena());
   }
+  if (from._internal_has_srt_transform()) {
+    srt_transform_ = new ::e8::SrtTransform(*from.srt_transform_);
+  } else {
+    srt_transform_ = nullptr;
+  }
   if (from._internal_has_bounding_box()) {
     bounding_box_ = new ::e8::AABB(*from.bounding_box_);
   } else {
@@ -263,9 +285,9 @@ void SceneEntityProto::SharedCtor() {
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   drawable_id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   physical_shape_id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  ::memset(&bounding_box_, 0, static_cast<size_t>(
+  ::memset(&srt_transform_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&movable_) -
-      reinterpret_cast<char*>(&bounding_box_)) + sizeof(movable_));
+      reinterpret_cast<char*>(&srt_transform_)) + sizeof(movable_));
 }
 
 SceneEntityProto::~SceneEntityProto() {
@@ -280,6 +302,7 @@ void SceneEntityProto::SharedDtor() {
   name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   drawable_id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   physical_shape_id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (this != internal_default_instance()) delete srt_transform_;
   if (this != internal_default_instance()) delete bounding_box_;
 }
 
@@ -309,6 +332,10 @@ void SceneEntityProto::Clear() {
   name_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   drawable_id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   physical_shape_id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (GetArena() == nullptr && srt_transform_ != nullptr) {
+    delete srt_transform_;
+  }
+  srt_transform_ = nullptr;
   if (GetArena() == nullptr && bounding_box_ != nullptr) {
     delete bounding_box_;
   }
@@ -360,25 +387,32 @@ const char* SceneEntityProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPA
           ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
-      // .e8.AABB bounding_box = 5;
+      // .e8.SrtTransform srt_transform = 5;
       case 5:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
+          ptr = ctx->ParseMessage(_internal_mutable_srt_transform(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .e8.AABB bounding_box = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
           ptr = ctx->ParseMessage(_internal_mutable_bounding_box(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // string drawable_id = 6;
-      case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+      // string drawable_id = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
           auto str = _internal_mutable_drawable_id();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "e8.SceneEntityProto.drawable_id"));
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // string physical_shape_id = 7;
-      case 7:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
+      // string physical_shape_id = 8;
+      case 8:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 66)) {
           auto str = _internal_mutable_physical_shape_id();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "e8.SceneEntityProto.physical_shape_id"));
@@ -444,32 +478,40 @@ failure:
     target = stream->WriteFixedPacked(4, _internal_transform(), target);
   }
 
-  // .e8.AABB bounding_box = 5;
+  // .e8.SrtTransform srt_transform = 5;
+  if (this->has_srt_transform()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        5, _Internal::srt_transform(this), target, stream);
+  }
+
+  // .e8.AABB bounding_box = 6;
   if (this->has_bounding_box()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(
-        5, _Internal::bounding_box(this), target, stream);
+        6, _Internal::bounding_box(this), target, stream);
   }
 
-  // string drawable_id = 6;
+  // string drawable_id = 7;
   if (this->drawable_id().size() > 0) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_drawable_id().data(), static_cast<int>(this->_internal_drawable_id().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
       "e8.SceneEntityProto.drawable_id");
     target = stream->WriteStringMaybeAliased(
-        6, this->_internal_drawable_id(), target);
+        7, this->_internal_drawable_id(), target);
   }
 
-  // string physical_shape_id = 7;
+  // string physical_shape_id = 8;
   if (this->physical_shape_id().size() > 0) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_physical_shape_id().data(), static_cast<int>(this->_internal_physical_shape_id().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
       "e8.SceneEntityProto.physical_shape_id");
     target = stream->WriteStringMaybeAliased(
-        7, this->_internal_physical_shape_id(), target);
+        8, this->_internal_physical_shape_id(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -517,21 +559,28 @@ size_t SceneEntityProto::ByteSizeLong() const {
         this->_internal_name());
   }
 
-  // string drawable_id = 6;
+  // string drawable_id = 7;
   if (this->drawable_id().size() > 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_drawable_id());
   }
 
-  // string physical_shape_id = 7;
+  // string physical_shape_id = 8;
   if (this->physical_shape_id().size() > 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_physical_shape_id());
   }
 
-  // .e8.AABB bounding_box = 5;
+  // .e8.SrtTransform srt_transform = 5;
+  if (this->has_srt_transform()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *srt_transform_);
+  }
+
+  // .e8.AABB bounding_box = 6;
   if (this->has_bounding_box()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
@@ -587,6 +636,9 @@ void SceneEntityProto::MergeFrom(const SceneEntityProto& from) {
   if (from.physical_shape_id().size() > 0) {
     _internal_set_physical_shape_id(from._internal_physical_shape_id());
   }
+  if (from.has_srt_transform()) {
+    _internal_mutable_srt_transform()->::e8::SrtTransform::MergeFrom(from._internal_srt_transform());
+  }
   if (from.has_bounding_box()) {
     _internal_mutable_bounding_box()->::e8::AABB::MergeFrom(from._internal_bounding_box());
   }
@@ -624,9 +676,9 @@ void SceneEntityProto::InternalSwap(SceneEntityProto* other) {
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(SceneEntityProto, movable_)
       + sizeof(SceneEntityProto::movable_)
-      - PROTOBUF_FIELD_OFFSET(SceneEntityProto, bounding_box_)>(
-          reinterpret_cast<char*>(&bounding_box_),
-          reinterpret_cast<char*>(&other->bounding_box_));
+      - PROTOBUF_FIELD_OFFSET(SceneEntityProto, srt_transform_)>(
+          reinterpret_cast<char*>(&srt_transform_),
+          reinterpret_cast<char*>(&other->srt_transform_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata SceneEntityProto::GetMetadata() const {

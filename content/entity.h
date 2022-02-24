@@ -19,6 +19,7 @@
 #define ISLANDS_CONTENT_ENTITY_H
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -28,6 +29,7 @@
 #include "content/proto/drawable.pb.h"
 #include "content/proto/entity.pb.h"
 #include "content/proto/physical_shape.pb.h"
+#include "content/proto/primitive.pb.h"
 
 namespace e8 {
 
@@ -48,9 +50,12 @@ using SceneEntityName = std::string;
  */
 struct SceneEntity {
     /**
-     * @brief SceneEntity Constructs an empty entity, with an automatically assigned unique ID.
+     * @brief SceneEntity Constructs an empty movable entity, with an automatically assigned unique
+     * ID.
+     *
+     * @param A descriptive human readable name for this entity.
      */
-    SceneEntity();
+    SceneEntity(SceneEntityName const &name);
 
     /**
      * @brief SceneEntity Constructs an entity from proto message. Since the proto references the
@@ -79,7 +84,11 @@ struct SceneEntity {
     // The homogeneous transformation to be applied to this entity's geometry.
     mat44 transform;
 
-    // An AABB bounding box surrounding the entity's geometry.
+    // Most likely inputs by a human. It may not always be available because a general homogeneous
+    // transform cannot be reverted back to an SRT specification.
+    std::optional<SrtTransform> srt_transform;
+
+    // An AABB bounding box surrounding the entity's geometry prior to any transformation.
     aabb bounding_box;
 
     // A drawable instance with information derived from a drawable. A shared pointer allows a large
@@ -89,6 +98,19 @@ struct SceneEntity {
 
     // TODO: Adds physical shape instance once it's implemented.
 };
+
+/**
+ * @brief SceneEntitySetSrtTransform Sets an SRT transform to the entity. It will synchronize the
+ * homogeneous transform with it.
+ */
+void SceneEntitySetSrtTransform(SrtTransform const &srt_transform, SceneEntity *entity);
+
+/**
+ * @brief SceneEntitySetTransform Sets a homogeneous transform to the entity. It will clear out the
+ * SRT transform if there is one. An SRT can't be set because SRT information can't be extracted
+ * from general homogeneous transform.
+ */
+void SceneEntitySetTransform(mat44 const &transform, SceneEntity *entity);
 
 /**
  * @brief ToProto Transforms a collection of scene entities to a SceneEntityCollection message. See

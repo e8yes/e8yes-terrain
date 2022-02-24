@@ -45,19 +45,23 @@ message SceneEntityProto {
     // The homogeneous transformation to be applied to this entity's geometry.
     repeated float transform = 4;
 
-    // An AABB bounding box surrounding the entity's geometry.
-    AABB bounding_box = 5;
+    // Most likely inputs by a human. It may not always be available because a general homogeneous
+    // transform cannot be reverted back to an SRT specification.
+    SrtTransform srt_transform = 5;
+
+    // An AABB bounding box (before a placement transform) surrounding the entity's geometry.
+    AABB bounding_box = 6;
 
     // A drawable instance with information derived from a drawable. A shared pointer allows a large
     // number of same drawables to be placed at different location of the scene with shared
     // information.
-    string drawable_id = 6;
+    string drawable_id = 7;
 
     // Like above, A physical shape instance with information derived from a physical shape.
-    string physical_shape_id = 7;
+    string physical_shape_id = 8;
 }
 
-/*
+/**
  * @brief The SceneEntityCollection message Encapsulates full information about a collection of
  * entities.
  */

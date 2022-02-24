@@ -15,14 +15,13 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <google/protobuf/map.h>
-#include <google/protobuf/repeated_field.h>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 #include "common/tensor.h"
+#include "content/common.h"
 #include "content/drawable.h"
 #include "content/entity.h"
 #include "content/proto/drawable.pb.h"
@@ -31,68 +30,19 @@
 #include "content/proto/primitive.pb.h"
 
 namespace e8 {
-namespace {
 
-google::protobuf::RepeatedField<float> ToProtoArray(mat44 const &transform) {
-    google::protobuf::RepeatedField<float> array;
-    array.Resize(/*new_size=*/4 * 4, /*value=*/0.0f);
-
-    for (unsigned i = 0; i < 4; ++i) {
-        for (unsigned j = 0; j < 4; ++j) {
-            array[i + j * 4] = transform(i, j);
-        }
-    }
-
-    return array;
-}
-
-mat44 ToMat44(google::protobuf::RepeatedField<float> const &array) {
-    mat44 transform;
-
-    for (unsigned i = 0; i < 4; ++i) {
-        for (unsigned j = 0; j < 4; ++j) {
-            transform(i, j) = array[i + j * 4];
-        }
-    }
-
-    return transform;
-}
-
-AABB ToProtoAabb(aabb const &bounding_box) {
-    AABB proto;
-    proto.mutable_min()->Resize(/*new_size=*/3, /*value=*/0.0f);
-    proto.mutable_max()->Resize(/*new_size=*/3, /*value=*/0.0f);
-
-    for (unsigned i = 0; i < 3; ++i) {
-        proto.set_min(i, bounding_box.min()(i));
-        proto.set_max(i, bounding_box.max()(i));
-    }
-
-    return proto;
-}
-
-aabb ToAabb(AABB const &proto) {
-    vec3 min;
-    vec3 max;
-
-    for (unsigned i = 0; i < 3; ++i) {
-        min(i) = proto.min(i);
-        max(i) = proto.max(i);
-    }
-
-    return aabb(min, max);
-}
-
-} // namespace
-
-SceneEntity::SceneEntity() {}
+SceneEntity::SceneEntity(SceneEntityName const &name) : name(name), movable(true) {}
 
 SceneEntity::SceneEntity(
     SceneEntityProto const &proto,
     std::unordered_map<DrawableId, std::shared_ptr<DrawableLod>> const &drawables)
     : id(proto.id()), name(proto.name()), movable(proto.movable()),
       transform(ToMat44(proto.transform())), bounding_box(ToAabb(proto.bounding_box())),
-      drawable_lod_instance(drawables.at(proto.id())) {}
+      drawable_lod_instance(drawables.at(proto.id())) {
+    if (proto.has_srt_transform()) {
+        srt_transform = proto.srt_transform();
+    }
+}
 
 SceneEntity::~SceneEntity() {}
 
@@ -101,10 +51,23 @@ SceneEntityProto SceneEntity::ToProto() const {
     proto.set_id(id);
     proto.set_name(name);
     proto.set_movable(movable);
-    *proto.mutable_transform() = ToProtoArray(transform);
-    *proto.mutable_bounding_box() = ToProtoAabb(bounding_box);
+    *proto.mutable_transform() = e8::ToProto(transform);
+    if (srt_transform.has_value()) {
+        *proto.mutable_srt_transform() = *srt_transform;
+    }
+    *proto.mutable_bounding_box() = e8::ToProto(bounding_box);
     proto.set_drawable_id(drawable_lod_instance->id());
     return proto;
+}
+
+void SceneEntitySetSrtTransform(SrtTransform const &srt_transform, SceneEntity *entity) {
+    entity->srt_transform = srt_transform;
+    entity->transform = ToHomogeneousTransform(srt_transform);
+}
+
+void SceneEntitySetTransform(mat44 const &transform, SceneEntity *entity) {
+    entity->transform = transform;
+    entity->srt_transform.reset();
 }
 
 SceneEntityCollection ToProto(std::vector<SceneEntity> const &entities) {

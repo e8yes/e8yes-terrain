@@ -22,7 +22,7 @@ package e8;
 import "entity.proto";
 import "scene_object.proto";
 
-/*
+/**
  * @brief The SceneProto message This is a serializable version of the SceneInterface sub-classes.
  */
 message SceneProto {

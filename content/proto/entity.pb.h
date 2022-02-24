@@ -200,9 +200,10 @@ class SceneEntityProto PROTOBUF_FINAL :
     kTransformFieldNumber = 4,
     kIdFieldNumber = 1,
     kNameFieldNumber = 2,
-    kDrawableIdFieldNumber = 6,
-    kPhysicalShapeIdFieldNumber = 7,
-    kBoundingBoxFieldNumber = 5,
+    kDrawableIdFieldNumber = 7,
+    kPhysicalShapeIdFieldNumber = 8,
+    kSrtTransformFieldNumber = 5,
+    kBoundingBoxFieldNumber = 6,
     kMovableFieldNumber = 3,
   };
   // repeated float transform = 4;
@@ -277,7 +278,7 @@ class SceneEntityProto PROTOBUF_FINAL :
   std::string* _internal_mutable_name();
   public:
 
-  // string drawable_id = 6;
+  // string drawable_id = 7;
   void clear_drawable_id();
   const std::string& drawable_id() const;
   void set_drawable_id(const std::string& value);
@@ -302,7 +303,7 @@ class SceneEntityProto PROTOBUF_FINAL :
   std::string* _internal_mutable_drawable_id();
   public:
 
-  // string physical_shape_id = 7;
+  // string physical_shape_id = 8;
   void clear_physical_shape_id();
   const std::string& physical_shape_id() const;
   void set_physical_shape_id(const std::string& value);
@@ -327,7 +328,25 @@ class SceneEntityProto PROTOBUF_FINAL :
   std::string* _internal_mutable_physical_shape_id();
   public:
 
-  // .e8.AABB bounding_box = 5;
+  // .e8.SrtTransform srt_transform = 5;
+  bool has_srt_transform() const;
+  private:
+  bool _internal_has_srt_transform() const;
+  public:
+  void clear_srt_transform();
+  const ::e8::SrtTransform& srt_transform() const;
+  ::e8::SrtTransform* release_srt_transform();
+  ::e8::SrtTransform* mutable_srt_transform();
+  void set_allocated_srt_transform(::e8::SrtTransform* srt_transform);
+  private:
+  const ::e8::SrtTransform& _internal_srt_transform() const;
+  ::e8::SrtTransform* _internal_mutable_srt_transform();
+  public:
+  void unsafe_arena_set_allocated_srt_transform(
+      ::e8::SrtTransform* srt_transform);
+  ::e8::SrtTransform* unsafe_arena_release_srt_transform();
+
+  // .e8.AABB bounding_box = 6;
   bool has_bounding_box() const;
   private:
   bool _internal_has_bounding_box() const;
@@ -367,6 +386,7 @@ class SceneEntityProto PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr drawable_id_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr physical_shape_id_;
+  ::e8::SrtTransform* srt_transform_;
   ::e8::AABB* bounding_box_;
   bool movable_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -871,7 +891,82 @@ SceneEntityProto::mutable_transform() {
   return _internal_mutable_transform();
 }
 
-// .e8.AABB bounding_box = 5;
+// .e8.SrtTransform srt_transform = 5;
+inline bool SceneEntityProto::_internal_has_srt_transform() const {
+  return this != internal_default_instance() && srt_transform_ != nullptr;
+}
+inline bool SceneEntityProto::has_srt_transform() const {
+  return _internal_has_srt_transform();
+}
+inline const ::e8::SrtTransform& SceneEntityProto::_internal_srt_transform() const {
+  const ::e8::SrtTransform* p = srt_transform_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::e8::SrtTransform*>(
+      &::e8::_SrtTransform_default_instance_);
+}
+inline const ::e8::SrtTransform& SceneEntityProto::srt_transform() const {
+  // @@protoc_insertion_point(field_get:e8.SceneEntityProto.srt_transform)
+  return _internal_srt_transform();
+}
+inline void SceneEntityProto::unsafe_arena_set_allocated_srt_transform(
+    ::e8::SrtTransform* srt_transform) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(srt_transform_);
+  }
+  srt_transform_ = srt_transform;
+  if (srt_transform) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneEntityProto.srt_transform)
+}
+inline ::e8::SrtTransform* SceneEntityProto::release_srt_transform() {
+  auto temp = unsafe_arena_release_srt_transform();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::e8::SrtTransform* SceneEntityProto::unsafe_arena_release_srt_transform() {
+  // @@protoc_insertion_point(field_release:e8.SceneEntityProto.srt_transform)
+  
+  ::e8::SrtTransform* temp = srt_transform_;
+  srt_transform_ = nullptr;
+  return temp;
+}
+inline ::e8::SrtTransform* SceneEntityProto::_internal_mutable_srt_transform() {
+  
+  if (srt_transform_ == nullptr) {
+    auto* p = CreateMaybeMessage<::e8::SrtTransform>(GetArena());
+    srt_transform_ = p;
+  }
+  return srt_transform_;
+}
+inline ::e8::SrtTransform* SceneEntityProto::mutable_srt_transform() {
+  // @@protoc_insertion_point(field_mutable:e8.SceneEntityProto.srt_transform)
+  return _internal_mutable_srt_transform();
+}
+inline void SceneEntityProto::set_allocated_srt_transform(::e8::SrtTransform* srt_transform) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(srt_transform_);
+  }
+  if (srt_transform) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(srt_transform)->GetArena();
+    if (message_arena != submessage_arena) {
+      srt_transform = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, srt_transform, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  srt_transform_ = srt_transform;
+  // @@protoc_insertion_point(field_set_allocated:e8.SceneEntityProto.srt_transform)
+}
+
+// .e8.AABB bounding_box = 6;
 inline bool SceneEntityProto::_internal_has_bounding_box() const {
   return this != internal_default_instance() && bounding_box_ != nullptr;
 }
@@ -946,7 +1041,7 @@ inline void SceneEntityProto::set_allocated_bounding_box(::e8::AABB* bounding_bo
   // @@protoc_insertion_point(field_set_allocated:e8.SceneEntityProto.bounding_box)
 }
 
-// string drawable_id = 6;
+// string drawable_id = 7;
 inline void SceneEntityProto::clear_drawable_id() {
   drawable_id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
@@ -1027,7 +1122,7 @@ inline void SceneEntityProto::unsafe_arena_set_allocated_drawable_id(
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneEntityProto.drawable_id)
 }
 
-// string physical_shape_id = 7;
+// string physical_shape_id = 8;
 inline void SceneEntityProto::clear_physical_shape_id() {
   physical_shape_id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
