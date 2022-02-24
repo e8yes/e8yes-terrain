@@ -67,7 +67,7 @@ class LinearScene : public SceneInterface {
      * @brief QueryEntities Querying entity requires O(n) time, where n is the number of entity in
      * the scene.
      */
-    std::vector<SceneEntity const *> QueryEntities(QueryFn query_fn) const override;
+    std::vector<SceneEntity const *> QueryEntities(QueryFn query_fn) override;
 
     SceneProto ToProto() const override;
 

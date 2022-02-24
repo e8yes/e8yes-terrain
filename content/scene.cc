@@ -27,6 +27,7 @@
 #include "content/proto/scene_object.pb.h"
 #include "content/scene.h"
 #include "content/scene_linear.h"
+#include "content/scene_object.h"
 #include "third_party/uuid/uuid4.h"
 
 namespace e8 {

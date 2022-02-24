@@ -29,14 +29,9 @@
 #include "content/entity.h"
 #include "content/proto/scene.pb.h"
 #include "content/proto/scene_object.pb.h"
+#include "content/scene_object.h"
 
 namespace e8 {
-
-// Uniquely identifies a scene object.
-using SceneObjectId = std::string;
-
-// Represents a descriptive human readable name of a scene object.
-using SceneObjectName = std::string;
 
 // Uniquely identifies a scene.
 using SceneId = std::string;
@@ -96,7 +91,7 @@ class SceneInterface {
      * @param query_fn See above for its definition.
      * @return An array of entities selected.
      */
-    virtual std::vector<SceneEntity const *> QueryEntities(QueryFn query_fn) const = 0;
+    virtual std::vector<SceneEntity const *> QueryEntities(QueryFn query_fn) = 0;
 
     /**
      * @brief ToProto Turns scene content into a protobuf object.

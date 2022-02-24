@@ -68,7 +68,7 @@ SceneEntity const *LinearScene::FindEntity(SceneEntityId const &id) const {
     return &(*it);
 }
 
-std::vector<SceneEntity const *> LinearScene::QueryEntities(QueryFn query_fn) const {
+std::vector<SceneEntity const *> LinearScene::QueryEntities(QueryFn query_fn) {
     std::vector<SceneEntity const *> result;
 
     for (auto const &entity : entities_) {
