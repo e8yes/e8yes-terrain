@@ -58,7 +58,7 @@ void RunIslandsDisplay(std::shared_ptr<EditorContext> editor_context, unsigned w
     SDL_Window *display_window = SDL_CreateWindow(
         /*title=*/kIslandsDisplayWindowTitle, /*x=*/SDL_WINDOWPOS_UNDEFINED,
         /*y=*/SDL_WINDOWPOS_UNDEFINED, window_width, window_height,
-        /*flags=*/SDL_WINDOW_ALWAYS_ON_TOP | SDL_WINDOW_VULKAN);
+        /*flags=*/SDL_WINDOW_VULKAN);
     assert(display_window != nullptr);
 
     {
