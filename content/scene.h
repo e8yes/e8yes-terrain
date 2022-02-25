@@ -26,9 +26,9 @@
 #include <vector>
 
 #include "common/tensor.h"
-#include "content/entity.h"
 #include "content/proto/scene.pb.h"
 #include "content/proto/scene_object.pb.h"
+#include "content/scene_entity.h"
 #include "content/scene_object.h"
 
 namespace e8 {

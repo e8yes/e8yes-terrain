@@ -21,8 +21,8 @@
 #include <string>
 #include <vector>
 
-#include "content/entity.h"
 #include "content/proto/scene_object.pb.h"
+#include "content/scene_entity.h"
 
 namespace e8 {
 

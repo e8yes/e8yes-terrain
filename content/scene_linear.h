@@ -21,9 +21,9 @@
 #include <string>
 #include <vector>
 
-#include "content/entity.h"
 #include "content/proto/scene.pb.h"
 #include "content/scene.h"
+#include "content/scene_entity.h"
 
 namespace e8 {
 

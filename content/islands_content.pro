@@ -19,7 +19,6 @@ INCLUDEPATH += ../
 SOURCES += \
     common.cc \
     drawable.cc \
-    entity.cc \
     procedural_basic.cc \
     procedural_object.cc \
     proto/drawable.pb.cc \
@@ -31,13 +30,13 @@ SOURCES += \
     proto/scene_object.pb.cc \
     proto/scene.pb.cc \
     scene.cc \
+    scene_entity.cc \
     scene_linear.cc \
     scene_object.cc
 
 HEADERS += \
     common.h \
     drawable.h \
-    entity.h \
     procedural_basic.h \
     procedural_object.h \
     proto/drawable.pb.h \
@@ -49,6 +48,7 @@ HEADERS += \
     proto/scene_object.pb.h \
     proto/scene.pb.h \
     scene.h \
+    scene_entity.h \
     scene_linear.h \
     scene_object.h
 

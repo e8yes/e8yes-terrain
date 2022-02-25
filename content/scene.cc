@@ -24,9 +24,9 @@
 
 #include "common/tensor.h"
 #include "content/common.h"
-#include "content/entity.h"
 #include "content/proto/scene_object.pb.h"
 #include "content/scene.h"
+#include "content/scene_entity.h"
 #include "content/scene_linear.h"
 #include "content/scene_object.h"
 #include "third_party/uuid/uuid4.h"

@@ -23,11 +23,11 @@
 #include "common/tensor.h"
 #include "content/common.h"
 #include "content/drawable.h"
-#include "content/entity.h"
 #include "content/proto/drawable.pb.h"
 #include "content/proto/entity.pb.h"
 #include "content/proto/physical_shape.pb.h"
 #include "content/proto/primitive.pb.h"
+#include "content/scene_entity.h"
 
 namespace e8 {
 
