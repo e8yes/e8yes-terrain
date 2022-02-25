@@ -1,0 +1,94 @@
+/**
+ * e8yes demo web server.
+ *
+ * <p>Copyright (C) 2020 Chifeng Wen {daviesx66@gmail.com}
+ *
+ * <p>This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * <p>You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
+ */
+
+syntax = "proto3";
+
+package e8;
+
+import "primitive.proto";
+
+/**
+ * @brief The ProceduralPlaneProto message A one-sided upward facing plane, centered at the origin.
+ */
+message ProceduralPlaneProto {
+    // Determines how much the plane spans along the x axis.
+    float width = 1;
+
+    // Determines how much the plane spans along the y axis.
+    float height = 2;
+
+    // It controls the subdivision. The subdivision process divides the plane into quads. This field
+    // specifies the maximum area the quad is allowed to be.
+    float cell_area = 3;
+}
+
+/**
+ * @brief The ProceduralBoxProto message A hollow box, centered at the origin.
+ */
+message ProceduralBoxProto {
+    // Determines how much the box spans along the x axis.
+    float width = 1;
+
+    // Determines how much the box spans along the y axis.
+    float height = 2;
+
+    // Determines how much the box spans along the z axis.
+    float depth = 3;
+
+    // It controls the subdivision. The subdivision process divides the box surfaces into quads.
+    // This field specifies the maximum area the quad is allowed to be.
+    float cell_area = 4;
+
+    // Sets the orientation of the box's surfaces. It indicates if the surfaces should face outward.
+    bool face_outward = 5;
+}
+
+/**
+ * @brief The ProceduralSphereProto message A hollow sphere, centered at the origin.
+ */
+message ProceduralSphereProto {
+    // The sphere's radius.
+    float radius = 1;
+
+    // It controls the subdivision. The subdivision process divides the sphere surface into quads.
+    // This field specifies the maximum area the quad is allowed to be.
+    float cell_area = 2;
+
+    // Sets the orientation of the sphere's surface. It indicates if the surface should face
+    // outward.
+    bool face_outward = 3;
+}
+
+/**
+ * @brief The ProceduralShapeProto message Source data for a procedural generator to produce
+ * geometries.
+ */
+message ProceduralShapeProto {
+    // Transformation of the shape, most likely inputs by a human.
+    SrtTransform srt_transform = 1;
+
+    oneof shape {
+        // Plane shape.
+        ProceduralPlaneProto plane = 2;
+
+        // Box shape.
+        ProceduralBoxProto box = 3;
+
+        // Sphere shape.
+        ProceduralSphereProto sphere = 4;
+    }
+}
