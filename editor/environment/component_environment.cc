@@ -26,7 +26,7 @@
 namespace e8 {
 namespace {
 
-void SetBackgroundColorSlider(SceneInterface const &scene, QSlider *red, QSlider *green,
+void SetBackgroundColorSlider(Scene const &scene, QSlider *red, QSlider *green,
                               QSlider *blue) {
     vec3 current_color = scene.BackgroundColor();
 
@@ -36,7 +36,7 @@ void SetBackgroundColorSlider(SceneInterface const &scene, QSlider *red, QSlider
 }
 
 void SetSceneBackgroundColor(QSlider const *red, QSlider const *green, QSlider const *blue,
-                             SceneInterface *scene) {
+                             Scene *scene) {
     vec3 new_background_color{static_cast<float>(red->value()) / red->maximum(),
                               static_cast<float>(green->value()) / green->maximum(),
                               static_cast<float>(blue->value()) / blue->maximum()};

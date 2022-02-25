@@ -47,14 +47,14 @@ QString FixSceneFilePath(QString const target_file_path) {
     return target_file_path;
 }
 
-void RenameSceneToFileName(QString const &target_file_path, SceneInterface *scene,
+void RenameSceneToFileName(QString const &target_file_path, Scene *scene,
                            SceneViewComponent *scene_view_comp) {
     QFileInfo file_info(target_file_path);
     scene->name = file_info.baseName().toStdString();
     scene_view_comp->OnChangeScene();
 }
 
-bool SaveScene(SceneInterface const &scene, std::string const &target_file_path) {
+bool SaveScene(Scene const &scene, std::string const &target_file_path) {
     std::fstream file(target_file_path, std::ios::out | std::ios::binary);
     if (!file.is_open()) {
         BOOST_LOG_TRIVIAL(error) << "SaveScene(): Failed to open scene file=[" << target_file_path

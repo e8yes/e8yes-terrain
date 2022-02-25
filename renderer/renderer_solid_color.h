@@ -45,7 +45,7 @@ class SolidColorRenderer {
      * @brief DrawFrame Draws a new frame filled with the scene's background color to the currently
      * available swap chain image.
      */
-    void DrawFrame(SceneInterface *scene);
+    void DrawFrame(Scene *scene);
 
   private:
     class SolidColorRendererImpl;

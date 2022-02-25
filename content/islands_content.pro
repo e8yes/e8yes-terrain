@@ -31,8 +31,9 @@ SOURCES += \
     proto/scene.pb.cc \
     scene.cc \
     scene_entity.cc \
-    scene_linear.cc \
-    scene_object.cc
+    scene_object.cc \
+    structure.cc \
+    structure_linear.cc
 
 HEADERS += \
     common.h \
@@ -49,8 +50,9 @@ HEADERS += \
     proto/scene.pb.h \
     scene.h \
     scene_entity.h \
-    scene_linear.h \
-    scene_object.h
+    scene_object.h \
+    structure.h \
+    structure_linear.h
 
 # Default rules for deployment.
 unix {

@@ -26,7 +26,7 @@
 namespace e8 {
 namespace {
 
-void UpdateSceneView(SceneInterface const *scene, QTreeWidget *scene_view_tree_widget) {
+void UpdateSceneView(Scene const *scene, QTreeWidget *scene_view_tree_widget) {
     scene_view_tree_widget->clear();
 
     if (scene == nullptr) {

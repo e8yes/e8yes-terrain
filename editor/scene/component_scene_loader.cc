@@ -24,9 +24,9 @@
 #include <fstream>
 #include <memory>
 
+#include "content/structure_linear.h"
 #include "content/proto/scene.pb.h"
 #include "content/scene.h"
-#include "content/scene_linear.h"
 #include "editor/basic/component_editor_portal_switcher.h"
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/context.h"
@@ -38,15 +38,9 @@
 namespace e8 {
 namespace {
 
-enum EditorSceneType {
-    EST_INVALID,
-    EST_LINEAR_SCENE,
-    EST_OCTREE_SCENE,
-};
-
 constexpr char const *kDefaultSceneName = "Untitled";
 
-bool CreateNewScene(EditorSceneType scene_type,
+bool CreateNewScene(SceneProto::StructureType structure_type,
                     EditorPortalSwitcherComponent *editor_portal_switcher_comp,
                     EnvironmentComponent *environment_comp,
                     ModificationMonitorComponent *modification_monitor_comp,
@@ -57,21 +51,7 @@ bool CreateNewScene(EditorSceneType scene_type,
         return false;
     }
 
-    switch (scene_type) {
-    case EST_LINEAR_SCENE: {
-        context->scene = std::make_unique<LinearScene>(kDefaultSceneName);
-        break;
-    }
-    case EST_OCTREE_SCENE: {
-        // TODO: Creates an octree scene when it is implemented.
-        BOOST_LOG_TRIVIAL(error) << "CreateNewScene(): Octree scene is not implemented.";
-        return false;
-    }
-    default: {
-        BOOST_LOG_TRIVIAL(error) << "CreateNewScene(): Unknown scene type.";
-        return false;
-    }
-    }
+    context->scene = std::make_unique<Scene>(structure_type, kDefaultSceneName);
 
     editor_portal_switcher_comp->SetEditorPortalEnabled(/*enabled=*/true);
     environment_comp->OnChangeScene();
@@ -101,7 +81,7 @@ bool LoadScene(std::string const &scene_file,
         return false;
     }
 
-    context->scene = ToScene(proto);
+    context->scene = std::make_unique<Scene>(proto);
 
     editor_portal_switcher_comp->SetEditorPortalEnabled(/*enabled=*/true);
     environment_comp->OnChangeScene();
@@ -138,7 +118,7 @@ void SceneLoaderComponent::OnClickNewSceneLinear() {
         return;
     }
 
-    if (!CreateNewScene(/*scene_type=*/EST_LINEAR_SCENE, editor_portal_switcher_comp_,
+    if (!CreateNewScene(/*scene_type=*/SceneProto::LINEAR, editor_portal_switcher_comp_,
                         environment_comp_, modification_monitor_comp_, scene_view_comp_,
                         context_)) {
         QMessageBox msg_box;
@@ -156,7 +136,7 @@ void SceneLoaderComponent::OnClickNewSceneOctree() {
         return;
     }
 
-    if (!CreateNewScene(/*scene_type=*/EST_OCTREE_SCENE, editor_portal_switcher_comp_,
+    if (!CreateNewScene(/*scene_type=*/SceneProto::OCTREE, editor_portal_switcher_comp_,
                         environment_comp_, modification_monitor_comp_, scene_view_comp_,
                         context_)) {
     }

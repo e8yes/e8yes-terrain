@@ -18,18 +18,16 @@
 #ifndef ISLANDS_RENDERER_SCENE_H
 #define ISLANDS_RENDERER_SCENE_H
 
-#include <functional>
 #include <memory>
+#include <shared_mutex>
 #include <string>
 #include <unordered_map>
-#include <unordered_set>
 #include <vector>
 
-#include "common/tensor.h"
 #include "content/proto/scene.pb.h"
 #include "content/proto/scene_object.pb.h"
-#include "content/scene_entity.h"
 #include "content/scene_object.h"
+#include "content/structure.h"
 
 namespace e8 {
 
@@ -37,66 +35,78 @@ namespace e8 {
 using SceneId = std::string;
 
 /**
- * @brief The SceneInterface class a container for efficient scene object storage and query. This
- * container isn't thread-safe.
+ * @brief The Scene class a container for efficient scene object storage and query. This container
+ * isn't thread-safe, but it provides locking device to enable safe concurrent resource access.
  */
-class SceneInterface {
+class Scene {
   public:
+    /**
+     * @brief The ReadAccess class Created by calling GainReadAccess(). Note, the access right is
+     * valid throughout the life of the ReadAccess object.
+     */
+    class ReadAccess {
+      public:
+        ReadAccess(std::shared_mutex *mu);
+        ReadAccess(ReadAccess &&other);
+        ReadAccess(ReadAccess const &) = delete;
+        ~ReadAccess();
+
+      private:
+        std::shared_mutex *mu_;
+    };
+
+    /**
+     * @brief The WriteAccess class Created by calling GainWriteAccess(). Note, the access right is
+     * valid throughout the life of the WriteAccess object.
+     */
+    class WriteAccess {
+      public:
+        WriteAccess(std::shared_mutex *mu);
+        WriteAccess(WriteAccess &&other);
+        WriteAccess(WriteAccess const &) = delete;
+        ~WriteAccess();
+
+      private:
+        std::shared_mutex *mu_;
+    };
+
     /**
      * @brief SceneInterface Constructs an empty scene.
      *
+     * @param structure_type The type of structure to use for storing scene entities.
      * @param name A descriptive human readable name for the scene.
      */
-    explicit SceneInterface(std::string const &name);
+    Scene(SceneProto::StructureType structure_type, std::string const &name);
 
     /**
      * @brief SceneInterface Constructs a scene base class with content provided by the proto
      * object.
      */
-    explicit SceneInterface(SceneProto const &proto);
+    explicit Scene(SceneProto const &proto);
 
-    virtual ~SceneInterface();
+    virtual ~Scene();
 
-    SceneInterface(SceneInterface const &) = delete;
-
-    /**
-     * @brief AddEntity Adds a new entity to the scene.
-     *
-     * @param entity The entity to be added.
-     * @return true only if the entity has not been added to the scene.
-     */
-    virtual bool AddEntity(SceneEntity const &entity) = 0;
+    Scene(Scene const &) = delete;
 
     /**
-     * @brief DeleteEntity Deletes a scene entity by its ID. It returns true only when the entity
-     * exists.
+     * @brief GainReadAccess Gain access to read scene content. Note, the access right is valid
+     * throughout the life of the ReadAccess object. Also, the scene must live longer than the
+     * returned object.
      */
-    virtual bool DeleteEntity(SceneEntityId const &id) = 0;
+    ReadAccess GainReadAccess();
 
     /**
-     * @brief FindEntity Finds a scene entity by its ID. It return a nullptr if it doesn't exist.
-     * When it returns a non-null pointer, it's only valid before the next AddEntity() and
-     * DeleteEntity() call.
+     * @brief GainWriteAccess Gain access to read and write scene content. Note, the access right is
+     * valid throughout the life of the WriteAccess object. Also, the scene must live longer than
+     * the returned object.
+     * @return
      */
-    virtual SceneEntity const *FindEntity(SceneEntityId const &id) const = 0;
-
-    // Defines a query function which judges upon the bounding box to determine whether the content
-    // in the box should be included in the result list.
-    using QueryFn = std::function<bool(aabb const &bounding_box, mat44 const &transform)>;
+    WriteAccess GainWriteAccess();
 
     /**
-     * @brief QueryEntities Selects the entities that satisfy the query function. The pointers in
-     * the result array is only valid before the next AddEntity() and DeleteEntity() call.
-     *
-     * @param query_fn See above for its definition.
-     * @return An array of entities selected.
+     * @brief SceneEntityContainer Gets access to the scene entity structure.
      */
-    virtual std::vector<SceneEntity const *> QueryEntities(QueryFn query_fn) = 0;
-
-    /**
-     * @brief ToProto Turns scene content into a protobuf object.
-     */
-    virtual SceneProto ToProto() const = 0;
+    SceneEntityStructureInterface *SceneEntityStructure();
 
     /**
      * @brief AddSceneObject Adds a new scene object to the scene if it has not already been
@@ -130,6 +140,11 @@ class SceneInterface {
      */
     vec3 BackgroundColor() const;
 
+    /**
+     * @brief ToProto Turns scene content into a protobuf object.
+     */
+    SceneProto ToProto() const;
+
   public:
     // Id of the scene.
     SceneId id;
@@ -137,20 +152,13 @@ class SceneInterface {
     // A descriptive human readable name of the scene.
     std::string name;
 
-  protected:
-    SceneProto _ToBaseProto() const;
-
-    std::unordered_set<SceneEntityId> _scene_entity_ids;
-
   private:
+    std::shared_mutex mu_;
+
     std::unordered_map<SceneObjectId, SceneObject> scene_objects_;
+    std::unique_ptr<SceneEntityStructureInterface> entity_structure_;
     vec3 background_color_;
 };
-
-/**
- * @brief ToScene Turns a scene proto object back to an in-memory scene sub-class.
- */
-std::unique_ptr<SceneInterface> ToScene(SceneProto const &proto);
 
 } // namespace e8
 

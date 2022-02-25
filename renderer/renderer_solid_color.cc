@@ -79,7 +79,7 @@ SolidColorRenderer::SolidColorRenderer(VulkanContext *context)
 
 SolidColorRenderer::~SolidColorRenderer() {}
 
-void SolidColorRenderer::DrawFrame(SceneInterface *scene) {
+void SolidColorRenderer::DrawFrame(Scene *scene) {
     std::unique_ptr<StartFrameResult> start_frame_result = StartFrame(pimpl_->context);
 
     FrameBuffer *frame_buffer = pimpl_->GetFrameBuffer(start_frame_result->swap_chain_image_index);

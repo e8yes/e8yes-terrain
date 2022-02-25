@@ -15,66 +15,59 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_CONTENT_SCENE_LINEAR_H
-#define ISLANDS_CONTENT_SCENE_LINEAR_H
+#ifndef ISLANDS_CONTENT_STRUCTURE_LINEAR_H
+#define ISLANDS_CONTENT_STRUCTURE_LINEAR_H
 
-#include <string>
 #include <vector>
 
-#include "content/proto/scene.pb.h"
-#include "content/scene.h"
+#include "common/tensor.h"
 #include "content/scene_entity.h"
+#include "content/structure.h"
 
 namespace e8 {
 
 /**
- * @brief The LinearScene class A linear (flat) scene structure.
+ * @brief The LinearSceneEntityContainer class A linear (flat) scene entity container structure.
  */
-class LinearScene : public SceneInterface {
+class LinearSceneEntityStructure : public SceneEntityStructureInterface {
   public:
     /**
      * @brief LinearScene Constructs a empty linear scene.
-     *
-     * @param name A descriptive human readable name for the scene.
      */
-    explicit LinearScene(std::string const &name);
-
-    /**
-     * @brief LinearScene Constructs a linear scene with content provided by the proto object.
-     */
-    explicit LinearScene(SceneProto const &proto);
-
-    ~LinearScene() override;
+    LinearSceneEntityStructure();
+    ~LinearSceneEntityStructure() override;
 
     /**
      * @brief AddEntity Adding entity requires O(1) time.
      */
-    bool AddEntity(SceneEntity const &entity) override;
+    void AddEntity(SceneEntity const *entity) override;
 
     /**
      * @brief DeleteEntity Deleting entity requires O(n) time, where n is the number of entity in
      * the scene.
      */
-    bool DeleteEntity(SceneEntityId const &id) override;
+    void DeleteEntity(SceneEntity const *entity) override;
 
     /**
-     * @brief FindEntity Finding entity by ID requires O(n) time, where n is the number of entity in
-     * the scene.
+     * @brief Build It does nothing.
      */
-    SceneEntity const *FindEntity(SceneEntityId const &id) const override;
+    void Build() override;
+
+    /**
+     * @brief Build It does nothing.
+     */
+    void Build(SceneEntity const *entity) override;
 
     /**
      * @brief QueryEntities Querying entity requires O(n) time, where n is the number of entity in
      * the scene.
      */
-    std::vector<SceneEntity const *> QueryEntities(QueryFn query_fn) override;
-
-    SceneProto ToProto() const override;
+    std::vector<SceneEntity const *> QueryEntities(QueryFn query_fn) const override;
 
   private:
-    std::vector<SceneEntity> entities_;
+    std::vector<SceneEntity const *> entities_;
 };
 
 } // namespace e8
 
-#endif // ISLANDS_CONTENT_SCENE_LINEAR_H
+#endif // ISLANDS_CONTENT_STRUCTURE_LINEAR_H
