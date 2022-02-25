@@ -20,8 +20,8 @@
 
 #include <QObject>
 
-#include "editor/component_editor_context.h"
 #include "editor/component_modification_monitor.h"
+#include "editor/context.h"
 
 namespace e8 {
 

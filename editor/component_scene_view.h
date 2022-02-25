@@ -20,7 +20,7 @@
 
 #include <QObject>
 
-#include "editor/component_editor_context.h"
+#include "editor/context.h"
 
 namespace e8 {
 

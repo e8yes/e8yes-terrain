@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_EDITOR_COMPONENT_EDITOR_CONTEXT_H
-#define ISLANDS_EDITOR_COMPONENT_EDITOR_CONTEXT_H
+#ifndef ISLANDS_EDITOR_CONTEXT_H
+#define ISLANDS_EDITOR_CONTEXT_H
 
 #include <QWidget>
 #include <memory>
@@ -54,4 +54,4 @@ void DeepScanWidget(QWidget *target, std::vector<QWidget *> *result);
 
 } // namespace e8
 
-#endif // ISLANDS_EDITOR_COMPONENT_EDITOR_CONTEXT_H
+#endif // ISLANDS_EDITOR_CONTEXT_H

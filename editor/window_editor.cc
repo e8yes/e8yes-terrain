@@ -20,7 +20,6 @@
 #include <memory>
 
 #include "common/tensor.h"
-#include "editor/component_editor_context.h"
 #include "editor/component_editor_portal_switcher.h"
 #include "editor/component_environment.h"
 #include "editor/component_modification_monitor.h"
@@ -29,6 +28,7 @@
 #include "editor/component_scene_saver.h"
 #include "editor/component_scene_view.h"
 #include "editor/component_status.h"
+#include "editor/context.h"
 #include "editor/window_editor.h"
 
 namespace e8 {

@@ -19,7 +19,7 @@
 #include <QWidget>
 #include <memory>
 
-#include "editor/component_editor_context.h"
+#include "editor/context.h"
 #include "ui_window_editor.h"
 
 namespace e8 {

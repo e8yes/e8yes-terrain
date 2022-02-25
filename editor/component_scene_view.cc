@@ -20,8 +20,8 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 
-#include "editor/component_editor_context.h"
 #include "editor/component_scene_view.h"
+#include "editor/context.h"
 
 namespace e8 {
 namespace {

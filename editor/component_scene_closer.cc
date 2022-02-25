@@ -19,12 +19,12 @@
 #include <QMessageBox>
 #include <QObject>
 
-#include "editor/component_editor_context.h"
 #include "editor/component_editor_portal_switcher.h"
 #include "editor/component_modification_monitor.h"
 #include "editor/component_scene_closer.h"
 #include "editor/component_scene_saver.h"
 #include "editor/component_scene_view.h"
+#include "editor/context.h"
 
 namespace e8 {
 namespace {

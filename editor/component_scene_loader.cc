@@ -27,13 +27,13 @@
 #include "content/proto/scene.pb.h"
 #include "content/scene.h"
 #include "content/scene_linear.h"
-#include "editor/component_editor_context.h"
 #include "editor/component_editor_portal_switcher.h"
 #include "editor/component_environment.h"
 #include "editor/component_modification_monitor.h"
 #include "editor/component_scene_loader.h"
 #include "editor/component_scene_saver.h"
 #include "editor/component_scene_view.h"
+#include "editor/context.h"
 
 namespace e8 {
 namespace {
