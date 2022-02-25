@@ -21,14 +21,12 @@
 #include <string>
 #include <vector>
 
+#include "content/common.h"
 #include "content/proto/procedural_object.pb.h"
 #include "content/scene_entity.h"
 #include "content/scene_object.h"
 
 namespace e8 {
-
-// Uniquely identifies a procedural object.
-using ProceduralObjectId = std::string;
 
 // A descriptive human readable name of a procedural object.
 using ProceduralObjectName = std::string;

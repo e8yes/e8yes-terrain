@@ -24,6 +24,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "content/common.h"
 #include "content/drawable.h"
 #include "content/proto/drawable.pb.h"
 #include "content/proto/scene_object.pb.h"
@@ -49,7 +50,7 @@ struct SceneObject {
      * procedural process referenced by the ID.
      */
     SceneObject(SceneObjectName const &name,
-                std::optional<std::string> const &procedural_object_id = std::nullopt);
+                std::optional<ProceduralObjectId> const &procedural_object_id = std::nullopt);
 
     /**
      * @brief SceneObject Reconstructs a scene object from a protobuf object. Since the entity proto
@@ -104,7 +105,7 @@ struct SceneObject {
 
     // If this field isn't null, it indicates that this scene object is generated procedural
     // process. The process is fully specified by the procedural object referenced by this ID.
-    std::optional<std::string> procedural_object_id;
+    std::optional<ProceduralObjectId> procedural_object_id;
 
     // Children must either be a list of scene objects or scene entities.
     std::list<SceneObject> child_scene_objects;

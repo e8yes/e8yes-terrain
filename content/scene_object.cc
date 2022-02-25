@@ -54,7 +54,7 @@ void CollectDrawables(SceneObject const &scene_object,
 }
 
 SceneObject::SceneObject(SceneObjectName const &name,
-                         std::optional<std::string> const &procedural_object_id)
+                         std::optional<ProceduralObjectId> const &procedural_object_id)
     : id(GenerateUuid()), name(name), procedural_object_id(procedural_object_id) {}
 
 SceneObject::SceneObject(

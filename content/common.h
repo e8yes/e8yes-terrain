@@ -80,6 +80,9 @@ aabb ToAabb(AABB const &proto);
  */
 mat44 ToHomogeneousTransform(SrtTransform const &srt_transform);
 
+// Uniquely identifies a procedural object.
+using ProceduralObjectId = std::string;
+
 } // namespace e8
 
 #endif // CONTENT_COMMON_H
