@@ -43,6 +43,7 @@ class SceneCloserComponent : public QObject {
 
   public slots:
     void OnClickCloseScene();
+    void OnClickExitApplication();
 
   private:
     EditorPortalSwitcherComponent *editor_portal_switcher_comp_;

@@ -16,6 +16,7 @@
  */
 
 #include <QAction>
+#include <QApplication>
 #include <QMessageBox>
 #include <QObject>
 
@@ -68,6 +69,11 @@ void SceneCloserComponent::OnClickCloseScene() {
 
     CloseScene(editor_portal_switcher_comp_, modification_monitor_comp_, scene_view_comp_,
                context_);
+}
+
+void SceneCloserComponent::OnClickExitApplication() {
+    this->OnClickCloseScene();
+    QApplication::exit();
 }
 
 } // namespace e8

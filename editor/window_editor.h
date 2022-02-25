@@ -18,6 +18,7 @@
 #ifndef ISLANDS_EDITOR_WINDOW_H
 #define ISLANDS_EDITOR_WINDOW_H
 
+#include <QCloseEvent>
 #include <QMainWindow>
 #include <QWidget>
 #include <memory>
@@ -44,6 +45,8 @@ class IslandsEditorWindow : public QMainWindow {
     IslandsEditorWindow(std::shared_ptr<EditorContext> const &editor_context,
                         QWidget *parent = nullptr);
     ~IslandsEditorWindow();
+
+    void closeEvent(QCloseEvent *) override;
 
   private:
     std::shared_ptr<EditorContext> editor_context_;

@@ -55,9 +55,14 @@ IslandsEditorWindow::IslandsEditorWindow(std::shared_ptr<EditorContext> const &e
         editor_portal_switcher_comp_.get(), environment_comp_.get(),
         modification_monitor_comp_.get(), scene_saver_comp_.get(), scene_view_comp_.get(),
         editor_context.get());
+
+    QAction::connect(editor_context_->ui->action_exit, &QAction::triggered, this,
+                     &IslandsEditorWindow::close);
 }
 
 IslandsEditorWindow::~IslandsEditorWindow() {}
+
+void IslandsEditorWindow::closeEvent(QCloseEvent *) { scene_closer_comp_->OnClickCloseScene(); }
 
 void RunIslandsEditorWindow(std::shared_ptr<EditorContext> editor_context, int argc, char *argv[]) {
     QApplication application(argc, argv);
