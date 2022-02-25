@@ -34,6 +34,10 @@ SceneObject CreateSceneObject(SceneObjectName const &name) {
     return object;
 }
 
+bool SceneObjectProcedural(SceneObject const &scene_object) {
+    return !scene_object.procedural_object_id().empty();
+}
+
 bool SceneObjectExternalChildren(SceneObject const &scene_object) {
     return scene_object.has_scene_entity_children();
 }

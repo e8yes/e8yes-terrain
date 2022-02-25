@@ -38,6 +38,11 @@ using SceneObjectName = std::string;
 SceneObject CreateSceneObject(SceneObjectName const &name);
 
 /**
+ * @brief SceneObjectProcedural Checks if the scene object is created by a procedural process.
+ */
+bool SceneObjectProcedural(SceneObject const &scene_object);
+
+/**
  * @brief SceneObjectExternalChildren Checks if the scene object's children are scene entities
  * (external nodes).
  */
