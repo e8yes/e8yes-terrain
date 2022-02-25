@@ -18,8 +18,8 @@
 #include <QObject>
 #include <boost/log/trivial.hpp>
 
-#include "editor/component_modification_monitor.h"
-#include "editor/context.h"
+#include "editor/basic/component_modification_monitor.h"
+#include "editor/basic/context.h"
 #include "ui_window_editor.h"
 
 namespace e8 {

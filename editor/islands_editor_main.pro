@@ -16,29 +16,29 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 INCLUDEPATH += ../
 
 SOURCES += \
-    component_editor_portal_switcher.cc \
-    component_environment.cc \
-    component_modification_monitor.cc \
-    component_scene_closer.cc \
-    component_scene_loader.cc \
-    component_scene_saver.cc \
-    component_scene_view.cc \
-    component_status.cc \
-    context.cc \
+    basic/component_editor_portal_switcher.cc \
+    basic/component_modification_monitor.cc \
+    basic/component_status.cc \
+    basic/context.cc \
+    environment/component_environment.cc \
+    scene/component_scene_closer.cc \
+    scene/component_scene_loader.cc \
+    scene/component_scene_saver.cc \
+    scene/component_scene_view.cc \
     main.cc \
     window_display.cc \
     window_editor.cc
 
 HEADERS += \
-    component_editor_portal_switcher.h \
-    component_environment.h \
-    component_modification_monitor.h \
-    component_scene_closer.h \
-    component_scene_loader.h \
-    component_scene_saver.h \
-    component_scene_view.h \
-    component_status.h \
-    context.h \
+    basic/component_editor_portal_switcher.h \
+    basic/component_modification_monitor.h \
+    basic/component_status.h \
+    basic/context.h \
+    environment/component_environment.h \
+    scene/component_scene_closer.h \
+    scene/component_scene_loader.h \
+    scene/component_scene_saver.h \
+    scene/component_scene_view.h \
     window_display.h \
     window_editor.h
 

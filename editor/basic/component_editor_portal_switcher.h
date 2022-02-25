@@ -15,28 +15,26 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_EDITOR_COMPONENT_SCENE_H
-#define ISLANDS_EDITOR_COMPONENT_SCENE_H
+#ifndef ISLANDS_EDITOR_COMPONENT_EDITOR_PORTAL_SWITCHER_H
+#define ISLANDS_EDITOR_COMPONENT_EDITOR_PORTAL_SWITCHER_H
 
 #include <QObject>
 
-#include "editor/context.h"
+#include "editor/basic/context.h"
 
 namespace e8 {
 
 /**
- * @brief The SceneViewComponent class When triggered, it pulls data from the current scene, if
- * available, and lists objects to a tree widget.
+ * @brief The EditorPortalSwitcherComponent class
  */
-class SceneViewComponent : public QObject {
+class EditorPortalSwitcherComponent : public QObject {
     Q_OBJECT
 
   public:
-    SceneViewComponent(EditorContext *context);
-    ~SceneViewComponent();
+    EditorPortalSwitcherComponent(EditorContext *context);
+    ~EditorPortalSwitcherComponent();
 
-  public slots:
-    void OnChangeScene();
+    void SetEditorPortalEnabled(bool enabled);
 
   private:
     EditorContext *context_;
@@ -44,4 +42,4 @@ class SceneViewComponent : public QObject {
 
 } // namespace e8
 
-#endif // ISLANDS_EDITOR_COMPONENT_SCENE_H
+#endif // ISLANDS_EDITOR_COMPONENT_EDITOR_PORTAL_SWITCHER_H

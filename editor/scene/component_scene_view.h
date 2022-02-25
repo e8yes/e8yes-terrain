@@ -15,15 +15,33 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef ISLANDS_EDITOR_COMPONENT_SCENE_H
+#define ISLANDS_EDITOR_COMPONENT_SCENE_H
+
 #include <QObject>
 
-#include "editor/component_status.h"
-#include "editor/context.h"
+#include "editor/basic/context.h"
 
 namespace e8 {
 
-StatusComponent::StatusComponent(EditorContext *context) : context_(context) {}
+/**
+ * @brief The SceneViewComponent class When triggered, it pulls data from the current scene, if
+ * available, and lists objects to a tree widget.
+ */
+class SceneViewComponent : public QObject {
+    Q_OBJECT
 
-StatusComponent::~StatusComponent() {}
+  public:
+    SceneViewComponent(EditorContext *context);
+    ~SceneViewComponent();
+
+  public slots:
+    void OnChangeScene();
+
+  private:
+    EditorContext *context_;
+};
 
 } // namespace e8
+
+#endif // ISLANDS_EDITOR_COMPONENT_SCENE_H

@@ -15,37 +15,42 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef COMPONENT_SCENE_CLOSER_H
-#define COMPONENT_SCENE_CLOSER_H
+#ifndef ISLANDS_EDITOR_COMPONENT_SCENE_LOADER_H
+#define ISLANDS_EDITOR_COMPONENT_SCENE_LOADER_H
 
 #include <QObject>
 
-#include "editor/component_editor_portal_switcher.h"
-#include "editor/component_modification_monitor.h"
-#include "editor/component_scene_saver.h"
-#include "editor/component_scene_view.h"
-#include "editor/context.h"
+#include "editor/basic/component_editor_portal_switcher.h"
+#include "editor/basic/component_modification_monitor.h"
+#include "editor/basic/context.h"
+#include "editor/environment/component_environment.h"
+#include "editor/scene/component_scene_saver.h"
+#include "editor/scene/component_scene_view.h"
 
 namespace e8 {
 
 /**
- * @brief The SceneCloserComponent class It's responsible for scene closing interactions.
+ * @brief The SceneLoaderComponent class It's responsible for scene loading interactions.
  */
-class SceneCloserComponent : public QObject {
+class SceneLoaderComponent : public QObject {
     Q_OBJECT
 
   public:
-    SceneCloserComponent(EditorPortalSwitcherComponent *editor_portal_switcher_comp,
+    SceneLoaderComponent(EditorPortalSwitcherComponent *editor_portal_switcher_comp,
+                         EnvironmentComponent *environment_comp,
                          ModificationMonitorComponent *modification_monitor_comp,
                          SceneSaverComponent *scene_saver_comp, SceneViewComponent *scene_view_comp,
                          EditorContext *context);
-    ~SceneCloserComponent();
+    ~SceneLoaderComponent();
 
   public slots:
-    void OnClickCloseScene();
+    void OnClickNewSceneLinear();
+    void OnClickNewSceneOctree();
+    void OnClickOpenScene();
 
   private:
     EditorPortalSwitcherComponent *editor_portal_switcher_comp_;
+    EnvironmentComponent *environment_comp_;
     ModificationMonitorComponent *modification_monitor_comp_;
     SceneSaverComponent *scene_saver_comp_;
     SceneViewComponent *scene_view_comp_;
@@ -55,4 +60,4 @@ class SceneCloserComponent : public QObject {
 
 } // namespace e8
 
-#endif // COMPONENT_SCENE_CLOSER_H
+#endif // ISLANDS_EDITOR_COMPONENT_SCENE_LOADER_H

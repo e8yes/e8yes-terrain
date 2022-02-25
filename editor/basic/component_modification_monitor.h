@@ -15,31 +15,40 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_EDITOR_COMPONENT_EDITOR_PORTAL_SWITCHER_H
-#define ISLANDS_EDITOR_COMPONENT_EDITOR_PORTAL_SWITCHER_H
+#ifndef ISLANDS_EDITOR_COMPONENT_MODIFICATION_MONITOR_H
+#define ISLANDS_EDITOR_COMPONENT_MODIFICATION_MONITOR_H
 
 #include <QObject>
 
-#include "editor/context.h"
+#include "editor/basic/context.h"
 
 namespace e8 {
 
 /**
- * @brief The EditorPortalSwitcherComponent class
+ * @brief The ModificationMonitorComponent class It responds to scene modification and reset events.
  */
-class EditorPortalSwitcherComponent : public QObject {
+class ModificationMonitorComponent : public QObject {
     Q_OBJECT
 
   public:
-    EditorPortalSwitcherComponent(EditorContext *context);
-    ~EditorPortalSwitcherComponent();
+    ModificationMonitorComponent(EditorContext *context);
+    ~ModificationMonitorComponent();
 
-    void SetEditorPortalEnabled(bool enabled);
+    /**
+     * @brief UnsavedModifications Checks if there are any currently unsaved modifications to the
+     * scene.
+     */
+    bool UnsavedModifications() const;
+
+  public slots:
+    void OnReset();
+    void OnModifyScene();
 
   private:
     EditorContext *context_;
+    bool unsaved_modifications_;
 };
 
 } // namespace e8
 
-#endif // ISLANDS_EDITOR_COMPONENT_EDITOR_PORTAL_SWITCHER_H
+#endif // ISLANDS_EDITOR_COMPONENT_MODIFICATION_MONITOR_H

@@ -19,9 +19,9 @@
 #include <algorithm>
 
 #include "common/tensor.h"
-#include "editor/component_environment.h"
-#include "editor/component_modification_monitor.h"
-#include "editor/context.h"
+#include "editor/basic/component_modification_monitor.h"
+#include "editor/basic/context.h"
+#include "editor/environment/component_environment.h"
 
 namespace e8 {
 namespace {

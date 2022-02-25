@@ -20,8 +20,8 @@
 #include <QWidget>
 #include <vector>
 
-#include "editor/component_editor_portal_switcher.h"
-#include "editor/context.h"
+#include "editor/basic/component_editor_portal_switcher.h"
+#include "editor/basic/context.h"
 #include "ui_window_editor.h"
 
 namespace e8 {

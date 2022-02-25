@@ -19,7 +19,7 @@
 #include <cassert>
 #include <memory>
 
-#include "editor/context.h"
+#include "editor/basic/context.h"
 #include "editor/window_display.h"
 #include "renderer/context.h"
 #include "renderer/renderer_solid_color.h"

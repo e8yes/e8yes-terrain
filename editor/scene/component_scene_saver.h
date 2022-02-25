@@ -22,9 +22,9 @@
 #include <optional>
 #include <string>
 
-#include "editor/component_modification_monitor.h"
-#include "editor/component_scene_view.h"
-#include "editor/context.h"
+#include "editor/basic/component_modification_monitor.h"
+#include "editor/basic/context.h"
+#include "editor/scene/component_scene_view.h"
 
 namespace e8 {
 

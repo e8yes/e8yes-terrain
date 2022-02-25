@@ -15,29 +15,15 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_EDITOR_COMPONENT_STATUS_H
-#define ISLANDS_EDITOR_COMPONENT_STATUS_H
-
 #include <QObject>
 
-#include "editor/context.h"
+#include "editor/basic/component_status.h"
+#include "editor/basic/context.h"
 
 namespace e8 {
 
-/**
- * @brief The StatusComponent class It updates the status UIs when triggered on various events.
- */
-class StatusComponent : public QObject {
-    Q_OBJECT
+StatusComponent::StatusComponent(EditorContext *context) : context_(context) {}
 
-  public:
-    StatusComponent(EditorContext *context);
-    ~StatusComponent();
-
-  private:
-    EditorContext *context_;
-};
+StatusComponent::~StatusComponent() {}
 
 } // namespace e8
-
-#endif // ISLANDS_EDITOR_COMPONENT_STATUS_H

@@ -15,37 +15,29 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_EDITOR_COMPONENT_ENVIRONMENT_H
-#define ISLANDS_EDITOR_COMPONENT_ENVIRONMENT_H
+#ifndef ISLANDS_EDITOR_COMPONENT_STATUS_H
+#define ISLANDS_EDITOR_COMPONENT_STATUS_H
 
 #include <QObject>
 
-#include "editor/component_modification_monitor.h"
-#include "editor/context.h"
+#include "editor/basic/context.h"
 
 namespace e8 {
 
 /**
- * @brief The EnvironmentComponent class Handles logic with UIs related to environment management.
+ * @brief The StatusComponent class It updates the status UIs when triggered on various events.
  */
-class EnvironmentComponent : public QObject {
+class StatusComponent : public QObject {
     Q_OBJECT
 
   public:
-    EnvironmentComponent(ModificationMonitorComponent *modification_monitor_comp,
-                         EditorContext *context);
-    ~EnvironmentComponent();
-
-  public slots:
-    void OnChangeScene();
-
-    void OnChangeBackgroundColor(int value);
+    StatusComponent(EditorContext *context);
+    ~StatusComponent();
 
   private:
     EditorContext *context_;
-    ModificationMonitorComponent *modification_monitor_comp_;
 };
 
 } // namespace e8
 
-#endif // ISLANDS_EDITOR_COMPONENT_ENVIRONMENT_H
+#endif // ISLANDS_EDITOR_COMPONENT_STATUS_H

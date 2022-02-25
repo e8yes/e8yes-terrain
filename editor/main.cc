@@ -19,7 +19,7 @@
 #include <memory>
 #include <thread>
 
-#include "editor/context.h"
+#include "editor/basic/context.h"
 #include "editor/window_display.h"
 #include "editor/window_editor.h"
 
