@@ -18,11 +18,10 @@
 #ifndef ISLANDS_RENDERER_SCENE_H
 #define ISLANDS_RENDERER_SCENE_H
 
+#include <map>
 #include <memory>
 #include <shared_mutex>
 #include <string>
-#include <unordered_map>
-#include <vector>
 
 #include "content/proto/scene.pb.h"
 #include "content/proto/scene_object.pb.h"
@@ -109,26 +108,24 @@ class Scene {
     SceneEntityStructureInterface *SceneEntityStructure();
 
     /**
-     * @brief AddSceneObject Adds a new scene object to the scene if it has not already been
-     * added. Otherwise, it will do nothing. The caller must ensures the entities grouped by the
-     * scene object must have been added to the scene via the AddEntity() call, or else, this
-     * function will fail.
+     * @brief AddRootSceneObject Adds a new root scene object to the scene if it has not already
+     * been added. Otherwise, it will do nothing.
      *
-     * @param scene_object The scene object to be moved into the scene.
+     * @param scene_object The scene object to be added into the scene.
      * @return true only if the scene object has not been added to the scene.
      */
-    bool AddSceneObject(SceneObject const &scene_object);
+    bool AddRootSceneObject(SceneObject const &scene_object);
 
     /**
-     * @brief DeleteSceneObject Deletes a scene object by ID. It returns true if the scene object
-     * exists.
+     * @brief DeleteRootSceneObject Deletes a root scene object by ID. It returns true if the scene
+     * object exists.
      */
-    bool DeleteSceneObject(SceneObjectId const &id);
+    bool DeleteRootSceneObject(SceneObjectId const &id);
 
     /**
-     * @brief AllSceneObjects Returns a list of all scene objects added to the scene.
+     * @brief AllRootSceneObjects Returns a list of all root scene objects added to the scene.
      */
-    std::unordered_map<SceneObjectId, SceneObject> const &AllSceneObjects() const;
+    std::map<SceneObjectId, SceneObject> const &AllRootSceneObjects() const;
 
     /**
      * @brief UpdateBackgroundColor Sets a new background color for the scene.
@@ -152,10 +149,15 @@ class Scene {
     // A descriptive human readable name of the scene.
     std::string name;
 
+    // The structure used for organizing scene entities efficiently.
+    SceneProto::StructureType structure_type;
+
   private:
+    void CreateSceneEntityStructure();
+
     std::shared_mutex mu_;
 
-    std::unordered_map<SceneObjectId, SceneObject> scene_objects_;
+    std::map<SceneObjectId, SceneObject> root_scene_objects_;
     std::unique_ptr<SceneEntityStructureInterface> entity_structure_;
     vec3 background_color_;
 };

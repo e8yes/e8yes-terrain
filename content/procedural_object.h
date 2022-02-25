@@ -22,8 +22,8 @@
 #include <vector>
 
 #include "content/proto/procedural_object.pb.h"
-#include "content/proto/scene_object.pb.h"
 #include "content/scene_entity.h"
+#include "content/scene_object.h"
 
 namespace e8 {
 
@@ -54,21 +54,9 @@ class ProceduralObjectInterface {
     ~ProceduralObjectInterface();
 
     /**
-     * @brief The SceneObjectResult struct Created by the ToSceneObject() call.
+     * @brief ToSceneObject Converts a procedural object to a regular scene object.
      */
-    struct SceneObjectResult {
-        // The converted scene object.
-        SceneObject scene_object;
-
-        // Entities the scene object consists of.
-        std::vector<SceneEntity> scene_entities;
-    };
-
-    /**
-     * @brief ToSceneObject Converts a procedural object to a regular scene object together with the
-     * underlying entities.
-     */
-    virtual SceneObjectResult ToSceneObject() const = 0;
+    virtual SceneObject ToSceneObject() const = 0;
 
     /**
      * @brief ToProto Converts a procedural object to a serializable protobuf object.

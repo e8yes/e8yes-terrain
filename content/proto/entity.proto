@@ -19,9 +19,7 @@ syntax = "proto3";
 
 package e8;
 
-import "drawable.proto";
 import "primitive.proto";
-import "physical_shape.proto";
 
 /**
  * @brief The SceneEntityProto message This is a serializable version of the SceneEntity structure.
@@ -59,19 +57,4 @@ message SceneEntityProto {
 
     // Like above, A physical shape instance with information derived from a physical shape.
     string physical_shape_id = 8;
-}
-
-/**
- * @brief The SceneEntityCollection message Encapsulates full information about a collection of
- * entities.
- */
-message SceneEntityCollection {
-    // A collection of entities.
-    repeated SceneEntityProto entities = 1;
-
-    // A collection of all drawables referenced by the entities.
-    map<string, DrawableLod> drawables = 2;
-
-    // A collection of all physical shapes referenced by the entities.
-    map<string, PhysicalShapeProto> physical_shapes = 3;
 }

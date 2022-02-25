@@ -28,7 +28,7 @@
 #include "content/proto/drawable.pb.h"
 #include "content/proto/procedural_object.pb.h"
 #include "content/proto/procedural_shape.pb.h"
-#include "content/proto/scene_object.pb.h"
+#include "content/scene_entity.h"
 #include "content/scene_object.h"
 
 namespace e8 {
@@ -126,17 +126,13 @@ ProceduralPlane::ProceduralPlane(ProceduralObjectProto const &proto)
 
 ProceduralPlane::~ProceduralPlane() {}
 
-ProceduralPlane::SceneObjectResult ProceduralPlane::ToSceneObject() const {
+SceneObject ProceduralPlane::ToSceneObject() const {
+    SceneObject scene_object(name, id);
+
     SceneEntity entity = PlaneEntity(width, height, cell_area, srt_transform, movable);
+    scene_object.AddSceneEntityChild(entity);
 
-    SceneObjectResult result;
-    result.scene_entities.push_back(entity);
-
-    result.scene_object = CreateSceneObject(name);
-    result.scene_object.set_procedural_object_id(id);
-    SceneObjectAddEntity(entity.id, &result.scene_object);
-
-    return result;
+    return scene_object;
 }
 
 ProceduralObjectProto ProceduralPlane::ToProto() const {

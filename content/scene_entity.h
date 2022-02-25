@@ -112,18 +112,6 @@ void SceneEntitySetSrtTransform(SrtTransform const &srt_transform, SceneEntity *
  */
 void SceneEntitySetTransform(mat44 const &transform, SceneEntity *entity);
 
-/**
- * @brief ToProto Transforms a collection of scene entities to a SceneEntityCollection message. See
- * the proto definition for what it is.
- */
-SceneEntityCollection ToProto(std::vector<SceneEntity> const &entities);
-
-/**
- * @brief ToSceneEntities Transforms a proto description of a collection of entities back to an
- * in-memory SceneEntity collection.
- */
-std::vector<SceneEntity> ToSceneEntities(SceneEntityCollection const &proto);
-
 } // namespace e8
 
 #endif // ISLANDS_CONTENT_ENTITY_H

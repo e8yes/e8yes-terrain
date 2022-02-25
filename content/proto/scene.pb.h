@@ -33,7 +33,6 @@
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
-#include "entity.pb.h"
 #include "scene_object.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
@@ -241,10 +240,9 @@ class SceneProto PROTOBUF_FINAL :
 
   enum : int {
     kBackgroundColorFieldNumber = 4,
-    kObjectsFieldNumber = 5,
     kIdFieldNumber = 1,
     kNameFieldNumber = 2,
-    kEntitiesFieldNumber = 6,
+    kObjectsFieldNumber = 5,
     kStructureTypeFieldNumber = 3,
   };
   // repeated float background_color = 4;
@@ -268,24 +266,6 @@ class SceneProto PROTOBUF_FINAL :
       background_color() const;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
       mutable_background_color();
-
-  // repeated .e8.SceneObject objects = 5;
-  int objects_size() const;
-  private:
-  int _internal_objects_size() const;
-  public:
-  void clear_objects();
-  ::e8::SceneObject* mutable_objects(int index);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneObject >*
-      mutable_objects();
-  private:
-  const ::e8::SceneObject& _internal_objects(int index) const;
-  ::e8::SceneObject* _internal_add_objects();
-  public:
-  const ::e8::SceneObject& objects(int index) const;
-  ::e8::SceneObject* add_objects();
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneObject >&
-      objects() const;
 
   // string id = 1;
   void clear_id();
@@ -337,23 +317,23 @@ class SceneProto PROTOBUF_FINAL :
   std::string* _internal_mutable_name();
   public:
 
-  // .e8.SceneEntityCollection entities = 6;
-  bool has_entities() const;
+  // .e8.SceneObjectCollection objects = 5;
+  bool has_objects() const;
   private:
-  bool _internal_has_entities() const;
+  bool _internal_has_objects() const;
   public:
-  void clear_entities();
-  const ::e8::SceneEntityCollection& entities() const;
-  ::e8::SceneEntityCollection* release_entities();
-  ::e8::SceneEntityCollection* mutable_entities();
-  void set_allocated_entities(::e8::SceneEntityCollection* entities);
+  void clear_objects();
+  const ::e8::SceneObjectCollection& objects() const;
+  ::e8::SceneObjectCollection* release_objects();
+  ::e8::SceneObjectCollection* mutable_objects();
+  void set_allocated_objects(::e8::SceneObjectCollection* objects);
   private:
-  const ::e8::SceneEntityCollection& _internal_entities() const;
-  ::e8::SceneEntityCollection* _internal_mutable_entities();
+  const ::e8::SceneObjectCollection& _internal_objects() const;
+  ::e8::SceneObjectCollection* _internal_mutable_objects();
   public:
-  void unsafe_arena_set_allocated_entities(
-      ::e8::SceneEntityCollection* entities);
-  ::e8::SceneEntityCollection* unsafe_arena_release_entities();
+  void unsafe_arena_set_allocated_objects(
+      ::e8::SceneObjectCollection* objects);
+  ::e8::SceneObjectCollection* unsafe_arena_release_objects();
 
   // .e8.SceneProto.StructureType structure_type = 3;
   void clear_structure_type();
@@ -373,10 +353,9 @@ class SceneProto PROTOBUF_FINAL :
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > background_color_;
   mutable std::atomic<int> _background_color_cached_byte_size_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneObject > objects_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr id_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
-  ::e8::SceneEntityCollection* entities_;
+  ::e8::SceneObjectCollection* objects_;
   int structure_type_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_scene_2eproto;
@@ -621,115 +600,79 @@ SceneProto::mutable_background_color() {
   return _internal_mutable_background_color();
 }
 
-// repeated .e8.SceneObject objects = 5;
-inline int SceneProto::_internal_objects_size() const {
-  return objects_.size();
+// .e8.SceneObjectCollection objects = 5;
+inline bool SceneProto::_internal_has_objects() const {
+  return this != internal_default_instance() && objects_ != nullptr;
 }
-inline int SceneProto::objects_size() const {
-  return _internal_objects_size();
+inline bool SceneProto::has_objects() const {
+  return _internal_has_objects();
 }
-inline ::e8::SceneObject* SceneProto::mutable_objects(int index) {
-  // @@protoc_insertion_point(field_mutable:e8.SceneProto.objects)
-  return objects_.Mutable(index);
+inline const ::e8::SceneObjectCollection& SceneProto::_internal_objects() const {
+  const ::e8::SceneObjectCollection* p = objects_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::e8::SceneObjectCollection*>(
+      &::e8::_SceneObjectCollection_default_instance_);
 }
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneObject >*
-SceneProto::mutable_objects() {
-  // @@protoc_insertion_point(field_mutable_list:e8.SceneProto.objects)
-  return &objects_;
-}
-inline const ::e8::SceneObject& SceneProto::_internal_objects(int index) const {
-  return objects_.Get(index);
-}
-inline const ::e8::SceneObject& SceneProto::objects(int index) const {
+inline const ::e8::SceneObjectCollection& SceneProto::objects() const {
   // @@protoc_insertion_point(field_get:e8.SceneProto.objects)
-  return _internal_objects(index);
+  return _internal_objects();
 }
-inline ::e8::SceneObject* SceneProto::_internal_add_objects() {
-  return objects_.Add();
-}
-inline ::e8::SceneObject* SceneProto::add_objects() {
-  // @@protoc_insertion_point(field_add:e8.SceneProto.objects)
-  return _internal_add_objects();
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneObject >&
-SceneProto::objects() const {
-  // @@protoc_insertion_point(field_list:e8.SceneProto.objects)
-  return objects_;
-}
-
-// .e8.SceneEntityCollection entities = 6;
-inline bool SceneProto::_internal_has_entities() const {
-  return this != internal_default_instance() && entities_ != nullptr;
-}
-inline bool SceneProto::has_entities() const {
-  return _internal_has_entities();
-}
-inline const ::e8::SceneEntityCollection& SceneProto::_internal_entities() const {
-  const ::e8::SceneEntityCollection* p = entities_;
-  return p != nullptr ? *p : *reinterpret_cast<const ::e8::SceneEntityCollection*>(
-      &::e8::_SceneEntityCollection_default_instance_);
-}
-inline const ::e8::SceneEntityCollection& SceneProto::entities() const {
-  // @@protoc_insertion_point(field_get:e8.SceneProto.entities)
-  return _internal_entities();
-}
-inline void SceneProto::unsafe_arena_set_allocated_entities(
-    ::e8::SceneEntityCollection* entities) {
+inline void SceneProto::unsafe_arena_set_allocated_objects(
+    ::e8::SceneObjectCollection* objects) {
   if (GetArena() == nullptr) {
-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(entities_);
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(objects_);
   }
-  entities_ = entities;
-  if (entities) {
+  objects_ = objects;
+  if (objects) {
     
   } else {
     
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneProto.entities)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneProto.objects)
 }
-inline ::e8::SceneEntityCollection* SceneProto::release_entities() {
-  auto temp = unsafe_arena_release_entities();
+inline ::e8::SceneObjectCollection* SceneProto::release_objects() {
+  auto temp = unsafe_arena_release_objects();
   if (GetArena() != nullptr) {
     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
   }
   return temp;
 }
-inline ::e8::SceneEntityCollection* SceneProto::unsafe_arena_release_entities() {
-  // @@protoc_insertion_point(field_release:e8.SceneProto.entities)
+inline ::e8::SceneObjectCollection* SceneProto::unsafe_arena_release_objects() {
+  // @@protoc_insertion_point(field_release:e8.SceneProto.objects)
   
-  ::e8::SceneEntityCollection* temp = entities_;
-  entities_ = nullptr;
+  ::e8::SceneObjectCollection* temp = objects_;
+  objects_ = nullptr;
   return temp;
 }
-inline ::e8::SceneEntityCollection* SceneProto::_internal_mutable_entities() {
+inline ::e8::SceneObjectCollection* SceneProto::_internal_mutable_objects() {
   
-  if (entities_ == nullptr) {
-    auto* p = CreateMaybeMessage<::e8::SceneEntityCollection>(GetArena());
-    entities_ = p;
+  if (objects_ == nullptr) {
+    auto* p = CreateMaybeMessage<::e8::SceneObjectCollection>(GetArena());
+    objects_ = p;
   }
-  return entities_;
+  return objects_;
 }
-inline ::e8::SceneEntityCollection* SceneProto::mutable_entities() {
-  // @@protoc_insertion_point(field_mutable:e8.SceneProto.entities)
-  return _internal_mutable_entities();
+inline ::e8::SceneObjectCollection* SceneProto::mutable_objects() {
+  // @@protoc_insertion_point(field_mutable:e8.SceneProto.objects)
+  return _internal_mutable_objects();
 }
-inline void SceneProto::set_allocated_entities(::e8::SceneEntityCollection* entities) {
+inline void SceneProto::set_allocated_objects(::e8::SceneObjectCollection* objects) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
   if (message_arena == nullptr) {
-    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(entities_);
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(objects_);
   }
-  if (entities) {
+  if (objects) {
     ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
-      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(entities)->GetArena();
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(objects)->GetArena();
     if (message_arena != submessage_arena) {
-      entities = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
-          message_arena, entities, submessage_arena);
+      objects = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, objects, submessage_arena);
     }
     
   } else {
     
   }
-  entities_ = entities;
-  // @@protoc_insertion_point(field_set_allocated:e8.SceneProto.entities)
+  objects_ = objects;
+  // @@protoc_insertion_point(field_set_allocated:e8.SceneProto.objects)
 }
 
 #ifdef __GNUC__

@@ -70,30 +70,4 @@ void SceneEntitySetTransform(mat44 const &transform, SceneEntity *entity) {
     entity->srt_transform.reset();
 }
 
-SceneEntityCollection ToProto(std::vector<SceneEntity> const &entities) {
-    SceneEntityCollection proto;
-
-    for (auto const &entity : entities) {
-        *proto.add_entities() = entity.ToProto();
-        (*proto.mutable_drawables())[entity.drawable_lod_instance->id()] =
-            *entity.drawable_lod_instance;
-    }
-
-    return proto;
-}
-
-std::vector<SceneEntity> ToSceneEntities(SceneEntityCollection const &proto) {
-    std::unordered_map<DrawableId, std::shared_ptr<DrawableLod>> drawables;
-    for (auto const &[id, drawable] : proto.drawables()) {
-        drawables[id] = std::make_shared<DrawableLod>(drawable);
-    }
-
-    std::vector<SceneEntity> entities;
-    for (auto entity_proto : proto.entities()) {
-        entities.push_back(SceneEntity(entity_proto, drawables));
-    }
-
-    return entities;
-}
-
 } // namespace e8

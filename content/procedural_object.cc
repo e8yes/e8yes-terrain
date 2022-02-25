@@ -20,8 +20,8 @@
 
 #include "content/procedural_object.h"
 #include "content/proto/procedural_object.pb.h"
-#include "content/proto/scene_object.pb.h"
 #include "content/scene_entity.h"
+#include "content/scene_object.h"
 
 namespace e8 {
 

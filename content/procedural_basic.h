@@ -22,6 +22,7 @@
 #include "content/common.h"
 #include "content/procedural_object.h"
 #include "content/proto/procedural_object.pb.h"
+#include "content/scene_object.h"
 
 namespace e8 {
 
@@ -51,7 +52,7 @@ class ProceduralPlane : public ProceduralObjectInterface {
 
     ~ProceduralPlane();
 
-    SceneObjectResult ToSceneObject() const override;
+    SceneObject ToSceneObject() const override;
     ProceduralObjectProto ToProto() const override;
 
   public:

@@ -19,24 +19,29 @@ syntax = "proto3";
 
 package e8;
 
+import "drawable.proto";
+import "entity.proto";
+import "physical_shape.proto";
+
 /**
- * @brief The SceneObject message It logically groups a set of entities into a hierarchy (tree).
+ * @brief The SceneObjectProto message This is a serializable version of the SceneObject object. It
+ * logically groups a set of entities into a hierarchy (tree).
  */
-message SceneObject {
+message SceneObjectProto {
     /*
      * @brief The SceneObjectChildren message An internal tree node.
      */
     message SceneObjectChildren {
-        // Child scene objects, referenced by their ID.
-        repeated string scene_object_ids = 1;
+        // Child scene objects.
+        repeated SceneObjectProto scene_objects = 1;
     }
 
     /*
      * @brief The SceneEntityChildren message An external tree node.
      */
     message SceneEntityChildren {
-        // Child scene entities, referenced by their ID.
-        repeated string scene_entity_ids = 1;
+        // Child scene entities.
+        repeated SceneEntityProto scene_entities = 1;
     }
 
     // ID of this scene object.
@@ -57,4 +62,19 @@ message SceneObject {
         // External child nodes pointing to a list of scene entities.
         SceneEntityChildren scene_entity_children = 5;
     }
+};
+
+/*
+ * @brief The SceneObjectCollection message Encapsulates full information about a collection of
+ * scene objects.
+ */
+message SceneObjectCollection {
+    // An array of root scene objects.
+    repeated SceneObjectProto scene_objects = 1;
+
+    // A collection of all drawables referenced by entities.
+    map<string, DrawableLod> drawables = 2;
+
+    // A collection of all physical shapes referenced by the entities.
+    map<string, PhysicalShapeProto> physical_shapes = 3;
 };
