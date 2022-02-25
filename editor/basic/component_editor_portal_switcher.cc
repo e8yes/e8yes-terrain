@@ -37,13 +37,15 @@ void SetSceneCreationWidgetsEnabled(bool enabled, Ui::IslandsEditorWindow *ui) {
         action->setEnabled(enabled);
     }
 
-    std::vector<QWidget *> widgets{ui->menu_new_scene};
+    std::vector<QWidget *> widgets{
+        ui->menu_new_scene,
+    };
     for (auto widget : widgets) {
         widget->setEnabled(enabled);
     }
 }
 
-void SetEditorWidgetsEnabled(bool enabled, Ui::IslandsEditorWindow *ui) {
+void SetSceneEditingWidgetsEnabled(bool enabled, Ui::IslandsEditorWindow *ui) {
     std::vector<QAction *> actions{
         ui->action_close_scene,
         ui->action_save_scene,
@@ -53,6 +55,7 @@ void SetEditorWidgetsEnabled(bool enabled, Ui::IslandsEditorWindow *ui) {
     }
 
     std::vector<QWidget *> widgets{
+        ui->menu_add_procedural_object,
         ui->menu_add_scene_object,
     };
     DeepScanWidget(ui->design_nav_tabs, &widgets);
@@ -71,7 +74,7 @@ EditorPortalSwitcherComponent::~EditorPortalSwitcherComponent() {}
 
 void EditorPortalSwitcherComponent::SetEditorPortalEnabled(bool enabled) {
     SetSceneCreationWidgetsEnabled(/*enabled=*/!enabled, context_->ui.get());
-    SetEditorWidgetsEnabled(/*enabled=*/enabled, context_->ui.get());
+    SetSceneEditingWidgetsEnabled(/*enabled=*/enabled, context_->ui.get());
 }
 
 } // namespace e8

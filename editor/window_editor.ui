@@ -555,6 +555,9 @@ QCheckBox::indicator:disabled, QRadioButton::indicator:disabled
      <string>Object</string>
     </property>
     <widget class="QMenu" name="menu_add_scene_object">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>Add Scene Object</string>
      </property>
@@ -562,6 +565,9 @@ QCheckBox::indicator:disabled, QRadioButton::indicator:disabled
      <addaction name="action_add_obj_file"/>
     </widget>
     <widget class="QMenu" name="menu_add_procedural_object">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>Add Procedural Object</string>
      </property>
