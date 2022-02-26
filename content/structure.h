@@ -49,16 +49,19 @@ class SceneEntityStructureInterface {
     virtual void DeleteEntity(SceneEntity const *entity) = 0;
 
     /**
-     * @brief Build Builds the internal structure, if needed, for all the scene entities that has
-     * been added.
+     * @brief Update Marks that the specified entity has been edited (different bounding box or
+     * transformation). Updates the internal structure, if needed, to reflect the change correctly.
+     * This function is typically fast for any structure implementation, but the internal structure
+     * may become suboptimal. Uses the Optimize() call to return it to an optimal state when some
+     * amount of individual Update() accumulates.
      */
-    virtual void Build() = 0;
+    virtual void Update(SceneEntity const *entity) = 0;
 
     /**
-     * @brief Build Updates the internal structure, if needed, for the specified scene entity. Uses
-     * this function when the transform or bounding box of the scene entity changes.
+     * @brief Optimize Rebuilds/optimizes the internal structure, if needed, for all the scene
+     * entities that has been added, deleted or updated.
      */
-    virtual void Build(SceneEntity const *entity) = 0;
+    virtual void Optimize() = 0;
 
     // Defines a query function which judges upon the bounding box to determine whether the content
     // in the box should be included in the result list.

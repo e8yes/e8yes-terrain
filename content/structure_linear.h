@@ -49,14 +49,14 @@ class LinearSceneEntityStructure : public SceneEntityStructureInterface {
     void DeleteEntity(SceneEntity const *entity) override;
 
     /**
-     * @brief Build It does nothing.
+     * @brief Update It does nothing.
      */
-    void Build() override;
+    void Update(SceneEntity const *entity) override;
 
     /**
-     * @brief Build It does nothing.
+     * @brief Optimize It does nothing.
      */
-    void Build(SceneEntity const *entity) override;
+    void Optimize() override;
 
     /**
      * @brief QueryEntities Querying entity requires O(n) time, where n is the number of entity in

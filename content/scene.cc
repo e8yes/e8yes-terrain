@@ -35,17 +35,21 @@
 namespace e8 {
 namespace {
 
-void CollectSceneEntityToStructure(SceneObject const &scene_object,
+void CollectSceneEntityToStructure(SceneObject const &scene_object, bool add,
                                    SceneEntityStructureInterface *structure) {
     if (scene_object.HasSceneEntityChildren()) {
         for (auto const &child_entity : scene_object.child_scene_entities) {
-            structure->AddEntity(&child_entity);
+            if (add) {
+                structure->AddEntity(&child_entity);
+            } else {
+                structure->DeleteEntity(&child_entity);
+            }
         }
         return;
     }
 
     for (auto const &child_object : scene_object.child_scene_objects) {
-        CollectSceneEntityToStructure(child_object, structure);
+        CollectSceneEntityToStructure(child_object, add, structure);
     }
 }
 
@@ -74,9 +78,9 @@ Scene::Scene(SceneProto const &proto)
 
     this->CreateSceneEntityStructure();
     for (auto const &[_, root_scene_object] : root_scene_objects_) {
-        CollectSceneEntityToStructure(root_scene_object, entity_structure_.get());
+        CollectSceneEntityToStructure(root_scene_object, /*add=*/true, entity_structure_.get());
     }
-    entity_structure_->Build();
+    entity_structure_->Optimize();
 
     background_color_ = ToVec3(proto.background_color());
 }
@@ -105,11 +109,23 @@ Scene::ReadAccess Scene::GainReadAccess() { return ReadAccess(&mu_); }
 Scene::WriteAccess Scene::GainWriteAccess() { return WriteAccess(&mu_); }
 
 bool Scene::AddRootSceneObject(SceneObject const &scene_object) {
-    return root_scene_objects_.insert(std::make_pair(scene_object.id, scene_object)).second;
+    auto const &[it, inserted] =
+        root_scene_objects_.insert(std::make_pair(scene_object.id, scene_object));
+    if (!inserted) {
+        return false;
+    }
+    CollectSceneEntityToStructure(it->second, /*add=*/true, entity_structure_.get());
+    return true;
 }
 
 bool Scene::DeleteRootSceneObject(SceneObjectId const &id) {
-    return 1 == root_scene_objects_.erase(id);
+    auto it = root_scene_objects_.find(id);
+    if (it == root_scene_objects_.end()) {
+        return false;
+    }
+    CollectSceneEntityToStructure(it->second, /*add=*/false, entity_structure_.get());
+    root_scene_objects_.erase(it);
+    return true;
 }
 
 std::map<SceneObjectId, SceneObject> const &Scene::AllRootSceneObjects() const {

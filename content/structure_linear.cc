@@ -41,9 +41,9 @@ void LinearSceneEntityStructure::DeleteEntity(SceneEntity const *entity) {
     entities_.erase(it);
 }
 
-void LinearSceneEntityStructure::Build() {}
+void LinearSceneEntityStructure::Update(SceneEntity const * /*entity*/) {}
 
-void LinearSceneEntityStructure::Build(SceneEntity const * /*entity*/) {}
+void LinearSceneEntityStructure::Optimize() {}
 
 std::vector<SceneEntity const *> LinearSceneEntityStructure::QueryEntities(QueryFn query_fn) const {
     std::vector<SceneEntity const *> result;
