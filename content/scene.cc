@@ -57,15 +57,31 @@ void CollectSceneEntityToStructure(SceneObject const &scene_object, bool add,
 
 Scene::ReadAccess::ReadAccess(std::shared_mutex *mu) : mu_(mu) { mu_->lock_shared(); }
 
-Scene::ReadAccess::ReadAccess(ReadAccess &&other) { mu_ = std::move(other.mu_); }
+Scene::ReadAccess::ReadAccess(ReadAccess &&other) {
+    mu_ = other.mu_;
+    other.mu_ = nullptr;
+}
 
-Scene::ReadAccess::~ReadAccess() { mu_->unlock_shared(); }
+Scene::ReadAccess::~ReadAccess() {
+    if (mu_ != nullptr) {
+        // The lock has not been moved.
+        mu_->unlock_shared();
+    }
+}
 
 Scene::WriteAccess::WriteAccess(std::shared_mutex *mu) : mu_(mu) { mu_->lock(); }
 
-Scene::WriteAccess::WriteAccess(WriteAccess &&other) { mu_ = std::move(other.mu_); }
+Scene::WriteAccess::WriteAccess(WriteAccess &&other) {
+    mu_ = other.mu_;
+    other.mu_ = nullptr;
+}
 
-Scene::WriteAccess::~WriteAccess() { mu_->unlock(); }
+Scene::WriteAccess::~WriteAccess() {
+    if (mu_ != nullptr) {
+        // The lock has not been moved.
+        mu_->unlock();
+    }
+}
 
 Scene::Scene(SceneProto::StructureType structure_type, std::string const &name)
     : id(GenerateUuid()), name(name), structure_type(structure_type) {

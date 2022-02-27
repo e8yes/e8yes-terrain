@@ -19,6 +19,7 @@
 #include <algorithm>
 
 #include "common/tensor.h"
+#include "content/scene.h"
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/context.h"
 #include "editor/environment/component_environment.h"
@@ -26,9 +27,12 @@
 namespace e8 {
 namespace {
 
-void SetBackgroundColorSlider(Scene const &scene, QSlider *red, QSlider *green,
-                              QSlider *blue) {
-    vec3 current_color = scene.BackgroundColor();
+void SetBackgroundColorSlider(Scene *scene, QSlider *red, QSlider *green, QSlider *blue) {
+    vec3 current_color;
+    {
+        Scene::ReadAccess read_access = scene->GainReadAccess();
+        current_color = scene->BackgroundColor();
+    }
 
     red->setValue(current_color(0) * red->maximum());
     green->setValue(current_color(1) * green->maximum());
@@ -40,7 +44,10 @@ void SetSceneBackgroundColor(QSlider const *red, QSlider const *green, QSlider c
     vec3 new_background_color{static_cast<float>(red->value()) / red->maximum(),
                               static_cast<float>(green->value()) / green->maximum(),
                               static_cast<float>(blue->value()) / blue->maximum()};
-    scene->UpdateBackgroundColor(new_background_color);
+    {
+        Scene::WriteAccess write_access = scene->GainWriteAccess();
+        scene->UpdateBackgroundColor(new_background_color);
+    }
 }
 
 } // namespace
@@ -59,7 +66,7 @@ EnvironmentComponent::EnvironmentComponent(ModificationMonitorComponent *modific
 EnvironmentComponent::~EnvironmentComponent() {}
 
 void EnvironmentComponent::OnChangeScene() {
-    SetBackgroundColorSlider(*context_->scene, context_->ui->bg_color_red_slider,
+    SetBackgroundColorSlider(context_->scene.get(), context_->ui->bg_color_red_slider,
                              context_->ui->bg_color_green_slider,
                              context_->ui->bg_color_blue_slider);
 }

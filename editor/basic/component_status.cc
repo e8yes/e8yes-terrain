@@ -61,8 +61,8 @@ void StatusComponent::OnChangeScene() { this->Update(); }
 
 void StatusComponent::SetModificationStatus(bool modified) {
     if (context_->scene == nullptr) {
-        BOOST_LOG_TRIVIAL(error) << "SetModificationStatus(): Setting modification status while "
-                                    "the scene doesn't exist.";
+        BOOST_LOG_TRIVIAL(error) << "SetModificationStatus(): Setting modification status when "
+                                    "the scene has been closed.";
         return;
     }
 

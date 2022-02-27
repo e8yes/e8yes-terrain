@@ -20,6 +20,7 @@
 #include <vulkan/vulkan.h>
 
 #include "common/tensor.h"
+#include "content/scene.h"
 #include "renderer/context.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/render_pass.h"
@@ -83,9 +84,13 @@ void SolidColorRenderer::DrawFrame(Scene *scene) {
     std::unique_ptr<StartFrameResult> start_frame_result = StartFrame(pimpl_->context);
 
     FrameBuffer *frame_buffer = pimpl_->GetFrameBuffer(start_frame_result->swap_chain_image_index);
-    frame_buffer->clear_values[0].color.float32[0] = scene->BackgroundColor()(0);
-    frame_buffer->clear_values[0].color.float32[1] = scene->BackgroundColor()(1);
-    frame_buffer->clear_values[0].color.float32[2] = scene->BackgroundColor()(2);
+
+    {
+        Scene::ReadAccess read_access = scene->GainReadAccess();
+        frame_buffer->clear_values[0].color.float32[0] = scene->BackgroundColor()(0);
+        frame_buffer->clear_values[0].color.float32[1] = scene->BackgroundColor()(1);
+        frame_buffer->clear_values[0].color.float32[2] = scene->BackgroundColor()(2);
+    }
 
     VkCommandBuffer cmds =
         StartRenderPass(*pimpl_->GetRenderPass(), *frame_buffer, pimpl_->context);
