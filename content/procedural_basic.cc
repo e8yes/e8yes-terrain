@@ -117,9 +117,18 @@ SceneEntity PlaneEntity(float width, float height, float cell_area,
 } // namespace
 
 ProceduralPlane::ProceduralPlane(ProceduralObjectName const &name, float width, float height,
+                                 float cell_area)
+    : ProceduralObjectInterface(name), width(width), height(height), cell_area(cell_area) {
+    *srt_transform.mutable_scaling() = e8::ToProto(vec3{1, 1, 1});
+    *srt_transform.mutable_rotation() = e8::ToProto(vec3{0, 0, 0});
+    *srt_transform.mutable_translation() = e8::ToProto(vec3{0, 0, 0});
+}
+
+ProceduralPlane::ProceduralPlane(ProceduralObjectName const &name, float width, float height,
                                  float cell_area, SrtTransform const &srt_transform)
-    : ProceduralObjectInterface(name), width(width), height(height), cell_area(cell_area),
-      srt_transform(srt_transform) {}
+    : ProceduralPlane(name, width, height, cell_area) {
+    this->srt_transform = srt_transform;
+}
 
 ProceduralPlane::ProceduralPlane(ProceduralObjectProto const &proto)
     : ProceduralObjectInterface(proto) {}

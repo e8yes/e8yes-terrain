@@ -45,6 +45,12 @@ class ProceduralPlane : public ProceduralObjectInterface {
                     SrtTransform const &srt_transform);
 
     /**
+     * @brief ProceduralPlane This constructor works similarly to the above. However, it assumes an
+     * SRT transform with an identity scaling transform and no rotation or translation.
+     */
+    ProceduralPlane(ProceduralObjectName const &name, float width, float height, float cell_area);
+
+    /**
      * @brief ProceduralPlane Constructs a plane procedural object with parameters provided by a
      * proto object.
      */
