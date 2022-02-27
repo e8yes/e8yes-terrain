@@ -35,8 +35,8 @@
 #include <google/protobuf/map_entry.h>
 #include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/unknown_field_set.h>
-#include "drawable.pb.h"
 #include "entity.pb.h"
+#include "geometry.pb.h"
 #include "physical_shape.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
@@ -64,9 +64,9 @@ namespace e8 {
 class SceneObjectCollection;
 class SceneObjectCollectionDefaultTypeInternal;
 extern SceneObjectCollectionDefaultTypeInternal _SceneObjectCollection_default_instance_;
-class SceneObjectCollection_DrawablesEntry_DoNotUse;
-class SceneObjectCollection_DrawablesEntry_DoNotUseDefaultTypeInternal;
-extern SceneObjectCollection_DrawablesEntry_DoNotUseDefaultTypeInternal _SceneObjectCollection_DrawablesEntry_DoNotUse_default_instance_;
+class SceneObjectCollection_GeometriesEntry_DoNotUse;
+class SceneObjectCollection_GeometriesEntry_DoNotUseDefaultTypeInternal;
+extern SceneObjectCollection_GeometriesEntry_DoNotUseDefaultTypeInternal _SceneObjectCollection_GeometriesEntry_DoNotUse_default_instance_;
 class SceneObjectCollection_PhysicalShapesEntry_DoNotUse;
 class SceneObjectCollection_PhysicalShapesEntry_DoNotUseDefaultTypeInternal;
 extern SceneObjectCollection_PhysicalShapesEntry_DoNotUseDefaultTypeInternal _SceneObjectCollection_PhysicalShapesEntry_DoNotUse_default_instance_;
@@ -82,7 +82,7 @@ extern SceneObjectProto_SceneObjectChildrenDefaultTypeInternal _SceneObjectProto
 }  // namespace e8
 PROTOBUF_NAMESPACE_OPEN
 template<> ::e8::SceneObjectCollection* Arena::CreateMaybeMessage<::e8::SceneObjectCollection>(Arena*);
-template<> ::e8::SceneObjectCollection_DrawablesEntry_DoNotUse* Arena::CreateMaybeMessage<::e8::SceneObjectCollection_DrawablesEntry_DoNotUse>(Arena*);
+template<> ::e8::SceneObjectCollection_GeometriesEntry_DoNotUse* Arena::CreateMaybeMessage<::e8::SceneObjectCollection_GeometriesEntry_DoNotUse>(Arena*);
 template<> ::e8::SceneObjectCollection_PhysicalShapesEntry_DoNotUse* Arena::CreateMaybeMessage<::e8::SceneObjectCollection_PhysicalShapesEntry_DoNotUse>(Arena*);
 template<> ::e8::SceneObjectProto* Arena::CreateMaybeMessage<::e8::SceneObjectProto>(Arena*);
 template<> ::e8::SceneObjectProto_SceneEntityChildren* Arena::CreateMaybeMessage<::e8::SceneObjectProto_SceneEntityChildren>(Arena*);
@@ -652,23 +652,23 @@ class SceneObjectProto PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
-class SceneObjectCollection_DrawablesEntry_DoNotUse : public ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<SceneObjectCollection_DrawablesEntry_DoNotUse, 
-    std::string, ::e8::DrawableLod,
+class SceneObjectCollection_GeometriesEntry_DoNotUse : public ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<SceneObjectCollection_GeometriesEntry_DoNotUse, 
+    std::string, ::e8::GeometryLod,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE,
     0 > {
 public:
-  typedef ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<SceneObjectCollection_DrawablesEntry_DoNotUse, 
-    std::string, ::e8::DrawableLod,
+  typedef ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<SceneObjectCollection_GeometriesEntry_DoNotUse, 
+    std::string, ::e8::GeometryLod,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE,
     0 > SuperType;
-  SceneObjectCollection_DrawablesEntry_DoNotUse();
-  SceneObjectCollection_DrawablesEntry_DoNotUse(::PROTOBUF_NAMESPACE_ID::Arena* arena);
-  void MergeFrom(const SceneObjectCollection_DrawablesEntry_DoNotUse& other);
-  static const SceneObjectCollection_DrawablesEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const SceneObjectCollection_DrawablesEntry_DoNotUse*>(&_SceneObjectCollection_DrawablesEntry_DoNotUse_default_instance_); }
+  SceneObjectCollection_GeometriesEntry_DoNotUse();
+  SceneObjectCollection_GeometriesEntry_DoNotUse(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  void MergeFrom(const SceneObjectCollection_GeometriesEntry_DoNotUse& other);
+  static const SceneObjectCollection_GeometriesEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const SceneObjectCollection_GeometriesEntry_DoNotUse*>(&_SceneObjectCollection_GeometriesEntry_DoNotUse_default_instance_); }
   static bool ValidateKey(std::string* s) {
-    return ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(s->data(), static_cast<int>(s->size()), ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::PARSE, "e8.SceneObjectCollection.DrawablesEntry.key");
+    return ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(s->data(), static_cast<int>(s->size()), ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::PARSE, "e8.SceneObjectCollection.GeometriesEntry.key");
  }
   static bool ValidateValue(void*) { return true; }
   void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& other) final;
@@ -831,7 +831,7 @@ class SceneObjectCollection PROTOBUF_FINAL :
 
   enum : int {
     kSceneObjectsFieldNumber = 1,
-    kDrawablesFieldNumber = 2,
+    kGeometriesFieldNumber = 2,
     kPhysicalShapesFieldNumber = 3,
   };
   // repeated .e8.SceneObjectProto scene_objects = 1;
@@ -852,22 +852,22 @@ class SceneObjectCollection PROTOBUF_FINAL :
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneObjectProto >&
       scene_objects() const;
 
-  // map<string, .e8.DrawableLod> drawables = 2;
-  int drawables_size() const;
+  // map<string, .e8.GeometryLod> geometries = 2;
+  int geometries_size() const;
   private:
-  int _internal_drawables_size() const;
+  int _internal_geometries_size() const;
   public:
-  void clear_drawables();
+  void clear_geometries();
   private:
-  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::DrawableLod >&
-      _internal_drawables() const;
-  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::DrawableLod >*
-      _internal_mutable_drawables();
+  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >&
+      _internal_geometries() const;
+  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >*
+      _internal_mutable_geometries();
   public:
-  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::DrawableLod >&
-      drawables() const;
-  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::DrawableLod >*
-      mutable_drawables();
+  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >&
+      geometries() const;
+  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >*
+      mutable_geometries();
 
   // map<string, .e8.PhysicalShapeProto> physical_shapes = 3;
   int physical_shapes_size() const;
@@ -895,11 +895,11 @@ class SceneObjectCollection PROTOBUF_FINAL :
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneObjectProto > scene_objects_;
   ::PROTOBUF_NAMESPACE_ID::internal::MapField<
-      SceneObjectCollection_DrawablesEntry_DoNotUse,
-      std::string, ::e8::DrawableLod,
+      SceneObjectCollection_GeometriesEntry_DoNotUse,
+      std::string, ::e8::GeometryLod,
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE,
-      0 > drawables_;
+      0 > geometries_;
   ::PROTOBUF_NAMESPACE_ID::internal::MapField<
       SceneObjectCollection_PhysicalShapesEntry_DoNotUse,
       std::string, ::e8::PhysicalShapeProto,
@@ -1448,30 +1448,30 @@ SceneObjectCollection::scene_objects() const {
   return scene_objects_;
 }
 
-// map<string, .e8.DrawableLod> drawables = 2;
-inline int SceneObjectCollection::_internal_drawables_size() const {
-  return drawables_.size();
+// map<string, .e8.GeometryLod> geometries = 2;
+inline int SceneObjectCollection::_internal_geometries_size() const {
+  return geometries_.size();
 }
-inline int SceneObjectCollection::drawables_size() const {
-  return _internal_drawables_size();
+inline int SceneObjectCollection::geometries_size() const {
+  return _internal_geometries_size();
 }
-inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::DrawableLod >&
-SceneObjectCollection::_internal_drawables() const {
-  return drawables_.GetMap();
+inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >&
+SceneObjectCollection::_internal_geometries() const {
+  return geometries_.GetMap();
 }
-inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::DrawableLod >&
-SceneObjectCollection::drawables() const {
-  // @@protoc_insertion_point(field_map:e8.SceneObjectCollection.drawables)
-  return _internal_drawables();
+inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >&
+SceneObjectCollection::geometries() const {
+  // @@protoc_insertion_point(field_map:e8.SceneObjectCollection.geometries)
+  return _internal_geometries();
 }
-inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::DrawableLod >*
-SceneObjectCollection::_internal_mutable_drawables() {
-  return drawables_.MutableMap();
+inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >*
+SceneObjectCollection::_internal_mutable_geometries() {
+  return geometries_.MutableMap();
 }
-inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::DrawableLod >*
-SceneObjectCollection::mutable_drawables() {
-  // @@protoc_insertion_point(field_mutable_map:e8.SceneObjectCollection.drawables)
-  return _internal_mutable_drawables();
+inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >*
+SceneObjectCollection::mutable_geometries() {
+  // @@protoc_insertion_point(field_mutable_map:e8.SceneObjectCollection.geometries)
+  return _internal_mutable_geometries();
 }
 
 // map<string, .e8.PhysicalShapeProto> physical_shapes = 3;

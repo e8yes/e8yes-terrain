@@ -22,36 +22,34 @@ package e8;
 import "primitive.proto";
 
 /**
- * @brief The Drawable message Represents an object that can be rendered by the renderer. It
- * provides all the information about the object for it to be efficiently processed by the
- * rendering pipeline.
+ * @brief The Geometry message Represents an object's geometry as triangle mesh.
  */
-message Drawable {
+message Geometry {
     /**
-     * @brief The RigidityType enum The type of rigidity to be expected for this drawable.
+     * @brief The RigidityType enum The type of rigidity to be expected for this geometry.
      */
     enum RigidityType {
         INVALID = 0;
 
-        // This drawable's geometry can neither be moved nor changed.
+        // This geometry can neither be moved nor changed.
         STATIC = 1;
 
-        // The geometry of this drawable can never change though it can be moved around through
-        // homogeneous transformation.
+        // The geometry can never change though it can be moved around through homogeneous
+        // transformation.
         RIGID = 2;
 
-        // The vertices of this drawable can be changed at any moment. However, the topology stays
+        // The vertices of this geometry can be changed at any moment. However, the topology stays
         // the same.
         DEFORMABLE = 3;
 
-        // Even the topology of this drawable can be changed at any moment.
+        // Even the topology of this geometry can be changed at any moment.
         TEARABLE = 4;
     };
 
-    // The type of rigidity to be expected for this drawable.
+    // The type of rigidity to be expected for this geometry.
     RigidityType rigidity = 1;
 
-    // A list of vertices defining the geometry of this drawable.
+    // A list of vertices defining the geometry of this geometry.
     repeated PrimitiveVertex vertices = 2;
 
     // Defines triangle primitives by referencing the vertices of each triangle from the vertex 
@@ -60,22 +58,22 @@ message Drawable {
 };
 
 /**
- * @brief The DrawableLod message Allows complex drawable to be represented with less detail at
+ * @brief The GeometryLod message Allows complex geometry to be represented with less detail at
  * distance.
  */
-message DrawableLod {
-    // ID of this drawable design.
+message GeometryLod {
+    // ID of this geometry design.
     string id = 1;
 
-    // A descriptive human readable name of this drawable.
-    string human_readable_name = 2;
+    // A descriptive human readable name of this geometry.
+    string name = 2;
 
-    // LOD of this drawable design in descending level of detail.
-    repeated Drawable drawable_lod = 3;
+    // LOD of this geometry design in descending level of detail.
+    repeated Geometry geometry_lod = 3;
 
-    // A list the same length as the drawable_lod specifying the minimum distance the drawble LOD is
+    // A list the same length as the geometry_lod specifying the minimum distance the geometry LOD is
     // from the viewer before it can be applied to the rendering process. Therefore, the distances
-    // are expected to be in ascending order. The renderer will pick the drawable with the least
+    // are expected to be in ascending order. The renderer will pick the geometry with the least
     // possible detail when possible.
     repeated float min_distances = 4;
 };

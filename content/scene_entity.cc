@@ -22,9 +22,9 @@
 
 #include "common/tensor.h"
 #include "content/common.h"
-#include "content/drawable.h"
-#include "content/proto/drawable.pb.h"
+#include "content/geometry.h"
 #include "content/proto/entity.pb.h"
+#include "content/proto/geometry.pb.h"
 #include "content/proto/physical_shape.pb.h"
 #include "content/proto/primitive.pb.h"
 #include "content/scene_entity.h"
@@ -36,10 +36,10 @@ SceneEntity::SceneEntity(SceneEntityName const &name)
 
 SceneEntity::SceneEntity(
     SceneEntityProto const &proto,
-    std::unordered_map<DrawableId, std::shared_ptr<DrawableLod>> const &drawables)
+    std::unordered_map<GeometryId, std::shared_ptr<GeometryLod>> const &geometries)
     : id(proto.id()), name(proto.name()), movable(proto.movable()),
       transform(ToMat44(proto.transform())), bounding_box(ToAabb(proto.bounding_box())),
-      drawable_lod_instance(drawables.at(proto.id())) {
+      geometry_lod_instance(geometries.at(proto.id())) {
     if (proto.has_srt_transform()) {
         srt_transform = proto.srt_transform();
     }
@@ -57,7 +57,7 @@ SceneEntityProto SceneEntity::ToProto() const {
         *proto.mutable_srt_transform() = *srt_transform;
     }
     *proto.mutable_bounding_box() = e8::ToProto(bounding_box);
-    proto.set_drawable_id(drawable_lod_instance->id());
+    proto.set_id(geometry_lod_instance->id());
     return proto;
 }
 

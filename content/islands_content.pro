@@ -18,11 +18,11 @@ INCLUDEPATH += ../
 
 SOURCES += \
     common.cc \
-    drawable.cc \
+    geometry.cc \
     procedural_basic.cc \
     procedural_object.cc \
-    proto/drawable.pb.cc \
     proto/entity.pb.cc \
+    proto/geometry.pb.cc \
     proto/physical_shape.pb.cc \
     proto/primitive.pb.cc \
     proto/procedural_object.pb.cc \
@@ -37,11 +37,11 @@ SOURCES += \
 
 HEADERS += \
     common.h \
-    drawable.h \
+    geometry.h \
     procedural_basic.h \
     procedural_object.h \
-    proto/drawable.pb.h \
     proto/entity.pb.h \
+    proto/geometry.pb.h \
     proto/physical_shape.pb.h \
     proto/primitive.pb.h \
     proto/procedural_object.pb.h \

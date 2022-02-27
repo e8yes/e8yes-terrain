@@ -15,35 +15,35 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_CONTENT_DRAWABLE_H
-#define ISLANDS_CONTENT_DRAWABLE_H
+#ifndef ISLANDS_CONTENT_GEOMETRY_H
+#define ISLANDS_CONTENT_GEOMETRY_H
 
 #include <google/protobuf/repeated_field.h>
 #include <memory>
 #include <string>
 
-#include "content/proto/drawable.pb.h"
+#include "content/proto/geometry.pb.h"
 
 namespace e8 {
 
-// It uniquely identifies a drawable design with its LOD series.
-using DrawableId = std::string;
+// It uniquely identifies a geometry design with its LOD series.
+using GeometryId = std::string;
 
-// A descriptive human readable name of a drawable LOD series.
-using DrawableName = std::string;
+// A descriptive human readable name of a geometry LOD series.
+using GeometryName = std::string;
 
 /**
- * @brief CreateDrawable Creates a drawable with LOD. All DrawableLods should be created here.
+ * @brief CreateGeometry Creates a geometry with LOD. All GeometryLods should be created here.
  *
- * @param name A descriptive human readable name for the drawable.
- * @param lod A series of drawable LOD in decreasing detail.
+ * @param name A descriptive human readable name for the geometry.
+ * @param lod A series of geometry LOD in decreasing detail.
  * @param lod_min_distances The minimum distance from the viewer the ith LOD can be used.
- * @return A drawable with LOD.
+ * @return A geometry with LOD.
  */
-std::shared_ptr<DrawableLod>
-CreateDrawable(DrawableName const &name, google::protobuf::RepeatedPtrField<Drawable> const &lod,
+std::shared_ptr<GeometryLod>
+CreateGeometry(GeometryName const &name, google::protobuf::RepeatedPtrField<Geometry> const &lod,
                google::protobuf::RepeatedField<float> const &lod_min_distances);
 
 } // namespace e8
 
-#endif // ISLANDS_CONTENT_DRAWABLE_H
+#endif // ISLANDS_CONTENT_GEOMETRY_H

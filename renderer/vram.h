@@ -22,7 +22,7 @@
 #include <memory>
 #include <optional>
 
-#include "content/proto/drawable.pb.h"
+#include "content/proto/geometry.pb.h"
 #include "renderer/context.h"
 #include "renderer/projection.h"
 
@@ -80,15 +80,15 @@ class GeometryVramTransfer {
     };
 
     /**
-     * @brief Upload Transfers the vertex and index data of the drawable to the GPU device if it has
-     * not been cached or the drawable is mutable. A drawable is mutable if its rigidity type is
+     * @brief Upload Transfers the vertex and index data of the geometry to the GPU device if it has
+     * not been cached or the geometry is mutable. A geometry is mutable if its rigidity type is
      * deformable or tearable. If the geometry data have been cached, it returns the previous
      * transfer result.
      *
-     * @param drawable The drawable whose geometry is to transfer/update.
+     * @param geometry The geometry to transfer/update.
      * @return See the UploadResult structure above.
      */
-    UploadResult Upload(Drawable const *drawable);
+    UploadResult Upload(Geometry const *geometry);
 
   private:
     class GeometryVramTransferImpl;

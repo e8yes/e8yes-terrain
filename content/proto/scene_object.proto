@@ -19,8 +19,8 @@ syntax = "proto3";
 
 package e8;
 
-import "drawable.proto";
 import "entity.proto";
+import "geometry.proto";
 import "physical_shape.proto";
 
 /**
@@ -72,8 +72,8 @@ message SceneObjectCollection {
     // An array of root scene objects.
     repeated SceneObjectProto scene_objects = 1;
 
-    // A collection of all drawables referenced by entities.
-    map<string, DrawableLod> drawables = 2;
+    // A collection of all geometries referenced by entities.
+    map<string, GeometryLod> geometries = 2;
 
     // A collection of all physical shapes referenced by the entities.
     map<string, PhysicalShapeProto> physical_shapes = 3;

@@ -14,10 +14,10 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
-extern PROTOBUF_INTERNAL_EXPORT_drawable_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_DrawableLod_drawable_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_geometry_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_GeometryLod_geometry_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_physical_5fshape_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_PhysicalShapeProto_physical_5fshape_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_entity_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_SceneEntityProto_entity_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_scene_5fobject_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_SceneObjectCollection_DrawablesEntry_DoNotUse_scene_5fobject_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_scene_5fobject_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_SceneObjectCollection_GeometriesEntry_DoNotUse_scene_5fobject_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_scene_5fobject_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_SceneObjectCollection_PhysicalShapesEntry_DoNotUse_scene_5fobject_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_scene_5fobject_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_SceneObjectProto_scene_5fobject_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_scene_5fobject_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_SceneObjectProto_SceneEntityChildren_scene_5fobject_2eproto;
@@ -36,10 +36,10 @@ class SceneObjectProtoDefaultTypeInternal {
   const ::e8::SceneObjectProto_SceneObjectChildren* scene_object_children_;
   const ::e8::SceneObjectProto_SceneEntityChildren* scene_entity_children_;
 } _SceneObjectProto_default_instance_;
-class SceneObjectCollection_DrawablesEntry_DoNotUseDefaultTypeInternal {
+class SceneObjectCollection_GeometriesEntry_DoNotUseDefaultTypeInternal {
  public:
-  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<SceneObjectCollection_DrawablesEntry_DoNotUse> _instance;
-} _SceneObjectCollection_DrawablesEntry_DoNotUse_default_instance_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<SceneObjectCollection_GeometriesEntry_DoNotUse> _instance;
+} _SceneObjectCollection_GeometriesEntry_DoNotUse_default_instance_;
 class SceneObjectCollection_PhysicalShapesEntry_DoNotUseDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<SceneObjectCollection_PhysicalShapesEntry_DoNotUse> _instance;
@@ -63,22 +63,22 @@ static void InitDefaultsscc_info_SceneObjectCollection_scene_5fobject_2eproto() 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<3> scc_info_SceneObjectCollection_scene_5fobject_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 3, 0, InitDefaultsscc_info_SceneObjectCollection_scene_5fobject_2eproto}, {
       &scc_info_SceneObjectProto_scene_5fobject_2eproto.base,
-      &scc_info_SceneObjectCollection_DrawablesEntry_DoNotUse_scene_5fobject_2eproto.base,
+      &scc_info_SceneObjectCollection_GeometriesEntry_DoNotUse_scene_5fobject_2eproto.base,
       &scc_info_SceneObjectCollection_PhysicalShapesEntry_DoNotUse_scene_5fobject_2eproto.base,}};
 
-static void InitDefaultsscc_info_SceneObjectCollection_DrawablesEntry_DoNotUse_scene_5fobject_2eproto() {
+static void InitDefaultsscc_info_SceneObjectCollection_GeometriesEntry_DoNotUse_scene_5fobject_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::e8::_SceneObjectCollection_DrawablesEntry_DoNotUse_default_instance_;
-    new (ptr) ::e8::SceneObjectCollection_DrawablesEntry_DoNotUse();
+    void* ptr = &::e8::_SceneObjectCollection_GeometriesEntry_DoNotUse_default_instance_;
+    new (ptr) ::e8::SceneObjectCollection_GeometriesEntry_DoNotUse();
   }
-  ::e8::SceneObjectCollection_DrawablesEntry_DoNotUse::InitAsDefaultInstance();
+  ::e8::SceneObjectCollection_GeometriesEntry_DoNotUse::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_SceneObjectCollection_DrawablesEntry_DoNotUse_scene_5fobject_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_SceneObjectCollection_DrawablesEntry_DoNotUse_scene_5fobject_2eproto}, {
-      &scc_info_DrawableLod_drawable_2eproto.base,}};
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_SceneObjectCollection_GeometriesEntry_DoNotUse_scene_5fobject_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_SceneObjectCollection_GeometriesEntry_DoNotUse_scene_5fobject_2eproto}, {
+      &scc_info_GeometryLod_geometry_2eproto.base,}};
 
 static void InitDefaultsscc_info_SceneObjectCollection_PhysicalShapesEntry_DoNotUse_scene_5fobject_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -158,13 +158,13 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_scene_5fobject_2eproto::offset
   offsetof(::e8::SceneObjectProtoDefaultTypeInternal, scene_object_children_),
   offsetof(::e8::SceneObjectProtoDefaultTypeInternal, scene_entity_children_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneObjectProto, children_),
-  PROTOBUF_FIELD_OFFSET(::e8::SceneObjectCollection_DrawablesEntry_DoNotUse, _has_bits_),
-  PROTOBUF_FIELD_OFFSET(::e8::SceneObjectCollection_DrawablesEntry_DoNotUse, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::e8::SceneObjectCollection_GeometriesEntry_DoNotUse, _has_bits_),
+  PROTOBUF_FIELD_OFFSET(::e8::SceneObjectCollection_GeometriesEntry_DoNotUse, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::e8::SceneObjectCollection_DrawablesEntry_DoNotUse, key_),
-  PROTOBUF_FIELD_OFFSET(::e8::SceneObjectCollection_DrawablesEntry_DoNotUse, value_),
+  PROTOBUF_FIELD_OFFSET(::e8::SceneObjectCollection_GeometriesEntry_DoNotUse, key_),
+  PROTOBUF_FIELD_OFFSET(::e8::SceneObjectCollection_GeometriesEntry_DoNotUse, value_),
   0,
   1,
   PROTOBUF_FIELD_OFFSET(::e8::SceneObjectCollection_PhysicalShapesEntry_DoNotUse, _has_bits_),
@@ -182,14 +182,14 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_scene_5fobject_2eproto::offset
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::e8::SceneObjectCollection, scene_objects_),
-  PROTOBUF_FIELD_OFFSET(::e8::SceneObjectCollection, drawables_),
+  PROTOBUF_FIELD_OFFSET(::e8::SceneObjectCollection, geometries_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneObjectCollection, physical_shapes_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::e8::SceneObjectProto_SceneObjectChildren)},
   { 6, -1, sizeof(::e8::SceneObjectProto_SceneEntityChildren)},
   { 12, -1, sizeof(::e8::SceneObjectProto)},
-  { 23, 30, sizeof(::e8::SceneObjectCollection_DrawablesEntry_DoNotUse)},
+  { 23, 30, sizeof(::e8::SceneObjectCollection_GeometriesEntry_DoNotUse)},
   { 32, 39, sizeof(::e8::SceneObjectCollection_PhysicalShapesEntry_DoNotUse)},
   { 41, -1, sizeof(::e8::SceneObjectCollection)},
 };
@@ -198,14 +198,14 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_SceneObjectProto_SceneObjectChildren_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_SceneObjectProto_SceneEntityChildren_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_SceneObjectProto_default_instance_),
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_SceneObjectCollection_DrawablesEntry_DoNotUse_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_SceneObjectCollection_GeometriesEntry_DoNotUse_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_SceneObjectCollection_PhysicalShapesEntry_DoNotUse_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_SceneObjectCollection_default_instance_),
 };
 
 const char descriptor_table_protodef_scene_5fobject_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\022scene_object.proto\022\002e8\032\016drawable.proto"
-  "\032\014entity.proto\032\024physical_shape.proto\"\365\002\n"
+  "\n\022scene_object.proto\022\002e8\032\014entity.proto\032\016"
+  "geometry.proto\032\024physical_shape.proto\"\365\002\n"
   "\020SceneObjectProto\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 "
   "\001(\t\022\034\n\024procedural_object_id\030\003 \001(\t\022I\n\025sce"
   "ne_object_children\030\004 \001(\0132(.e8.SceneObjec"
@@ -215,32 +215,32 @@ const char descriptor_table_protodef_scene_5fobject_2eproto[] PROTOBUF_SECTION_V
   "ildren\022+\n\rscene_objects\030\001 \003(\0132\024.e8.Scene"
   "ObjectProto\032C\n\023SceneEntityChildren\022,\n\016sc"
   "ene_entities\030\001 \003(\0132\024.e8.SceneEntityProto"
-  "B\n\n\010children\"\333\002\n\025SceneObjectCollection\022+"
+  "B\n\n\010children\"\336\002\n\025SceneObjectCollection\022+"
   "\n\rscene_objects\030\001 \003(\0132\024.e8.SceneObjectPr"
-  "oto\022;\n\tdrawables\030\002 \003(\0132(.e8.SceneObjectC"
-  "ollection.DrawablesEntry\022F\n\017physical_sha"
-  "pes\030\003 \003(\0132-.e8.SceneObjectCollection.Phy"
-  "sicalShapesEntry\032A\n\016DrawablesEntry\022\013\n\003ke"
-  "y\030\001 \001(\t\022\036\n\005value\030\002 \001(\0132\017.e8.DrawableLod:"
-  "\0028\001\032M\n\023PhysicalShapesEntry\022\013\n\003key\030\001 \001(\t\022"
-  "%\n\005value\030\002 \001(\0132\026.e8.PhysicalShapeProto:\002"
-  "8\001b\006proto3"
+  "oto\022=\n\ngeometries\030\002 \003(\0132).e8.SceneObject"
+  "Collection.GeometriesEntry\022F\n\017physical_s"
+  "hapes\030\003 \003(\0132-.e8.SceneObjectCollection.P"
+  "hysicalShapesEntry\032B\n\017GeometriesEntry\022\013\n"
+  "\003key\030\001 \001(\t\022\036\n\005value\030\002 \001(\0132\017.e8.GeometryL"
+  "od:\0028\001\032M\n\023PhysicalShapesEntry\022\013\n\003key\030\001 \001"
+  "(\t\022%\n\005value\030\002 \001(\0132\026.e8.PhysicalShapeProt"
+  "o:\0028\001b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_scene_5fobject_2eproto_deps[3] = {
-  &::descriptor_table_drawable_2eproto,
   &::descriptor_table_entity_2eproto,
+  &::descriptor_table_geometry_2eproto,
   &::descriptor_table_physical_5fshape_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_scene_5fobject_2eproto_sccs[5] = {
   &scc_info_SceneObjectCollection_scene_5fobject_2eproto.base,
-  &scc_info_SceneObjectCollection_DrawablesEntry_DoNotUse_scene_5fobject_2eproto.base,
+  &scc_info_SceneObjectCollection_GeometriesEntry_DoNotUse_scene_5fobject_2eproto.base,
   &scc_info_SceneObjectCollection_PhysicalShapesEntry_DoNotUse_scene_5fobject_2eproto.base,
   &scc_info_SceneObjectProto_scene_5fobject_2eproto.base,
   &scc_info_SceneObjectProto_SceneEntityChildren_scene_5fobject_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_scene_5fobject_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_scene_5fobject_2eproto = {
-  false, false, descriptor_table_protodef_scene_5fobject_2eproto, "scene_object.proto", 810,
+  false, false, descriptor_table_protodef_scene_5fobject_2eproto, "scene_object.proto", 813,
   &descriptor_table_scene_5fobject_2eproto_once, descriptor_table_scene_5fobject_2eproto_sccs, descriptor_table_scene_5fobject_2eproto_deps, 5, 3,
   schemas, file_default_instances, TableStruct_scene_5fobject_2eproto::offsets,
   file_level_metadata_scene_5fobject_2eproto, 6, file_level_enum_descriptors_scene_5fobject_2eproto, file_level_service_descriptors_scene_5fobject_2eproto,
@@ -1096,16 +1096,16 @@ void SceneObjectProto::InternalSwap(SceneObjectProto* other) {
 
 // ===================================================================
 
-SceneObjectCollection_DrawablesEntry_DoNotUse::SceneObjectCollection_DrawablesEntry_DoNotUse() {}
-SceneObjectCollection_DrawablesEntry_DoNotUse::SceneObjectCollection_DrawablesEntry_DoNotUse(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+SceneObjectCollection_GeometriesEntry_DoNotUse::SceneObjectCollection_GeometriesEntry_DoNotUse() {}
+SceneObjectCollection_GeometriesEntry_DoNotUse::SceneObjectCollection_GeometriesEntry_DoNotUse(::PROTOBUF_NAMESPACE_ID::Arena* arena)
     : SuperType(arena) {}
-void SceneObjectCollection_DrawablesEntry_DoNotUse::MergeFrom(const SceneObjectCollection_DrawablesEntry_DoNotUse& other) {
+void SceneObjectCollection_GeometriesEntry_DoNotUse::MergeFrom(const SceneObjectCollection_GeometriesEntry_DoNotUse& other) {
   MergeFromInternal(other);
 }
-::PROTOBUF_NAMESPACE_ID::Metadata SceneObjectCollection_DrawablesEntry_DoNotUse::GetMetadata() const {
+::PROTOBUF_NAMESPACE_ID::Metadata SceneObjectCollection_GeometriesEntry_DoNotUse::GetMetadata() const {
   return GetMetadataStatic();
 }
-void SceneObjectCollection_DrawablesEntry_DoNotUse::MergeFrom(
+void SceneObjectCollection_GeometriesEntry_DoNotUse::MergeFrom(
     const ::PROTOBUF_NAMESPACE_ID::Message& other) {
   ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom(other);
 }
@@ -1136,8 +1136,8 @@ class SceneObjectCollection::_Internal {
  public:
 };
 
-void SceneObjectCollection::clear_drawables() {
-  drawables_.Clear();
+void SceneObjectCollection::clear_geometries() {
+  geometries_.Clear();
 }
 void SceneObjectCollection::clear_physical_shapes() {
   physical_shapes_.Clear();
@@ -1145,7 +1145,7 @@ void SceneObjectCollection::clear_physical_shapes() {
 SceneObjectCollection::SceneObjectCollection(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena),
   scene_objects_(arena),
-  drawables_(arena),
+  geometries_(arena),
   physical_shapes_(arena) {
   SharedCtor();
   RegisterArenaDtor(arena);
@@ -1155,7 +1155,7 @@ SceneObjectCollection::SceneObjectCollection(const SceneObjectCollection& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
       scene_objects_(from.scene_objects_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  drawables_.MergeFrom(from.drawables_);
+  geometries_.MergeFrom(from.geometries_);
   physical_shapes_.MergeFrom(from.physical_shapes_);
   // @@protoc_insertion_point(copy_constructor:e8.SceneObjectCollection)
 }
@@ -1196,7 +1196,7 @@ void SceneObjectCollection::Clear() {
   (void) cached_has_bits;
 
   scene_objects_.Clear();
-  drawables_.Clear();
+  geometries_.Clear();
   physical_shapes_.Clear();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
@@ -1221,13 +1221,13 @@ const char* SceneObjectCollection::_InternalParse(const char* ptr, ::PROTOBUF_NA
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
         } else goto handle_unusual;
         continue;
-      // map<string, .e8.DrawableLod> drawables = 2;
+      // map<string, .e8.GeometryLod> geometries = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
           ptr -= 1;
           do {
             ptr += 1;
-            ptr = ctx->ParseMessage(&drawables_, ptr);
+            ptr = ctx->ParseMessage(&geometries_, ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<18>(ptr));
@@ -1281,9 +1281,9 @@ failure:
       InternalWriteMessage(1, this->_internal_scene_objects(i), target, stream);
   }
 
-  // map<string, .e8.DrawableLod> drawables = 2;
-  if (!this->_internal_drawables().empty()) {
-    typedef ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::DrawableLod >::const_pointer
+  // map<string, .e8.GeometryLod> geometries = 2;
+  if (!this->_internal_geometries().empty()) {
+    typedef ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >::const_pointer
         ConstPtr;
     typedef ConstPtr SortItem;
     typedef ::PROTOBUF_NAMESPACE_ID::internal::CompareByDerefFirst<SortItem> Less;
@@ -1292,31 +1292,31 @@ failure:
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
           p->first.data(), static_cast<int>(p->first.length()),
           ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-          "e8.SceneObjectCollection.DrawablesEntry.key");
+          "e8.SceneObjectCollection.GeometriesEntry.key");
       }
     };
 
     if (stream->IsSerializationDeterministic() &&
-        this->_internal_drawables().size() > 1) {
+        this->_internal_geometries().size() > 1) {
       ::std::unique_ptr<SortItem[]> items(
-          new SortItem[this->_internal_drawables().size()]);
-      typedef ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::DrawableLod >::size_type size_type;
+          new SortItem[this->_internal_geometries().size()]);
+      typedef ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >::size_type size_type;
       size_type n = 0;
-      for (::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::DrawableLod >::const_iterator
-          it = this->_internal_drawables().begin();
-          it != this->_internal_drawables().end(); ++it, ++n) {
+      for (::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >::const_iterator
+          it = this->_internal_geometries().begin();
+          it != this->_internal_geometries().end(); ++it, ++n) {
         items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
       }
       ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
       for (size_type i = 0; i < n; i++) {
-        target = SceneObjectCollection_DrawablesEntry_DoNotUse::Funcs::InternalSerialize(2, items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second, target, stream);
+        target = SceneObjectCollection_GeometriesEntry_DoNotUse::Funcs::InternalSerialize(2, items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second, target, stream);
         Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
       }
     } else {
-      for (::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::DrawableLod >::const_iterator
-          it = this->_internal_drawables().begin();
-          it != this->_internal_drawables().end(); ++it) {
-        target = SceneObjectCollection_DrawablesEntry_DoNotUse::Funcs::InternalSerialize(2, it->first, it->second, target, stream);
+      for (::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >::const_iterator
+          it = this->_internal_geometries().begin();
+          it != this->_internal_geometries().end(); ++it) {
+        target = SceneObjectCollection_GeometriesEntry_DoNotUse::Funcs::InternalSerialize(2, it->first, it->second, target, stream);
         Utf8Check::Check(&(*it));
       }
     }
@@ -1386,13 +1386,13 @@ size_t SceneObjectCollection::ByteSizeLong() const {
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
   }
 
-  // map<string, .e8.DrawableLod> drawables = 2;
+  // map<string, .e8.GeometryLod> geometries = 2;
   total_size += 1 *
-      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(this->_internal_drawables_size());
-  for (::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::DrawableLod >::const_iterator
-      it = this->_internal_drawables().begin();
-      it != this->_internal_drawables().end(); ++it) {
-    total_size += SceneObjectCollection_DrawablesEntry_DoNotUse::Funcs::ByteSizeLong(it->first, it->second);
+      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(this->_internal_geometries_size());
+  for (::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >::const_iterator
+      it = this->_internal_geometries().begin();
+      it != this->_internal_geometries().end(); ++it) {
+    total_size += SceneObjectCollection_GeometriesEntry_DoNotUse::Funcs::ByteSizeLong(it->first, it->second);
   }
 
   // map<string, .e8.PhysicalShapeProto> physical_shapes = 3;
@@ -1436,7 +1436,7 @@ void SceneObjectCollection::MergeFrom(const SceneObjectCollection& from) {
   (void) cached_has_bits;
 
   scene_objects_.MergeFrom(from.scene_objects_);
-  drawables_.MergeFrom(from.drawables_);
+  geometries_.MergeFrom(from.geometries_);
   physical_shapes_.MergeFrom(from.physical_shapes_);
 }
 
@@ -1462,7 +1462,7 @@ void SceneObjectCollection::InternalSwap(SceneObjectCollection* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   scene_objects_.InternalSwap(&other->scene_objects_);
-  drawables_.Swap(&other->drawables_);
+  geometries_.Swap(&other->geometries_);
   physical_shapes_.Swap(&other->physical_shapes_);
 }
 
@@ -1483,8 +1483,8 @@ template<> PROTOBUF_NOINLINE ::e8::SceneObjectProto_SceneEntityChildren* Arena::
 template<> PROTOBUF_NOINLINE ::e8::SceneObjectProto* Arena::CreateMaybeMessage< ::e8::SceneObjectProto >(Arena* arena) {
   return Arena::CreateMessageInternal< ::e8::SceneObjectProto >(arena);
 }
-template<> PROTOBUF_NOINLINE ::e8::SceneObjectCollection_DrawablesEntry_DoNotUse* Arena::CreateMaybeMessage< ::e8::SceneObjectCollection_DrawablesEntry_DoNotUse >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::e8::SceneObjectCollection_DrawablesEntry_DoNotUse >(arena);
+template<> PROTOBUF_NOINLINE ::e8::SceneObjectCollection_GeometriesEntry_DoNotUse* Arena::CreateMaybeMessage< ::e8::SceneObjectCollection_GeometriesEntry_DoNotUse >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::e8::SceneObjectCollection_GeometriesEntry_DoNotUse >(arena);
 }
 template<> PROTOBUF_NOINLINE ::e8::SceneObjectCollection_PhysicalShapesEntry_DoNotUse* Arena::CreateMaybeMessage< ::e8::SceneObjectCollection_PhysicalShapesEntry_DoNotUse >(Arena* arena) {
   return Arena::CreateMessageInternal< ::e8::SceneObjectCollection_PhysicalShapesEntry_DoNotUse >(arena);

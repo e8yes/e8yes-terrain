@@ -25,8 +25,8 @@
 #include <unordered_map>
 
 #include "content/common.h"
-#include "content/drawable.h"
-#include "content/proto/drawable.pb.h"
+#include "content/geometry.h"
+#include "content/proto/geometry.pb.h"
 #include "content/proto/scene_object.pb.h"
 #include "content/scene_entity.h"
 
@@ -54,11 +54,11 @@ struct SceneObject {
 
     /**
      * @brief SceneObject Reconstructs a scene object from a protobuf object. Since the entity proto
-     * references the drawable and physical shape information by only IDs, it requires two maps of
+     * references the geometry and physical shape information by only IDs, it requires two maps of
      * actually instances to correctly fill the entity up.
      */
     SceneObject(SceneObjectProto const &proto,
-                std::unordered_map<DrawableId, std::shared_ptr<DrawableLod>> const &drawables);
+                std::unordered_map<GeometryId, std::shared_ptr<GeometryLod>> const &geometries);
 
     ~SceneObject();
 

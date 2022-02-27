@@ -173,13 +173,13 @@ std::unique_ptr<GpuBarrier> FinishRenderPass(VkCommandBuffer cmds, GpuBarrier co
     return std::make_unique<GpuBarrier>(done_signal, cmds, context);
 }
 
-void RenderDrawables(std::vector<DrawableInstance> const &drawables,
+void RenderGeometrys(std::vector<DrawableInstance> const &drawables,
                      GraphicsPipeline const &pipeline, SetUniformsFn const &set_uniforms_fn,
                      GeometryVramTransfer *geo_vram, VkCommandBuffer cmds) {
     vkCmdBindPipeline(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline);
 
     for (auto const &instance : drawables) {
-        GeometryVramTransfer::UploadResult result = geo_vram->Upload(instance.drawable);
+        GeometryVramTransfer::UploadResult result = geo_vram->Upload(instance.geometry);
         if (!result.vertex_buffer.has_value() || !result.index_buffer.has_value()) {
             continue;
         }
@@ -192,7 +192,7 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
                                /*pOffsets=*/&offset);
         vkCmdBindIndexBuffer(cmds, result.index_buffer->buffer, /*offset=*/0,
                              result.index_element_type);
-        vkCmdDrawIndexed(cmds, instance.drawable->primitives().size() * 3,
+        vkCmdDrawIndexed(cmds, instance.geometry->primitives().size() * 3,
                          /*instanceCount=*/1, /*firstIndex=*/0, /*vertexOffset=*/0,
                          /*firstInstance=*/0);
     }

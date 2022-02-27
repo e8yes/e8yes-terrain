@@ -24,32 +24,32 @@
 #include <unordered_map>
 
 #include "content/common.h"
-#include "content/drawable.h"
-#include "content/proto/drawable.pb.h"
+#include "content/geometry.h"
 #include "content/proto/entity.pb.h"
+#include "content/proto/geometry.pb.h"
 #include "content/proto/scene_object.pb.h"
 #include "content/scene_entity.h"
 #include "content/scene_object.h"
 
 namespace e8 {
 
-void CollectDrawables(SceneObject const &scene_object,
-                      google::protobuf::Map<DrawableId, DrawableLod> *drawables) {
+void CollectGeometries(SceneObject const &scene_object,
+                       google::protobuf::Map<GeometryId, GeometryLod> *geometries) {
     if (scene_object.HasSceneEntityChildren()) {
         for (auto const &child_entity : scene_object.child_scene_entities) {
-            if (child_entity.drawable_lod_instance == nullptr) {
+            if (child_entity.geometry_lod_instance == nullptr) {
                 continue;
             }
 
-            (*drawables)[child_entity.drawable_lod_instance->id()] =
-                *child_entity.drawable_lod_instance;
+            (*geometries)[child_entity.geometry_lod_instance->id()] =
+                *child_entity.geometry_lod_instance;
         }
 
         return;
     }
 
     for (auto const &child_object : scene_object.child_scene_objects) {
-        CollectDrawables(child_object, drawables);
+        CollectGeometries(child_object, geometries);
     }
 }
 
@@ -59,7 +59,7 @@ SceneObject::SceneObject(SceneObjectName const &name,
 
 SceneObject::SceneObject(
     SceneObjectProto const &proto,
-    std::unordered_map<DrawableId, std::shared_ptr<DrawableLod>> const &drawables)
+    std::unordered_map<GeometryId, std::shared_ptr<GeometryLod>> const &geometries)
     : id(proto.id()), name(proto.name()) {
     if (!proto.procedural_object_id().empty()) {
         procedural_object_id = proto.procedural_object_id();
@@ -67,13 +67,13 @@ SceneObject::SceneObject(
 
     if (proto.has_scene_object_children()) {
         for (auto const &child : proto.scene_object_children().scene_objects()) {
-            this->AddSceneObjectChild(SceneObject(child, drawables));
+            this->AddSceneObjectChild(SceneObject(child, geometries));
         }
     }
 
     if (proto.has_scene_entity_children()) {
         for (auto const &child : proto.scene_entity_children().scene_entities()) {
-            this->AddSceneEntityChild(SceneEntity(child, drawables));
+            this->AddSceneEntityChild(SceneEntity(child, geometries));
         }
     }
 }
@@ -123,22 +123,22 @@ SceneObjectCollection ToProto(std::map<SceneObjectId, SceneObject> const &scene_
 
     for (auto const &[_, scene_object] : scene_objects) {
         *proto.add_scene_objects() = scene_object.ToProto();
-        CollectDrawables(scene_object, proto.mutable_drawables());
+        CollectGeometries(scene_object, proto.mutable_geometries());
     }
 
     return proto;
 }
 
 std::map<SceneObjectId, SceneObject> ToSceneObjects(SceneObjectCollection const &proto) {
-    std::unordered_map<DrawableId, std::shared_ptr<DrawableLod>> drawables;
-    for (auto const &[id, drawable] : proto.drawables()) {
-        drawables[id] = std::make_shared<DrawableLod>(drawable);
+    std::unordered_map<GeometryId, std::shared_ptr<GeometryLod>> geometries;
+    for (auto const &[id, geometry] : proto.geometries()) {
+        geometries[id] = std::make_shared<GeometryLod>(geometry);
     }
 
     std::map<SceneObjectId, SceneObject> root_scene_objects;
     for (auto scene_object_proto : proto.scene_objects()) {
         root_scene_objects.insert(
-            std::make_pair(scene_object_proto.id(), SceneObject(scene_object_proto, drawables)));
+            std::make_pair(scene_object_proto.id(), SceneObject(scene_object_proto, geometries)));
     }
 
     return root_scene_objects;

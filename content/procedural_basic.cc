@@ -22,10 +22,10 @@
 
 #include "common/tensor.h"
 #include "content/common.h"
-#include "content/drawable.h"
+#include "content/geometry.h"
 #include "content/procedural_basic.h"
 #include "content/procedural_object.h"
-#include "content/proto/drawable.pb.h"
+#include "content/proto/geometry.pb.h"
 #include "content/proto/procedural_object.pb.h"
 #include "content/proto/procedural_shape.pb.h"
 #include "content/scene_entity.h"
@@ -35,10 +35,10 @@ namespace e8 {
 namespace {
 
 constexpr char const *kEntityName = "entity";
-constexpr char const *kDrawableName = "drawable";
+constexpr char const *kGeometryName = "geometry";
 float const kLodMinDistance = 0.0f;
 
-Drawable PlaneDrawable(float width, float height, float cell_area, bool movable) {
+Geometry PlaneGeometry(float width, float height, float cell_area, bool movable) {
     assert(width > 0);
     assert(height > 0);
     assert(cell_area <= width * height);
@@ -53,7 +53,7 @@ Drawable PlaneDrawable(float width, float height, float cell_area, bool movable)
     assert(num_width_steps >= 2);
     assert(num_height_steps >= 2);
 
-    Drawable drawable;
+    Geometry geometry;
 
     // Generates vertices.
     for (unsigned j = 0; j < num_height_steps; ++j) {
@@ -63,7 +63,7 @@ Drawable PlaneDrawable(float width, float height, float cell_area, bool movable)
             vec2 tex_coord{static_cast<float>(i) / (num_width_steps - 1),
                            static_cast<float>(j) / (num_height_steps - 1)};
 
-            PrimitiveVertex *vertex = drawable.add_vertices();
+            PrimitiveVertex *vertex = geometry.add_vertices();
             *vertex->mutable_position() = ToProto(position);
             *vertex->mutable_normal() = ToProto(normal);
             *vertex->mutable_texcoord() = ToProto(tex_coord);
@@ -73,12 +73,12 @@ Drawable PlaneDrawable(float width, float height, float cell_area, bool movable)
     // Generates triangle faces.
     for (unsigned j = 0; j < num_height_steps - 1; ++j) {
         for (unsigned i = 0; i < num_width_steps - 1; ++i) {
-            PrimitiveIndices *top_left = drawable.add_primitives();
+            PrimitiveIndices *top_left = geometry.add_primitives();
             top_left->add_indices((i + 0) + (j + 0) * num_width_steps);
             top_left->add_indices((i + 1) + (j + 0) * num_width_steps);
             top_left->add_indices((i + 0) + (j + 1) * num_width_steps);
 
-            PrimitiveIndices *bottom_right = drawable.add_primitives();
+            PrimitiveIndices *bottom_right = geometry.add_primitives();
             bottom_right->add_indices((i + 1) + (j + 1) * num_width_steps);
             bottom_right->add_indices((i + 0) + (j + 1) * num_width_steps);
             bottom_right->add_indices((i + 1) + (j + 0) * num_width_steps);
@@ -86,30 +86,30 @@ Drawable PlaneDrawable(float width, float height, float cell_area, bool movable)
     }
 
     if (movable) {
-        drawable.set_rigidity(Drawable::RIGID);
+        geometry.set_rigidity(Geometry::RIGID);
     } else {
-        drawable.set_rigidity(Drawable::STATIC);
+        geometry.set_rigidity(Geometry::STATIC);
     }
 
-    return drawable;
+    return geometry;
 }
 
 SceneEntity PlaneEntity(float width, float height, float cell_area,
                         SrtTransform const &srt_transform, bool movable) {
-    google::protobuf::RepeatedPtrField<Drawable> drawable_lod;
+    google::protobuf::RepeatedPtrField<Geometry> geometry_lod;
     google::protobuf::RepeatedField<float> min_distances;
 
-    Drawable plane_drawable = PlaneDrawable(width, height, cell_area, movable);
-    *drawable_lod.Add() = plane_drawable;
+    Geometry plane_geometry = PlaneGeometry(width, height, cell_area, movable);
+    *geometry_lod.Add() = plane_geometry;
     min_distances.Add(kLodMinDistance);
 
-    std::shared_ptr<DrawableLod> drawable_lod_instance =
-        CreateDrawable(kDrawableName, drawable_lod, min_distances);
+    std::shared_ptr<GeometryLod> geometry_lod_instance =
+        CreateGeometry(kGeometryName, geometry_lod, min_distances);
 
     SceneEntity entity(kEntityName);
     entity.movable = movable;
     SceneEntitySetSrtTransform(srt_transform, &entity);
-    entity.drawable_lod_instance = drawable_lod_instance;
+    entity.geometry_lod_instance = geometry_lod_instance;
 
     return entity;
 }

@@ -19,19 +19,19 @@
 #define ISLANDS_RENDERER_DRAWABLE_INSTANCE_H
 
 #include "common/tensor.h"
-#include "content/proto/drawable.pb.h"
+#include "content/proto/geometry.pb.h"
 
 namespace e8 {
 
 /**
- * @brief The DrawableInstance struct Stores references to a drawable. This instanced drawable is
- * what get actually rendered.
+ * @brief The DrawableInstance struct Stores references to a geometry, material definition and
+ * transformation. This instanced drawable is what get actually rendered.
  */
 struct DrawableInstance {
-    // The drawable selected from a series of LODs.
-    Drawable const *drawable;
+    // The geometry selected from a series of LODs.
+    Geometry const *geometry;
 
-    // The homogeneous transformation to be applied to the drawable's geometry.
+    // The homogeneous transformation to be applied to the geometry.
     mat44 const *transform;
 };
 

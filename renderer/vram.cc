@@ -15,7 +15,6 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QVulkanWindow>
 #include <cassert>
 #include <cstdint>
 #include <google/protobuf/repeated_field.h>
@@ -24,7 +23,7 @@
 #include <unordered_map>
 
 #include "common/tensor.h"
-#include "content/proto/drawable.pb.h"
+#include "content/proto/geometry.pb.h"
 #include "renderer/context.h"
 #include "renderer/projection.h"
 #include "renderer/vram.h"
@@ -70,7 +69,7 @@ class GeometryVramTransfer::GeometryVramTransferImpl {
   public:
     GeometryVramTransferImpl(unsigned capacity, VulkanContext *context);
 
-    std::unordered_map<Drawable const *, UploadResult>::iterator Fetch(Drawable const *drawable);
+    std::unordered_map<Geometry const *, UploadResult>::iterator Fetch(Geometry const *geometry);
 
     bool UploadVertices(google::protobuf::RepeatedPtrField<PrimitiveVertex> const &vertices,
                         std::optional<BufferUploadResult> *vertex_upload_result);
@@ -83,7 +82,7 @@ class GeometryVramTransfer::GeometryVramTransferImpl {
     bool AllocateBuffer(unsigned new_size, VkBufferUsageFlags usage,
                         std::optional<BufferUploadResult> *buffer_upload_result);
 
-    std::unordered_map<Drawable const *, UploadResult> cache_;
+    std::unordered_map<Geometry const *, UploadResult> cache_;
     VulkanContext *context_;
     unsigned used_;
     unsigned const capacity_;
@@ -93,11 +92,11 @@ GeometryVramTransfer::GeometryVramTransferImpl::GeometryVramTransferImpl(unsigne
                                                                          VulkanContext *context)
     : context_(context), used_(0), capacity_(capacity) {}
 
-std::unordered_map<Drawable const *, GeometryVramTransfer::UploadResult>::iterator
-GeometryVramTransfer::GeometryVramTransferImpl::Fetch(Drawable const *drawable) {
-    auto it = cache_.find(drawable);
+std::unordered_map<Geometry const *, GeometryVramTransfer::UploadResult>::iterator
+GeometryVramTransfer::GeometryVramTransferImpl::Fetch(Geometry const *geometry) {
+    auto it = cache_.find(geometry);
     if (it == cache_.end()) {
-        it = cache_.insert(std::make_pair(drawable, UploadResult())).first;
+        it = cache_.insert(std::make_pair(geometry, UploadResult())).first;
     }
     return it;
 }
@@ -232,29 +231,29 @@ GeometryVramTransfer::UploadResult::UploadResult()
 
 GeometryVramTransfer::UploadResult::~UploadResult() {}
 
-GeometryVramTransfer::UploadResult GeometryVramTransfer::Upload(Drawable const *drawable) {
-    auto &[_, cached_upload] = *pimpl_->Fetch(drawable);
+GeometryVramTransfer::UploadResult GeometryVramTransfer::Upload(Geometry const *geometry) {
+    auto &[_, cached_upload] = *pimpl_->Fetch(geometry);
     if (!cached_upload.vertex_buffer.has_value() || !cached_upload.index_buffer.has_value()) {
         // Data has never been uploaded before.
-        pimpl_->UploadVertices(drawable->vertices(), &cached_upload.vertex_buffer);
-        pimpl_->UploadIndices(drawable->primitives(), drawable->vertices().size(),
+        pimpl_->UploadVertices(geometry->vertices(), &cached_upload.vertex_buffer);
+        pimpl_->UploadIndices(geometry->primitives(), geometry->vertices().size(),
                               &cached_upload.index_buffer, &cached_upload.index_element_type);
         return cached_upload;
     }
 
-    switch (drawable->rigidity()) {
-    case Drawable::DEFORMABLE: {
-        pimpl_->UploadVertices(drawable->vertices(), &cached_upload.vertex_buffer);
+    switch (geometry->rigidity()) {
+    case Geometry::DEFORMABLE: {
+        pimpl_->UploadVertices(geometry->vertices(), &cached_upload.vertex_buffer);
         break;
     }
-    case Drawable::TEARABLE: {
-        pimpl_->UploadVertices(drawable->vertices(), &cached_upload.vertex_buffer);
-        pimpl_->UploadIndices(drawable->primitives(), drawable->vertices().size(),
+    case Geometry::TEARABLE: {
+        pimpl_->UploadVertices(geometry->vertices(), &cached_upload.vertex_buffer);
+        pimpl_->UploadIndices(geometry->primitives(), geometry->vertices().size(),
                               &cached_upload.index_buffer, &cached_upload.index_element_type);
         break;
     }
-    case Drawable::STATIC:
-    case Drawable::RIGID: {
+    case Geometry::STATIC:
+    case Geometry::RIGID: {
         // Nothing needs to be updated, supposedly.
         break;
     }

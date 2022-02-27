@@ -25,9 +25,9 @@
 #include <vector>
 
 #include "common/tensor.h"
-#include "content/drawable.h"
-#include "content/proto/drawable.pb.h"
+#include "content/geometry.h"
 #include "content/proto/entity.pb.h"
+#include "content/proto/geometry.pb.h"
 #include "content/proto/physical_shape.pb.h"
 #include "content/proto/primitive.pb.h"
 
@@ -59,11 +59,11 @@ struct SceneEntity {
 
     /**
      * @brief SceneEntity Constructs an entity from proto message. Since the proto references the
-     * drawable and physical shape information by only IDs, it requires two maps of actually
+     * geometry and physical shape information by only IDs, it requires two maps of actually
      * instances to correctly fill the entity up.
      */
     SceneEntity(SceneEntityProto const &proto,
-                std::unordered_map<DrawableId, std::shared_ptr<DrawableLod>> const &drawables);
+                std::unordered_map<GeometryId, std::shared_ptr<GeometryLod>> const &geometries);
 
     ~SceneEntity();
 
@@ -91,10 +91,10 @@ struct SceneEntity {
     // An AABB bounding box surrounding the entity's geometry prior to any transformation.
     aabb bounding_box;
 
-    // A drawable instance with information derived from a drawable. A shared pointer allows a large
-    // number of same drawables to be placed at different location of the scene with shared
+    // A geometry instance with information derived from a geometry. A shared pointer allows a large
+    // number of same geometries to be placed at different location of the scene with shared
     // information.
-    std::shared_ptr<DrawableLod> drawable_lod_instance;
+    std::shared_ptr<GeometryLod> geometry_lod_instance;
 
     // TODO: Adds physical shape instance once it's implemented.
 };
