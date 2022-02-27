@@ -24,6 +24,12 @@
 
 namespace e8 {
 
+// All possible element types.
+constexpr char const *kSceneType = "Scene";
+constexpr char const *kSceneObjectType = "SceneObject";
+constexpr char const *kProceduralSceneObjectType = "ProceduralObject";
+constexpr char const *kSceneEntityType = "SceneEntity";
+
 /**
  * @brief The SceneViewComponent class When triggered, it pulls data from the current scene, if
  * available, and lists objects to a tree widget.

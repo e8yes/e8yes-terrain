@@ -16,15 +16,66 @@
  */
 
 #include <QObject>
+#include <QString>
 #include <QStringList>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
+#include <map>
+#include <string>
 
+#include "content/procedural_basic.h"
+#include "content/scene.h"
+#include "content/scene_entity.h"
+#include "content/scene_object.h"
 #include "editor/basic/context.h"
 #include "editor/scene/component_scene_view.h"
 
 namespace e8 {
 namespace {
+
+std::string ItemName(std::string const &name, std::string const &id) {
+    return name + '@' + id.substr(0, 3);
+}
+
+void AddSceneEntity(SceneEntity const &scene_entity, QTreeWidgetItem *parent_node) {
+    QTreeWidgetItem *child = new QTreeWidgetItem();
+    child->setText(/*column=*/0, ItemName(scene_entity.name, scene_entity.id).c_str());
+    child->setData(/*column=*/0, /*role=*/Qt::UserRole, QVariant(QString(scene_entity.id.c_str())));
+    child->setText(/*column=*/1, kSceneEntityType);
+    child->setData(/*column=*/1, /*role=*/Qt::UserRole, QVariant(QString(kSceneEntityType)));
+
+    parent_node->addChild(child);
+}
+
+void AddSceneObject(SceneObject const &scene_object, QTreeWidgetItem *parent_node) {
+    QTreeWidgetItem *current_node = new QTreeWidgetItem();
+
+    current_node->setText(/*column=*/0, ItemName(scene_object.name, scene_object.id).c_str());
+    current_node->setData(/*column=*/0, /*role=*/Qt::UserRole,
+                          QVariant(QString(scene_object.id.c_str())));
+    if (scene_object.Procedural()) {
+        current_node->setText(/*column=*/1, kProceduralSceneObjectType);
+        current_node->setData(/*column=*/1, /*role=*/Qt::UserRole,
+                              QVariant(QString(kProceduralSceneObjectType)));
+    } else {
+        current_node->setText(/*column=*/1, kSceneObjectType);
+        current_node->setData(/*column=*/1, /*role=*/Qt::UserRole,
+                              QVariant(QString(kSceneObjectType)));
+    }
+
+    parent_node->addChild(current_node);
+
+    // Handles child elements.
+    if (scene_object.HasSceneEntityChildren()) {
+        for (auto const &child_entity : scene_object.child_scene_entities) {
+            AddSceneEntity(child_entity, current_node);
+        }
+    } else {
+        for (auto const &child_object : scene_object.child_scene_objects) {
+            AddSceneObject(child_object, current_node);
+        }
+    }
+}
 
 void UpdateSceneView(Scene const *scene, QTreeWidget *scene_view_tree_widget) {
     scene_view_tree_widget->clear();
@@ -34,8 +85,14 @@ void UpdateSceneView(Scene const *scene, QTreeWidget *scene_view_tree_widget) {
     }
 
     QTreeWidgetItem *scene_root = new QTreeWidgetItem();
-    scene_root->setText(/*column=*/0, scene->name.c_str());
-    scene_root->setText(/*column=*/1, scene->id.c_str());
+    scene_root->setText(/*column=*/0, ItemName(scene->name, scene->id).c_str());
+    scene_root->setData(/*column=*/0, /*role=*/Qt::UserRole, QVariant(QString(scene->id.c_str())));
+    scene_root->setText(/*column=*/1, kSceneType);
+    scene_root->setData(/*column=*/1, /*role=*/Qt::UserRole, QVariant(QString(kSceneType)));
+
+    for (auto const &[_, scene_object] : scene->AllRootSceneObjects()) {
+        AddSceneObject(scene_object, scene_root);
+    }
 
     scene_view_tree_widget->addTopLevelItem(scene_root);
 }
@@ -43,7 +100,7 @@ void UpdateSceneView(Scene const *scene, QTreeWidget *scene_view_tree_widget) {
 } // namespace
 
 SceneViewComponent::SceneViewComponent(EditorContext *context) : context_(context) {
-    context_->ui->scene_view_tree_widget->setHeaderLabels(QStringList{"Name", "ID"});
+    context_->ui->scene_view_tree_widget->setHeaderLabels(QStringList{"Name", "Type"});
 }
 
 SceneViewComponent::~SceneViewComponent() {}
