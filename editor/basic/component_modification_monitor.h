@@ -20,6 +20,7 @@
 
 #include <QObject>
 
+#include "editor/basic/component_status.h"
 #include "editor/basic/context.h"
 
 namespace e8 {
@@ -31,7 +32,7 @@ class ModificationMonitorComponent : public QObject {
     Q_OBJECT
 
   public:
-    ModificationMonitorComponent(EditorContext *context);
+    ModificationMonitorComponent(StatusComponent *status_comp, EditorContext *context);
     ~ModificationMonitorComponent();
 
     /**
@@ -45,8 +46,10 @@ class ModificationMonitorComponent : public QObject {
     void OnModifyScene();
 
   private:
-    EditorContext *context_;
+    StatusComponent *status_comp_;
     bool unsaved_modifications_;
+
+    EditorContext *context_;
 };
 
 } // namespace e8

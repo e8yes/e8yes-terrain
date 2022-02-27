@@ -38,9 +38,9 @@ IslandsEditorWindow::IslandsEditorWindow(std::shared_ptr<EditorContext> const &e
     : QMainWindow(parent), editor_context_(editor_context) {
     editor_context_->ui->setupUi(this);
 
-    status_comp_ = std::make_unique<StatusComponent>(editor_context.get());
+    status_comp_ = std::make_unique<StatusComponent>(this, editor_context.get());
     modification_monitor_comp_ =
-        std::make_unique<ModificationMonitorComponent>(editor_context.get());
+        std::make_unique<ModificationMonitorComponent>(status_comp_.get(), editor_context.get());
     editor_portal_switcher_comp_ =
         std::make_unique<EditorPortalSwitcherComponent>(editor_context.get());
     environment_comp_ = std::make_unique<EnvironmentComponent>(modification_monitor_comp_.get(),
@@ -71,7 +71,6 @@ void RunIslandsEditorWindow(std::shared_ptr<EditorContext> editor_context, int a
     editor_window.show();
 
     application.exec();
-
     editor_context->running = false;
 }
 

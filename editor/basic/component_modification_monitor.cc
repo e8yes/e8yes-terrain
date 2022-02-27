@@ -19,6 +19,7 @@
 #include <boost/log/trivial.hpp>
 
 #include "editor/basic/component_modification_monitor.h"
+#include "editor/basic/component_status.h"
 #include "editor/basic/context.h"
 #include "ui_window_editor.h"
 
@@ -31,8 +32,9 @@ void SetSaverEnabled(bool enabled, Ui::IslandsEditorWindow *ui) {
 
 } // namespace
 
-ModificationMonitorComponent::ModificationMonitorComponent(EditorContext *context)
-    : context_(context), unsaved_modifications_(false) {}
+ModificationMonitorComponent::ModificationMonitorComponent(StatusComponent *status_comp,
+                                                           EditorContext *context)
+    : status_comp_(status_comp), unsaved_modifications_(false), context_(context) {}
 
 ModificationMonitorComponent::~ModificationMonitorComponent() {}
 
@@ -41,6 +43,7 @@ bool ModificationMonitorComponent::UnsavedModifications() const { return unsaved
 void ModificationMonitorComponent::OnReset() {
     unsaved_modifications_ = false;
     SetSaverEnabled(/*enabled=*/false, context_->ui.get());
+    status_comp_->SetModificationStatus(false);
 }
 
 void ModificationMonitorComponent::OnModifyScene() {
@@ -50,6 +53,7 @@ void ModificationMonitorComponent::OnModifyScene() {
 
     unsaved_modifications_ = true;
     SetSaverEnabled(/*enabled=*/true, context_->ui.get());
+    status_comp_->SetModificationStatus(true);
 }
 
 } // namespace e8

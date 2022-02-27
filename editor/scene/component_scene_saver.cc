@@ -121,6 +121,8 @@ void SceneSaverComponent::OnClickSaveScene() {
         return;
     }
 
+    load_path_ = save_path.toStdString();
+
     modification_monitor_comp_->OnReset();
 }
 

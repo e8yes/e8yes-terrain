@@ -18,6 +18,7 @@
 #ifndef ISLANDS_EDITOR_COMPONENT_STATUS_H
 #define ISLANDS_EDITOR_COMPONENT_STATUS_H
 
+#include <QMainWindow>
 #include <QObject>
 
 #include "editor/basic/context.h"
@@ -31,10 +32,18 @@ class StatusComponent : public QObject {
     Q_OBJECT
 
   public:
-    StatusComponent(EditorContext *context);
+    StatusComponent(QMainWindow *editor_window, EditorContext *context);
     ~StatusComponent();
 
+    void OnChangeScene();
+    void SetModificationStatus(bool modified);
+
   private:
+    void Update();
+
+    QMainWindow *editor_window_;
+    bool modified_;
+
     EditorContext *context_;
 };
 

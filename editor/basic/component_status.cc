@@ -15,15 +15,59 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QMainWindow>
 #include <QObject>
+#include <QString>
+#include <boost/log/trivial.hpp>
+#include <string>
 
+#include "content/scene.h"
 #include "editor/basic/component_status.h"
 #include "editor/basic/context.h"
+#include "ui_window_editor.h"
 
 namespace e8 {
+namespace {
 
-StatusComponent::StatusComponent(EditorContext *context) : context_(context) {}
+constexpr char const *kEditorWindowSuffix = "e8 islands editor";
+
+QString SceneName(Scene const &scene) {
+    return QString::fromStdString(scene.name + '@' + scene.id.substr(0, 3));
+}
+
+} // namespace
+
+StatusComponent::StatusComponent(QMainWindow *editor_window, EditorContext *context)
+    : editor_window_(editor_window), modified_(false), context_(context) {
+    editor_window_->setWindowTitle(kEditorWindowSuffix);
+}
 
 StatusComponent::~StatusComponent() {}
+
+void StatusComponent::Update() {
+    if (context_->scene == nullptr) {
+        editor_window_->setWindowTitle(kEditorWindowSuffix);
+        return;
+    }
+
+    if (modified_) {
+        editor_window_->setWindowTitle(SceneName(*context_->scene) + "* - " + kEditorWindowSuffix);
+    } else {
+        editor_window_->setWindowTitle(SceneName(*context_->scene) + " - " + kEditorWindowSuffix);
+    }
+}
+
+void StatusComponent::OnChangeScene() { this->Update(); }
+
+void StatusComponent::SetModificationStatus(bool modified) {
+    if (context_->scene == nullptr) {
+        BOOST_LOG_TRIVIAL(error) << "SetModificationStatus(): Setting modification status while "
+                                    "the scene doesn't exist.";
+        return;
+    }
+
+    modified_ = modified;
+    this->Update();
+}
 
 } // namespace e8
