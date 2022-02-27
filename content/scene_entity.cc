@@ -31,7 +31,8 @@
 
 namespace e8 {
 
-SceneEntity::SceneEntity(SceneEntityName const &name) : name(name), movable(true) {}
+SceneEntity::SceneEntity(SceneEntityName const &name)
+    : id(GenerateUuid()), name(name), movable(true) {}
 
 SceneEntity::SceneEntity(
     SceneEntityProto const &proto,
