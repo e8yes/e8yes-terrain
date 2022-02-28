@@ -66,7 +66,7 @@ const char descriptor_table_protodef_camera_2eproto[] PROTOBUF_SECTION_VARIABLE(
   "\t\022\020\n\010position\030\002 \003(\002\022\020\n\010rotation\030\003 \003(\002\022\024\n"
   "\014focal_length\030\004 \001(\002\022\024\n\014sensor_width\030\005 \001("
   "\002\022\025\n\rsensor_height\030\006 \001(\002\022\024\n\014max_distance"
-  "\030\007 \001(\002\022\023\n\013image_width\030\010 \001(\002b\006proto3"
+  "\030\007 \001(\002\022\023\n\013image_width\030\010 \001(\005b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_camera_2eproto_deps[1] = {
 };
@@ -231,11 +231,11 @@ const char* Camera::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::int
           ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
-      // float image_width = 8;
+      // int32 image_width = 8;
       case 8:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 69)) {
-          image_width_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
-          ptr += sizeof(float);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 64)) {
+          image_width_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
         } else goto handle_unusual;
         continue;
       default: {
@@ -310,10 +310,10 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(7, this->_internal_max_distance(), target);
   }
 
-  // float image_width = 8;
-  if (!(this->image_width() <= 0 && this->image_width() >= 0)) {
+  // int32 image_width = 8;
+  if (this->image_width() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(8, this->_internal_image_width(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(8, this->_internal_image_width(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -389,9 +389,11 @@ size_t Camera::ByteSizeLong() const {
     total_size += 1 + 4;
   }
 
-  // float image_width = 8;
-  if (!(this->image_width() <= 0 && this->image_width() >= 0)) {
-    total_size += 1 + 4;
+  // int32 image_width = 8;
+  if (this->image_width() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_image_width());
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -442,7 +444,7 @@ void Camera::MergeFrom(const Camera& from) {
   if (!(from.max_distance() <= 0 && from.max_distance() >= 0)) {
     _internal_set_max_distance(from._internal_max_distance());
   }
-  if (!(from.image_width() <= 0 && from.image_width() >= 0)) {
+  if (from.image_width() != 0) {
     _internal_set_image_width(from._internal_image_width());
   }
 }

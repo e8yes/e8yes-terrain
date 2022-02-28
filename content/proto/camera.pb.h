@@ -293,13 +293,13 @@ class Camera PROTOBUF_FINAL :
   void _internal_set_max_distance(float value);
   public:
 
-  // float image_width = 8;
+  // int32 image_width = 8;
   void clear_image_width();
-  float image_width() const;
-  void set_image_width(float value);
+  ::PROTOBUF_NAMESPACE_ID::int32 image_width() const;
+  void set_image_width(::PROTOBUF_NAMESPACE_ID::int32 value);
   private:
-  float _internal_image_width() const;
-  void _internal_set_image_width(float value);
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_image_width() const;
+  void _internal_set_image_width(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
   // @@protoc_insertion_point(class_scope:e8.Camera)
@@ -318,7 +318,7 @@ class Camera PROTOBUF_FINAL :
   float sensor_width_;
   float sensor_height_;
   float max_distance_;
-  float image_width_;
+  ::PROTOBUF_NAMESPACE_ID::int32 image_width_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_camera_2eproto;
 };
@@ -588,22 +588,22 @@ inline void Camera::set_max_distance(float value) {
   // @@protoc_insertion_point(field_set:e8.Camera.max_distance)
 }
 
-// float image_width = 8;
+// int32 image_width = 8;
 inline void Camera::clear_image_width() {
   image_width_ = 0;
 }
-inline float Camera::_internal_image_width() const {
+inline ::PROTOBUF_NAMESPACE_ID::int32 Camera::_internal_image_width() const {
   return image_width_;
 }
-inline float Camera::image_width() const {
+inline ::PROTOBUF_NAMESPACE_ID::int32 Camera::image_width() const {
   // @@protoc_insertion_point(field_get:e8.Camera.image_width)
   return _internal_image_width();
 }
-inline void Camera::_internal_set_image_width(float value) {
+inline void Camera::_internal_set_image_width(::PROTOBUF_NAMESPACE_ID::int32 value) {
   
   image_width_ = value;
 }
-inline void Camera::set_image_width(float value) {
+inline void Camera::set_image_width(::PROTOBUF_NAMESPACE_ID::int32 value) {
   _internal_set_image_width(value);
   // @@protoc_insertion_point(field_set:e8.Camera.image_width)
 }

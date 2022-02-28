@@ -139,7 +139,7 @@ void Scene::CreateDefaultCamera() {
     *camera.mutable_rotation() = e8::ToProto(vec3{0, 0, 0});
     camera.set_focal_length(35);
     camera.set_sensor_width(36);
-    camera.set_sensor_height(34);
+    camera.set_sensor_height(24);
     camera.set_image_width(1024);
     camera.set_max_distance(1000);
 }

@@ -47,5 +47,5 @@ message Camera {
     float max_distance = 7;
 
     // The width of the image, in pixel, to produce by this camera.
-    float image_width = 8;
+    int32 image_width = 8;
 }           
