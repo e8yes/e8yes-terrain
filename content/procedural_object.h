@@ -18,6 +18,9 @@
 #ifndef ISLANDS_CONTENT_PROCEDURAL_OBJECT_H
 #define ISLANDS_CONTENT_PROCEDURAL_OBJECT_H
 
+#include <google/protobuf/repeated_field.h>
+#include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -72,8 +75,23 @@ class ProceduralObjectInterface {
     bool movable;
 
   protected:
-    ProceduralObjectProto _ToBaseProto() const;
+    ProceduralObjectProto
+    _ToBaseProto(ProceduralObjectProto::ProceduralObjectType const &object_type) const;
 };
+
+/**
+ * @brief ToProto Turns a collection of procedural objects into protobuf objects.
+ */
+google::protobuf::RepeatedPtrField<ProceduralObjectProto>
+ToProto(std::map<ProceduralObjectId, std::unique_ptr<ProceduralObjectInterface>> const
+            &procedural_objects);
+
+/**
+ * @brief ToProceduralObjects Turns an array of protobuf procedural objects back to a collection of
+ * in-memory procedural objects.
+ */
+std::map<ProceduralObjectId, std::unique_ptr<ProceduralObjectInterface>>
+ToProceduralObjects(google::protobuf::RepeatedPtrField<ProceduralObjectProto> const &protos);
 
 } // namespace e8
 

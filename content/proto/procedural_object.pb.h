@@ -31,6 +31,7 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 #include "procedural_shape.pb.h"
 // @@protoc_insertion_point(includes)
@@ -65,6 +66,33 @@ template<> ::e8::ProceduralObjectProto* Arena::CreateMaybeMessage<::e8::Procedur
 PROTOBUF_NAMESPACE_CLOSE
 namespace e8 {
 
+enum ProceduralObjectProto_ProceduralObjectType : int {
+  ProceduralObjectProto_ProceduralObjectType_INVALID = 0,
+  ProceduralObjectProto_ProceduralObjectType_PLANE = 1,
+  ProceduralObjectProto_ProceduralObjectType_BOX = 2,
+  ProceduralObjectProto_ProceduralObjectType_SPHERE = 3,
+  ProceduralObjectProto_ProceduralObjectType_ProceduralObjectProto_ProceduralObjectType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
+  ProceduralObjectProto_ProceduralObjectType_ProceduralObjectProto_ProceduralObjectType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
+};
+bool ProceduralObjectProto_ProceduralObjectType_IsValid(int value);
+constexpr ProceduralObjectProto_ProceduralObjectType ProceduralObjectProto_ProceduralObjectType_ProceduralObjectType_MIN = ProceduralObjectProto_ProceduralObjectType_INVALID;
+constexpr ProceduralObjectProto_ProceduralObjectType ProceduralObjectProto_ProceduralObjectType_ProceduralObjectType_MAX = ProceduralObjectProto_ProceduralObjectType_SPHERE;
+constexpr int ProceduralObjectProto_ProceduralObjectType_ProceduralObjectType_ARRAYSIZE = ProceduralObjectProto_ProceduralObjectType_ProceduralObjectType_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ProceduralObjectProto_ProceduralObjectType_descriptor();
+template<typename T>
+inline const std::string& ProceduralObjectProto_ProceduralObjectType_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, ProceduralObjectProto_ProceduralObjectType>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function ProceduralObjectProto_ProceduralObjectType_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    ProceduralObjectProto_ProceduralObjectType_descriptor(), enum_t_value);
+}
+inline bool ProceduralObjectProto_ProceduralObjectType_Parse(
+    const std::string& name, ProceduralObjectProto_ProceduralObjectType* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<ProceduralObjectProto_ProceduralObjectType>(
+    ProceduralObjectProto_ProceduralObjectType_descriptor(), name, value);
+}
 // ===================================================================
 
 class ProceduralObjectProto PROTOBUF_FINAL :
@@ -177,15 +205,50 @@ class ProceduralObjectProto PROTOBUF_FINAL :
 
   // nested types ----------------------------------------------------
 
+  typedef ProceduralObjectProto_ProceduralObjectType ProceduralObjectType;
+  static constexpr ProceduralObjectType INVALID =
+    ProceduralObjectProto_ProceduralObjectType_INVALID;
+  static constexpr ProceduralObjectType PLANE =
+    ProceduralObjectProto_ProceduralObjectType_PLANE;
+  static constexpr ProceduralObjectType BOX =
+    ProceduralObjectProto_ProceduralObjectType_BOX;
+  static constexpr ProceduralObjectType SPHERE =
+    ProceduralObjectProto_ProceduralObjectType_SPHERE;
+  static inline bool ProceduralObjectType_IsValid(int value) {
+    return ProceduralObjectProto_ProceduralObjectType_IsValid(value);
+  }
+  static constexpr ProceduralObjectType ProceduralObjectType_MIN =
+    ProceduralObjectProto_ProceduralObjectType_ProceduralObjectType_MIN;
+  static constexpr ProceduralObjectType ProceduralObjectType_MAX =
+    ProceduralObjectProto_ProceduralObjectType_ProceduralObjectType_MAX;
+  static constexpr int ProceduralObjectType_ARRAYSIZE =
+    ProceduralObjectProto_ProceduralObjectType_ProceduralObjectType_ARRAYSIZE;
+  static inline const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor*
+  ProceduralObjectType_descriptor() {
+    return ProceduralObjectProto_ProceduralObjectType_descriptor();
+  }
+  template<typename T>
+  static inline const std::string& ProceduralObjectType_Name(T enum_t_value) {
+    static_assert(::std::is_same<T, ProceduralObjectType>::value ||
+      ::std::is_integral<T>::value,
+      "Incorrect type passed to function ProceduralObjectType_Name.");
+    return ProceduralObjectProto_ProceduralObjectType_Name(enum_t_value);
+  }
+  static inline bool ProceduralObjectType_Parse(const std::string& name,
+      ProceduralObjectType* value) {
+    return ProceduralObjectProto_ProceduralObjectType_Parse(name, value);
+  }
+
   // accessors -------------------------------------------------------
 
   enum : int {
-    kShapesFieldNumber = 4,
+    kShapesFieldNumber = 5,
     kIdFieldNumber = 1,
     kNameFieldNumber = 2,
-    kMovableFieldNumber = 3,
+    kTypeFieldNumber = 3,
+    kMovableFieldNumber = 4,
   };
-  // repeated .e8.ProceduralShapeProto shapes = 4;
+  // repeated .e8.ProceduralShapeProto shapes = 5;
   int shapes_size() const;
   private:
   int _internal_shapes_size() const;
@@ -253,7 +316,16 @@ class ProceduralObjectProto PROTOBUF_FINAL :
   std::string* _internal_mutable_name();
   public:
 
-  // bool movable = 3;
+  // .e8.ProceduralObjectProto.ProceduralObjectType type = 3;
+  void clear_type();
+  ::e8::ProceduralObjectProto_ProceduralObjectType type() const;
+  void set_type(::e8::ProceduralObjectProto_ProceduralObjectType value);
+  private:
+  ::e8::ProceduralObjectProto_ProceduralObjectType _internal_type() const;
+  void _internal_set_type(::e8::ProceduralObjectProto_ProceduralObjectType value);
+  public:
+
+  // bool movable = 4;
   void clear_movable();
   bool movable() const;
   void set_movable(bool value);
@@ -272,6 +344,7 @@ class ProceduralObjectProto PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::ProceduralShapeProto > shapes_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr id_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
+  int type_;
   bool movable_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_procedural_5fobject_2eproto;
@@ -449,7 +522,27 @@ inline void ProceduralObjectProto::unsafe_arena_set_allocated_name(
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.ProceduralObjectProto.name)
 }
 
-// bool movable = 3;
+// .e8.ProceduralObjectProto.ProceduralObjectType type = 3;
+inline void ProceduralObjectProto::clear_type() {
+  type_ = 0;
+}
+inline ::e8::ProceduralObjectProto_ProceduralObjectType ProceduralObjectProto::_internal_type() const {
+  return static_cast< ::e8::ProceduralObjectProto_ProceduralObjectType >(type_);
+}
+inline ::e8::ProceduralObjectProto_ProceduralObjectType ProceduralObjectProto::type() const {
+  // @@protoc_insertion_point(field_get:e8.ProceduralObjectProto.type)
+  return _internal_type();
+}
+inline void ProceduralObjectProto::_internal_set_type(::e8::ProceduralObjectProto_ProceduralObjectType value) {
+  
+  type_ = value;
+}
+inline void ProceduralObjectProto::set_type(::e8::ProceduralObjectProto_ProceduralObjectType value) {
+  _internal_set_type(value);
+  // @@protoc_insertion_point(field_set:e8.ProceduralObjectProto.type)
+}
+
+// bool movable = 4;
 inline void ProceduralObjectProto::clear_movable() {
   movable_ = false;
 }
@@ -469,7 +562,7 @@ inline void ProceduralObjectProto::set_movable(bool value) {
   // @@protoc_insertion_point(field_set:e8.ProceduralObjectProto.movable)
 }
 
-// repeated .e8.ProceduralShapeProto shapes = 4;
+// repeated .e8.ProceduralShapeProto shapes = 5;
 inline int ProceduralObjectProto::_internal_shapes_size() const {
   return shapes_.size();
 }
@@ -512,6 +605,16 @@ ProceduralObjectProto::shapes() const {
 // @@protoc_insertion_point(namespace_scope)
 
 }  // namespace e8
+
+PROTOBUF_NAMESPACE_OPEN
+
+template <> struct is_proto_enum< ::e8::ProceduralObjectProto_ProceduralObjectType> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::e8::ProceduralObjectProto_ProceduralObjectType>() {
+  return ::e8::ProceduralObjectProto_ProceduralObjectType_descriptor();
+}
+
+PROTOBUF_NAMESPACE_CLOSE
 
 // @@protoc_insertion_point(global_scope)
 

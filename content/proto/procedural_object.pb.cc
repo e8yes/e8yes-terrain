@@ -37,7 +37,7 @@ static void InitDefaultsscc_info_ProceduralObjectProto_procedural_5fobject_2epro
       &scc_info_ProceduralShapeProto_procedural_5fshape_2eproto.base,}};
 
 static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_procedural_5fobject_2eproto[1];
-static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_procedural_5fobject_2eproto = nullptr;
+static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_procedural_5fobject_2eproto[1];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_procedural_5fobject_2eproto = nullptr;
 
 const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_procedural_5fobject_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -48,6 +48,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_procedural_5fobject_2eproto::o
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::e8::ProceduralObjectProto, id_),
   PROTOBUF_FIELD_OFFSET(::e8::ProceduralObjectProto, name_),
+  PROTOBUF_FIELD_OFFSET(::e8::ProceduralObjectProto, type_),
   PROTOBUF_FIELD_OFFSET(::e8::ProceduralObjectProto, movable_),
   PROTOBUF_FIELD_OFFSET(::e8::ProceduralObjectProto, shapes_),
 };
@@ -61,10 +62,13 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 
 const char descriptor_table_protodef_procedural_5fobject_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\027procedural_object.proto\022\002e8\032\026procedura"
-  "l_shape.proto\"l\n\025ProceduralObjectProto\022\n"
-  "\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\017\n\007movable\030\003 \001("
-  "\010\022(\n\006shapes\030\004 \003(\0132\030.e8.ProceduralShapePr"
-  "otob\006proto3"
+  "l_shape.proto\"\357\001\n\025ProceduralObjectProto\022"
+  "\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022<\n\004type\030\003 \001(\0162"
+  "..e8.ProceduralObjectProto.ProceduralObj"
+  "ectType\022\017\n\007movable\030\004 \001(\010\022(\n\006shapes\030\005 \003(\013"
+  "2\030.e8.ProceduralShapeProto\"C\n\024Procedural"
+  "ObjectType\022\013\n\007INVALID\020\000\022\t\n\005PLANE\020\001\022\007\n\003BO"
+  "X\020\002\022\n\n\006SPHERE\020\003b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_procedural_5fobject_2eproto_deps[1] = {
   &::descriptor_table_procedural_5fshape_2eproto,
@@ -74,7 +78,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_pro
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_procedural_5fobject_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_procedural_5fobject_2eproto = {
-  false, false, descriptor_table_protodef_procedural_5fobject_2eproto, "procedural_object.proto", 171,
+  false, false, descriptor_table_protodef_procedural_5fobject_2eproto, "procedural_object.proto", 303,
   &descriptor_table_procedural_5fobject_2eproto_once, descriptor_table_procedural_5fobject_2eproto_sccs, descriptor_table_procedural_5fobject_2eproto_deps, 1, 1,
   schemas, file_default_instances, TableStruct_procedural_5fobject_2eproto::offsets,
   file_level_metadata_procedural_5fobject_2eproto, 1, file_level_enum_descriptors_procedural_5fobject_2eproto, file_level_service_descriptors_procedural_5fobject_2eproto,
@@ -83,6 +87,31 @@ const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_proced
 // Force running AddDescriptors() at dynamic initialization time.
 static bool dynamic_init_dummy_procedural_5fobject_2eproto = (static_cast<void>(::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_procedural_5fobject_2eproto)), true);
 namespace e8 {
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ProceduralObjectProto_ProceduralObjectType_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_procedural_5fobject_2eproto);
+  return file_level_enum_descriptors_procedural_5fobject_2eproto[0];
+}
+bool ProceduralObjectProto_ProceduralObjectType_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+      return true;
+    default:
+      return false;
+  }
+}
+
+#if (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
+constexpr ProceduralObjectProto_ProceduralObjectType ProceduralObjectProto::INVALID;
+constexpr ProceduralObjectProto_ProceduralObjectType ProceduralObjectProto::PLANE;
+constexpr ProceduralObjectProto_ProceduralObjectType ProceduralObjectProto::BOX;
+constexpr ProceduralObjectProto_ProceduralObjectType ProceduralObjectProto::SPHERE;
+constexpr ProceduralObjectProto_ProceduralObjectType ProceduralObjectProto::ProceduralObjectType_MIN;
+constexpr ProceduralObjectProto_ProceduralObjectType ProceduralObjectProto::ProceduralObjectType_MAX;
+constexpr int ProceduralObjectProto::ProceduralObjectType_ARRAYSIZE;
+#endif  // (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
 
 // ===================================================================
 
@@ -116,7 +145,9 @@ ProceduralObjectProto::ProceduralObjectProto(const ProceduralObjectProto& from)
     name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_name(),
       GetArena());
   }
-  movable_ = from.movable_;
+  ::memcpy(&type_, &from.type_,
+    static_cast<size_t>(reinterpret_cast<char*>(&movable_) -
+    reinterpret_cast<char*>(&type_)) + sizeof(movable_));
   // @@protoc_insertion_point(copy_constructor:e8.ProceduralObjectProto)
 }
 
@@ -124,7 +155,9 @@ void ProceduralObjectProto::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_ProceduralObjectProto_procedural_5fobject_2eproto.base);
   id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  movable_ = false;
+  ::memset(&type_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&movable_) -
+      reinterpret_cast<char*>(&type_)) + sizeof(movable_));
 }
 
 ProceduralObjectProto::~ProceduralObjectProto() {
@@ -163,7 +196,9 @@ void ProceduralObjectProto::Clear() {
   shapes_.Clear();
   id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   name_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  movable_ = false;
+  ::memset(&type_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&movable_) -
+      reinterpret_cast<char*>(&type_)) + sizeof(movable_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -193,23 +228,31 @@ const char* ProceduralObjectProto::_InternalParse(const char* ptr, ::PROTOBUF_NA
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // bool movable = 3;
+      // .e8.ProceduralObjectProto.ProceduralObjectType type = 3;
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+          ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+          _internal_set_type(static_cast<::e8::ProceduralObjectProto_ProceduralObjectType>(val));
+        } else goto handle_unusual;
+        continue;
+      // bool movable = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
           movable_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // repeated .e8.ProceduralShapeProto shapes = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+      // repeated .e8.ProceduralShapeProto shapes = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
           ptr -= 1;
           do {
             ptr += 1;
             ptr = ctx->ParseMessage(_internal_add_shapes(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<34>(ptr));
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<42>(ptr));
         } else goto handle_unusual;
         continue;
       default: {
@@ -260,18 +303,25 @@ failure:
         2, this->_internal_name(), target);
   }
 
-  // bool movable = 3;
-  if (this->movable() != 0) {
+  // .e8.ProceduralObjectProto.ProceduralObjectType type = 3;
+  if (this->type() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(3, this->_internal_movable(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
+      3, this->_internal_type(), target);
   }
 
-  // repeated .e8.ProceduralShapeProto shapes = 4;
+  // bool movable = 4;
+  if (this->movable() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(4, this->_internal_movable(), target);
+  }
+
+  // repeated .e8.ProceduralShapeProto shapes = 5;
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->_internal_shapes_size()); i < n; i++) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(4, this->_internal_shapes(i), target, stream);
+      InternalWriteMessage(5, this->_internal_shapes(i), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -290,7 +340,7 @@ size_t ProceduralObjectProto::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated .e8.ProceduralShapeProto shapes = 4;
+  // repeated .e8.ProceduralShapeProto shapes = 5;
   total_size += 1UL * this->_internal_shapes_size();
   for (const auto& msg : this->shapes_) {
     total_size +=
@@ -311,7 +361,13 @@ size_t ProceduralObjectProto::ByteSizeLong() const {
         this->_internal_name());
   }
 
-  // bool movable = 3;
+  // .e8.ProceduralObjectProto.ProceduralObjectType type = 3;
+  if (this->type() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_type());
+  }
+
+  // bool movable = 4;
   if (this->movable() != 0) {
     total_size += 1 + 1;
   }
@@ -354,6 +410,9 @@ void ProceduralObjectProto::MergeFrom(const ProceduralObjectProto& from) {
   if (from.name().size() > 0) {
     _internal_set_name(from._internal_name());
   }
+  if (from.type() != 0) {
+    _internal_set_type(from._internal_type());
+  }
   if (from.movable() != 0) {
     _internal_set_movable(from._internal_movable());
   }
@@ -383,7 +442,12 @@ void ProceduralObjectProto::InternalSwap(ProceduralObjectProto* other) {
   shapes_.InternalSwap(&other->shapes_);
   id_.Swap(&other->id_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   name_.Swap(&other->name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  swap(movable_, other->movable_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(ProceduralObjectProto, movable_)
+      + sizeof(ProceduralObjectProto::movable_)
+      - PROTOBUF_FIELD_OFFSET(ProceduralObjectProto, type_)>(
+          reinterpret_cast<char*>(&type_),
+          reinterpret_cast<char*>(&other->type_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata ProceduralObjectProto::GetMetadata() const {

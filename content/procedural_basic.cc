@@ -38,6 +38,14 @@ constexpr char const *kEntityName = "entity";
 constexpr char const *kGeometryName = "geometry";
 float const kLodMinDistance = 0.0f;
 
+aabb BoundingBoxOf(Geometry const &geometry) {
+    aabb bounding_box;
+    for (auto const &vertex : geometry.vertices()) {
+        bounding_box = bounding_box + ToVec3(vertex.position());
+    }
+    return bounding_box;
+}
+
 Geometry PlaneGeometry(float width, float height, float cell_area, bool movable) {
     assert(width > 0);
     assert(height > 0);
@@ -58,7 +66,7 @@ Geometry PlaneGeometry(float width, float height, float cell_area, bool movable)
     // Generates vertices.
     for (unsigned j = 0; j < num_height_steps; ++j) {
         for (unsigned i = 0; i < num_width_steps; ++i) {
-            vec3 position{quad_width * i - width / 2, quad_height * j - height / 2, 0};
+            vec3 position{quad_width * i - width / 2, height / 2 - quad_height * j, 0};
             vec3 normal{0, 0, 1};
             vec2 tex_coord{static_cast<float>(i) / (num_width_steps - 1),
                            static_cast<float>(j) / (num_height_steps - 1)};
@@ -108,6 +116,7 @@ SceneEntity PlaneEntity(float width, float height, float cell_area,
 
     SceneEntity entity(kEntityName);
     entity.movable = movable;
+    entity.bounding_box = BoundingBoxOf(geometry_lod_instance->geometry_lod(0));
     SceneEntitySetSrtTransform(srt_transform, &entity);
     entity.geometry_lod_instance = geometry_lod_instance;
 
@@ -131,7 +140,15 @@ ProceduralPlane::ProceduralPlane(ProceduralObjectName const &name, float width, 
 }
 
 ProceduralPlane::ProceduralPlane(ProceduralObjectProto const &proto)
-    : ProceduralObjectInterface(proto) {}
+    : ProceduralObjectInterface(proto) {
+    assert(proto.shapes().size() == 1);
+    assert(proto.shapes(0).has_plane());
+
+    srt_transform = proto.shapes(0).srt_transform();
+    width = proto.shapes(0).plane().width();
+    height = proto.shapes(0).plane().height();
+    cell_area = proto.shapes(0).plane().cell_area();
+}
 
 ProceduralPlane::~ProceduralPlane() {}
 
@@ -154,7 +171,7 @@ ProceduralObjectProto ProceduralPlane::ToProto() const {
     *shape.mutable_srt_transform() = srt_transform;
     *shape.mutable_plane() = plane;
 
-    ProceduralObjectProto proto = this->_ToBaseProto();
+    ProceduralObjectProto proto = this->_ToBaseProto(ProceduralObjectProto::PLANE);
     *proto.add_shapes() = shape;
     return proto;
 }
