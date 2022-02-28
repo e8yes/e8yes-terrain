@@ -21,6 +21,7 @@ SOURCES += \
     geometry.cc \
     procedural_basic.cc \
     procedural_object.cc \
+    proto/camera.pb.cc \
     proto/entity.pb.cc \
     proto/geometry.pb.cc \
     proto/physical_shape.pb.cc \
@@ -40,6 +41,7 @@ HEADERS += \
     geometry.h \
     procedural_basic.h \
     procedural_object.h \
+    proto/camera.pb.h \
     proto/entity.pb.h \
     proto/geometry.pb.h \
     proto/physical_shape.pb.h \

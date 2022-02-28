@@ -1,0 +1,51 @@
+/**
+ * e8yes demo web server.
+ *
+ * <p>Copyright (C) 2020 Chifeng Wen {daviesx66@gmail.com}
+ *
+ * <p>This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * <p>You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
+ */
+
+syntax = "proto3";
+
+package e8;
+
+/**
+ * @brief The Camera message Parameters for simulating a digital camera.
+ */
+message Camera {
+    // ID of this camera.
+    string id = 1;
+
+    // The camera's location.
+    repeated float position = 2;
+
+    // The camera's rotation transform, specified in degree, to apply to each axes of rotation in
+    // the model space. Rotation will first apply to the z axis, then the y axis, finally the x
+    // axis.
+    repeated float rotation = 3;
+
+    // The camera's focal length, in milimeter.
+    float focal_length = 4;
+
+    // The width of the camera sensor, in milimeter.
+    float sensor_width = 5;
+
+    // The height of the camera sensor, in milimeter.
+    float sensor_height = 6;
+
+    // The maximum distance, in meter, within which objects can be captured by this camera.
+    float max_distance = 7;
+
+    // The width of the image, in pixel, to produce by this camera.
+    float image_width = 8;
+}           

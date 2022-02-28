@@ -24,6 +24,7 @@
 #include <string>
 
 #include "content/procedural_object.h"
+#include "content/proto/camera.pb.h"
 #include "content/proto/scene.pb.h"
 #include "content/proto/scene_object.pb.h"
 #include "content/scene_object.h"
@@ -134,16 +135,6 @@ class Scene {
     std::map<SceneObjectId, SceneObject> const &AllRootSceneObjects() const;
 
     /**
-     * @brief UpdateBackgroundColor Sets a new background color for the scene.
-     */
-    void UpdateBackgroundColor(vec3 const &color);
-
-    /**
-     * @brief BackgroundColor Returns the scene's current background color.
-     */
-    vec3 BackgroundColor() const;
-
-    /**
      * @brief ToProto Turns scene content into a protobuf object.
      */
     SceneProto ToProto() const;
@@ -158,7 +149,14 @@ class Scene {
     // The structure used for organizing scene entities efficiently.
     SceneProto::StructureType structure_type;
 
+    // The scene' background color.
+    vec3 background_color;
+
+    // The scene's main camera.
+    Camera camera;
+
   private:
+    void CreateDefaultCamera();
     void CreateSceneEntityStructure();
 
     std::shared_mutex mu_;
@@ -166,7 +164,6 @@ class Scene {
     std::map<ProceduralObjectId, std::unique_ptr<ProceduralObjectInterface>> procedural_objects_;
     std::map<SceneObjectId, SceneObject> root_scene_objects_;
     std::unique_ptr<SceneEntityStructureInterface> entity_structure_;
-    vec3 background_color_;
 };
 
 } // namespace e8

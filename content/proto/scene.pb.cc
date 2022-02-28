@@ -14,6 +14,7 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
+extern PROTOBUF_INTERNAL_EXPORT_camera_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Camera_camera_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_procedural_5fobject_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_ProceduralObjectProto_procedural_5fobject_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_scene_5fobject_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<3> scc_info_SceneObjectCollection_scene_5fobject_2eproto;
 namespace e8 {
@@ -33,8 +34,9 @@ static void InitDefaultsscc_info_SceneProto_scene_2eproto() {
   ::e8::SceneProto::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_SceneProto_scene_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 2, 0, InitDefaultsscc_info_SceneProto_scene_2eproto}, {
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<3> scc_info_SceneProto_scene_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 3, 0, InitDefaultsscc_info_SceneProto_scene_2eproto}, {
+      &scc_info_Camera_camera_2eproto.base,
       &scc_info_SceneObjectCollection_scene_5fobject_2eproto.base,
       &scc_info_ProceduralObjectProto_procedural_5fobject_2eproto.base,}};
 
@@ -52,6 +54,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_scene_2eproto::offsets[] PROTO
   PROTOBUF_FIELD_OFFSET(::e8::SceneProto, name_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneProto, structure_type_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneProto, background_color_),
+  PROTOBUF_FIELD_OFFSET(::e8::SceneProto, camera_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneProto, scene_objects_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneProto, precedural_objects_),
 };
@@ -64,17 +67,19 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_scene_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\013scene.proto\022\002e8\032\027procedural_object.pro"
-  "to\032\022scene_object.proto\"\225\002\n\nSceneProto\022\n\n"
-  "\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\0224\n\016structure_typ"
-  "e\030\003 \001(\0162\034.e8.SceneProto.StructureType\022\030\n"
-  "\020background_color\030\004 \003(\002\0220\n\rscene_objects"
-  "\030\005 \001(\0132\031.e8.SceneObjectCollection\0225\n\022pre"
-  "cedural_objects\030\006 \003(\0132\031.e8.ProceduralObj"
-  "ectProto\"4\n\rStructureType\022\013\n\007INVALID\020\000\022\n"
-  "\n\006LINEAR\020\001\022\n\n\006OCTREE\020\002b\006proto3"
+  "\n\013scene.proto\022\002e8\032\014camera.proto\032\027procedu"
+  "ral_object.proto\032\022scene_object.proto\"\261\002\n"
+  "\nSceneProto\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\0224\n"
+  "\016structure_type\030\003 \001(\0162\034.e8.SceneProto.St"
+  "ructureType\022\030\n\020background_color\030\004 \003(\002\022\032\n"
+  "\006camera\030\005 \001(\0132\n.e8.Camera\0220\n\rscene_objec"
+  "ts\030\006 \001(\0132\031.e8.SceneObjectCollection\0225\n\022p"
+  "recedural_objects\030\007 \003(\0132\031.e8.ProceduralO"
+  "bjectProto\"4\n\rStructureType\022\013\n\007INVALID\020\000"
+  "\022\n\n\006LINEAR\020\001\022\n\n\006OCTREE\020\002b\006proto3"
   ;
-static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_scene_2eproto_deps[2] = {
+static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_scene_2eproto_deps[3] = {
+  &::descriptor_table_camera_2eproto,
   &::descriptor_table_procedural_5fobject_2eproto,
   &::descriptor_table_scene_5fobject_2eproto,
 };
@@ -83,8 +88,8 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_sce
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_scene_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_scene_2eproto = {
-  false, false, descriptor_table_protodef_scene_2eproto, "scene.proto", 350,
-  &descriptor_table_scene_2eproto_once, descriptor_table_scene_2eproto_sccs, descriptor_table_scene_2eproto_deps, 1, 2,
+  false, false, descriptor_table_protodef_scene_2eproto, "scene.proto", 392,
+  &descriptor_table_scene_2eproto_once, descriptor_table_scene_2eproto_sccs, descriptor_table_scene_2eproto_deps, 1, 3,
   schemas, file_default_instances, TableStruct_scene_2eproto::offsets,
   file_level_metadata_scene_2eproto, 1, file_level_enum_descriptors_scene_2eproto, file_level_service_descriptors_scene_2eproto,
 };
@@ -119,17 +124,30 @@ constexpr int SceneProto::StructureType_ARRAYSIZE;
 // ===================================================================
 
 void SceneProto::InitAsDefaultInstance() {
+  ::e8::_SceneProto_default_instance_._instance.get_mutable()->camera_ = const_cast< ::e8::Camera*>(
+      ::e8::Camera::internal_default_instance());
   ::e8::_SceneProto_default_instance_._instance.get_mutable()->scene_objects_ = const_cast< ::e8::SceneObjectCollection*>(
       ::e8::SceneObjectCollection::internal_default_instance());
 }
 class SceneProto::_Internal {
  public:
+  static const ::e8::Camera& camera(const SceneProto* msg);
   static const ::e8::SceneObjectCollection& scene_objects(const SceneProto* msg);
 };
 
+const ::e8::Camera&
+SceneProto::_Internal::camera(const SceneProto* msg) {
+  return *msg->camera_;
+}
 const ::e8::SceneObjectCollection&
 SceneProto::_Internal::scene_objects(const SceneProto* msg) {
   return *msg->scene_objects_;
+}
+void SceneProto::clear_camera() {
+  if (GetArena() == nullptr && camera_ != nullptr) {
+    delete camera_;
+  }
+  camera_ = nullptr;
 }
 void SceneProto::clear_scene_objects() {
   if (GetArena() == nullptr && scene_objects_ != nullptr) {
@@ -163,6 +181,11 @@ SceneProto::SceneProto(const SceneProto& from)
     name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_name(),
       GetArena());
   }
+  if (from._internal_has_camera()) {
+    camera_ = new ::e8::Camera(*from.camera_);
+  } else {
+    camera_ = nullptr;
+  }
   if (from._internal_has_scene_objects()) {
     scene_objects_ = new ::e8::SceneObjectCollection(*from.scene_objects_);
   } else {
@@ -176,9 +199,9 @@ void SceneProto::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_SceneProto_scene_2eproto.base);
   id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  ::memset(&scene_objects_, 0, static_cast<size_t>(
+  ::memset(&camera_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&structure_type_) -
-      reinterpret_cast<char*>(&scene_objects_)) + sizeof(structure_type_));
+      reinterpret_cast<char*>(&camera_)) + sizeof(structure_type_));
 }
 
 SceneProto::~SceneProto() {
@@ -191,6 +214,7 @@ void SceneProto::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
   id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (this != internal_default_instance()) delete camera_;
   if (this != internal_default_instance()) delete scene_objects_;
 }
 
@@ -219,6 +243,10 @@ void SceneProto::Clear() {
   precedural_objects_.Clear();
   id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   name_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (GetArena() == nullptr && camera_ != nullptr) {
+    delete camera_;
+  }
+  camera_ = nullptr;
   if (GetArena() == nullptr && scene_objects_ != nullptr) {
     delete scene_objects_;
   }
@@ -271,23 +299,30 @@ const char* SceneProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
           ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
-      // .e8.SceneObjectCollection scene_objects = 5;
+      // .e8.Camera camera = 5;
       case 5:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
+          ptr = ctx->ParseMessage(_internal_mutable_camera(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .e8.SceneObjectCollection scene_objects = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
           ptr = ctx->ParseMessage(_internal_mutable_scene_objects(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // repeated .e8.ProceduralObjectProto precedural_objects = 6;
-      case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+      // repeated .e8.ProceduralObjectProto precedural_objects = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
           ptr -= 1;
           do {
             ptr += 1;
             ptr = ctx->ParseMessage(_internal_add_precedural_objects(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<50>(ptr));
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<58>(ptr));
         } else goto handle_unusual;
         continue;
       default: {
@@ -350,20 +385,28 @@ failure:
     target = stream->WriteFixedPacked(4, _internal_background_color(), target);
   }
 
-  // .e8.SceneObjectCollection scene_objects = 5;
+  // .e8.Camera camera = 5;
+  if (this->has_camera()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        5, _Internal::camera(this), target, stream);
+  }
+
+  // .e8.SceneObjectCollection scene_objects = 6;
   if (this->has_scene_objects()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(
-        5, _Internal::scene_objects(this), target, stream);
+        6, _Internal::scene_objects(this), target, stream);
   }
 
-  // repeated .e8.ProceduralObjectProto precedural_objects = 6;
+  // repeated .e8.ProceduralObjectProto precedural_objects = 7;
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->_internal_precedural_objects_size()); i < n; i++) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(6, this->_internal_precedural_objects(i), target, stream);
+      InternalWriteMessage(7, this->_internal_precedural_objects(i), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -397,7 +440,7 @@ size_t SceneProto::ByteSizeLong() const {
     total_size += data_size;
   }
 
-  // repeated .e8.ProceduralObjectProto precedural_objects = 6;
+  // repeated .e8.ProceduralObjectProto precedural_objects = 7;
   total_size += 1UL * this->_internal_precedural_objects_size();
   for (const auto& msg : this->precedural_objects_) {
     total_size +=
@@ -418,7 +461,14 @@ size_t SceneProto::ByteSizeLong() const {
         this->_internal_name());
   }
 
-  // .e8.SceneObjectCollection scene_objects = 5;
+  // .e8.Camera camera = 5;
+  if (this->has_camera()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *camera_);
+  }
+
+  // .e8.SceneObjectCollection scene_objects = 6;
   if (this->has_scene_objects()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
@@ -470,6 +520,9 @@ void SceneProto::MergeFrom(const SceneProto& from) {
   if (from.name().size() > 0) {
     _internal_set_name(from._internal_name());
   }
+  if (from.has_camera()) {
+    _internal_mutable_camera()->::e8::Camera::MergeFrom(from._internal_camera());
+  }
   if (from.has_scene_objects()) {
     _internal_mutable_scene_objects()->::e8::SceneObjectCollection::MergeFrom(from._internal_scene_objects());
   }
@@ -506,9 +559,9 @@ void SceneProto::InternalSwap(SceneProto* other) {
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(SceneProto, structure_type_)
       + sizeof(SceneProto::structure_type_)
-      - PROTOBUF_FIELD_OFFSET(SceneProto, scene_objects_)>(
-          reinterpret_cast<char*>(&scene_objects_),
-          reinterpret_cast<char*>(&other->scene_objects_));
+      - PROTOBUF_FIELD_OFFSET(SceneProto, camera_)>(
+          reinterpret_cast<char*>(&camera_),
+          reinterpret_cast<char*>(&other->camera_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata SceneProto::GetMetadata() const {

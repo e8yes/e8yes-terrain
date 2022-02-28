@@ -19,6 +19,7 @@ syntax = "proto3";
 
 package e8;
 
+import "camera.proto";
 import "procedural_object.proto";
 import "scene_object.proto";
 
@@ -48,12 +49,15 @@ message SceneProto {
     // To distinguish which scene sub-class should be used for the content.
     StructureType structure_type = 3;
 
-    // The backgr0und color of the scene. The array has exactly 3 elements.
+    // The background color of the scene. The array has exactly 3 elements.
     repeated float background_color = 4;
 
+    // The camera setup.
+    Camera camera = 5;
+
     // A collection of all scene objects.
-    SceneObjectCollection scene_objects = 5;
+    SceneObjectCollection scene_objects = 6;
 
     // A collection of all procedural objects.
-    repeated ProceduralObjectProto precedural_objects = 6;
+    repeated ProceduralObjectProto precedural_objects = 7;
 }

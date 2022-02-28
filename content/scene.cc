@@ -108,6 +108,7 @@ Scene::WriteAccess::~WriteAccess() {
 
 Scene::Scene(SceneProto::StructureType structure_type, std::string const &name)
     : id(GenerateUuid()), name(name), structure_type(structure_type) {
+    this->CreateDefaultCamera();
     this->CreateSceneEntityStructure();
 }
 
@@ -126,10 +127,22 @@ Scene::Scene(SceneProto const &proto)
     }
     entity_structure_->Optimize();
 
-    background_color_ = ToVec3(proto.background_color());
+    background_color = ToVec3(proto.background_color());
+    camera = proto.camera();
 }
 
 Scene::~Scene() {}
+
+void Scene::CreateDefaultCamera() {
+    camera.set_id(GenerateUuid());
+    *camera.mutable_position() = e8::ToProto(vec3{0, 0, 0});
+    *camera.mutable_rotation() = e8::ToProto(vec3{0, 0, 0});
+    camera.set_focal_length(35);
+    camera.set_sensor_width(36);
+    camera.set_sensor_height(34);
+    camera.set_image_width(1024);
+    camera.set_max_distance(1000);
+}
 
 void Scene::CreateSceneEntityStructure() {
     switch (structure_type) {
@@ -188,17 +201,14 @@ std::map<SceneObjectId, SceneObject> const &Scene::AllRootSceneObjects() const {
     return root_scene_objects_;
 }
 
-void Scene::UpdateBackgroundColor(vec3 const &color) { background_color_ = color; }
-
-vec3 Scene::BackgroundColor() const { return background_color_; }
-
 SceneProto Scene::ToProto() const {
     SceneProto proto;
 
     proto.set_id(id);
     proto.set_name(name);
     proto.set_structure_type(structure_type);
-    *proto.mutable_background_color() = e8::ToProto(background_color_);
+    *proto.mutable_background_color() = e8::ToProto(background_color);
+    *proto.mutable_camera() = camera;
     *proto.mutable_precedural_objects() = e8::ToProto(procedural_objects_);
     *proto.mutable_scene_objects() = e8::ToProto(root_scene_objects_);
 

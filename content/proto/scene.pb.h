@@ -33,6 +33,7 @@
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
+#include "camera.pb.h"
 #include "procedural_object.pb.h"
 #include "scene_object.pb.h"
 // @@protoc_insertion_point(includes)
@@ -241,10 +242,11 @@ class SceneProto PROTOBUF_FINAL :
 
   enum : int {
     kBackgroundColorFieldNumber = 4,
-    kPreceduralObjectsFieldNumber = 6,
+    kPreceduralObjectsFieldNumber = 7,
     kIdFieldNumber = 1,
     kNameFieldNumber = 2,
-    kSceneObjectsFieldNumber = 5,
+    kCameraFieldNumber = 5,
+    kSceneObjectsFieldNumber = 6,
     kStructureTypeFieldNumber = 3,
   };
   // repeated float background_color = 4;
@@ -269,7 +271,7 @@ class SceneProto PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
       mutable_background_color();
 
-  // repeated .e8.ProceduralObjectProto precedural_objects = 6;
+  // repeated .e8.ProceduralObjectProto precedural_objects = 7;
   int precedural_objects_size() const;
   private:
   int _internal_precedural_objects_size() const;
@@ -337,7 +339,25 @@ class SceneProto PROTOBUF_FINAL :
   std::string* _internal_mutable_name();
   public:
 
-  // .e8.SceneObjectCollection scene_objects = 5;
+  // .e8.Camera camera = 5;
+  bool has_camera() const;
+  private:
+  bool _internal_has_camera() const;
+  public:
+  void clear_camera();
+  const ::e8::Camera& camera() const;
+  ::e8::Camera* release_camera();
+  ::e8::Camera* mutable_camera();
+  void set_allocated_camera(::e8::Camera* camera);
+  private:
+  const ::e8::Camera& _internal_camera() const;
+  ::e8::Camera* _internal_mutable_camera();
+  public:
+  void unsafe_arena_set_allocated_camera(
+      ::e8::Camera* camera);
+  ::e8::Camera* unsafe_arena_release_camera();
+
+  // .e8.SceneObjectCollection scene_objects = 6;
   bool has_scene_objects() const;
   private:
   bool _internal_has_scene_objects() const;
@@ -376,6 +396,7 @@ class SceneProto PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::ProceduralObjectProto > precedural_objects_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr id_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
+  ::e8::Camera* camera_;
   ::e8::SceneObjectCollection* scene_objects_;
   int structure_type_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -621,7 +642,82 @@ SceneProto::mutable_background_color() {
   return _internal_mutable_background_color();
 }
 
-// .e8.SceneObjectCollection scene_objects = 5;
+// .e8.Camera camera = 5;
+inline bool SceneProto::_internal_has_camera() const {
+  return this != internal_default_instance() && camera_ != nullptr;
+}
+inline bool SceneProto::has_camera() const {
+  return _internal_has_camera();
+}
+inline const ::e8::Camera& SceneProto::_internal_camera() const {
+  const ::e8::Camera* p = camera_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::e8::Camera*>(
+      &::e8::_Camera_default_instance_);
+}
+inline const ::e8::Camera& SceneProto::camera() const {
+  // @@protoc_insertion_point(field_get:e8.SceneProto.camera)
+  return _internal_camera();
+}
+inline void SceneProto::unsafe_arena_set_allocated_camera(
+    ::e8::Camera* camera) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(camera_);
+  }
+  camera_ = camera;
+  if (camera) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneProto.camera)
+}
+inline ::e8::Camera* SceneProto::release_camera() {
+  auto temp = unsafe_arena_release_camera();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::e8::Camera* SceneProto::unsafe_arena_release_camera() {
+  // @@protoc_insertion_point(field_release:e8.SceneProto.camera)
+  
+  ::e8::Camera* temp = camera_;
+  camera_ = nullptr;
+  return temp;
+}
+inline ::e8::Camera* SceneProto::_internal_mutable_camera() {
+  
+  if (camera_ == nullptr) {
+    auto* p = CreateMaybeMessage<::e8::Camera>(GetArena());
+    camera_ = p;
+  }
+  return camera_;
+}
+inline ::e8::Camera* SceneProto::mutable_camera() {
+  // @@protoc_insertion_point(field_mutable:e8.SceneProto.camera)
+  return _internal_mutable_camera();
+}
+inline void SceneProto::set_allocated_camera(::e8::Camera* camera) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(camera_);
+  }
+  if (camera) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(camera)->GetArena();
+    if (message_arena != submessage_arena) {
+      camera = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, camera, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  camera_ = camera;
+  // @@protoc_insertion_point(field_set_allocated:e8.SceneProto.camera)
+}
+
+// .e8.SceneObjectCollection scene_objects = 6;
 inline bool SceneProto::_internal_has_scene_objects() const {
   return this != internal_default_instance() && scene_objects_ != nullptr;
 }
@@ -696,7 +792,7 @@ inline void SceneProto::set_allocated_scene_objects(::e8::SceneObjectCollection*
   // @@protoc_insertion_point(field_set_allocated:e8.SceneProto.scene_objects)
 }
 
-// repeated .e8.ProceduralObjectProto precedural_objects = 6;
+// repeated .e8.ProceduralObjectProto precedural_objects = 7;
 inline int SceneProto::_internal_precedural_objects_size() const {
   return precedural_objects_.size();
 }
