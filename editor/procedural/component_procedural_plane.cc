@@ -17,6 +17,8 @@
 
 #include <QAction>
 #include <QObject>
+#include <algorithm>
+#include <memory>
 
 #include "content/procedural_basic.h"
 #include "content/scene.h"
@@ -47,8 +49,9 @@ void ProceduralPlaneComponent::OnClickAddProceduralPlane() {
     {
         Scene::WriteAccess write_access = context_->scene->GainWriteAccess();
 
-        ProceduralPlane plane(kPlaneObjectName, /*width=*/1, /*height=*/1, /*cell_area=*/0.1);
-        context_->scene->AddRootSceneObject(plane.ToSceneObject());
+        auto plane = std::make_unique<ProceduralPlane>(kPlaneObjectName, /*width=*/1, /*height=*/1,
+                                                       /*cell_area=*/1);
+        context_->scene->AddProceduralObject(std::move(plane));
     }
 
     modification_monitor_comp_->OnModifyScene();

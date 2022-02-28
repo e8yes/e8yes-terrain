@@ -33,6 +33,7 @@
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
+#include "procedural_object.pb.h"
 #include "scene_object.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
@@ -240,9 +241,10 @@ class SceneProto PROTOBUF_FINAL :
 
   enum : int {
     kBackgroundColorFieldNumber = 4,
+    kPreceduralObjectsFieldNumber = 6,
     kIdFieldNumber = 1,
     kNameFieldNumber = 2,
-    kObjectsFieldNumber = 5,
+    kSceneObjectsFieldNumber = 5,
     kStructureTypeFieldNumber = 3,
   };
   // repeated float background_color = 4;
@@ -266,6 +268,24 @@ class SceneProto PROTOBUF_FINAL :
       background_color() const;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
       mutable_background_color();
+
+  // repeated .e8.ProceduralObjectProto precedural_objects = 6;
+  int precedural_objects_size() const;
+  private:
+  int _internal_precedural_objects_size() const;
+  public:
+  void clear_precedural_objects();
+  ::e8::ProceduralObjectProto* mutable_precedural_objects(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::ProceduralObjectProto >*
+      mutable_precedural_objects();
+  private:
+  const ::e8::ProceduralObjectProto& _internal_precedural_objects(int index) const;
+  ::e8::ProceduralObjectProto* _internal_add_precedural_objects();
+  public:
+  const ::e8::ProceduralObjectProto& precedural_objects(int index) const;
+  ::e8::ProceduralObjectProto* add_precedural_objects();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::ProceduralObjectProto >&
+      precedural_objects() const;
 
   // string id = 1;
   void clear_id();
@@ -317,23 +337,23 @@ class SceneProto PROTOBUF_FINAL :
   std::string* _internal_mutable_name();
   public:
 
-  // .e8.SceneObjectCollection objects = 5;
-  bool has_objects() const;
+  // .e8.SceneObjectCollection scene_objects = 5;
+  bool has_scene_objects() const;
   private:
-  bool _internal_has_objects() const;
+  bool _internal_has_scene_objects() const;
   public:
-  void clear_objects();
-  const ::e8::SceneObjectCollection& objects() const;
-  ::e8::SceneObjectCollection* release_objects();
-  ::e8::SceneObjectCollection* mutable_objects();
-  void set_allocated_objects(::e8::SceneObjectCollection* objects);
+  void clear_scene_objects();
+  const ::e8::SceneObjectCollection& scene_objects() const;
+  ::e8::SceneObjectCollection* release_scene_objects();
+  ::e8::SceneObjectCollection* mutable_scene_objects();
+  void set_allocated_scene_objects(::e8::SceneObjectCollection* scene_objects);
   private:
-  const ::e8::SceneObjectCollection& _internal_objects() const;
-  ::e8::SceneObjectCollection* _internal_mutable_objects();
+  const ::e8::SceneObjectCollection& _internal_scene_objects() const;
+  ::e8::SceneObjectCollection* _internal_mutable_scene_objects();
   public:
-  void unsafe_arena_set_allocated_objects(
-      ::e8::SceneObjectCollection* objects);
-  ::e8::SceneObjectCollection* unsafe_arena_release_objects();
+  void unsafe_arena_set_allocated_scene_objects(
+      ::e8::SceneObjectCollection* scene_objects);
+  ::e8::SceneObjectCollection* unsafe_arena_release_scene_objects();
 
   // .e8.SceneProto.StructureType structure_type = 3;
   void clear_structure_type();
@@ -353,9 +373,10 @@ class SceneProto PROTOBUF_FINAL :
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > background_color_;
   mutable std::atomic<int> _background_color_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::ProceduralObjectProto > precedural_objects_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr id_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
-  ::e8::SceneObjectCollection* objects_;
+  ::e8::SceneObjectCollection* scene_objects_;
   int structure_type_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_scene_2eproto;
@@ -600,79 +621,115 @@ SceneProto::mutable_background_color() {
   return _internal_mutable_background_color();
 }
 
-// .e8.SceneObjectCollection objects = 5;
-inline bool SceneProto::_internal_has_objects() const {
-  return this != internal_default_instance() && objects_ != nullptr;
+// .e8.SceneObjectCollection scene_objects = 5;
+inline bool SceneProto::_internal_has_scene_objects() const {
+  return this != internal_default_instance() && scene_objects_ != nullptr;
 }
-inline bool SceneProto::has_objects() const {
-  return _internal_has_objects();
+inline bool SceneProto::has_scene_objects() const {
+  return _internal_has_scene_objects();
 }
-inline const ::e8::SceneObjectCollection& SceneProto::_internal_objects() const {
-  const ::e8::SceneObjectCollection* p = objects_;
+inline const ::e8::SceneObjectCollection& SceneProto::_internal_scene_objects() const {
+  const ::e8::SceneObjectCollection* p = scene_objects_;
   return p != nullptr ? *p : *reinterpret_cast<const ::e8::SceneObjectCollection*>(
       &::e8::_SceneObjectCollection_default_instance_);
 }
-inline const ::e8::SceneObjectCollection& SceneProto::objects() const {
-  // @@protoc_insertion_point(field_get:e8.SceneProto.objects)
-  return _internal_objects();
+inline const ::e8::SceneObjectCollection& SceneProto::scene_objects() const {
+  // @@protoc_insertion_point(field_get:e8.SceneProto.scene_objects)
+  return _internal_scene_objects();
 }
-inline void SceneProto::unsafe_arena_set_allocated_objects(
-    ::e8::SceneObjectCollection* objects) {
+inline void SceneProto::unsafe_arena_set_allocated_scene_objects(
+    ::e8::SceneObjectCollection* scene_objects) {
   if (GetArena() == nullptr) {
-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(objects_);
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(scene_objects_);
   }
-  objects_ = objects;
-  if (objects) {
+  scene_objects_ = scene_objects;
+  if (scene_objects) {
     
   } else {
     
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneProto.objects)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneProto.scene_objects)
 }
-inline ::e8::SceneObjectCollection* SceneProto::release_objects() {
-  auto temp = unsafe_arena_release_objects();
+inline ::e8::SceneObjectCollection* SceneProto::release_scene_objects() {
+  auto temp = unsafe_arena_release_scene_objects();
   if (GetArena() != nullptr) {
     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
   }
   return temp;
 }
-inline ::e8::SceneObjectCollection* SceneProto::unsafe_arena_release_objects() {
-  // @@protoc_insertion_point(field_release:e8.SceneProto.objects)
+inline ::e8::SceneObjectCollection* SceneProto::unsafe_arena_release_scene_objects() {
+  // @@protoc_insertion_point(field_release:e8.SceneProto.scene_objects)
   
-  ::e8::SceneObjectCollection* temp = objects_;
-  objects_ = nullptr;
+  ::e8::SceneObjectCollection* temp = scene_objects_;
+  scene_objects_ = nullptr;
   return temp;
 }
-inline ::e8::SceneObjectCollection* SceneProto::_internal_mutable_objects() {
+inline ::e8::SceneObjectCollection* SceneProto::_internal_mutable_scene_objects() {
   
-  if (objects_ == nullptr) {
+  if (scene_objects_ == nullptr) {
     auto* p = CreateMaybeMessage<::e8::SceneObjectCollection>(GetArena());
-    objects_ = p;
+    scene_objects_ = p;
   }
-  return objects_;
+  return scene_objects_;
 }
-inline ::e8::SceneObjectCollection* SceneProto::mutable_objects() {
-  // @@protoc_insertion_point(field_mutable:e8.SceneProto.objects)
-  return _internal_mutable_objects();
+inline ::e8::SceneObjectCollection* SceneProto::mutable_scene_objects() {
+  // @@protoc_insertion_point(field_mutable:e8.SceneProto.scene_objects)
+  return _internal_mutable_scene_objects();
 }
-inline void SceneProto::set_allocated_objects(::e8::SceneObjectCollection* objects) {
+inline void SceneProto::set_allocated_scene_objects(::e8::SceneObjectCollection* scene_objects) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
   if (message_arena == nullptr) {
-    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(objects_);
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(scene_objects_);
   }
-  if (objects) {
+  if (scene_objects) {
     ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
-      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(objects)->GetArena();
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(scene_objects)->GetArena();
     if (message_arena != submessage_arena) {
-      objects = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
-          message_arena, objects, submessage_arena);
+      scene_objects = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, scene_objects, submessage_arena);
     }
     
   } else {
     
   }
-  objects_ = objects;
-  // @@protoc_insertion_point(field_set_allocated:e8.SceneProto.objects)
+  scene_objects_ = scene_objects;
+  // @@protoc_insertion_point(field_set_allocated:e8.SceneProto.scene_objects)
+}
+
+// repeated .e8.ProceduralObjectProto precedural_objects = 6;
+inline int SceneProto::_internal_precedural_objects_size() const {
+  return precedural_objects_.size();
+}
+inline int SceneProto::precedural_objects_size() const {
+  return _internal_precedural_objects_size();
+}
+inline ::e8::ProceduralObjectProto* SceneProto::mutable_precedural_objects(int index) {
+  // @@protoc_insertion_point(field_mutable:e8.SceneProto.precedural_objects)
+  return precedural_objects_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::ProceduralObjectProto >*
+SceneProto::mutable_precedural_objects() {
+  // @@protoc_insertion_point(field_mutable_list:e8.SceneProto.precedural_objects)
+  return &precedural_objects_;
+}
+inline const ::e8::ProceduralObjectProto& SceneProto::_internal_precedural_objects(int index) const {
+  return precedural_objects_.Get(index);
+}
+inline const ::e8::ProceduralObjectProto& SceneProto::precedural_objects(int index) const {
+  // @@protoc_insertion_point(field_get:e8.SceneProto.precedural_objects)
+  return _internal_precedural_objects(index);
+}
+inline ::e8::ProceduralObjectProto* SceneProto::_internal_add_precedural_objects() {
+  return precedural_objects_.Add();
+}
+inline ::e8::ProceduralObjectProto* SceneProto::add_precedural_objects() {
+  // @@protoc_insertion_point(field_add:e8.SceneProto.precedural_objects)
+  return _internal_add_precedural_objects();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::ProceduralObjectProto >&
+SceneProto::precedural_objects() const {
+  // @@protoc_insertion_point(field_list:e8.SceneProto.precedural_objects)
+  return precedural_objects_;
 }
 
 #ifdef __GNUC__

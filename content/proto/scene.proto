@@ -19,6 +19,7 @@ syntax = "proto3";
 
 package e8;
 
+import "procedural_object.proto";
 import "scene_object.proto";
 
 /**
@@ -51,5 +52,8 @@ message SceneProto {
     repeated float background_color = 4;
 
     // A collection of all scene objects.
-    SceneObjectCollection objects = 5;
+    SceneObjectCollection scene_objects = 5;
+
+    // A collection of all procedural objects.
+    repeated ProceduralObjectProto precedural_objects = 6;
 }

@@ -114,13 +114,15 @@ struct SceneObject {
 
 /**
  * @brief ToProto Transforms a collection of scene objects to a SceneObjectCollection message. See
- * the proto definition for what it is.
+ * the proto definition for what it is. Note, for procedural objects, only the root procedural node
+ * will be put into the protobuf message.
  */
 SceneObjectCollection ToProto(std::map<SceneObjectId, SceneObject> const &scene_objects);
 
 /**
  * @brief ToSceneObjects Transforms a proto description of a collection of scene objects back to an
- * in-memory SceneObject collection.
+ * in-memory SceneObject collection. Note, procedural scene entities will not be restored in the
+ * result map. Only the procedural ID is set.
  */
 std::map<SceneObjectId, SceneObject> ToSceneObjects(SceneObjectCollection const &proto);
 

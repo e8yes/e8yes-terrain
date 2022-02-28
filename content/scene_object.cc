@@ -35,6 +35,10 @@ namespace e8 {
 
 void CollectGeometries(SceneObject const &scene_object,
                        google::protobuf::Map<GeometryId, GeometryLod> *geometries) {
+    if (scene_object.Procedural()) {
+        return;
+    }
+
     if (scene_object.HasSceneEntityChildren()) {
         for (auto const &child_entity : scene_object.child_scene_entities) {
             if (child_entity.geometry_lod_instance == nullptr) {
@@ -62,7 +66,9 @@ SceneObject::SceneObject(
     std::unordered_map<GeometryId, std::shared_ptr<GeometryLod>> const &geometries)
     : id(proto.id()), name(proto.name()) {
     if (!proto.procedural_object_id().empty()) {
+        // Procedural children won't be read from the protobuf message.
         procedural_object_id = proto.procedural_object_id();
+        return;
     }
 
     if (proto.has_scene_object_children()) {
@@ -102,7 +108,9 @@ SceneObjectProto SceneObject::ToProto() const {
     proto.set_id(id);
     proto.set_name(name);
     if (procedural_object_id.has_value()) {
+        // Procedural children will not be put into the protobuf message.
         proto.set_procedural_object_id(*procedural_object_id);
+        return proto;
     }
 
     if (this->HasSceneObjectChildren()) {

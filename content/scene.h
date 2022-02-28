@@ -23,6 +23,7 @@
 #include <shared_mutex>
 #include <string>
 
+#include "content/procedural_object.h"
 #include "content/proto/scene.pb.h"
 #include "content/proto/scene_object.pb.h"
 #include "content/scene_object.h"
@@ -123,6 +124,11 @@ class Scene {
     bool DeleteRootSceneObject(SceneObjectId const &id);
 
     /**
+     * @brief AddProceduralObject
+     */
+    bool AddProceduralObject(std::unique_ptr<ProceduralObjectInterface> &&procedural_object);
+
+    /**
      * @brief AllRootSceneObjects Returns a list of all root scene objects added to the scene.
      */
     std::map<SceneObjectId, SceneObject> const &AllRootSceneObjects() const;
@@ -157,6 +163,7 @@ class Scene {
 
     std::shared_mutex mu_;
 
+    std::map<ProceduralObjectId, std::unique_ptr<ProceduralObjectInterface>> procedural_objects_;
     std::map<SceneObjectId, SceneObject> root_scene_objects_;
     std::unique_ptr<SceneEntityStructureInterface> entity_structure_;
     vec3 background_color_;

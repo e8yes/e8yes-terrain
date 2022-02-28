@@ -19,11 +19,14 @@
 #include <cassert>
 #include <functional>
 #include <map>
+#include <memory>
 #include <shared_mutex>
 #include <string>
 
 #include "common/tensor.h"
 #include "content/common.h"
+#include "content/procedural_object.h"
+#include "content/proto/scene.pb.h"
 #include "content/proto/scene_object.pb.h"
 #include "content/scene.h"
 #include "content/scene_entity.h"
@@ -34,6 +37,26 @@
 
 namespace e8 {
 namespace {
+
+void FillProceduralObject(
+    SceneObject *scene_object,
+    std::map<ProceduralObjectId, std::unique_ptr<ProceduralObjectInterface>> const
+        &procedural_objects) {
+    if (scene_object->HasSceneEntityChildren()) {
+        return;
+    }
+
+    if (scene_object->Procedural()) {
+        // Replaces a procedural node with a generated scene object.
+        auto const &procedural_object = procedural_objects.at(*scene_object->procedural_object_id);
+        *scene_object = procedural_object->ToSceneObject();
+        return;
+    }
+
+    for (auto &child_object : scene_object->child_scene_objects) {
+        FillProceduralObject(&child_object, procedural_objects);
+    }
+}
 
 void CollectSceneEntityToStructure(SceneObject const &scene_object, bool add,
                                    SceneEntityStructureInterface *structure) {
@@ -90,7 +113,12 @@ Scene::Scene(SceneProto::StructureType structure_type, std::string const &name)
 
 Scene::Scene(SceneProto const &proto)
     : id(proto.id()), name(proto.name()), structure_type(proto.structure_type()) {
-    root_scene_objects_ = ToSceneObjects(proto.objects());
+    procedural_objects_ = ToProceduralObjects(proto.precedural_objects());
+
+    root_scene_objects_ = ToSceneObjects(proto.scene_objects());
+    for (auto &[_, root_scene_object] : root_scene_objects_) {
+        FillProceduralObject(&root_scene_object, procedural_objects_);
+    }
 
     this->CreateSceneEntityStructure();
     for (auto const &[_, root_scene_object] : root_scene_objects_) {
@@ -144,6 +172,18 @@ bool Scene::DeleteRootSceneObject(SceneObjectId const &id) {
     return true;
 }
 
+bool Scene::AddProceduralObject(std::unique_ptr<ProceduralObjectInterface> &&procedural_object) {
+    auto it = procedural_objects_.find(procedural_object->id);
+    if (it != procedural_objects_.end()) {
+        return false;
+    }
+    it = procedural_objects_
+             .insert(std::make_pair(procedural_object->id, std::move(procedural_object)))
+             .first;
+    this->AddRootSceneObject(it->second->ToSceneObject());
+    return true;
+}
+
 std::map<SceneObjectId, SceneObject> const &Scene::AllRootSceneObjects() const {
     return root_scene_objects_;
 }
@@ -158,8 +198,9 @@ SceneProto Scene::ToProto() const {
     proto.set_id(id);
     proto.set_name(name);
     proto.set_structure_type(structure_type);
-    *proto.mutable_objects() = e8::ToProto(root_scene_objects_);
     *proto.mutable_background_color() = e8::ToProto(background_color_);
+    *proto.mutable_precedural_objects() = e8::ToProto(procedural_objects_);
+    *proto.mutable_scene_objects() = e8::ToProto(root_scene_objects_);
 
     return proto;
 }

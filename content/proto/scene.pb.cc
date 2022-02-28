@@ -14,6 +14,7 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
+extern PROTOBUF_INTERNAL_EXPORT_procedural_5fobject_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_ProceduralObjectProto_procedural_5fobject_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_scene_5fobject_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<3> scc_info_SceneObjectCollection_scene_5fobject_2eproto;
 namespace e8 {
 class SceneProtoDefaultTypeInternal {
@@ -32,9 +33,10 @@ static void InitDefaultsscc_info_SceneProto_scene_2eproto() {
   ::e8::SceneProto::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_SceneProto_scene_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_SceneProto_scene_2eproto}, {
-      &scc_info_SceneObjectCollection_scene_5fobject_2eproto.base,}};
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_SceneProto_scene_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 2, 0, InitDefaultsscc_info_SceneProto_scene_2eproto}, {
+      &scc_info_SceneObjectCollection_scene_5fobject_2eproto.base,
+      &scc_info_ProceduralObjectProto_procedural_5fobject_2eproto.base,}};
 
 static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_scene_2eproto[1];
 static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_scene_2eproto[1];
@@ -50,7 +52,8 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_scene_2eproto::offsets[] PROTO
   PROTOBUF_FIELD_OFFSET(::e8::SceneProto, name_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneProto, structure_type_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneProto, background_color_),
-  PROTOBUF_FIELD_OFFSET(::e8::SceneProto, objects_),
+  PROTOBUF_FIELD_OFFSET(::e8::SceneProto, scene_objects_),
+  PROTOBUF_FIELD_OFFSET(::e8::SceneProto, precedural_objects_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::e8::SceneProto)},
@@ -61,15 +64,18 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_scene_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\013scene.proto\022\002e8\032\022scene_object.proto\"\330\001"
-  "\n\nSceneProto\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\0224"
-  "\n\016structure_type\030\003 \001(\0162\034.e8.SceneProto.S"
-  "tructureType\022\030\n\020background_color\030\004 \003(\002\022*"
-  "\n\007objects\030\005 \001(\0132\031.e8.SceneObjectCollecti"
-  "on\"4\n\rStructureType\022\013\n\007INVALID\020\000\022\n\n\006LINE"
-  "AR\020\001\022\n\n\006OCTREE\020\002b\006proto3"
+  "\n\013scene.proto\022\002e8\032\027procedural_object.pro"
+  "to\032\022scene_object.proto\"\225\002\n\nSceneProto\022\n\n"
+  "\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\0224\n\016structure_typ"
+  "e\030\003 \001(\0162\034.e8.SceneProto.StructureType\022\030\n"
+  "\020background_color\030\004 \003(\002\0220\n\rscene_objects"
+  "\030\005 \001(\0132\031.e8.SceneObjectCollection\0225\n\022pre"
+  "cedural_objects\030\006 \003(\0132\031.e8.ProceduralObj"
+  "ectProto\"4\n\rStructureType\022\013\n\007INVALID\020\000\022\n"
+  "\n\006LINEAR\020\001\022\n\n\006OCTREE\020\002b\006proto3"
   ;
-static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_scene_2eproto_deps[1] = {
+static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_scene_2eproto_deps[2] = {
+  &::descriptor_table_procedural_5fobject_2eproto,
   &::descriptor_table_scene_5fobject_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_scene_2eproto_sccs[1] = {
@@ -77,8 +83,8 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_sce
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_scene_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_scene_2eproto = {
-  false, false, descriptor_table_protodef_scene_2eproto, "scene.proto", 264,
-  &descriptor_table_scene_2eproto_once, descriptor_table_scene_2eproto_sccs, descriptor_table_scene_2eproto_deps, 1, 1,
+  false, false, descriptor_table_protodef_scene_2eproto, "scene.proto", 350,
+  &descriptor_table_scene_2eproto_once, descriptor_table_scene_2eproto_sccs, descriptor_table_scene_2eproto_deps, 1, 2,
   schemas, file_default_instances, TableStruct_scene_2eproto::offsets,
   file_level_metadata_scene_2eproto, 1, file_level_enum_descriptors_scene_2eproto, file_level_service_descriptors_scene_2eproto,
 };
@@ -113,34 +119,39 @@ constexpr int SceneProto::StructureType_ARRAYSIZE;
 // ===================================================================
 
 void SceneProto::InitAsDefaultInstance() {
-  ::e8::_SceneProto_default_instance_._instance.get_mutable()->objects_ = const_cast< ::e8::SceneObjectCollection*>(
+  ::e8::_SceneProto_default_instance_._instance.get_mutable()->scene_objects_ = const_cast< ::e8::SceneObjectCollection*>(
       ::e8::SceneObjectCollection::internal_default_instance());
 }
 class SceneProto::_Internal {
  public:
-  static const ::e8::SceneObjectCollection& objects(const SceneProto* msg);
+  static const ::e8::SceneObjectCollection& scene_objects(const SceneProto* msg);
 };
 
 const ::e8::SceneObjectCollection&
-SceneProto::_Internal::objects(const SceneProto* msg) {
-  return *msg->objects_;
+SceneProto::_Internal::scene_objects(const SceneProto* msg) {
+  return *msg->scene_objects_;
 }
-void SceneProto::clear_objects() {
-  if (GetArena() == nullptr && objects_ != nullptr) {
-    delete objects_;
+void SceneProto::clear_scene_objects() {
+  if (GetArena() == nullptr && scene_objects_ != nullptr) {
+    delete scene_objects_;
   }
-  objects_ = nullptr;
+  scene_objects_ = nullptr;
+}
+void SceneProto::clear_precedural_objects() {
+  precedural_objects_.Clear();
 }
 SceneProto::SceneProto(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena),
-  background_color_(arena) {
+  background_color_(arena),
+  precedural_objects_(arena) {
   SharedCtor();
   RegisterArenaDtor(arena);
   // @@protoc_insertion_point(arena_constructor:e8.SceneProto)
 }
 SceneProto::SceneProto(const SceneProto& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
-      background_color_(from.background_color_) {
+      background_color_(from.background_color_),
+      precedural_objects_(from.precedural_objects_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_id().empty()) {
@@ -152,10 +163,10 @@ SceneProto::SceneProto(const SceneProto& from)
     name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_name(),
       GetArena());
   }
-  if (from._internal_has_objects()) {
-    objects_ = new ::e8::SceneObjectCollection(*from.objects_);
+  if (from._internal_has_scene_objects()) {
+    scene_objects_ = new ::e8::SceneObjectCollection(*from.scene_objects_);
   } else {
-    objects_ = nullptr;
+    scene_objects_ = nullptr;
   }
   structure_type_ = from.structure_type_;
   // @@protoc_insertion_point(copy_constructor:e8.SceneProto)
@@ -165,9 +176,9 @@ void SceneProto::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_SceneProto_scene_2eproto.base);
   id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  ::memset(&objects_, 0, static_cast<size_t>(
+  ::memset(&scene_objects_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&structure_type_) -
-      reinterpret_cast<char*>(&objects_)) + sizeof(structure_type_));
+      reinterpret_cast<char*>(&scene_objects_)) + sizeof(structure_type_));
 }
 
 SceneProto::~SceneProto() {
@@ -180,7 +191,7 @@ void SceneProto::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
   id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (this != internal_default_instance()) delete objects_;
+  if (this != internal_default_instance()) delete scene_objects_;
 }
 
 void SceneProto::ArenaDtor(void* object) {
@@ -205,12 +216,13 @@ void SceneProto::Clear() {
   (void) cached_has_bits;
 
   background_color_.Clear();
+  precedural_objects_.Clear();
   id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   name_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  if (GetArena() == nullptr && objects_ != nullptr) {
-    delete objects_;
+  if (GetArena() == nullptr && scene_objects_ != nullptr) {
+    delete scene_objects_;
   }
-  objects_ = nullptr;
+  scene_objects_ = nullptr;
   structure_type_ = 0;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
@@ -259,11 +271,23 @@ const char* SceneProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
           ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
-      // .e8.SceneObjectCollection objects = 5;
+      // .e8.SceneObjectCollection scene_objects = 5;
       case 5:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
-          ptr = ctx->ParseMessage(_internal_mutable_objects(), ptr);
+          ptr = ctx->ParseMessage(_internal_mutable_scene_objects(), ptr);
           CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // repeated .e8.ProceduralObjectProto precedural_objects = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_precedural_objects(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<50>(ptr));
         } else goto handle_unusual;
         continue;
       default: {
@@ -326,12 +350,20 @@ failure:
     target = stream->WriteFixedPacked(4, _internal_background_color(), target);
   }
 
-  // .e8.SceneObjectCollection objects = 5;
-  if (this->has_objects()) {
+  // .e8.SceneObjectCollection scene_objects = 5;
+  if (this->has_scene_objects()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(
-        5, _Internal::objects(this), target, stream);
+        5, _Internal::scene_objects(this), target, stream);
+  }
+
+  // repeated .e8.ProceduralObjectProto precedural_objects = 6;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_precedural_objects_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(6, this->_internal_precedural_objects(i), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -365,6 +397,13 @@ size_t SceneProto::ByteSizeLong() const {
     total_size += data_size;
   }
 
+  // repeated .e8.ProceduralObjectProto precedural_objects = 6;
+  total_size += 1UL * this->_internal_precedural_objects_size();
+  for (const auto& msg : this->precedural_objects_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
   // string id = 1;
   if (this->id().size() > 0) {
     total_size += 1 +
@@ -379,11 +418,11 @@ size_t SceneProto::ByteSizeLong() const {
         this->_internal_name());
   }
 
-  // .e8.SceneObjectCollection objects = 5;
-  if (this->has_objects()) {
+  // .e8.SceneObjectCollection scene_objects = 5;
+  if (this->has_scene_objects()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-        *objects_);
+        *scene_objects_);
   }
 
   // .e8.SceneProto.StructureType structure_type = 3;
@@ -424,14 +463,15 @@ void SceneProto::MergeFrom(const SceneProto& from) {
   (void) cached_has_bits;
 
   background_color_.MergeFrom(from.background_color_);
+  precedural_objects_.MergeFrom(from.precedural_objects_);
   if (from.id().size() > 0) {
     _internal_set_id(from._internal_id());
   }
   if (from.name().size() > 0) {
     _internal_set_name(from._internal_name());
   }
-  if (from.has_objects()) {
-    _internal_mutable_objects()->::e8::SceneObjectCollection::MergeFrom(from._internal_objects());
+  if (from.has_scene_objects()) {
+    _internal_mutable_scene_objects()->::e8::SceneObjectCollection::MergeFrom(from._internal_scene_objects());
   }
   if (from.structure_type() != 0) {
     _internal_set_structure_type(from._internal_structure_type());
@@ -460,14 +500,15 @@ void SceneProto::InternalSwap(SceneProto* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   background_color_.InternalSwap(&other->background_color_);
+  precedural_objects_.InternalSwap(&other->precedural_objects_);
   id_.Swap(&other->id_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   name_.Swap(&other->name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(SceneProto, structure_type_)
       + sizeof(SceneProto::structure_type_)
-      - PROTOBUF_FIELD_OFFSET(SceneProto, objects_)>(
-          reinterpret_cast<char*>(&objects_),
-          reinterpret_cast<char*>(&other->objects_));
+      - PROTOBUF_FIELD_OFFSET(SceneProto, scene_objects_)>(
+          reinterpret_cast<char*>(&scene_objects_),
+          reinterpret_cast<char*>(&other->scene_objects_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata SceneProto::GetMetadata() const {
