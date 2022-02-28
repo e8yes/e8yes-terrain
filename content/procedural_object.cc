@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 
+#include "content/common.h"
 #include "content/procedural_object.h"
 #include "content/proto/procedural_object.pb.h"
 #include "content/scene_entity.h"
@@ -26,7 +27,7 @@
 namespace e8 {
 
 ProceduralObjectInterface::ProceduralObjectInterface(ProceduralObjectName const &name)
-    : name(name), movable(true) {}
+    : id(GenerateUuid()), name(name), movable(true) {}
 
 ProceduralObjectInterface::ProceduralObjectInterface(ProceduralObjectProto const &proto)
     : id(proto.id()), name(proto.name()) {}

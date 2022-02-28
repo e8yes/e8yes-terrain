@@ -21,6 +21,7 @@ SOURCES += \
     basic/component_status.cc \
     basic/context.cc \
     environment/component_environment.cc \
+    procedural/component_procedural_plane.cc \
     scene/component_scene_closer.cc \
     scene/component_scene_loader.cc \
     scene/component_scene_saver.cc \
@@ -35,6 +36,7 @@ HEADERS += \
     basic/component_status.h \
     basic/context.h \
     environment/component_environment.h \
+    procedural/component_procedural_plane.h \
     scene/component_scene_closer.h \
     scene/component_scene_loader.h \
     scene/component_scene_saver.h \
@@ -43,6 +45,7 @@ HEADERS += \
     window_editor.h
 
 FORMS += \
+    procedural/component_procedural_plane.ui \
     window_editor.ui
 
 TRANSLATIONS += \

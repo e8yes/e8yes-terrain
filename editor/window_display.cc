@@ -19,6 +19,7 @@
 #include <cassert>
 #include <memory>
 
+#include "content/scene.h"
 #include "editor/basic/context.h"
 #include "editor/window_display.h"
 #include "renderer/context.h"
@@ -32,8 +33,9 @@ constexpr char const *kIslandsDisplayWindowTitle = "e8 islands display";
 void RunDisplayLoop(std::shared_ptr<EditorContext> const &editor_context,
                     SolidColorRenderer *renderer) {
     while (editor_context->running) {
-        if (editor_context->scene != nullptr) {
-            renderer->DrawFrame(editor_context->scene.get());
+        std::shared_ptr<Scene> acquired_scene = editor_context->scene;
+        if (acquired_scene != nullptr) {
+            renderer->DrawFrame(acquired_scene.get());
         }
 
         SDL_Event event;

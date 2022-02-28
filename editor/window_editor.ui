@@ -623,6 +623,15 @@ QCheckBox::indicator:disabled, QRadioButton::indicator:disabled
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::MultiSelection</enum>
+           </property>
+           <property name="selectionBehavior">
+            <enum>QAbstractItemView::SelectRows</enum>
+           </property>
            <property name="columnCount">
             <number>2</number>
            </property>

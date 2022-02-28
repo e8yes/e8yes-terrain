@@ -15,6 +15,7 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QCloseEvent>
 #include <QMainWindow>
 #include <QWidget>
 #include <memory>
@@ -25,6 +26,7 @@
 #include "editor/basic/component_status.h"
 #include "editor/basic/context.h"
 #include "editor/environment/component_environment.h"
+#include "editor/procedural/component_procedural_plane.h"
 #include "editor/scene/component_scene_closer.h"
 #include "editor/scene/component_scene_loader.h"
 #include "editor/scene/component_scene_saver.h"
@@ -55,6 +57,8 @@ IslandsEditorWindow::IslandsEditorWindow(std::shared_ptr<EditorContext> const &e
         editor_portal_switcher_comp_.get(), environment_comp_.get(),
         modification_monitor_comp_.get(), scene_saver_comp_.get(), scene_view_comp_.get(),
         editor_context.get());
+    procedural_plane_comp_ = std::make_unique<ProceduralPlaneComponent>(
+        modification_monitor_comp_.get(), scene_view_comp_.get(), editor_context.get());
 
     QAction::connect(editor_context_->ui->action_exit, &QAction::triggered, this,
                      &IslandsEditorWindow::close);

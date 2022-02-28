@@ -28,6 +28,7 @@
 #include "editor/basic/component_status.h"
 #include "editor/basic/context.h"
 #include "editor/environment/component_environment.h"
+#include "editor/procedural/component_procedural_plane.h"
 #include "editor/scene/component_scene_closer.h"
 #include "editor/scene/component_scene_loader.h"
 #include "editor/scene/component_scene_saver.h"
@@ -58,6 +59,7 @@ class IslandsEditorWindow : public QMainWindow {
     std::unique_ptr<SceneSaverComponent> scene_saver_comp_;
     std::unique_ptr<SceneCloserComponent> scene_closer_comp_;
     std::unique_ptr<SceneLoaderComponent> scene_loader_comp_;
+    std::unique_ptr<ProceduralPlaneComponent> procedural_plane_comp_;
 };
 
 /**

@@ -24,9 +24,9 @@
 #include <fstream>
 #include <memory>
 
-#include "content/structure_linear.h"
 #include "content/proto/scene.pb.h"
 #include "content/scene.h"
+#include "content/structure_linear.h"
 #include "editor/basic/component_editor_portal_switcher.h"
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/context.h"
@@ -51,7 +51,7 @@ bool CreateNewScene(SceneProto::StructureType structure_type,
         return false;
     }
 
-    context->scene = std::make_unique<Scene>(structure_type, kDefaultSceneName);
+    context->scene = std::make_shared<Scene>(structure_type, kDefaultSceneName);
 
     editor_portal_switcher_comp->SetEditorPortalEnabled(/*enabled=*/true);
     environment_comp->OnChangeScene();
@@ -81,7 +81,7 @@ bool LoadScene(std::string const &scene_file,
         return false;
     }
 
-    context->scene = std::make_unique<Scene>(proto);
+    context->scene = std::make_shared<Scene>(proto);
 
     editor_portal_switcher_comp->SetEditorPortalEnabled(/*enabled=*/true);
     environment_comp->OnChangeScene();

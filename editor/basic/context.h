@@ -40,7 +40,7 @@ struct EditorContext {
     std::unique_ptr<Ui::IslandsEditorWindow> ui;
 
     // The scene the editor is currently working on, it may be null.
-    std::unique_ptr<Scene> scene;
+    std::shared_ptr<Scene> scene;
 
     // Indicates if the editor is running.
     bool running;
