@@ -30,7 +30,7 @@
 #include "editor/basic/component_editor_portal_switcher.h"
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/context.h"
-#include "editor/environment/component_environment.h"
+#include "editor/environment/component_ambient.h"
 #include "editor/scene/component_scene_loader.h"
 #include "editor/scene/component_scene_saver.h"
 #include "editor/scene/component_scene_view.h"
@@ -40,9 +40,8 @@ namespace {
 
 constexpr char const *kDefaultSceneName = "Untitled";
 
-bool CreateNewScene(SceneProto::StructureType structure_type,
+bool CreateNewScene(SceneProto::StructureType structure_type, AmbientComponent *ambient_comp,
                     EditorPortalSwitcherComponent *editor_portal_switcher_comp,
-                    EnvironmentComponent *environment_comp,
                     ModificationMonitorComponent *modification_monitor_comp,
                     SceneViewComponent *scene_view_comp, EditorContext *context) {
     if (context->scene != nullptr) {
@@ -54,16 +53,15 @@ bool CreateNewScene(SceneProto::StructureType structure_type,
     context->scene = std::make_shared<Scene>(structure_type, kDefaultSceneName);
 
     editor_portal_switcher_comp->SetEditorPortalEnabled(/*enabled=*/true);
-    environment_comp->OnChangeScene();
+    ambient_comp->OnChangeScene();
     modification_monitor_comp->OnModifyScene();
     scene_view_comp->OnChangeScene();
 
     return true;
 }
 
-bool LoadScene(std::string const &scene_file,
+bool LoadScene(std::string const &scene_file, AmbientComponent *ambient_comp,
                EditorPortalSwitcherComponent *editor_portal_switcher_comp,
-               EnvironmentComponent *environment_comp,
                ModificationMonitorComponent *modification_monitor_comp,
                SceneSaverComponent *scene_saver_comp, SceneViewComponent *scene_view_comp,
                EditorContext *context) {
@@ -84,7 +82,7 @@ bool LoadScene(std::string const &scene_file,
     context->scene = std::make_shared<Scene>(proto);
 
     editor_portal_switcher_comp->SetEditorPortalEnabled(/*enabled=*/true);
-    environment_comp->OnChangeScene();
+    ambient_comp->OnChangeScene();
     modification_monitor_comp->OnReset();
     scene_saver_comp->OnChangeLoadPath(scene_file);
     scene_view_comp->OnChangeScene();
@@ -95,13 +93,12 @@ bool LoadScene(std::string const &scene_file,
 } // namespace
 
 SceneLoaderComponent::SceneLoaderComponent(
-    EditorPortalSwitcherComponent *editor_portal_switcher_comp,
-    EnvironmentComponent *environment_comp, ModificationMonitorComponent *modification_monitor_comp,
-    SceneSaverComponent *scene_saver_comp, SceneViewComponent *scene_view_comp,
-    EditorContext *context)
-    : editor_portal_switcher_comp_(editor_portal_switcher_comp),
-      environment_comp_(environment_comp), modification_monitor_comp_(modification_monitor_comp),
-      scene_saver_comp_(scene_saver_comp), scene_view_comp_(scene_view_comp), context_(context) {
+    AmbientComponent *ambient_comp, EditorPortalSwitcherComponent *editor_portal_switcher_comp,
+    ModificationMonitorComponent *modification_monitor_comp, SceneSaverComponent *scene_saver_comp,
+    SceneViewComponent *scene_view_comp, EditorContext *context)
+    : ambient_comp_(ambient_comp), editor_portal_switcher_comp_(editor_portal_switcher_comp),
+      modification_monitor_comp_(modification_monitor_comp), scene_saver_comp_(scene_saver_comp),
+      scene_view_comp_(scene_view_comp), context_(context) {
     QAction::connect(context_->ui->action_new_scene_flat, &QAction::triggered, this,
                      &SceneLoaderComponent::OnClickNewSceneLinear);
     QAction::connect(context_->ui->action_new_scene_octree, &QAction::triggered, this,
@@ -118,8 +115,8 @@ void SceneLoaderComponent::OnClickNewSceneLinear() {
         return;
     }
 
-    if (!CreateNewScene(/*scene_type=*/SceneProto::LINEAR, editor_portal_switcher_comp_,
-                        environment_comp_, modification_monitor_comp_, scene_view_comp_,
+    if (!CreateNewScene(/*scene_type=*/SceneProto::LINEAR, ambient_comp_,
+                        editor_portal_switcher_comp_, modification_monitor_comp_, scene_view_comp_,
                         context_)) {
         QMessageBox msg_box;
         msg_box.setText("Failed to Create Scene");
@@ -136,8 +133,8 @@ void SceneLoaderComponent::OnClickNewSceneOctree() {
         return;
     }
 
-    if (!CreateNewScene(/*scene_type=*/SceneProto::OCTREE, editor_portal_switcher_comp_,
-                        environment_comp_, modification_monitor_comp_, scene_view_comp_,
+    if (!CreateNewScene(/*scene_type=*/SceneProto::OCTREE, ambient_comp_,
+                        editor_portal_switcher_comp_, modification_monitor_comp_, scene_view_comp_,
                         context_)) {
     }
 }
@@ -152,7 +149,7 @@ void SceneLoaderComponent::OnClickOpenScene() {
         /*parent=*/nullptr, /*caption=*/tr("Open Scene"), QDir::homePath(),
         /*filter=*/tr("e8 islands scene (*.pb)"));
 
-    if (!LoadScene(scene_file.toStdString(), editor_portal_switcher_comp_, environment_comp_,
+    if (!LoadScene(scene_file.toStdString(), ambient_comp_, editor_portal_switcher_comp_,
                    modification_monitor_comp_, scene_saver_comp_, scene_view_comp_, context_)) {
         QMessageBox msg_box;
         msg_box.setText("Failed to Load Scene");

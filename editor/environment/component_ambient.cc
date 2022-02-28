@@ -22,7 +22,7 @@
 #include "content/scene.h"
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/context.h"
-#include "editor/environment/component_environment.h"
+#include "editor/environment/component_ambient.h"
 
 namespace e8 {
 namespace {
@@ -31,7 +31,7 @@ void SetBackgroundColorSlider(Scene *scene, QSlider *red, QSlider *green, QSlide
     vec3 current_color;
     {
         Scene::ReadAccess read_access = scene->GainReadAccess();
-        current_color = scene->BackgroundColor();
+        current_color = scene->background_color;
     }
 
     red->setValue(current_color(0) * red->maximum());
@@ -46,32 +46,32 @@ void SetSceneBackgroundColor(QSlider const *red, QSlider const *green, QSlider c
                               static_cast<float>(blue->value()) / blue->maximum()};
     {
         Scene::WriteAccess write_access = scene->GainWriteAccess();
-        scene->UpdateBackgroundColor(new_background_color);
+        scene->background_color = new_background_color;
     }
 }
 
 } // namespace
 
-EnvironmentComponent::EnvironmentComponent(ModificationMonitorComponent *modification_monitor_comp,
+AmbientComponent::AmbientComponent(ModificationMonitorComponent *modification_monitor_comp,
                                            EditorContext *context)
     : context_(context), modification_monitor_comp_(modification_monitor_comp) {
     QObject::connect(context->ui->bg_color_red_slider, &QSlider::valueChanged, this,
-                     &EnvironmentComponent::OnChangeBackgroundColor);
+                     &AmbientComponent::OnChangeBackgroundColor);
     QObject::connect(context->ui->bg_color_green_slider, &QSlider::valueChanged, this,
-                     &EnvironmentComponent::OnChangeBackgroundColor);
+                     &AmbientComponent::OnChangeBackgroundColor);
     QObject::connect(context->ui->bg_color_blue_slider, &QSlider::valueChanged, this,
-                     &EnvironmentComponent::OnChangeBackgroundColor);
+                     &AmbientComponent::OnChangeBackgroundColor);
 }
 
-EnvironmentComponent::~EnvironmentComponent() {}
+AmbientComponent::~AmbientComponent() {}
 
-void EnvironmentComponent::OnChangeScene() {
+void AmbientComponent::OnChangeScene() {
     SetBackgroundColorSlider(context_->scene.get(), context_->ui->bg_color_red_slider,
                              context_->ui->bg_color_green_slider,
                              context_->ui->bg_color_blue_slider);
 }
 
-void EnvironmentComponent::OnChangeBackgroundColor(int /*value*/) {
+void AmbientComponent::OnChangeBackgroundColor(int /*value*/) {
     SetSceneBackgroundColor(context_->ui->bg_color_red_slider, context_->ui->bg_color_green_slider,
                             context_->ui->bg_color_blue_slider, context_->scene.get());
 

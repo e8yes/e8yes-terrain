@@ -23,7 +23,7 @@
 #include "editor/basic/component_editor_portal_switcher.h"
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/context.h"
-#include "editor/environment/component_environment.h"
+#include "editor/environment/component_ambient.h"
 #include "editor/scene/component_scene_saver.h"
 #include "editor/scene/component_scene_view.h"
 
@@ -36,8 +36,8 @@ class SceneLoaderComponent : public QObject {
     Q_OBJECT
 
   public:
-    SceneLoaderComponent(EditorPortalSwitcherComponent *editor_portal_switcher_comp,
-                         EnvironmentComponent *environment_comp,
+    SceneLoaderComponent(AmbientComponent *ambient_comp,
+                         EditorPortalSwitcherComponent *editor_portal_switcher_comp,
                          ModificationMonitorComponent *modification_monitor_comp,
                          SceneSaverComponent *scene_saver_comp, SceneViewComponent *scene_view_comp,
                          EditorContext *context);
@@ -49,8 +49,8 @@ class SceneLoaderComponent : public QObject {
     void OnClickOpenScene();
 
   private:
+    AmbientComponent *ambient_comp_;
     EditorPortalSwitcherComponent *editor_portal_switcher_comp_;
-    EnvironmentComponent *environment_comp_;
     ModificationMonitorComponent *modification_monitor_comp_;
     SceneSaverComponent *scene_saver_comp_;
     SceneViewComponent *scene_view_comp_;

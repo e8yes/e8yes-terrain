@@ -25,7 +25,7 @@
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/component_status.h"
 #include "editor/basic/context.h"
-#include "editor/environment/component_environment.h"
+#include "editor/environment/component_ambient.h"
 #include "editor/procedural/component_procedural_plane.h"
 #include "editor/scene/component_scene_closer.h"
 #include "editor/scene/component_scene_loader.h"
@@ -45,8 +45,8 @@ IslandsEditorWindow::IslandsEditorWindow(std::shared_ptr<EditorContext> const &e
         std::make_unique<ModificationMonitorComponent>(status_comp_.get(), editor_context.get());
     editor_portal_switcher_comp_ =
         std::make_unique<EditorPortalSwitcherComponent>(editor_context.get());
-    environment_comp_ = std::make_unique<EnvironmentComponent>(modification_monitor_comp_.get(),
-                                                               editor_context.get());
+    ambient_comp_ =
+        std::make_unique<AmbientComponent>(modification_monitor_comp_.get(), editor_context.get());
     scene_view_comp_ = std::make_unique<SceneViewComponent>(editor_context.get());
     scene_saver_comp_ = std::make_unique<SceneSaverComponent>(
         modification_monitor_comp_.get(), scene_view_comp_.get(), editor_context.get());
@@ -54,9 +54,8 @@ IslandsEditorWindow::IslandsEditorWindow(std::shared_ptr<EditorContext> const &e
         editor_portal_switcher_comp_.get(), modification_monitor_comp_.get(),
         scene_saver_comp_.get(), scene_view_comp_.get(), editor_context.get());
     scene_loader_comp_ = std::make_unique<SceneLoaderComponent>(
-        editor_portal_switcher_comp_.get(), environment_comp_.get(),
-        modification_monitor_comp_.get(), scene_saver_comp_.get(), scene_view_comp_.get(),
-        editor_context.get());
+        ambient_comp_.get(), editor_portal_switcher_comp_.get(), modification_monitor_comp_.get(),
+        scene_saver_comp_.get(), scene_view_comp_.get(), editor_context.get());
     procedural_plane_comp_ = std::make_unique<ProceduralPlaneComponent>(
         modification_monitor_comp_.get(), scene_view_comp_.get(), editor_context.get());
 

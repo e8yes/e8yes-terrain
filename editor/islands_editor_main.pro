@@ -20,7 +20,7 @@ SOURCES += \
     basic/component_modification_monitor.cc \
     basic/component_status.cc \
     basic/context.cc \
-    environment/component_environment.cc \
+    environment/component_ambient.cc \
     procedural/component_procedural_plane.cc \
     scene/component_scene_closer.cc \
     scene/component_scene_loader.cc \
@@ -35,7 +35,7 @@ HEADERS += \
     basic/component_modification_monitor.h \
     basic/component_status.h \
     basic/context.h \
-    environment/component_environment.h \
+    environment/component_ambient.h \
     procedural/component_procedural_plane.h \
     scene/component_scene_closer.h \
     scene/component_scene_loader.h \

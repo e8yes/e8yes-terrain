@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_EDITOR_COMPONENT_ENVIRONMENT_H
-#define ISLANDS_EDITOR_COMPONENT_ENVIRONMENT_H
+#ifndef ISLANDS_EDITOR_COMPONENT_AMBIENT_H
+#define ISLANDS_EDITOR_COMPONENT_AMBIENT_H
 
 #include <QObject>
 
@@ -26,19 +26,18 @@
 namespace e8 {
 
 /**
- * @brief The EnvironmentComponent class Handles logic with UIs related to environment management.
+ * @brief The AmbientComponent class Handles logic with UIs related to ambient configuration.
  */
-class EnvironmentComponent : public QObject {
+class AmbientComponent : public QObject {
     Q_OBJECT
 
   public:
-    EnvironmentComponent(ModificationMonitorComponent *modification_monitor_comp,
-                         EditorContext *context);
-    ~EnvironmentComponent();
+    AmbientComponent(ModificationMonitorComponent *modification_monitor_comp,
+                     EditorContext *context);
+    ~AmbientComponent();
 
   public slots:
     void OnChangeScene();
-
     void OnChangeBackgroundColor(int value);
 
   private:
@@ -48,4 +47,4 @@ class EnvironmentComponent : public QObject {
 
 } // namespace e8
 
-#endif // ISLANDS_EDITOR_COMPONENT_ENVIRONMENT_H
+#endif // ISLANDS_EDITOR_COMPONENT_AMBIENT_H
