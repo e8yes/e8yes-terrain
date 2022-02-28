@@ -24,6 +24,7 @@
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/context.h"
 #include "editor/environment/component_ambient.h"
+#include "editor/environment/component_camera.h"
 #include "editor/scene/component_scene_saver.h"
 #include "editor/scene/component_scene_view.h"
 
@@ -36,7 +37,7 @@ class SceneLoaderComponent : public QObject {
     Q_OBJECT
 
   public:
-    SceneLoaderComponent(AmbientComponent *ambient_comp,
+    SceneLoaderComponent(AmbientComponent *ambient_comp, CameraComponent *camera_comp,
                          EditorPortalSwitcherComponent *editor_portal_switcher_comp,
                          ModificationMonitorComponent *modification_monitor_comp,
                          SceneSaverComponent *scene_saver_comp, SceneViewComponent *scene_view_comp,
@@ -50,6 +51,7 @@ class SceneLoaderComponent : public QObject {
 
   private:
     AmbientComponent *ambient_comp_;
+    CameraComponent *camera_comp_;
     EditorPortalSwitcherComponent *editor_portal_switcher_comp_;
     ModificationMonitorComponent *modification_monitor_comp_;
     SceneSaverComponent *scene_saver_comp_;

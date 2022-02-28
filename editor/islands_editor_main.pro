@@ -21,6 +21,7 @@ SOURCES += \
     basic/component_status.cc \
     basic/context.cc \
     environment/component_ambient.cc \
+    environment/component_camera.cc \
     procedural/component_procedural_plane.cc \
     scene/component_scene_closer.cc \
     scene/component_scene_loader.cc \
@@ -36,6 +37,7 @@ HEADERS += \
     basic/component_status.h \
     basic/context.h \
     environment/component_ambient.h \
+    environment/component_camera.h \
     procedural/component_procedural_plane.h \
     scene/component_scene_closer.h \
     scene/component_scene_loader.h \
