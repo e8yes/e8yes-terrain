@@ -165,6 +165,8 @@ Scene::ReadAccess Scene::GainReadAccess() { return ReadAccess(&mu_); }
 
 Scene::WriteAccess Scene::GainWriteAccess() { return WriteAccess(&mu_); }
 
+SceneEntityStructureInterface *Scene::SceneEntityStructure() { return entity_structure_.get(); }
+
 bool Scene::AddRootSceneObject(SceneObject const &scene_object) {
     auto const &[it, inserted] =
         root_scene_objects_.insert(std::make_pair(scene_object.id, scene_object));
