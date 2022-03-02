@@ -205,7 +205,10 @@ VkDevice CreateDevice(VkPhysicalDevice physical_device,
                       QueueFamilyIndex graphics_queue_family_index,
                       QueueFamilyIndex present_queue_family_index, VkQueue *graphics_queue,
                       VkQueue *present_queue) {
-    DeviceExtensions device_extensions{VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+    DeviceExtensions device_extensions{
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+        VK_EXT_INDEX_TYPE_UINT8_EXTENSION_NAME,
+    };
 
     std::vector<VkDeviceQueueCreateInfo> queue_infos;
     std::vector<QueueFamilyIndex> required_queues{graphics_queue_family_index};
@@ -234,10 +237,6 @@ VkDevice CreateDevice(VkPhysicalDevice physical_device,
     device_info.pEnabledFeatures = &device_features;
     device_info.enabledExtensionCount = device_extensions.size();
     device_info.ppEnabledExtensionNames = device_extensions.data();
-    //    if (!kDebugModeValidationLayers.empty()) {
-    //        device_info.ppEnabledLayerNames = kDebugModeValidationLayers.data();
-    //        device_info.enabledLayerCount = kDebugModeValidationLayers.size();
-    //    }
 
     VkDevice device;
     assert(VK_SUCCESS ==
