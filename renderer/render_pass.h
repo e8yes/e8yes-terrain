@@ -61,7 +61,7 @@ std::unique_ptr<GpuBarrier> FinishRenderPass(VkCommandBuffer cmds, GpuBarrier co
 using SetUniformsFn = std::function<void(DrawableInstance const &drawable, VkCommandBuffer cmds)>;
 
 /**
- * @brief RenderGeometrys Renders an array of drawables with the specified graphics pipeline. Note,
+ * @brief RenderDrawables Renders an array of drawables with the specified graphics pipeline. Note,
  * it doesn't actually draw the drawables but only adds Vulkan commands to the command buffer.
  *
  * @param drawables The array of drawables to be rendered.
@@ -70,7 +70,7 @@ using SetUniformsFn = std::function<void(DrawableInstance const &drawable, VkCom
  * @param geo_vram The geometry VRAM transferer.
  * @param cmds The command buffer to which draw commands will be added.
  */
-void RenderGeometrys(std::vector<DrawableInstance> const &drawables,
+void RenderDrawables(std::vector<DrawableInstance> const &drawables,
                      GraphicsPipeline const &pipeline, SetUniformsFn const &set_uniforms_fn,
                      GeometryVramTransfer *geo_vram, VkCommandBuffer cmds);
 

@@ -118,7 +118,7 @@ PipelineOutputInterface *DepthMapPipeline::Run(std::vector<DrawableInstance> con
                                            *pimpl_->output->GetFrameBuffer(), pimpl_->context);
 
     ShaderUniformLayout const &uniform_layout = pimpl_->GetUniformLayout();
-    RenderGeometrys(
+    RenderDrawables(
         drawables, pimpl_->GetGraphicsPipeline(),
         [&projection, &uniform_layout](DrawableInstance const &drawable, VkCommandBuffer cmds) {
             mat44 model_view_proj = projection.ProjectiveTransform() * projection.ViewTransform() *
