@@ -869,15 +869,15 @@ inline mat44 mat44_basis(vec3 const &u, vec3 const &v, vec3 const &w) {
 }
 
 inline mat44 mat44_rotate(float a, vec3 const &axis) {
-    vec3 const &w = axis.normalize();
+    vec3 w = axis.normalize();
 
-    vec3 const &ref = std::abs(w(1) - 1) < 1e-5f ? vec3({1, 0, 0}) : vec3({0, 1, 0});
+    vec3 ref = std::abs(w(1) - 1) < 1e-5f ? vec3({1, 0, 0}) : vec3({0, 1, 0});
 
-    vec3 const &u = w.outer(ref).normalize();
-    vec3 const &v = w.outer(u).normalize();
+    vec3 u = w.outer(ref).normalize();
+    vec3 v = w.outer(u).normalize();
 
-    mat44 const &inv_r = mat44_basis(u, v, w);
-    mat44 const &r = ~inv_r;
+    mat44 inv_r = mat44_basis(u, v, w);
+    mat44 r = ~inv_r;
 
     float cos = std::cos(a);
     float sin = std::sin(a);
@@ -888,16 +888,26 @@ inline mat44 mat44_rotate(float a, vec3 const &axis) {
 }
 
 inline mat44 mat44_lookat(vec3 const &eye, vec3 const &center, vec3 const &up) {
-    vec3 const &w = (center - eye).normalize();
-    vec3 const &u_up = up.normalize();
-    vec3 const &v = w.outer(u_up).normalize();
-    vec3 const &u = v.outer(w);
+    vec3 w = (center - eye).normalize();
+    vec3 u_up = up.normalize();
+    vec3 v = w.outer(u_up).normalize();
+    vec3 u = v.outer(w);
 
-    mat44 const &l =
+    mat44 inv_l =
         mat44({v(0), u(0), -w(0), 0, v(1), u(1), -w(1), 0, v(2), u(2), -w(2), 0, 0, 0, 0, 1});
 
-    mat44 const &t = mat44_translate(-eye);
-    return t * l;
+    mat44 inv_t = mat44_translate(-eye);
+    return inv_l * inv_t;
+}
+
+inline mat44 mat44_roll_pitch_yaw(vec3 const &location, vec3 const &roll_pitch_yaw) {
+    mat44 inv_rot_x = mat44_rotate(-roll_pitch_yaw(0), vec3{1, 0, 0});
+    mat44 inv_rot_y = mat44_rotate(-roll_pitch_yaw(1), vec3{0, 1, 0});
+    mat44 inv_rot_z = mat44_rotate(-roll_pitch_yaw(2), vec3{0, 0, 1});
+
+    mat44 inv_t = mat44_translate(-location);
+
+    return inv_rot_x * inv_rot_y * inv_rot_z * inv_t;
 }
 
 class frustum {
@@ -928,7 +938,7 @@ inline mat44 frustum::projective_transform() const {
     float delta_x = left + right;
 
     return mat44({a / width, 0, 0, 0, 0, a / height, 0, 0, delta_x / width, delta_y / height,
-                  (-z_far - z_near) / d, -1, 0, 0, -a * z_far / d, 0});
+                  z_near / d, -1, 0, 0, z_near * z_far / d, 0});
 }
 
 inline frustum frustum_perspective2(float tan_fovy, float aspect, float z_near, float z_far) {
