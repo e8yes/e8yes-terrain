@@ -20,6 +20,7 @@
 
 #include "common/tensor.h"
 #include "content/proto/geometry.pb.h"
+#include "content/scene_entity.h"
 
 namespace e8 {
 
@@ -43,6 +44,13 @@ unsigned const kPrimitiveVertexNormalOffset = sizeof(vec3);
 
 // Offset of the texture coordinate attribute in the primitive vertex proto.
 unsigned const kPrimitiveVertexTexCoordOffset = kPrimitiveVertexNormalOffset + sizeof(vec3);
+
+/**
+ * @brief ToDrawable Selects a suitable geometry and material LODs from each entity and creates a
+ * drawable from the selection, if there is one.
+ */
+std::vector<DrawableInstance> ToDrawables(std::vector<SceneEntity const *> const &scene_entities,
+                                          vec3 const &viewer_location);
 
 } // namespace e8
 
