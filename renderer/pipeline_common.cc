@@ -204,7 +204,7 @@ std::unique_ptr<FixedStageConfig> CreateFixedStageConfig(VkPolygonMode polygon_m
     info->depth_stencil.depthTestEnable = enable_depth_test ? VK_TRUE : VK_FALSE;
     info->depth_stencil.depthWriteEnable = enable_depth_test ? VK_TRUE : VK_FALSE;
     info->depth_stencil.depthCompareOp =
-        enable_depth_test ? VK_COMPARE_OP_LESS_OR_EQUAL : VK_COMPARE_OP_ALWAYS;
+        enable_depth_test ? VK_COMPARE_OP_GREATER_OR_EQUAL : VK_COMPARE_OP_ALWAYS;
     info->depth_stencil.depthBoundsTestEnable = VK_FALSE;
     info->depth_stencil.minDepthBounds = 0.0f;
     info->depth_stencil.maxDepthBounds = 1.0f;
@@ -465,7 +465,7 @@ std::unique_ptr<FrameBuffer> CreateFrameBuffer(RenderPass const &render_pass, un
     }
     if (depth_attachment.has_value()) {
         VkClearValue depth_value{};
-        depth_value.depthStencil.depth = 1.0f;
+        depth_value.depthStencil.depth = 0.0f;
         depth_value.depthStencil.stencil = 0.0f;
         info->clear_values.push_back(depth_value);
     }
