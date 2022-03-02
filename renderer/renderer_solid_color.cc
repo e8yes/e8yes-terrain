@@ -17,63 +17,33 @@
 
 #include <chrono>
 #include <memory>
+#include <optional>
 #include <vulkan/vulkan.h>
 
 #include "common/tensor.h"
 #include "content/scene.h"
 #include "renderer/context.h"
-#include "renderer/pipeline_common.h"
+#include "renderer/frame.h"
+#include "renderer/pipeline_output.h"
+#include "renderer/pipeline_solid_color.h"
 #include "renderer/render_pass.h"
 #include "renderer/renderer_solid_color.h"
 
 namespace e8 {
 
-class SolidColorRenderer::SolidColorRendererImpl {
-  public:
+struct SolidColorRenderer::SolidColorRendererImpl {
     SolidColorRendererImpl(VulkanContext *context);
     ~SolidColorRendererImpl();
 
-  public:
-    RenderPass *GetRenderPass();
-    FrameBuffer *GetFrameBuffer(unsigned swap_chain_index);
-
+    SwapChainPipelineOutput output;
+    SolidColorPipeline pipeline;
     VulkanContext *context;
-
-  private:
-    std::vector<std::unique_ptr<FrameBufferAttachment>> color_attachments_;
-    std::unique_ptr<FrameBufferAttachment> depth_attachment_;
-    std::unique_ptr<RenderPass> render_pass_;
-    std::vector<std::unique_ptr<FrameBuffer>> frame_buffers_;
 };
 
 SolidColorRenderer::SolidColorRendererImpl::SolidColorRendererImpl(VulkanContext *context)
-    : context(context) {
-    color_attachments_ = CreateColorAttachmentsForSwapChain(context);
-    assert(!color_attachments_.empty());
-    depth_attachment_ = CreateDepthAttachment(context->swap_chain_image_extent.width,
-                                              context->swap_chain_image_extent.height, context);
-    render_pass_ =
-        CreateRenderPass(std::vector<VkAttachmentDescription>{color_attachments_[0]->desc},
-                         depth_attachment_->desc, context);
-
-    for (auto const &color_attachment : color_attachments_) {
-        std::unique_ptr<FrameBuffer> frame_buffer = CreateFrameBuffer(
-            *render_pass_, context->swap_chain_image_extent.width,
-            context->swap_chain_image_extent.height,
-            std::vector<VkImageView>{color_attachment->view}, depth_attachment_->view, context);
-        frame_buffers_.emplace_back(std::move(frame_buffer));
-    }
-}
+    : output(/*with_depth_buffer=*/false, context), pipeline(&output, context), context(context) {}
 
 SolidColorRenderer::SolidColorRendererImpl::~SolidColorRendererImpl() {}
-
-RenderPass *SolidColorRenderer::SolidColorRendererImpl::GetRenderPass() {
-    return render_pass_.get();
-}
-
-FrameBuffer *SolidColorRenderer::SolidColorRendererImpl::GetFrameBuffer(unsigned swap_chain_index) {
-    return frame_buffers_[swap_chain_index].get();
-}
 
 SolidColorRenderer::SolidColorRenderer(VulkanContext *context)
     : pimpl_(std::make_unique<SolidColorRendererImpl>(context)) {}
@@ -83,21 +53,16 @@ SolidColorRenderer::~SolidColorRenderer() {}
 void SolidColorRenderer::DrawFrame(Scene *scene) {
     std::unique_ptr<StartFrameResult> start_frame_result = StartFrame(pimpl_->context);
 
-    FrameBuffer *frame_buffer = pimpl_->GetFrameBuffer(start_frame_result->swap_chain_image_index);
+    pimpl_->output.SetSwapChainImageIndex(start_frame_result->swap_chain_image_index);
 
+    PipelineOutputInterface *final_output;
     {
         Scene::ReadAccess read_access = scene->GainReadAccess();
-        frame_buffer->clear_values[0].color.float32[0] = scene->BackgroundColor()(0);
-        frame_buffer->clear_values[0].color.float32[1] = scene->BackgroundColor()(1);
-        frame_buffer->clear_values[0].color.float32[2] = scene->BackgroundColor()(2);
+        final_output = pimpl_->pipeline.Run(scene->background_color,
+                                            start_frame_result->acquire_swap_chain_image_barrier);
     }
 
-    VkCommandBuffer cmds =
-        StartRenderPass(*pimpl_->GetRenderPass(), *frame_buffer, pimpl_->context);
-    std::unique_ptr<GpuBarrier> final_task = FinishRenderPass(
-        cmds, start_frame_result->acquire_swap_chain_image_barrier, /*last=*/true, pimpl_->context);
-
-    EndFrame(*final_task, start_frame_result->swap_chain_image_index,
+    EndFrame(*final_output->barrier, start_frame_result->swap_chain_image_index,
              /*max_frame_duration=*/std::chrono::seconds(10), pimpl_->context);
 }
 

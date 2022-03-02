@@ -19,9 +19,7 @@
 #define ISLANDS_RENDERER_SOLID_COLOR_H
 
 #include <memory>
-#include <optional>
 
-#include "common/tensor.h"
 #include "content/scene.h"
 #include "renderer/context.h"
 
@@ -48,7 +46,7 @@ class SolidColorRenderer {
     void DrawFrame(Scene *scene);
 
   private:
-    class SolidColorRendererImpl;
+    struct SolidColorRendererImpl;
     std::unique_ptr<SolidColorRendererImpl> pimpl_;
 };
 

@@ -26,7 +26,7 @@
 #include "common/tensor.h"
 #include "renderer/context.h"
 #include "renderer/drawable_instance.h"
-#include "renderer/pipeline_common.h"
+#include "renderer/pipeline_output.h"
 #include "renderer/projection.h"
 #include "renderer/render_pass.h"
 #include "renderer/vram.h"
@@ -41,44 +41,25 @@ class DepthMapPipeline {
     /**
      * @brief DepthMapPipeline Constructs a graphics pipeline for rendering a depth map.
      *
-     * @param width The width of a depth map in pixels.
-     * @param height The height of a depth map in pixels.
+     * @param output An object for storing the rendered depth map.
      * @param context Contextual Vulkan handles.
      */
-    DepthMapPipeline(unsigned width, unsigned height, VulkanContext *context);
+    DepthMapPipeline(PipelineOutputInterface *output, VulkanContext *context);
     ~DepthMapPipeline();
 
     /**
-     * @brief The FutureResult struct The running result of this depth map pipeline.
-     */
-    struct FutureResult {
-        /**
-         * @brief FutureResult Should only be constructed by calling Run().
-         */
-        FutureResult(FrameBufferAttachment const &depth_attachment,
-                     std::unique_ptr<GpuBarrier> &&barrier);
-        ~FutureResult();
-
-        // The rendering result (depth map image).
-        FrameBufferAttachment const &depth_attachment;
-
-        // The barrier for the pipeline run.
-        std::unique_ptr<GpuBarrier> barrier;
-    };
-
-    /**
      * @brief Run Runs the depth map graphics pipeline. The pipeline can only be run when the
-     * previous run was finished (indicated by the barrier).
+     * previous run was finished (indicated by the output's barrier).
      *
      * @param drawables An array of drawables to be rendered onto the depth map.
      * @param projection Defines how drawables should be projected to the depth map.
      * @param barrier The previous tasks' barrier.
      * @param geo_vram The geometry VRAM transferrer.
-     * @return A rendering result future.
+     * @return The output object set from the constructor.
      */
-    FutureResult Run(std::vector<DrawableInstance> const &drawables,
-                     ProjectionInterface const &projection, GpuBarrier const &barrier,
-                     GeometryVramTransfer *geo_vram);
+    PipelineOutputInterface *Run(std::vector<DrawableInstance> const &drawables,
+                                 ProjectionInterface const &projection, GpuBarrier const &barrier,
+                                 GeometryVramTransfer *geo_vram);
 
   private:
     class DepthMapPipelineImpl;
