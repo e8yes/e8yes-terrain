@@ -26,7 +26,7 @@
 #include "content/proto/geometry.pb.h"
 #include "renderer/context.h"
 #include "renderer/projection.h"
-#include "renderer/vram.h"
+#include "renderer/vram_geometry.h"
 
 namespace e8 {
 namespace {

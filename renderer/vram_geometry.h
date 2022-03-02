@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_VRAM_H
-#define ISLANDS_RENDERER_VRAM_H
+#ifndef ISLANDS_RENDERER_VRAM_GEOMETRY_H
+#define ISLANDS_RENDERER_VRAM_GEOMETRY_H
 
 #include <limits>
 #include <memory>
@@ -97,4 +97,4 @@ class GeometryVramTransfer {
 
 } // namespace e8
 
-#endif // ISLANDS_RENDERER_VRAM_H
+#endif // ISLANDS_RENDERER_VRAM_GEOMETRY_H

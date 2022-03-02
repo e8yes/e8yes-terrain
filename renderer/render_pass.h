@@ -27,7 +27,7 @@
 #include "renderer/drawable_instance.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/pipeline_output.h"
-#include "renderer/vram.h"
+#include "renderer/vram_geometry.h"
 
 namespace e8 {
 
