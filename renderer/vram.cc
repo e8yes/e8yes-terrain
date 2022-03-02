@@ -37,7 +37,9 @@ unsigned VertexBufferSize(google::protobuf::RepeatedPtrField<PrimitiveVertex> co
 
 unsigned OptimalIndexSize(size_t num_vertices) {
     if (num_vertices <= 1 << 8) {
-        return sizeof(uint8_t);
+        // TODO: Adds indexTypeUint8 device feature.
+        // return sizeof(uint8_t);
+        return sizeof(uint16_t);
     } else if (num_vertices <= 1 << 16) {
         return sizeof(uint16_t);
     } else if (num_vertices <= 1UL << 32) {
