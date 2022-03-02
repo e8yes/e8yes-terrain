@@ -19,6 +19,7 @@
 #define ISLANDS_RENDERER_PROJECTION_H
 
 #include "common/tensor.h"
+#include "content/proto/camera.pb.h"
 
 namespace e8 {
 
@@ -59,10 +60,17 @@ class PerspectiveProjection : public ProjectionInterface {
      * @param width The width of the viewport.
      * @param height The height of the viewport.
      * @param location The 3D location of the pivot.
-     * @param direction A unit vector defining the outward facing direction of the viewport.
+     * @param roll_pitch_yaw A unit vector defining the outward facing direction of the viewport.
      */
     PerspectiveProjection(float near_clip, float far_clip, float width, float height,
-                          vec3 const &location, vec3 const &direction);
+                          vec3 const &location, vec3 const &roll_pitch_yaw);
+
+    /**
+     * @brief PerspectiveProjection
+     * @param camera
+     */
+    PerspectiveProjection(Camera const &camera);
+
     ~PerspectiveProjection();
 
     mat44 ViewTransform() const override;
