@@ -32,6 +32,9 @@ namespace e8 {
 // File paths to the shader programs.
 constexpr char const *kVertexShaderFilePathDepthMap = "./depth.vert.spv";
 constexpr char const *kVertexShaderFilePathGeometryMap = "./geometry.vert.spv";
+constexpr char const *kVertexShaderFilePathPostProcessor = "./post_processor.vert.spv";
+constexpr char const *kFragmentShaderFilePathDepthMapRaw = "./depth_raw.frag.spv";
+constexpr char const *kFragmentShaderFilePathPostProcessorEmpty = "./post_processor.frag.spv";
 
 /**
  * @brief The ShaderStages struct Stores the shader handle and stage information of a graphics
@@ -87,6 +90,17 @@ struct ShaderUniformLayout {
     ShaderUniformLayout(ShaderUniformLayout const &) = delete;
     ShaderUniformLayout(ShaderUniformLayout &&) = delete;
 
+    // descriptor set layout designed for low mutation frequency (changes every frame) uniform data.
+    VkDescriptorSetLayout per_frame_desc_set;
+
+    // A descriptor set layout designed for mid mutation frequency (changes every render pass)
+    // uniform data.
+    VkDescriptorSetLayout per_pass_desc_set;
+
+    // A descriptor set layout designed for high mutation frequency (changes every drawable) uniform
+    // data.
+    VkDescriptorSetLayout per_drawable_desc_set;
+
     // A full Vulkan object storing the layout of shader uniform variables.
     VkPipelineLayout layout;
 
@@ -103,18 +117,21 @@ struct ShaderUniformLayout {
  * This function will always return a valid ShaderUniformLayout structure. Any failure occurs during
  * layout creation will make it fail.
  *
- * TODO: Allows descriptor set layout to be specified.
- *
- * @param push_constant_size The size (in bytes) of the push constant uniform variable if there is
- * one. It must be greater than zero when specified.
- * @param push_constant_accessible_stage If the argument push_constant_size is specified, the caller
- * must also provide the stages where the uniform push constant variable is accessible.
+ * @param push_constant Specifies the push-constant layout.
+ * @param per_frame_desc_set A descriptor set layout designed for low mutation frequency (changes
+ * every frame) uniform data.
+ * @param per_pass_desc_set A descriptor set layout designed for mid mutation frequency (changes
+ * every render pass) uniform data.
+ * @param per_drawable_desc_est A descriptor set layout designed for high mutation frequency
+ * (changes every drawable) uniform data.
  * @param context Contextual Vulkan handles.
  * @return A valid unique pointer to the ShaderUniformLayout structure.
  */
 std::unique_ptr<ShaderUniformLayout>
-CreateShaderUniformLayout(std::optional<unsigned> const &push_constant_size,
-                          std::optional<VkShaderStageFlags> const &push_constant_accessible_stage,
+CreateShaderUniformLayout(std::optional<VkPushConstantRange> const &push_constant,
+                          std::vector<VkDescriptorSetLayoutBinding> const &per_frame_desc_set,
+                          std::vector<VkDescriptorSetLayoutBinding> const &per_pass_desc_set,
+                          std::vector<VkDescriptorSetLayoutBinding> const &per_drawable_desc_set,
                           VulkanContext *context);
 
 /**

@@ -44,6 +44,13 @@ struct PushConstants {
     mat44 model_view_proj_trans;
 };
 
+VkPushConstantRange PushConstantLayout() {
+    VkPushConstantRange push_constant{};
+    push_constant.size = sizeof(PushConstants);
+    push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    return push_constant;
+}
+
 std::vector<VkVertexInputAttributeDescription> VertexShaderInputAttributes() {
     VkVertexInputAttributeDescription position_attribute;
     position_attribute.binding = 0;
@@ -81,8 +88,9 @@ DepthMapPipeline::DepthMapPipelineImpl::DepthMapPipelineImpl(PipelineOutputInter
                                                              VulkanContext *context)
     : output(output), context(context) {
     uniform_layout_ = CreateShaderUniformLayout(
-        /*push_constant_size=*/sizeof(PushConstants),
-        /*push_constant_accessible_stage=*/VK_SHADER_STAGE_VERTEX_BIT, context);
+        PushConstantLayout(), /*per_frame_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
+        /*per_pass_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
+        /*per_drawable_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(), context);
     shader_stages_ = CreateShaderStages(/*vertex_shader_file_path=*/kVertexShaderFilePathDepthMap,
                                         /*fragment_shader_file_path=*/std::nullopt, context);
     vertex_inputs_ = CreateVertexInputState(VertexShaderInputAttributes());
@@ -117,10 +125,10 @@ PipelineOutputInterface *DepthMapPipeline::Run(std::vector<DrawableInstance> con
     VkCommandBuffer cmds = StartRenderPass(pimpl_->output->GetRenderPass(),
                                            *pimpl_->output->GetFrameBuffer(), pimpl_->context);
 
-    ShaderUniformLayout const &uniform_layout = pimpl_->GetUniformLayout();
     RenderDrawables(
-        drawables, pimpl_->GetGraphicsPipeline(),
-        [&projection, &uniform_layout](DrawableInstance const &drawable, VkCommandBuffer cmds) {
+        drawables, pimpl_->GetGraphicsPipeline(), pimpl_->GetUniformLayout(),
+        [&projection](DrawableInstance const &drawable, ShaderUniformLayout const &uniform_layout,
+                      VkCommandBuffer cmds) {
             mat44 model_view_proj = projection.ProjectiveTransform() * projection.ViewTransform() *
                                     (*drawable.transform);
             PushConstants push_constants(model_view_proj);
@@ -132,7 +140,8 @@ PipelineOutputInterface *DepthMapPipeline::Run(std::vector<DrawableInstance> con
         },
         geo_vram, cmds);
 
-    pimpl_->output->barrier = FinishRenderPass(cmds, barrier, /*last=*/false, pimpl_->context);
+    pimpl_->output->barrier =
+        FinishRenderPass(cmds, barrier, pimpl_->output->FinalOutput(), pimpl_->context);
 
     return pimpl_->output;
 }

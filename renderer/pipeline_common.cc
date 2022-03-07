@@ -112,8 +112,10 @@ ShaderUniformLayout::~ShaderUniformLayout() {
 }
 
 std::unique_ptr<ShaderUniformLayout>
-CreateShaderUniformLayout(std::optional<unsigned> const &push_constant_size,
-                          std::optional<VkShaderStageFlags> const &push_constant_accessible_stage,
+CreateShaderUniformLayout(std::optional<VkPushConstantRange> const &push_constant,
+                          std::vector<VkDescriptorSetLayoutBinding> const &per_frame_desc_set,
+                          std::vector<VkDescriptorSetLayoutBinding> const &per_pass_desc_set,
+                          std::vector<VkDescriptorSetLayoutBinding> const &per_drawable_desc_set,
                           VulkanContext *context) {
     auto info = std::make_unique<ShaderUniformLayout>(context);
 
@@ -122,16 +124,53 @@ CreateShaderUniformLayout(std::optional<unsigned> const &push_constant_size,
     layout_info.setLayoutCount = 0;
     layout_info.pSetLayouts = nullptr;
 
-    VkPushConstantRange push_constant_range{};
-    if (push_constant_size.has_value()) {
-        assert(*push_constant_size > 0);
-        push_constant_range.offset = 0;
-        push_constant_range.size = *push_constant_size;
-        push_constant_range.stageFlags = *push_constant_accessible_stage;
-
-        layout_info.pPushConstantRanges = &push_constant_range;
+    // Sets push constant layout.
+    if (push_constant.has_value()) {
+        layout_info.pPushConstantRanges = &push_constant.value();
         layout_info.pushConstantRangeCount = 1;
     }
+
+    // Creates and sets descriptor set layout.
+    std::vector<VkDescriptorSetLayout> desc_set_layouts;
+
+    if (!per_frame_desc_set.empty()) {
+        VkDescriptorSetLayoutCreateInfo desc_set_info{};
+        desc_set_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        desc_set_info.pBindings = per_frame_desc_set.data();
+        desc_set_info.bindingCount = per_frame_desc_set.size();
+
+        assert(VK_SUCCESS == vkCreateDescriptorSetLayout(context->device, &desc_set_info,
+                                                         /*pAllocator=*/nullptr,
+                                                         &info->per_frame_desc_set));
+        desc_set_layouts.push_back(info->per_frame_desc_set);
+    }
+
+    if (!per_pass_desc_set.empty()) {
+        VkDescriptorSetLayoutCreateInfo desc_set_info{};
+        desc_set_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        desc_set_info.pBindings = per_pass_desc_set.data();
+        desc_set_info.bindingCount = per_pass_desc_set.size();
+
+        assert(VK_SUCCESS == vkCreateDescriptorSetLayout(context->device, &desc_set_info,
+                                                         /*pAllocator=*/nullptr,
+                                                         &info->per_pass_desc_set));
+        desc_set_layouts.push_back(info->per_pass_desc_set);
+    }
+
+    if (!per_drawable_desc_set.empty()) {
+        VkDescriptorSetLayoutCreateInfo desc_set_info{};
+        desc_set_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        desc_set_info.pBindings = per_drawable_desc_set.data();
+        desc_set_info.bindingCount = per_drawable_desc_set.size();
+
+        assert(VK_SUCCESS == vkCreateDescriptorSetLayout(context->device, &desc_set_info,
+                                                         /*pAllocator=*/nullptr,
+                                                         &info->per_drawable_desc_set));
+        desc_set_layouts.push_back(info->per_drawable_desc_set);
+    }
+
+    layout_info.pSetLayouts = desc_set_layouts.data();
+    layout_info.setLayoutCount = desc_set_layouts.size();
 
     assert(VK_SUCCESS == vkCreatePipelineLayout(context->device, &layout_info,
                                                 /*pAllocator=*/nullptr, &info->layout));
@@ -154,9 +193,9 @@ CreateVertexInputState(std::vector<VkVertexInputAttributeDescription> const &inp
     info->input_binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
     info->state.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    info->state.vertexBindingDescriptionCount = 1;
-    info->state.pVertexBindingDescriptions = &info->input_binding;
     if (!info->input_attributes.empty()) {
+        info->state.vertexBindingDescriptionCount = 1;
+        info->state.pVertexBindingDescriptions = &info->input_binding;
         info->state.vertexAttributeDescriptionCount = info->input_attributes.size();
         info->state.pVertexAttributeDescriptions = info->input_attributes.data();
     }

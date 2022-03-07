@@ -48,7 +48,7 @@ class SolidColorPipeline {
      *
      * @param color The color value to fill into the output.
      * @param barrier The previous tasks' barrier.
-     * @return The output object set from the constructor.
+     * @return The output object set from the constructor, with a barrier assigned.
      */
     PipelineOutputInterface *Run(vec3 const &color, GpuBarrier const &barrier);
 
