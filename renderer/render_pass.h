@@ -56,9 +56,10 @@ VkCommandBuffer StartRenderPass(RenderPass const &pass, FrameBuffer const &frame
 std::unique_ptr<GpuBarrier> FinishRenderPass(VkCommandBuffer cmds, GpuBarrier const &barrier,
                                              bool final, VulkanContext *context);
 
-// Represents a function which sets the value of uniform variables for drawing the particular
-// drawable.
-using SetUniformsFn = std::function<void(DrawableInstance const &drawable, VkCommandBuffer cmds)>;
+// Represents a function which sets the value of uniform variables for drawing the drawable.
+using SetDrawableUniformsFn =
+    std::function<void(DrawableInstance const &drawable, ShaderUniformLayout const &uniform_layout,
+                       VkCommandBuffer cmds)>;
 
 /**
  * @brief RenderDrawables Renders an array of drawables with the specified graphics pipeline. Note,
@@ -66,13 +67,30 @@ using SetUniformsFn = std::function<void(DrawableInstance const &drawable, VkCom
  *
  * @param drawables The array of drawables to be rendered.
  * @param pipeline The graphics pipeline to use for the rendering.
+ * @param uniform_layout
  * @param set_uniforms_fn A custom function to set uniform variables for drawing a drawable.
  * @param geo_vram The geometry VRAM transferer.
  * @param cmds The command buffer to which draw commands will be added.
  */
 void RenderDrawables(std::vector<DrawableInstance> const &drawables,
-                     GraphicsPipeline const &pipeline, SetUniformsFn const &set_uniforms_fn,
-                     GeometryVramTransfer *geo_vram, VkCommandBuffer cmds);
+                     GraphicsPipeline const &pipeline, ShaderUniformLayout const &uniform_layout,
+                     SetDrawableUniformsFn const &set_uniforms_fn, GeometryVramTransfer *geo_vram,
+                     VkCommandBuffer cmds);
+
+// Represents a function which sets the value of uniform variables for post processing.
+using SetPostProcessorUniformsFn =
+    std::function<void(ShaderUniformLayout const &uniform_layout, VkCommandBuffer cmds)>;
+
+/**
+ * @brief PostProcess Renders a quad that fills the pipeline output.
+ *
+ * @param pipeline The graphics pipeline to use for the post processing.
+ * @param set_uniforms_fn A custom function to set uniform variables for the post processing
+ * fragment shader.
+ * @param cmds The command buffer to which draw commands will be added.
+ */
+void PostProcess(GraphicsPipeline const &pipeline, ShaderUniformLayout const &uniform_layout,
+                 SetPostProcessorUniformsFn const &set_uniforms_fn, VkCommandBuffer cmds);
 
 } // namespace e8
 

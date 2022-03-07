@@ -104,8 +104,9 @@ std::unique_ptr<GpuBarrier> FinishRenderPass(VkCommandBuffer cmds, GpuBarrier co
 }
 
 void RenderDrawables(std::vector<DrawableInstance> const &drawables,
-                     GraphicsPipeline const &pipeline, SetUniformsFn const &set_uniforms_fn,
-                     GeometryVramTransfer *geo_vram, VkCommandBuffer cmds) {
+                     GraphicsPipeline const &pipeline, ShaderUniformLayout const &uniform_layout,
+                     SetDrawableUniformsFn const &set_uniforms_fn, GeometryVramTransfer *geo_vram,
+                     VkCommandBuffer cmds) {
     vkCmdBindPipeline(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline);
 
     for (auto const &instance : drawables) {
@@ -114,7 +115,7 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
             continue;
         }
 
-        set_uniforms_fn(instance, cmds);
+        set_uniforms_fn(instance, uniform_layout, cmds);
 
         VkDeviceSize offset = 0;
         vkCmdBindVertexBuffers(cmds, /*firstBinding=*/0, /*bindingCount=*/1,
@@ -126,6 +127,16 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
                          /*instanceCount=*/1, /*firstIndex=*/0, /*vertexOffset=*/0,
                          /*firstInstance=*/0);
     }
+}
+
+void PostProcess(GraphicsPipeline const &pipeline, ShaderUniformLayout const &uniform_layout,
+                 SetPostProcessorUniformsFn const &set_uniforms_fn, VkCommandBuffer cmds) {
+    vkCmdBindPipeline(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline);
+
+    set_uniforms_fn(uniform_layout, cmds);
+
+    vkCmdDraw(cmds, /*vertex_count=*/3, /*instanceCount=*/2, /*firstVertex=*/0,
+              /*firstInstance=*/0);
 }
 
 } // namespace e8
