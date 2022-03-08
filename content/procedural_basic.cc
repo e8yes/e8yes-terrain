@@ -66,7 +66,7 @@ Geometry PlaneGeometry(float width, float height, float cell_area, bool movable)
     // Generates vertices.
     for (unsigned j = 0; j < num_height_steps; ++j) {
         for (unsigned i = 0; i < num_width_steps; ++i) {
-            vec3 position{quad_width * i - width / 2, height / 2 - quad_height * j, 0};
+            vec3 position{quad_width * i - width / 2, quad_height * j - height / 2, 0};
             vec3 normal{0, 0, 1};
             vec2 tex_coord{static_cast<float>(i) / (num_width_steps - 1),
                            static_cast<float>(j) / (num_height_steps - 1)};
