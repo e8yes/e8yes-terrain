@@ -52,9 +52,8 @@ PerspectiveProjection::~PerspectiveProjection() {}
 
 PerspectiveProjection::PerspectiveProjection(Camera const &camera)
     : PerspectiveProjection(kNearClipDistance, camera.max_distance(),
-                            kNearClipDistance / (2 * camera.focal_length()) * camera.sensor_width(),
-                            kNearClipDistance / (2 * camera.focal_length()) *
-                                camera.sensor_height(),
+                            kNearClipDistance / camera.focal_length() * camera.sensor_width(),
+                            kNearClipDistance / camera.focal_length() * camera.sensor_height(),
                             ToVec3(camera.position()), ToRadianRollPitchYaw(camera)) {}
 
 mat44 PerspectiveProjection::ViewTransform() const { return view_transform_; }
