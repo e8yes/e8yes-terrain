@@ -19,22 +19,36 @@ INCLUDEPATH += ../
 SOURCES += \
     context.cc \
     drawable_instance.cc \
+    frame.cc \
     pipeline_common.cc \
     pipeline_depth_map.cc \
+    pipeline_depth_map_visualizer.cc \
+    pipeline_output.cc \
+    pipeline_post_processor.cc \
+    pipeline_solid_color.cc \
     projection.cc \
+    query_fn.cc \
     render_pass.cc \
+    renderer_depth.cc \
     renderer_solid_color.cc \
-    vram.cc
+    vram_geometry.cc
 
 HEADERS += \
     context.h \
     drawable_instance.h \
+    frame.h \
     pipeline_common.h \
     pipeline_depth_map.h \
+    pipeline_depth_map_visualizer.h \
+    pipeline_output.h \
+    pipeline_post_processor.h \
+    pipeline_solid_color.h \
     projection.h \
+    query_fn.h \
     render_pass.h \
+    renderer_depth.h \
     renderer_solid_color.h \
-    vram.h
+    vram_geometry.h
 
 # Default rules for deployment.
 unix {

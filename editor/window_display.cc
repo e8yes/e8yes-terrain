@@ -23,6 +23,7 @@
 #include "editor/basic/context.h"
 #include "editor/window_display.h"
 #include "renderer/context.h"
+#include "renderer/renderer_depth.h"
 #include "renderer/renderer_solid_color.h"
 
 namespace e8 {
@@ -30,8 +31,7 @@ namespace {
 
 constexpr char const *kIslandsDisplayWindowTitle = "e8 islands display";
 
-void RunDisplayLoop(std::shared_ptr<EditorContext> const &editor_context,
-                    SolidColorRenderer *renderer) {
+void RunDisplayLoop(std::shared_ptr<EditorContext> const &editor_context, DepthRenderer *renderer) {
     while (editor_context->running) {
         std::shared_ptr<Scene> acquired_scene = editor_context->scene;
         if (acquired_scene != nullptr) {
@@ -66,7 +66,7 @@ void RunIslandsDisplay(std::shared_ptr<EditorContext> editor_context, unsigned w
     {
         // Initializes a renderer and renders the scene state continually.
         std::unique_ptr<VulkanContext> context = CreateVulkanContext(display_window);
-        SolidColorRenderer renderer(context.get());
+        DepthRenderer renderer(context.get());
 
         RunDisplayLoop(editor_context, &renderer);
     }

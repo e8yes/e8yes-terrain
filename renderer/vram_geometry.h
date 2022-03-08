@@ -22,7 +22,7 @@
 #include <memory>
 #include <optional>
 
-#include "content/proto/geometry.pb.h"
+#include "content/geometry.h"
 #include "renderer/context.h"
 #include "renderer/projection.h"
 
