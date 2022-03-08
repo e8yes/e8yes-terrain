@@ -40,13 +40,11 @@ class PostProcessorPipeline {
      *
      * @param fragment_shader The fragment shader to create the desired post processing effect.
      * @param uniform_layout The fragment shader's uniform layout.
-     * @param set_uniforms_fn A function to set the values of the shader's uniform variables.
      * @param output To receive output from the post processor.
      * @param context Contextual Vulkan handles.
      */
     PostProcessorPipeline(std::string const &fragment_shader,
                           std::unique_ptr<ShaderUniformLayout> uniform_layout,
-                          SetPostProcessorUniformsFn const &set_uniforms_fn,
                           PipelineOutputInterface *output, VulkanContext *context);
 
     /**
@@ -65,9 +63,12 @@ class PostProcessorPipeline {
      * previous run was finished (indicated by the output's barrier).
      *
      * @param barrier The previous tasks' barrier.
+     * @param set_uniforms_fn A function to set the values of the shader's uniform variables. If not
+     * supplied, an empty function will be used.
      * @return The output object set from the constructor, with a barrier assigned.
      */
-    PipelineOutputInterface *Run(GpuBarrier const &barrier);
+    PipelineOutputInterface *Run(GpuBarrier const &barrier,
+                                 SetPostProcessorUniformsFn const &set_uniforms_fn = nullptr);
 
   private:
     struct PostProcessorPipelineImpl;

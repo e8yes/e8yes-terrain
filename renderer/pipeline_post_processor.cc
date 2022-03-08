@@ -46,11 +46,8 @@ std::unique_ptr<ShaderUniformLayout> EmptyShaderUniformLayout(VulkanContext *con
 struct PostProcessorPipeline::PostProcessorPipelineImpl {
     PostProcessorPipelineImpl(std::string const &fragment_shader,
                               std::unique_ptr<ShaderUniformLayout> uniform_layout,
-                              SetPostProcessorUniformsFn const &set_uniforms_fn,
                               PipelineOutputInterface *output, VulkanContext *context);
     ~PostProcessorPipelineImpl();
-
-    SetPostProcessorUniformsFn set_uniforms_fn;
 
     PipelineOutputInterface *output;
     VulkanContext *context;
@@ -65,10 +62,8 @@ struct PostProcessorPipeline::PostProcessorPipelineImpl {
 
 PostProcessorPipeline::PostProcessorPipelineImpl::PostProcessorPipelineImpl(
     std::string const &fragment_shader, std::unique_ptr<ShaderUniformLayout> uniform_layout,
-    SetPostProcessorUniformsFn const &set_uniforms_fn, PipelineOutputInterface *output,
-    VulkanContext *context)
-    : set_uniforms_fn(set_uniforms_fn), output(output), context(context),
-      uniform_layout(std::move(uniform_layout)) {
+    PipelineOutputInterface *output, VulkanContext *context)
+    : output(output), context(context), uniform_layout(std::move(uniform_layout)) {
     shader_stages =
         CreateShaderStages(/*vertex_shader_file_path=*/kVertexShaderFilePathPostProcessor,
                            /*fragment_shader_file_path=*/fragment_shader, context);
@@ -76,7 +71,7 @@ PostProcessorPipeline::PostProcessorPipelineImpl::PostProcessorPipelineImpl(
         /*input_attributes=*/std::vector<VkVertexInputAttributeDescription>());
     fixed_stage_config =
         CreateFixedStageConfig(/*polygon_mode=*/VK_POLYGON_MODE_FILL,
-                               /*cull_mode=*/VK_CULL_MODE_BACK_BIT,
+                               /*cull_mode=*/VK_CULL_MODE_NONE,
                                /*enable_depth_test=*/false, output->width, output->height);
 
     pipeline =
@@ -88,25 +83,30 @@ PostProcessorPipeline::PostProcessorPipelineImpl::~PostProcessorPipelineImpl() {
 
 PostProcessorPipeline::PostProcessorPipeline(std::string const &fragment_shader,
                                              std::unique_ptr<ShaderUniformLayout> uniform_layout,
-                                             SetPostProcessorUniformsFn const &set_uniforms_fn,
                                              PipelineOutputInterface *output,
                                              VulkanContext *context)
     : pimpl_(std::make_unique<PostProcessorPipelineImpl>(fragment_shader, std::move(uniform_layout),
-                                                         set_uniforms_fn, output, context)) {}
+                                                         output, context)) {}
 
 PostProcessorPipeline::PostProcessorPipeline(PipelineOutputInterface *output,
                                              VulkanContext *context)
     : PostProcessorPipeline(kFragmentShaderFilePathPostProcessorEmpty,
-                            EmptyShaderUniformLayout(context), NoOpSetPostProcessorUniformsFn,
-                            output, context) {}
+                            EmptyShaderUniformLayout(context), output, context) {}
 
 PostProcessorPipeline::~PostProcessorPipeline() {}
 
-PipelineOutputInterface *PostProcessorPipeline::Run(GpuBarrier const &barrier) {
+PipelineOutputInterface *
+PostProcessorPipeline::Run(GpuBarrier const &barrier,
+                           SetPostProcessorUniformsFn const &set_uniforms_fn) {
     VkCommandBuffer cmds = StartRenderPass(pimpl_->output->GetRenderPass(),
                                            *pimpl_->output->GetFrameBuffer(), pimpl_->context);
 
-    PostProcess(*pimpl_->pipeline, *pimpl_->uniform_layout, pimpl_->set_uniforms_fn, cmds);
+    if (set_uniforms_fn != nullptr) {
+        PostProcess(*pimpl_->pipeline, *pimpl_->uniform_layout, set_uniforms_fn, cmds);
+    } else {
+        PostProcess(*pimpl_->pipeline, *pimpl_->uniform_layout, NoOpSetPostProcessorUniformsFn,
+                    cmds);
+    }
 
     pimpl_->output->barrier =
         FinishRenderPass(cmds, barrier, pimpl_->output->FinalOutput(), pimpl_->context);
