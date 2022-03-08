@@ -18,7 +18,7 @@ void main() {
 	);
 
     const uint indices[6] = uint[6](
-        0, 1, 3, 1, 2, 3
+        0, 2, 1, 0, 3, 2
     );
 
     uint index = indices[gl_VertexIndex + gl_InstanceIndex*3];
