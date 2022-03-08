@@ -34,7 +34,7 @@
 namespace e8 {
 
 void CollectGeometries(SceneObject const &scene_object,
-                       google::protobuf::Map<GeometryId, GeometryLod> *geometries) {
+                       google::protobuf::Map<GeometryId, GeometryLodProto> *geometries) {
     if (scene_object.Procedural()) {
         return;
     }
@@ -45,8 +45,8 @@ void CollectGeometries(SceneObject const &scene_object,
                 continue;
             }
 
-            (*geometries)[child_entity.geometry_lod_instance->id()] =
-                *child_entity.geometry_lod_instance;
+            (*geometries)[child_entity.geometry_lod_instance->id] =
+                child_entity.geometry_lod_instance->ToProto();
         }
 
         return;

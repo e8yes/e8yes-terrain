@@ -22,9 +22,9 @@ package e8;
 import "primitive.proto";
 
 /**
- * @brief The Geometry message Represents an object's geometry as triangle mesh.
+ * @brief The GeometryProto message Represents an object's geometry as triangle mesh.
  */
-message Geometry {
+message GeometryProto {
     /**
      * @brief The RigidityType enum The type of rigidity to be expected for this geometry.
      */
@@ -50,18 +50,18 @@ message Geometry {
     RigidityType rigidity = 1;
 
     // A list of vertices defining the geometry of this geometry.
-    repeated PrimitiveVertex vertices = 2;
+    repeated PrimitiveVertexProto vertices = 2;
 
     // Defines triangle primitives by referencing the vertices of each triangle from the vertex 
     // list returned by the above function.
-    repeated PrimitiveIndices primitives = 3;
+    repeated PrimitiveIndicesProto primitives = 3;
 };
 
 /**
  * @brief The GeometryLod message Allows complex geometry to be represented with less detail at
  * distance.
  */
-message GeometryLod {
+message GeometryLodProto {
     // ID of this geometry design.
     string id = 1;
 
@@ -69,7 +69,7 @@ message GeometryLod {
     string name = 2;
 
     // LOD of this geometry design in descending level of detail.
-    repeated Geometry geometry_lod = 3;
+    repeated GeometryProto geometry_lod = 3;
 
     // A list the same length as the geometry_lod specifying the minimum distance the geometry LOD is
     // from the viewer before it can be applied to the rendering process. Therefore, the distances

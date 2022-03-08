@@ -36,15 +36,6 @@ struct DrawableInstance {
     mat44 const *transform;
 };
 
-// Offset of the position attribute in the primitive vertex proto.
-unsigned const kPrimitiveVertexPositionOffset = 0;
-
-// Offset of the normal attribute in the primitive vertex proto.
-unsigned const kPrimitiveVertexNormalOffset = sizeof(vec3);
-
-// Offset of the texture coordinate attribute in the primitive vertex proto.
-unsigned const kPrimitiveVertexTexCoordOffset = kPrimitiveVertexNormalOffset + sizeof(vec3);
-
 /**
  * @brief ToDrawable Selects a suitable geometry and material LODs from each entity and creates a
  * drawable from the selection, if there is one.

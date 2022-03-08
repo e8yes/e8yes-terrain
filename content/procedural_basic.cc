@@ -17,7 +17,6 @@
 
 #include <cassert>
 #include <cmath>
-#include <google/protobuf/repeated_field.h>
 #include <memory>
 
 #include "common/tensor.h"
@@ -40,8 +39,8 @@ float const kLodMinDistance = 0.0f;
 
 aabb BoundingBoxOf(Geometry const &geometry) {
     aabb bounding_box;
-    for (auto const &vertex : geometry.vertices()) {
-        bounding_box = bounding_box + ToVec3(vertex.position());
+    for (auto const &vertex : geometry.vertices) {
+        bounding_box = bounding_box + vertex.position;
     }
     return bounding_box;
 }
@@ -64,39 +63,44 @@ Geometry PlaneGeometry(float width, float height, float cell_area, bool movable)
     Geometry geometry;
 
     // Generates vertices.
+    geometry.vertices.resize(num_width_steps * num_height_steps);
+
     for (unsigned j = 0; j < num_height_steps; ++j) {
         for (unsigned i = 0; i < num_width_steps; ++i) {
-            vec3 position{quad_width * i - width / 2, quad_height * j - height / 2, 0};
-            vec3 normal{0, 0, 1};
-            vec2 tex_coord{static_cast<float>(i) / (num_width_steps - 1),
-                           static_cast<float>(j) / (num_height_steps - 1)};
+            PrimitiveVertex vertex;
+            vertex.position = vec3{quad_width * i - width / 2, quad_height * j - height / 2, 0};
+            vertex.normal = vec3{0, 0, 1};
+            vertex.tex_coord = vec2{static_cast<float>(i) / (num_width_steps - 1),
+                                    static_cast<float>(j) / (num_height_steps - 1)};
 
-            PrimitiveVertex *vertex = geometry.add_vertices();
-            *vertex->mutable_position() = ToProto(position);
-            *vertex->mutable_normal() = ToProto(normal);
-            *vertex->mutable_texcoord() = ToProto(tex_coord);
+            geometry.vertices[i + j * num_width_steps] = vertex;
         }
     }
 
     // Generates triangle faces.
+    geometry.primitives.resize((num_width_steps - 1) * (num_height_steps - 1) * 2);
+
     for (unsigned j = 0; j < num_height_steps - 1; ++j) {
         for (unsigned i = 0; i < num_width_steps - 1; ++i) {
-            PrimitiveIndices *top_left = geometry.add_primitives();
-            top_left->add_indices((i + 0) + (j + 0) * num_width_steps);
-            top_left->add_indices((i + 1) + (j + 0) * num_width_steps);
-            top_left->add_indices((i + 0) + (j + 1) * num_width_steps);
+            Primitive top_left;
+            top_left.vertex_refs(0) = (i + 0) + (j + 0) * num_width_steps;
+            top_left.vertex_refs(1) = (i + 1) + (j + 0) * num_width_steps;
+            top_left.vertex_refs(2) = (i + 0) + (j + 1) * num_width_steps;
 
-            PrimitiveIndices *bottom_right = geometry.add_primitives();
-            bottom_right->add_indices((i + 1) + (j + 1) * num_width_steps);
-            bottom_right->add_indices((i + 0) + (j + 1) * num_width_steps);
-            bottom_right->add_indices((i + 1) + (j + 0) * num_width_steps);
+            Primitive bottom_right;
+            bottom_right.vertex_refs(0) = (i + 1) + (j + 1) * num_width_steps;
+            bottom_right.vertex_refs(1) = (i + 0) + (j + 1) * num_width_steps;
+            bottom_right.vertex_refs(2) = (i + 1) + (j + 0) * num_width_steps;
+
+            geometry.primitives[i + 0 + j * (num_width_steps - 1) * 2] = top_left;
+            geometry.primitives[i + 1 + j * (num_width_steps - 1) * 2] = bottom_right;
         }
     }
 
     if (movable) {
-        geometry.set_rigidity(Geometry::RIGID);
+        geometry.rigidity = GeometryProto::RIGID;
     } else {
-        geometry.set_rigidity(Geometry::STATIC);
+        geometry.rigidity = GeometryProto::STATIC;
     }
 
     return geometry;
@@ -104,19 +108,17 @@ Geometry PlaneGeometry(float width, float height, float cell_area, bool movable)
 
 SceneEntity PlaneEntity(float width, float height, float cell_area,
                         SrtTransform const &srt_transform, bool movable) {
-    google::protobuf::RepeatedPtrField<Geometry> geometry_lod;
-    google::protobuf::RepeatedField<float> min_distances;
-
     Geometry plane_geometry = PlaneGeometry(width, height, cell_area, movable);
-    *geometry_lod.Add() = plane_geometry;
-    min_distances.Add(kLodMinDistance);
+
+    std::vector<Geometry> lod{plane_geometry};
+    std::vector<float> lod_min_distances{kLodMinDistance};
 
     std::shared_ptr<GeometryLod> geometry_lod_instance =
-        CreateGeometry(kGeometryName, geometry_lod, min_distances);
+        std::make_shared<GeometryLod>(kGeometryName, lod, lod_min_distances);
 
     SceneEntity entity(kEntityName);
     entity.movable = movable;
-    entity.bounding_box = BoundingBoxOf(geometry_lod_instance->geometry_lod(0));
+    entity.bounding_box = BoundingBoxOf(geometry_lod_instance->lod[0]);
     SceneEntitySetSrtTransform(srt_transform, &entity);
     entity.geometry_lod_instance = geometry_lod_instance;
 

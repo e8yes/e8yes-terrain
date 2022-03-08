@@ -653,13 +653,13 @@ class SceneObjectProto PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class SceneObjectCollection_GeometriesEntry_DoNotUse : public ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<SceneObjectCollection_GeometriesEntry_DoNotUse, 
-    std::string, ::e8::GeometryLod,
+    std::string, ::e8::GeometryLodProto,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE,
     0 > {
 public:
   typedef ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<SceneObjectCollection_GeometriesEntry_DoNotUse, 
-    std::string, ::e8::GeometryLod,
+    std::string, ::e8::GeometryLodProto,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE,
     0 > SuperType;
@@ -852,21 +852,21 @@ class SceneObjectCollection PROTOBUF_FINAL :
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneObjectProto >&
       scene_objects() const;
 
-  // map<string, .e8.GeometryLod> geometries = 2;
+  // map<string, .e8.GeometryLodProto> geometries = 2;
   int geometries_size() const;
   private:
   int _internal_geometries_size() const;
   public:
   void clear_geometries();
   private:
-  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >&
+  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLodProto >&
       _internal_geometries() const;
-  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >*
+  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLodProto >*
       _internal_mutable_geometries();
   public:
-  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >&
+  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLodProto >&
       geometries() const;
-  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >*
+  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLodProto >*
       mutable_geometries();
 
   // map<string, .e8.PhysicalShapeProto> physical_shapes = 3;
@@ -896,7 +896,7 @@ class SceneObjectCollection PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneObjectProto > scene_objects_;
   ::PROTOBUF_NAMESPACE_ID::internal::MapField<
       SceneObjectCollection_GeometriesEntry_DoNotUse,
-      std::string, ::e8::GeometryLod,
+      std::string, ::e8::GeometryLodProto,
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE,
       0 > geometries_;
@@ -1448,27 +1448,27 @@ SceneObjectCollection::scene_objects() const {
   return scene_objects_;
 }
 
-// map<string, .e8.GeometryLod> geometries = 2;
+// map<string, .e8.GeometryLodProto> geometries = 2;
 inline int SceneObjectCollection::_internal_geometries_size() const {
   return geometries_.size();
 }
 inline int SceneObjectCollection::geometries_size() const {
   return _internal_geometries_size();
 }
-inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >&
+inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLodProto >&
 SceneObjectCollection::_internal_geometries() const {
   return geometries_.GetMap();
 }
-inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >&
+inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLodProto >&
 SceneObjectCollection::geometries() const {
   // @@protoc_insertion_point(field_map:e8.SceneObjectCollection.geometries)
   return _internal_geometries();
 }
-inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >*
+inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLodProto >*
 SceneObjectCollection::_internal_mutable_geometries() {
   return geometries_.MutableMap();
 }
-inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >*
+inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLodProto >*
 SceneObjectCollection::mutable_geometries() {
   // @@protoc_insertion_point(field_mutable_map:e8.SceneObjectCollection.geometries)
   return _internal_mutable_geometries();

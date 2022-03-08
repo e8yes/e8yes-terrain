@@ -58,43 +58,43 @@ namespace e8 {
 class AABB;
 class AABBDefaultTypeInternal;
 extern AABBDefaultTypeInternal _AABB_default_instance_;
-class PrimitiveIndices;
-class PrimitiveIndicesDefaultTypeInternal;
-extern PrimitiveIndicesDefaultTypeInternal _PrimitiveIndices_default_instance_;
-class PrimitiveVertex;
-class PrimitiveVertexDefaultTypeInternal;
-extern PrimitiveVertexDefaultTypeInternal _PrimitiveVertex_default_instance_;
+class PrimitiveIndicesProto;
+class PrimitiveIndicesProtoDefaultTypeInternal;
+extern PrimitiveIndicesProtoDefaultTypeInternal _PrimitiveIndicesProto_default_instance_;
+class PrimitiveVertexProto;
+class PrimitiveVertexProtoDefaultTypeInternal;
+extern PrimitiveVertexProtoDefaultTypeInternal _PrimitiveVertexProto_default_instance_;
 class SrtTransform;
 class SrtTransformDefaultTypeInternal;
 extern SrtTransformDefaultTypeInternal _SrtTransform_default_instance_;
 }  // namespace e8
 PROTOBUF_NAMESPACE_OPEN
 template<> ::e8::AABB* Arena::CreateMaybeMessage<::e8::AABB>(Arena*);
-template<> ::e8::PrimitiveIndices* Arena::CreateMaybeMessage<::e8::PrimitiveIndices>(Arena*);
-template<> ::e8::PrimitiveVertex* Arena::CreateMaybeMessage<::e8::PrimitiveVertex>(Arena*);
+template<> ::e8::PrimitiveIndicesProto* Arena::CreateMaybeMessage<::e8::PrimitiveIndicesProto>(Arena*);
+template<> ::e8::PrimitiveVertexProto* Arena::CreateMaybeMessage<::e8::PrimitiveVertexProto>(Arena*);
 template<> ::e8::SrtTransform* Arena::CreateMaybeMessage<::e8::SrtTransform>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace e8 {
 
 // ===================================================================
 
-class PrimitiveVertex PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:e8.PrimitiveVertex) */ {
+class PrimitiveVertexProto PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:e8.PrimitiveVertexProto) */ {
  public:
-  inline PrimitiveVertex() : PrimitiveVertex(nullptr) {};
-  virtual ~PrimitiveVertex();
+  inline PrimitiveVertexProto() : PrimitiveVertexProto(nullptr) {};
+  virtual ~PrimitiveVertexProto();
 
-  PrimitiveVertex(const PrimitiveVertex& from);
-  PrimitiveVertex(PrimitiveVertex&& from) noexcept
-    : PrimitiveVertex() {
+  PrimitiveVertexProto(const PrimitiveVertexProto& from);
+  PrimitiveVertexProto(PrimitiveVertexProto&& from) noexcept
+    : PrimitiveVertexProto() {
     *this = ::std::move(from);
   }
 
-  inline PrimitiveVertex& operator=(const PrimitiveVertex& from) {
+  inline PrimitiveVertexProto& operator=(const PrimitiveVertexProto& from) {
     CopyFrom(from);
     return *this;
   }
-  inline PrimitiveVertex& operator=(PrimitiveVertex&& from) noexcept {
+  inline PrimitiveVertexProto& operator=(PrimitiveVertexProto&& from) noexcept {
     if (GetArena() == from.GetArena()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -112,20 +112,20 @@ class PrimitiveVertex PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const PrimitiveVertex& default_instance();
+  static const PrimitiveVertexProto& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const PrimitiveVertex* internal_default_instance() {
-    return reinterpret_cast<const PrimitiveVertex*>(
-               &_PrimitiveVertex_default_instance_);
+  static inline const PrimitiveVertexProto* internal_default_instance() {
+    return reinterpret_cast<const PrimitiveVertexProto*>(
+               &_PrimitiveVertexProto_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     0;
 
-  friend void swap(PrimitiveVertex& a, PrimitiveVertex& b) {
+  friend void swap(PrimitiveVertexProto& a, PrimitiveVertexProto& b) {
     a.Swap(&b);
   }
-  inline void Swap(PrimitiveVertex* other) {
+  inline void Swap(PrimitiveVertexProto* other) {
     if (other == this) return;
     if (GetArena() == other->GetArena()) {
       InternalSwap(other);
@@ -133,7 +133,7 @@ class PrimitiveVertex PROTOBUF_FINAL :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(PrimitiveVertex* other) {
+  void UnsafeArenaSwap(PrimitiveVertexProto* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -141,17 +141,17 @@ class PrimitiveVertex PROTOBUF_FINAL :
 
   // implements Message ----------------------------------------------
 
-  inline PrimitiveVertex* New() const final {
-    return CreateMaybeMessage<PrimitiveVertex>(nullptr);
+  inline PrimitiveVertexProto* New() const final {
+    return CreateMaybeMessage<PrimitiveVertexProto>(nullptr);
   }
 
-  PrimitiveVertex* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<PrimitiveVertex>(arena);
+  PrimitiveVertexProto* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<PrimitiveVertexProto>(arena);
   }
   void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const PrimitiveVertex& from);
-  void MergeFrom(const PrimitiveVertex& from);
+  void CopyFrom(const PrimitiveVertexProto& from);
+  void MergeFrom(const PrimitiveVertexProto& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -165,13 +165,13 @@ class PrimitiveVertex PROTOBUF_FINAL :
   inline void SharedCtor();
   inline void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(PrimitiveVertex* other);
+  void InternalSwap(PrimitiveVertexProto* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "e8.PrimitiveVertex";
+    return "e8.PrimitiveVertexProto";
   }
   protected:
-  explicit PrimitiveVertex(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  explicit PrimitiveVertexProto(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   private:
   static void ArenaDtor(void* object);
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
@@ -261,7 +261,7 @@ class PrimitiveVertex PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
       mutable_texcoord();
 
-  // @@protoc_insertion_point(class_scope:e8.PrimitiveVertex)
+  // @@protoc_insertion_point(class_scope:e8.PrimitiveVertexProto)
  private:
   class _Internal;
 
@@ -279,23 +279,23 @@ class PrimitiveVertex PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
-class PrimitiveIndices PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:e8.PrimitiveIndices) */ {
+class PrimitiveIndicesProto PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:e8.PrimitiveIndicesProto) */ {
  public:
-  inline PrimitiveIndices() : PrimitiveIndices(nullptr) {};
-  virtual ~PrimitiveIndices();
+  inline PrimitiveIndicesProto() : PrimitiveIndicesProto(nullptr) {};
+  virtual ~PrimitiveIndicesProto();
 
-  PrimitiveIndices(const PrimitiveIndices& from);
-  PrimitiveIndices(PrimitiveIndices&& from) noexcept
-    : PrimitiveIndices() {
+  PrimitiveIndicesProto(const PrimitiveIndicesProto& from);
+  PrimitiveIndicesProto(PrimitiveIndicesProto&& from) noexcept
+    : PrimitiveIndicesProto() {
     *this = ::std::move(from);
   }
 
-  inline PrimitiveIndices& operator=(const PrimitiveIndices& from) {
+  inline PrimitiveIndicesProto& operator=(const PrimitiveIndicesProto& from) {
     CopyFrom(from);
     return *this;
   }
-  inline PrimitiveIndices& operator=(PrimitiveIndices&& from) noexcept {
+  inline PrimitiveIndicesProto& operator=(PrimitiveIndicesProto&& from) noexcept {
     if (GetArena() == from.GetArena()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -313,20 +313,20 @@ class PrimitiveIndices PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const PrimitiveIndices& default_instance();
+  static const PrimitiveIndicesProto& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const PrimitiveIndices* internal_default_instance() {
-    return reinterpret_cast<const PrimitiveIndices*>(
-               &_PrimitiveIndices_default_instance_);
+  static inline const PrimitiveIndicesProto* internal_default_instance() {
+    return reinterpret_cast<const PrimitiveIndicesProto*>(
+               &_PrimitiveIndicesProto_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     1;
 
-  friend void swap(PrimitiveIndices& a, PrimitiveIndices& b) {
+  friend void swap(PrimitiveIndicesProto& a, PrimitiveIndicesProto& b) {
     a.Swap(&b);
   }
-  inline void Swap(PrimitiveIndices* other) {
+  inline void Swap(PrimitiveIndicesProto* other) {
     if (other == this) return;
     if (GetArena() == other->GetArena()) {
       InternalSwap(other);
@@ -334,7 +334,7 @@ class PrimitiveIndices PROTOBUF_FINAL :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(PrimitiveIndices* other) {
+  void UnsafeArenaSwap(PrimitiveIndicesProto* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -342,17 +342,17 @@ class PrimitiveIndices PROTOBUF_FINAL :
 
   // implements Message ----------------------------------------------
 
-  inline PrimitiveIndices* New() const final {
-    return CreateMaybeMessage<PrimitiveIndices>(nullptr);
+  inline PrimitiveIndicesProto* New() const final {
+    return CreateMaybeMessage<PrimitiveIndicesProto>(nullptr);
   }
 
-  PrimitiveIndices* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<PrimitiveIndices>(arena);
+  PrimitiveIndicesProto* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<PrimitiveIndicesProto>(arena);
   }
   void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const PrimitiveIndices& from);
-  void MergeFrom(const PrimitiveIndices& from);
+  void CopyFrom(const PrimitiveIndicesProto& from);
+  void MergeFrom(const PrimitiveIndicesProto& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -366,13 +366,13 @@ class PrimitiveIndices PROTOBUF_FINAL :
   inline void SharedCtor();
   inline void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(PrimitiveIndices* other);
+  void InternalSwap(PrimitiveIndicesProto* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "e8.PrimitiveIndices";
+    return "e8.PrimitiveIndicesProto";
   }
   protected:
-  explicit PrimitiveIndices(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  explicit PrimitiveIndicesProto(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   private:
   static void ArenaDtor(void* object);
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
@@ -416,7 +416,7 @@ class PrimitiveIndices PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
       mutable_indices();
 
-  // @@protoc_insertion_point(class_scope:e8.PrimitiveIndices)
+  // @@protoc_insertion_point(class_scope:e8.PrimitiveIndicesProto)
  private:
   class _Internal;
 
@@ -814,197 +814,197 @@ class SrtTransform PROTOBUF_FINAL :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
-// PrimitiveVertex
+// PrimitiveVertexProto
 
 // repeated float position = 1;
-inline int PrimitiveVertex::_internal_position_size() const {
+inline int PrimitiveVertexProto::_internal_position_size() const {
   return position_.size();
 }
-inline int PrimitiveVertex::position_size() const {
+inline int PrimitiveVertexProto::position_size() const {
   return _internal_position_size();
 }
-inline void PrimitiveVertex::clear_position() {
+inline void PrimitiveVertexProto::clear_position() {
   position_.Clear();
 }
-inline float PrimitiveVertex::_internal_position(int index) const {
+inline float PrimitiveVertexProto::_internal_position(int index) const {
   return position_.Get(index);
 }
-inline float PrimitiveVertex::position(int index) const {
-  // @@protoc_insertion_point(field_get:e8.PrimitiveVertex.position)
+inline float PrimitiveVertexProto::position(int index) const {
+  // @@protoc_insertion_point(field_get:e8.PrimitiveVertexProto.position)
   return _internal_position(index);
 }
-inline void PrimitiveVertex::set_position(int index, float value) {
+inline void PrimitiveVertexProto::set_position(int index, float value) {
   position_.Set(index, value);
-  // @@protoc_insertion_point(field_set:e8.PrimitiveVertex.position)
+  // @@protoc_insertion_point(field_set:e8.PrimitiveVertexProto.position)
 }
-inline void PrimitiveVertex::_internal_add_position(float value) {
+inline void PrimitiveVertexProto::_internal_add_position(float value) {
   position_.Add(value);
 }
-inline void PrimitiveVertex::add_position(float value) {
+inline void PrimitiveVertexProto::add_position(float value) {
   _internal_add_position(value);
-  // @@protoc_insertion_point(field_add:e8.PrimitiveVertex.position)
+  // @@protoc_insertion_point(field_add:e8.PrimitiveVertexProto.position)
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-PrimitiveVertex::_internal_position() const {
+PrimitiveVertexProto::_internal_position() const {
   return position_;
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-PrimitiveVertex::position() const {
-  // @@protoc_insertion_point(field_list:e8.PrimitiveVertex.position)
+PrimitiveVertexProto::position() const {
+  // @@protoc_insertion_point(field_list:e8.PrimitiveVertexProto.position)
   return _internal_position();
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-PrimitiveVertex::_internal_mutable_position() {
+PrimitiveVertexProto::_internal_mutable_position() {
   return &position_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-PrimitiveVertex::mutable_position() {
-  // @@protoc_insertion_point(field_mutable_list:e8.PrimitiveVertex.position)
+PrimitiveVertexProto::mutable_position() {
+  // @@protoc_insertion_point(field_mutable_list:e8.PrimitiveVertexProto.position)
   return _internal_mutable_position();
 }
 
 // repeated float normal = 2;
-inline int PrimitiveVertex::_internal_normal_size() const {
+inline int PrimitiveVertexProto::_internal_normal_size() const {
   return normal_.size();
 }
-inline int PrimitiveVertex::normal_size() const {
+inline int PrimitiveVertexProto::normal_size() const {
   return _internal_normal_size();
 }
-inline void PrimitiveVertex::clear_normal() {
+inline void PrimitiveVertexProto::clear_normal() {
   normal_.Clear();
 }
-inline float PrimitiveVertex::_internal_normal(int index) const {
+inline float PrimitiveVertexProto::_internal_normal(int index) const {
   return normal_.Get(index);
 }
-inline float PrimitiveVertex::normal(int index) const {
-  // @@protoc_insertion_point(field_get:e8.PrimitiveVertex.normal)
+inline float PrimitiveVertexProto::normal(int index) const {
+  // @@protoc_insertion_point(field_get:e8.PrimitiveVertexProto.normal)
   return _internal_normal(index);
 }
-inline void PrimitiveVertex::set_normal(int index, float value) {
+inline void PrimitiveVertexProto::set_normal(int index, float value) {
   normal_.Set(index, value);
-  // @@protoc_insertion_point(field_set:e8.PrimitiveVertex.normal)
+  // @@protoc_insertion_point(field_set:e8.PrimitiveVertexProto.normal)
 }
-inline void PrimitiveVertex::_internal_add_normal(float value) {
+inline void PrimitiveVertexProto::_internal_add_normal(float value) {
   normal_.Add(value);
 }
-inline void PrimitiveVertex::add_normal(float value) {
+inline void PrimitiveVertexProto::add_normal(float value) {
   _internal_add_normal(value);
-  // @@protoc_insertion_point(field_add:e8.PrimitiveVertex.normal)
+  // @@protoc_insertion_point(field_add:e8.PrimitiveVertexProto.normal)
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-PrimitiveVertex::_internal_normal() const {
+PrimitiveVertexProto::_internal_normal() const {
   return normal_;
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-PrimitiveVertex::normal() const {
-  // @@protoc_insertion_point(field_list:e8.PrimitiveVertex.normal)
+PrimitiveVertexProto::normal() const {
+  // @@protoc_insertion_point(field_list:e8.PrimitiveVertexProto.normal)
   return _internal_normal();
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-PrimitiveVertex::_internal_mutable_normal() {
+PrimitiveVertexProto::_internal_mutable_normal() {
   return &normal_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-PrimitiveVertex::mutable_normal() {
-  // @@protoc_insertion_point(field_mutable_list:e8.PrimitiveVertex.normal)
+PrimitiveVertexProto::mutable_normal() {
+  // @@protoc_insertion_point(field_mutable_list:e8.PrimitiveVertexProto.normal)
   return _internal_mutable_normal();
 }
 
 // repeated float texcoord = 3;
-inline int PrimitiveVertex::_internal_texcoord_size() const {
+inline int PrimitiveVertexProto::_internal_texcoord_size() const {
   return texcoord_.size();
 }
-inline int PrimitiveVertex::texcoord_size() const {
+inline int PrimitiveVertexProto::texcoord_size() const {
   return _internal_texcoord_size();
 }
-inline void PrimitiveVertex::clear_texcoord() {
+inline void PrimitiveVertexProto::clear_texcoord() {
   texcoord_.Clear();
 }
-inline float PrimitiveVertex::_internal_texcoord(int index) const {
+inline float PrimitiveVertexProto::_internal_texcoord(int index) const {
   return texcoord_.Get(index);
 }
-inline float PrimitiveVertex::texcoord(int index) const {
-  // @@protoc_insertion_point(field_get:e8.PrimitiveVertex.texcoord)
+inline float PrimitiveVertexProto::texcoord(int index) const {
+  // @@protoc_insertion_point(field_get:e8.PrimitiveVertexProto.texcoord)
   return _internal_texcoord(index);
 }
-inline void PrimitiveVertex::set_texcoord(int index, float value) {
+inline void PrimitiveVertexProto::set_texcoord(int index, float value) {
   texcoord_.Set(index, value);
-  // @@protoc_insertion_point(field_set:e8.PrimitiveVertex.texcoord)
+  // @@protoc_insertion_point(field_set:e8.PrimitiveVertexProto.texcoord)
 }
-inline void PrimitiveVertex::_internal_add_texcoord(float value) {
+inline void PrimitiveVertexProto::_internal_add_texcoord(float value) {
   texcoord_.Add(value);
 }
-inline void PrimitiveVertex::add_texcoord(float value) {
+inline void PrimitiveVertexProto::add_texcoord(float value) {
   _internal_add_texcoord(value);
-  // @@protoc_insertion_point(field_add:e8.PrimitiveVertex.texcoord)
+  // @@protoc_insertion_point(field_add:e8.PrimitiveVertexProto.texcoord)
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-PrimitiveVertex::_internal_texcoord() const {
+PrimitiveVertexProto::_internal_texcoord() const {
   return texcoord_;
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-PrimitiveVertex::texcoord() const {
-  // @@protoc_insertion_point(field_list:e8.PrimitiveVertex.texcoord)
+PrimitiveVertexProto::texcoord() const {
+  // @@protoc_insertion_point(field_list:e8.PrimitiveVertexProto.texcoord)
   return _internal_texcoord();
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-PrimitiveVertex::_internal_mutable_texcoord() {
+PrimitiveVertexProto::_internal_mutable_texcoord() {
   return &texcoord_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-PrimitiveVertex::mutable_texcoord() {
-  // @@protoc_insertion_point(field_mutable_list:e8.PrimitiveVertex.texcoord)
+PrimitiveVertexProto::mutable_texcoord() {
+  // @@protoc_insertion_point(field_mutable_list:e8.PrimitiveVertexProto.texcoord)
   return _internal_mutable_texcoord();
 }
 
 // -------------------------------------------------------------------
 
-// PrimitiveIndices
+// PrimitiveIndicesProto
 
 // repeated int32 indices = 1;
-inline int PrimitiveIndices::_internal_indices_size() const {
+inline int PrimitiveIndicesProto::_internal_indices_size() const {
   return indices_.size();
 }
-inline int PrimitiveIndices::indices_size() const {
+inline int PrimitiveIndicesProto::indices_size() const {
   return _internal_indices_size();
 }
-inline void PrimitiveIndices::clear_indices() {
+inline void PrimitiveIndicesProto::clear_indices() {
   indices_.Clear();
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 PrimitiveIndices::_internal_indices(int index) const {
+inline ::PROTOBUF_NAMESPACE_ID::int32 PrimitiveIndicesProto::_internal_indices(int index) const {
   return indices_.Get(index);
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 PrimitiveIndices::indices(int index) const {
-  // @@protoc_insertion_point(field_get:e8.PrimitiveIndices.indices)
+inline ::PROTOBUF_NAMESPACE_ID::int32 PrimitiveIndicesProto::indices(int index) const {
+  // @@protoc_insertion_point(field_get:e8.PrimitiveIndicesProto.indices)
   return _internal_indices(index);
 }
-inline void PrimitiveIndices::set_indices(int index, ::PROTOBUF_NAMESPACE_ID::int32 value) {
+inline void PrimitiveIndicesProto::set_indices(int index, ::PROTOBUF_NAMESPACE_ID::int32 value) {
   indices_.Set(index, value);
-  // @@protoc_insertion_point(field_set:e8.PrimitiveIndices.indices)
+  // @@protoc_insertion_point(field_set:e8.PrimitiveIndicesProto.indices)
 }
-inline void PrimitiveIndices::_internal_add_indices(::PROTOBUF_NAMESPACE_ID::int32 value) {
+inline void PrimitiveIndicesProto::_internal_add_indices(::PROTOBUF_NAMESPACE_ID::int32 value) {
   indices_.Add(value);
 }
-inline void PrimitiveIndices::add_indices(::PROTOBUF_NAMESPACE_ID::int32 value) {
+inline void PrimitiveIndicesProto::add_indices(::PROTOBUF_NAMESPACE_ID::int32 value) {
   _internal_add_indices(value);
-  // @@protoc_insertion_point(field_add:e8.PrimitiveIndices.indices)
+  // @@protoc_insertion_point(field_add:e8.PrimitiveIndicesProto.indices)
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
-PrimitiveIndices::_internal_indices() const {
+PrimitiveIndicesProto::_internal_indices() const {
   return indices_;
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
-PrimitiveIndices::indices() const {
-  // @@protoc_insertion_point(field_list:e8.PrimitiveIndices.indices)
+PrimitiveIndicesProto::indices() const {
+  // @@protoc_insertion_point(field_list:e8.PrimitiveIndicesProto.indices)
   return _internal_indices();
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
-PrimitiveIndices::_internal_mutable_indices() {
+PrimitiveIndicesProto::_internal_mutable_indices() {
   return &indices_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
-PrimitiveIndices::mutable_indices() {
-  // @@protoc_insertion_point(field_mutable_list:e8.PrimitiveIndices.indices)
+PrimitiveIndicesProto::mutable_indices() {
+  // @@protoc_insertion_point(field_mutable_list:e8.PrimitiveIndicesProto.indices)
   return _internal_mutable_indices();
 }
 

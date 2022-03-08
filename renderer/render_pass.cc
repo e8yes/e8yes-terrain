@@ -123,7 +123,7 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
                                /*pOffsets=*/&offset);
         vkCmdBindIndexBuffer(cmds, result.index_buffer->buffer, /*offset=*/0,
                              result.index_element_type);
-        vkCmdDrawIndexed(cmds, instance.geometry->primitives().size() * 3,
+        vkCmdDrawIndexed(cmds, instance.geometry->primitives.size() * 3,
                          /*instanceCount=*/1, /*firstIndex=*/0, /*vertexOffset=*/0,
                          /*firstInstance=*/0);
     }

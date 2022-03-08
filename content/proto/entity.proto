@@ -50,10 +50,10 @@ message SceneEntityProto {
     // An AABB bounding box (before a placement transform) surrounding the entity's geometry.
     AABB bounding_box = 6;
 
-    // A drawable instance with information derived from a drawable. A shared pointer allows a large
-    // number of same drawables to be placed at different location of the scene with shared
+    // A geometry instance with information derived from a GeometryLod. A shared pointer allows a
+    // large number of same drawables to be placed at different location of the scene with shared
     // information.
-    string drawable_id = 7;
+    string geometry_id = 7;
 
     // Like above, A physical shape instance with information derived from a physical shape.
     string physical_shape_id = 8;

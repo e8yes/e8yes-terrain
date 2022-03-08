@@ -15,14 +15,14 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 namespace e8 {
-class PrimitiveVertexDefaultTypeInternal {
+class PrimitiveVertexProtoDefaultTypeInternal {
  public:
-  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<PrimitiveVertex> _instance;
-} _PrimitiveVertex_default_instance_;
-class PrimitiveIndicesDefaultTypeInternal {
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<PrimitiveVertexProto> _instance;
+} _PrimitiveVertexProto_default_instance_;
+class PrimitiveIndicesProtoDefaultTypeInternal {
  public:
-  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<PrimitiveIndices> _instance;
-} _PrimitiveIndices_default_instance_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<PrimitiveIndicesProto> _instance;
+} _PrimitiveIndicesProto_default_instance_;
 class AABBDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<AABB> _instance;
@@ -46,33 +46,33 @@ static void InitDefaultsscc_info_AABB_primitive_2eproto() {
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_AABB_primitive_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_AABB_primitive_2eproto}, {}};
 
-static void InitDefaultsscc_info_PrimitiveIndices_primitive_2eproto() {
+static void InitDefaultsscc_info_PrimitiveIndicesProto_primitive_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::e8::_PrimitiveIndices_default_instance_;
-    new (ptr) ::e8::PrimitiveIndices();
+    void* ptr = &::e8::_PrimitiveIndicesProto_default_instance_;
+    new (ptr) ::e8::PrimitiveIndicesProto();
     ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::e8::PrimitiveIndices::InitAsDefaultInstance();
+  ::e8::PrimitiveIndicesProto::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_PrimitiveIndices_primitive_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_PrimitiveIndices_primitive_2eproto}, {}};
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_PrimitiveIndicesProto_primitive_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_PrimitiveIndicesProto_primitive_2eproto}, {}};
 
-static void InitDefaultsscc_info_PrimitiveVertex_primitive_2eproto() {
+static void InitDefaultsscc_info_PrimitiveVertexProto_primitive_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::e8::_PrimitiveVertex_default_instance_;
-    new (ptr) ::e8::PrimitiveVertex();
+    void* ptr = &::e8::_PrimitiveVertexProto_default_instance_;
+    new (ptr) ::e8::PrimitiveVertexProto();
     ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::e8::PrimitiveVertex::InitAsDefaultInstance();
+  ::e8::PrimitiveVertexProto::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_PrimitiveVertex_primitive_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_PrimitiveVertex_primitive_2eproto}, {}};
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_PrimitiveVertexProto_primitive_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_PrimitiveVertexProto_primitive_2eproto}, {}};
 
 static void InitDefaultsscc_info_SrtTransform_primitive_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -94,19 +94,19 @@ static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_s
 
 const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_primitive_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::e8::PrimitiveVertex, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::e8::PrimitiveVertexProto, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::e8::PrimitiveVertex, position_),
-  PROTOBUF_FIELD_OFFSET(::e8::PrimitiveVertex, normal_),
-  PROTOBUF_FIELD_OFFSET(::e8::PrimitiveVertex, texcoord_),
+  PROTOBUF_FIELD_OFFSET(::e8::PrimitiveVertexProto, position_),
+  PROTOBUF_FIELD_OFFSET(::e8::PrimitiveVertexProto, normal_),
+  PROTOBUF_FIELD_OFFSET(::e8::PrimitiveVertexProto, texcoord_),
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::e8::PrimitiveIndices, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::e8::PrimitiveIndicesProto, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::e8::PrimitiveIndices, indices_),
+  PROTOBUF_FIELD_OFFSET(::e8::PrimitiveIndicesProto, indices_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::e8::AABB, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -124,39 +124,39 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_primitive_2eproto::offsets[] P
   PROTOBUF_FIELD_OFFSET(::e8::SrtTransform, translation_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, sizeof(::e8::PrimitiveVertex)},
-  { 8, -1, sizeof(::e8::PrimitiveIndices)},
+  { 0, -1, sizeof(::e8::PrimitiveVertexProto)},
+  { 8, -1, sizeof(::e8::PrimitiveIndicesProto)},
   { 14, -1, sizeof(::e8::AABB)},
   { 21, -1, sizeof(::e8::SrtTransform)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_PrimitiveVertex_default_instance_),
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_PrimitiveIndices_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_PrimitiveVertexProto_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_PrimitiveIndicesProto_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_AABB_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_SrtTransform_default_instance_),
 };
 
 const char descriptor_table_protodef_primitive_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\017primitive.proto\022\002e8\"E\n\017PrimitiveVertex"
-  "\022\020\n\010position\030\001 \003(\002\022\016\n\006normal\030\002 \003(\002\022\020\n\010te"
-  "xcoord\030\003 \003(\002\"#\n\020PrimitiveIndices\022\017\n\007indi"
-  "ces\030\001 \003(\005\" \n\004AABB\022\013\n\003min\030\001 \003(\002\022\013\n\003max\030\002 "
-  "\003(\002\"F\n\014SrtTransform\022\017\n\007scaling\030\001 \003(\002\022\020\n\010"
-  "rotation\030\002 \003(\002\022\023\n\013translation\030\003 \003(\002b\006pro"
-  "to3"
+  "\n\017primitive.proto\022\002e8\"J\n\024PrimitiveVertex"
+  "Proto\022\020\n\010position\030\001 \003(\002\022\016\n\006normal\030\002 \003(\002\022"
+  "\020\n\010texcoord\030\003 \003(\002\"(\n\025PrimitiveIndicesPro"
+  "to\022\017\n\007indices\030\001 \003(\005\" \n\004AABB\022\013\n\003min\030\001 \003(\002"
+  "\022\013\n\003max\030\002 \003(\002\"F\n\014SrtTransform\022\017\n\007scaling"
+  "\030\001 \003(\002\022\020\n\010rotation\030\002 \003(\002\022\023\n\013translation\030"
+  "\003 \003(\002b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_primitive_2eproto_deps[1] = {
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_primitive_2eproto_sccs[4] = {
   &scc_info_AABB_primitive_2eproto.base,
-  &scc_info_PrimitiveIndices_primitive_2eproto.base,
-  &scc_info_PrimitiveVertex_primitive_2eproto.base,
+  &scc_info_PrimitiveIndicesProto_primitive_2eproto.base,
+  &scc_info_PrimitiveVertexProto_primitive_2eproto.base,
   &scc_info_SrtTransform_primitive_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_primitive_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_primitive_2eproto = {
-  false, false, descriptor_table_protodef_primitive_2eproto, "primitive.proto", 243,
+  false, false, descriptor_table_protodef_primitive_2eproto, "primitive.proto", 253,
   &descriptor_table_primitive_2eproto_once, descriptor_table_primitive_2eproto_sccs, descriptor_table_primitive_2eproto_deps, 4, 0,
   schemas, file_default_instances, TableStruct_primitive_2eproto::offsets,
   file_level_metadata_primitive_2eproto, 4, file_level_enum_descriptors_primitive_2eproto, file_level_service_descriptors_primitive_2eproto,
@@ -168,60 +168,60 @@ namespace e8 {
 
 // ===================================================================
 
-void PrimitiveVertex::InitAsDefaultInstance() {
+void PrimitiveVertexProto::InitAsDefaultInstance() {
 }
-class PrimitiveVertex::_Internal {
+class PrimitiveVertexProto::_Internal {
  public:
 };
 
-PrimitiveVertex::PrimitiveVertex(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+PrimitiveVertexProto::PrimitiveVertexProto(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena),
   position_(arena),
   normal_(arena),
   texcoord_(arena) {
   SharedCtor();
   RegisterArenaDtor(arena);
-  // @@protoc_insertion_point(arena_constructor:e8.PrimitiveVertex)
+  // @@protoc_insertion_point(arena_constructor:e8.PrimitiveVertexProto)
 }
-PrimitiveVertex::PrimitiveVertex(const PrimitiveVertex& from)
+PrimitiveVertexProto::PrimitiveVertexProto(const PrimitiveVertexProto& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
       position_(from.position_),
       normal_(from.normal_),
       texcoord_(from.texcoord_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  // @@protoc_insertion_point(copy_constructor:e8.PrimitiveVertex)
+  // @@protoc_insertion_point(copy_constructor:e8.PrimitiveVertexProto)
 }
 
-void PrimitiveVertex::SharedCtor() {
+void PrimitiveVertexProto::SharedCtor() {
 }
 
-PrimitiveVertex::~PrimitiveVertex() {
-  // @@protoc_insertion_point(destructor:e8.PrimitiveVertex)
+PrimitiveVertexProto::~PrimitiveVertexProto() {
+  // @@protoc_insertion_point(destructor:e8.PrimitiveVertexProto)
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void PrimitiveVertex::SharedDtor() {
+void PrimitiveVertexProto::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
 }
 
-void PrimitiveVertex::ArenaDtor(void* object) {
-  PrimitiveVertex* _this = reinterpret_cast< PrimitiveVertex* >(object);
+void PrimitiveVertexProto::ArenaDtor(void* object) {
+  PrimitiveVertexProto* _this = reinterpret_cast< PrimitiveVertexProto* >(object);
   (void)_this;
 }
-void PrimitiveVertex::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+void PrimitiveVertexProto::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
 }
-void PrimitiveVertex::SetCachedSize(int size) const {
+void PrimitiveVertexProto::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const PrimitiveVertex& PrimitiveVertex::default_instance() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_PrimitiveVertex_primitive_2eproto.base);
+const PrimitiveVertexProto& PrimitiveVertexProto::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_PrimitiveVertexProto_primitive_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void PrimitiveVertex::Clear() {
-// @@protoc_insertion_point(message_clear_start:e8.PrimitiveVertex)
+void PrimitiveVertexProto::Clear() {
+// @@protoc_insertion_point(message_clear_start:e8.PrimitiveVertexProto)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -232,7 +232,7 @@ void PrimitiveVertex::Clear() {
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* PrimitiveVertex::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* PrimitiveVertexProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
@@ -292,9 +292,9 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* PrimitiveVertex::_InternalSerialize(
+::PROTOBUF_NAMESPACE_ID::uint8* PrimitiveVertexProto::_InternalSerialize(
     ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:e8.PrimitiveVertex)
+  // @@protoc_insertion_point(serialize_to_array_start:e8.PrimitiveVertexProto)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -317,12 +317,12 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:e8.PrimitiveVertex)
+  // @@protoc_insertion_point(serialize_to_array_end:e8.PrimitiveVertexProto)
   return target;
 }
 
-size_t PrimitiveVertex::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:e8.PrimitiveVertex)
+size_t PrimitiveVertexProto::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:e8.PrimitiveVertexProto)
   size_t total_size = 0;
 
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
@@ -383,23 +383,23 @@ size_t PrimitiveVertex::ByteSizeLong() const {
   return total_size;
 }
 
-void PrimitiveVertex::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:e8.PrimitiveVertex)
+void PrimitiveVertexProto::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:e8.PrimitiveVertexProto)
   GOOGLE_DCHECK_NE(&from, this);
-  const PrimitiveVertex* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<PrimitiveVertex>(
+  const PrimitiveVertexProto* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<PrimitiveVertexProto>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:e8.PrimitiveVertex)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:e8.PrimitiveVertexProto)
     ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:e8.PrimitiveVertex)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:e8.PrimitiveVertexProto)
     MergeFrom(*source);
   }
 }
 
-void PrimitiveVertex::MergeFrom(const PrimitiveVertex& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:e8.PrimitiveVertex)
+void PrimitiveVertexProto::MergeFrom(const PrimitiveVertexProto& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:e8.PrimitiveVertexProto)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
@@ -410,25 +410,25 @@ void PrimitiveVertex::MergeFrom(const PrimitiveVertex& from) {
   texcoord_.MergeFrom(from.texcoord_);
 }
 
-void PrimitiveVertex::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:e8.PrimitiveVertex)
+void PrimitiveVertexProto::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:e8.PrimitiveVertexProto)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void PrimitiveVertex::CopyFrom(const PrimitiveVertex& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:e8.PrimitiveVertex)
+void PrimitiveVertexProto::CopyFrom(const PrimitiveVertexProto& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:e8.PrimitiveVertexProto)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool PrimitiveVertex::IsInitialized() const {
+bool PrimitiveVertexProto::IsInitialized() const {
   return true;
 }
 
-void PrimitiveVertex::InternalSwap(PrimitiveVertex* other) {
+void PrimitiveVertexProto::InternalSwap(PrimitiveVertexProto* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   position_.InternalSwap(&other->position_);
@@ -436,63 +436,63 @@ void PrimitiveVertex::InternalSwap(PrimitiveVertex* other) {
   texcoord_.InternalSwap(&other->texcoord_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata PrimitiveVertex::GetMetadata() const {
+::PROTOBUF_NAMESPACE_ID::Metadata PrimitiveVertexProto::GetMetadata() const {
   return GetMetadataStatic();
 }
 
 
 // ===================================================================
 
-void PrimitiveIndices::InitAsDefaultInstance() {
+void PrimitiveIndicesProto::InitAsDefaultInstance() {
 }
-class PrimitiveIndices::_Internal {
+class PrimitiveIndicesProto::_Internal {
  public:
 };
 
-PrimitiveIndices::PrimitiveIndices(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+PrimitiveIndicesProto::PrimitiveIndicesProto(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena),
   indices_(arena) {
   SharedCtor();
   RegisterArenaDtor(arena);
-  // @@protoc_insertion_point(arena_constructor:e8.PrimitiveIndices)
+  // @@protoc_insertion_point(arena_constructor:e8.PrimitiveIndicesProto)
 }
-PrimitiveIndices::PrimitiveIndices(const PrimitiveIndices& from)
+PrimitiveIndicesProto::PrimitiveIndicesProto(const PrimitiveIndicesProto& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
       indices_(from.indices_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  // @@protoc_insertion_point(copy_constructor:e8.PrimitiveIndices)
+  // @@protoc_insertion_point(copy_constructor:e8.PrimitiveIndicesProto)
 }
 
-void PrimitiveIndices::SharedCtor() {
+void PrimitiveIndicesProto::SharedCtor() {
 }
 
-PrimitiveIndices::~PrimitiveIndices() {
-  // @@protoc_insertion_point(destructor:e8.PrimitiveIndices)
+PrimitiveIndicesProto::~PrimitiveIndicesProto() {
+  // @@protoc_insertion_point(destructor:e8.PrimitiveIndicesProto)
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void PrimitiveIndices::SharedDtor() {
+void PrimitiveIndicesProto::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
 }
 
-void PrimitiveIndices::ArenaDtor(void* object) {
-  PrimitiveIndices* _this = reinterpret_cast< PrimitiveIndices* >(object);
+void PrimitiveIndicesProto::ArenaDtor(void* object) {
+  PrimitiveIndicesProto* _this = reinterpret_cast< PrimitiveIndicesProto* >(object);
   (void)_this;
 }
-void PrimitiveIndices::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+void PrimitiveIndicesProto::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
 }
-void PrimitiveIndices::SetCachedSize(int size) const {
+void PrimitiveIndicesProto::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const PrimitiveIndices& PrimitiveIndices::default_instance() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_PrimitiveIndices_primitive_2eproto.base);
+const PrimitiveIndicesProto& PrimitiveIndicesProto::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_PrimitiveIndicesProto_primitive_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void PrimitiveIndices::Clear() {
-// @@protoc_insertion_point(message_clear_start:e8.PrimitiveIndices)
+void PrimitiveIndicesProto::Clear() {
+// @@protoc_insertion_point(message_clear_start:e8.PrimitiveIndicesProto)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -501,7 +501,7 @@ void PrimitiveIndices::Clear() {
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* PrimitiveIndices::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* PrimitiveIndicesProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
@@ -541,9 +541,9 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* PrimitiveIndices::_InternalSerialize(
+::PROTOBUF_NAMESPACE_ID::uint8* PrimitiveIndicesProto::_InternalSerialize(
     ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:e8.PrimitiveIndices)
+  // @@protoc_insertion_point(serialize_to_array_start:e8.PrimitiveIndicesProto)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -560,12 +560,12 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:e8.PrimitiveIndices)
+  // @@protoc_insertion_point(serialize_to_array_end:e8.PrimitiveIndicesProto)
   return target;
 }
 
-size_t PrimitiveIndices::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:e8.PrimitiveIndices)
+size_t PrimitiveIndicesProto::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:e8.PrimitiveIndicesProto)
   size_t total_size = 0;
 
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
@@ -596,23 +596,23 @@ size_t PrimitiveIndices::ByteSizeLong() const {
   return total_size;
 }
 
-void PrimitiveIndices::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:e8.PrimitiveIndices)
+void PrimitiveIndicesProto::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:e8.PrimitiveIndicesProto)
   GOOGLE_DCHECK_NE(&from, this);
-  const PrimitiveIndices* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<PrimitiveIndices>(
+  const PrimitiveIndicesProto* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<PrimitiveIndicesProto>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:e8.PrimitiveIndices)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:e8.PrimitiveIndicesProto)
     ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:e8.PrimitiveIndices)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:e8.PrimitiveIndicesProto)
     MergeFrom(*source);
   }
 }
 
-void PrimitiveIndices::MergeFrom(const PrimitiveIndices& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:e8.PrimitiveIndices)
+void PrimitiveIndicesProto::MergeFrom(const PrimitiveIndicesProto& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:e8.PrimitiveIndicesProto)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
@@ -621,31 +621,31 @@ void PrimitiveIndices::MergeFrom(const PrimitiveIndices& from) {
   indices_.MergeFrom(from.indices_);
 }
 
-void PrimitiveIndices::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:e8.PrimitiveIndices)
+void PrimitiveIndicesProto::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:e8.PrimitiveIndicesProto)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void PrimitiveIndices::CopyFrom(const PrimitiveIndices& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:e8.PrimitiveIndices)
+void PrimitiveIndicesProto::CopyFrom(const PrimitiveIndicesProto& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:e8.PrimitiveIndicesProto)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool PrimitiveIndices::IsInitialized() const {
+bool PrimitiveIndicesProto::IsInitialized() const {
   return true;
 }
 
-void PrimitiveIndices::InternalSwap(PrimitiveIndices* other) {
+void PrimitiveIndicesProto::InternalSwap(PrimitiveIndicesProto* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   indices_.InternalSwap(&other->indices_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata PrimitiveIndices::GetMetadata() const {
+::PROTOBUF_NAMESPACE_ID::Metadata PrimitiveIndicesProto::GetMetadata() const {
   return GetMetadataStatic();
 }
 
@@ -1168,11 +1168,11 @@ void SrtTransform::InternalSwap(SrtTransform* other) {
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace e8
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::e8::PrimitiveVertex* Arena::CreateMaybeMessage< ::e8::PrimitiveVertex >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::e8::PrimitiveVertex >(arena);
+template<> PROTOBUF_NOINLINE ::e8::PrimitiveVertexProto* Arena::CreateMaybeMessage< ::e8::PrimitiveVertexProto >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::e8::PrimitiveVertexProto >(arena);
 }
-template<> PROTOBUF_NOINLINE ::e8::PrimitiveIndices* Arena::CreateMaybeMessage< ::e8::PrimitiveIndices >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::e8::PrimitiveIndices >(arena);
+template<> PROTOBUF_NOINLINE ::e8::PrimitiveIndicesProto* Arena::CreateMaybeMessage< ::e8::PrimitiveIndicesProto >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::e8::PrimitiveIndicesProto >(arena);
 }
 template<> PROTOBUF_NOINLINE ::e8::AABB* Arena::CreateMaybeMessage< ::e8::AABB >(Arena* arena) {
   return Arena::CreateMessageInternal< ::e8::AABB >(arena);

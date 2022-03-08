@@ -14,7 +14,7 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
-extern PROTOBUF_INTERNAL_EXPORT_geometry_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_GeometryLod_geometry_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_geometry_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_GeometryLodProto_geometry_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_physical_5fshape_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_PhysicalShapeProto_physical_5fshape_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_entity_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_SceneEntityProto_entity_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_scene_5fobject_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_SceneObjectCollection_GeometriesEntry_DoNotUse_scene_5fobject_2eproto;
@@ -78,7 +78,7 @@ static void InitDefaultsscc_info_SceneObjectCollection_GeometriesEntry_DoNotUse_
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_SceneObjectCollection_GeometriesEntry_DoNotUse_scene_5fobject_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_SceneObjectCollection_GeometriesEntry_DoNotUse_scene_5fobject_2eproto}, {
-      &scc_info_GeometryLod_geometry_2eproto.base,}};
+      &scc_info_GeometryLodProto_geometry_2eproto.base,}};
 
 static void InitDefaultsscc_info_SceneObjectCollection_PhysicalShapesEntry_DoNotUse_scene_5fobject_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -215,16 +215,16 @@ const char descriptor_table_protodef_scene_5fobject_2eproto[] PROTOBUF_SECTION_V
   "ildren\022+\n\rscene_objects\030\001 \003(\0132\024.e8.Scene"
   "ObjectProto\032C\n\023SceneEntityChildren\022,\n\016sc"
   "ene_entities\030\001 \003(\0132\024.e8.SceneEntityProto"
-  "B\n\n\010children\"\336\002\n\025SceneObjectCollection\022+"
+  "B\n\n\010children\"\343\002\n\025SceneObjectCollection\022+"
   "\n\rscene_objects\030\001 \003(\0132\024.e8.SceneObjectPr"
   "oto\022=\n\ngeometries\030\002 \003(\0132).e8.SceneObject"
   "Collection.GeometriesEntry\022F\n\017physical_s"
   "hapes\030\003 \003(\0132-.e8.SceneObjectCollection.P"
-  "hysicalShapesEntry\032B\n\017GeometriesEntry\022\013\n"
-  "\003key\030\001 \001(\t\022\036\n\005value\030\002 \001(\0132\017.e8.GeometryL"
-  "od:\0028\001\032M\n\023PhysicalShapesEntry\022\013\n\003key\030\001 \001"
-  "(\t\022%\n\005value\030\002 \001(\0132\026.e8.PhysicalShapeProt"
-  "o:\0028\001b\006proto3"
+  "hysicalShapesEntry\032G\n\017GeometriesEntry\022\013\n"
+  "\003key\030\001 \001(\t\022#\n\005value\030\002 \001(\0132\024.e8.GeometryL"
+  "odProto:\0028\001\032M\n\023PhysicalShapesEntry\022\013\n\003ke"
+  "y\030\001 \001(\t\022%\n\005value\030\002 \001(\0132\026.e8.PhysicalShap"
+  "eProto:\0028\001b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_scene_5fobject_2eproto_deps[3] = {
   &::descriptor_table_entity_2eproto,
@@ -240,7 +240,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_sce
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_scene_5fobject_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_scene_5fobject_2eproto = {
-  false, false, descriptor_table_protodef_scene_5fobject_2eproto, "scene_object.proto", 813,
+  false, false, descriptor_table_protodef_scene_5fobject_2eproto, "scene_object.proto", 818,
   &descriptor_table_scene_5fobject_2eproto_once, descriptor_table_scene_5fobject_2eproto_sccs, descriptor_table_scene_5fobject_2eproto_deps, 5, 3,
   schemas, file_default_instances, TableStruct_scene_5fobject_2eproto::offsets,
   file_level_metadata_scene_5fobject_2eproto, 6, file_level_enum_descriptors_scene_5fobject_2eproto, file_level_service_descriptors_scene_5fobject_2eproto,
@@ -1221,7 +1221,7 @@ const char* SceneObjectCollection::_InternalParse(const char* ptr, ::PROTOBUF_NA
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
         } else goto handle_unusual;
         continue;
-      // map<string, .e8.GeometryLod> geometries = 2;
+      // map<string, .e8.GeometryLodProto> geometries = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
           ptr -= 1;
@@ -1281,9 +1281,9 @@ failure:
       InternalWriteMessage(1, this->_internal_scene_objects(i), target, stream);
   }
 
-  // map<string, .e8.GeometryLod> geometries = 2;
+  // map<string, .e8.GeometryLodProto> geometries = 2;
   if (!this->_internal_geometries().empty()) {
-    typedef ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >::const_pointer
+    typedef ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLodProto >::const_pointer
         ConstPtr;
     typedef ConstPtr SortItem;
     typedef ::PROTOBUF_NAMESPACE_ID::internal::CompareByDerefFirst<SortItem> Less;
@@ -1300,9 +1300,9 @@ failure:
         this->_internal_geometries().size() > 1) {
       ::std::unique_ptr<SortItem[]> items(
           new SortItem[this->_internal_geometries().size()]);
-      typedef ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >::size_type size_type;
+      typedef ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLodProto >::size_type size_type;
       size_type n = 0;
-      for (::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >::const_iterator
+      for (::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLodProto >::const_iterator
           it = this->_internal_geometries().begin();
           it != this->_internal_geometries().end(); ++it, ++n) {
         items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
@@ -1313,7 +1313,7 @@ failure:
         Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
       }
     } else {
-      for (::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >::const_iterator
+      for (::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLodProto >::const_iterator
           it = this->_internal_geometries().begin();
           it != this->_internal_geometries().end(); ++it) {
         target = SceneObjectCollection_GeometriesEntry_DoNotUse::Funcs::InternalSerialize(2, it->first, it->second, target, stream);
@@ -1386,10 +1386,10 @@ size_t SceneObjectCollection::ByteSizeLong() const {
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
   }
 
-  // map<string, .e8.GeometryLod> geometries = 2;
+  // map<string, .e8.GeometryLodProto> geometries = 2;
   total_size += 1 *
       ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(this->_internal_geometries_size());
-  for (::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLod >::const_iterator
+  for (::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLodProto >::const_iterator
       it = this->_internal_geometries().begin();
       it != this->_internal_geometries().end(); ++it) {
     total_size += SceneObjectCollection_GeometriesEntry_DoNotUse::Funcs::ByteSizeLong(it->first, it->second);

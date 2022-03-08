@@ -57,7 +57,7 @@ SceneEntityProto SceneEntity::ToProto() const {
         *proto.mutable_srt_transform() = *srt_transform;
     }
     *proto.mutable_bounding_box() = e8::ToProto(bounding_box);
-    proto.set_id(geometry_lod_instance->id());
+    proto.set_geometry_id(geometry_lod_instance->id);
     return proto;
 }
 

@@ -14,49 +14,49 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
-extern PROTOBUF_INTERNAL_EXPORT_geometry_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_Geometry_geometry_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_primitive_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_PrimitiveIndices_primitive_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_primitive_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_PrimitiveVertex_primitive_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_geometry_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_GeometryProto_geometry_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_primitive_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_PrimitiveIndicesProto_primitive_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_primitive_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_PrimitiveVertexProto_primitive_2eproto;
 namespace e8 {
-class GeometryDefaultTypeInternal {
+class GeometryProtoDefaultTypeInternal {
  public:
-  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Geometry> _instance;
-} _Geometry_default_instance_;
-class GeometryLodDefaultTypeInternal {
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<GeometryProto> _instance;
+} _GeometryProto_default_instance_;
+class GeometryLodProtoDefaultTypeInternal {
  public:
-  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<GeometryLod> _instance;
-} _GeometryLod_default_instance_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<GeometryLodProto> _instance;
+} _GeometryLodProto_default_instance_;
 }  // namespace e8
-static void InitDefaultsscc_info_Geometry_geometry_2eproto() {
+static void InitDefaultsscc_info_GeometryLodProto_geometry_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::e8::_Geometry_default_instance_;
-    new (ptr) ::e8::Geometry();
+    void* ptr = &::e8::_GeometryLodProto_default_instance_;
+    new (ptr) ::e8::GeometryLodProto();
     ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::e8::Geometry::InitAsDefaultInstance();
+  ::e8::GeometryLodProto::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_Geometry_geometry_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 2, 0, InitDefaultsscc_info_Geometry_geometry_2eproto}, {
-      &scc_info_PrimitiveVertex_primitive_2eproto.base,
-      &scc_info_PrimitiveIndices_primitive_2eproto.base,}};
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_GeometryLodProto_geometry_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_GeometryLodProto_geometry_2eproto}, {
+      &scc_info_GeometryProto_geometry_2eproto.base,}};
 
-static void InitDefaultsscc_info_GeometryLod_geometry_2eproto() {
+static void InitDefaultsscc_info_GeometryProto_geometry_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::e8::_GeometryLod_default_instance_;
-    new (ptr) ::e8::GeometryLod();
+    void* ptr = &::e8::_GeometryProto_default_instance_;
+    new (ptr) ::e8::GeometryProto();
     ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::e8::GeometryLod::InitAsDefaultInstance();
+  ::e8::GeometryProto::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_GeometryLod_geometry_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_GeometryLod_geometry_2eproto}, {
-      &scc_info_Geometry_geometry_2eproto.base,}};
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_GeometryProto_geometry_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 2, 0, InitDefaultsscc_info_GeometryProto_geometry_2eproto}, {
+      &scc_info_PrimitiveVertexProto_primitive_2eproto.base,
+      &scc_info_PrimitiveIndicesProto_primitive_2eproto.base,}};
 
 static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_geometry_2eproto[2];
 static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_geometry_2eproto[1];
@@ -64,55 +64,55 @@ static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_s
 
 const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_geometry_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::e8::Geometry, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::e8::GeometryProto, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::e8::Geometry, rigidity_),
-  PROTOBUF_FIELD_OFFSET(::e8::Geometry, vertices_),
-  PROTOBUF_FIELD_OFFSET(::e8::Geometry, primitives_),
+  PROTOBUF_FIELD_OFFSET(::e8::GeometryProto, rigidity_),
+  PROTOBUF_FIELD_OFFSET(::e8::GeometryProto, vertices_),
+  PROTOBUF_FIELD_OFFSET(::e8::GeometryProto, primitives_),
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::e8::GeometryLod, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::e8::GeometryLodProto, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::e8::GeometryLod, id_),
-  PROTOBUF_FIELD_OFFSET(::e8::GeometryLod, name_),
-  PROTOBUF_FIELD_OFFSET(::e8::GeometryLod, geometry_lod_),
-  PROTOBUF_FIELD_OFFSET(::e8::GeometryLod, min_distances_),
+  PROTOBUF_FIELD_OFFSET(::e8::GeometryLodProto, id_),
+  PROTOBUF_FIELD_OFFSET(::e8::GeometryLodProto, name_),
+  PROTOBUF_FIELD_OFFSET(::e8::GeometryLodProto, geometry_lod_),
+  PROTOBUF_FIELD_OFFSET(::e8::GeometryLodProto, min_distances_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, sizeof(::e8::Geometry)},
-  { 8, -1, sizeof(::e8::GeometryLod)},
+  { 0, -1, sizeof(::e8::GeometryProto)},
+  { 8, -1, sizeof(::e8::GeometryLodProto)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_Geometry_default_instance_),
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_GeometryLod_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_GeometryProto_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_GeometryLodProto_default_instance_),
 };
 
 const char descriptor_table_protodef_geometry_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\016geometry.proto\022\002e8\032\017primitive.proto\"\332\001"
-  "\n\010Geometry\022+\n\010rigidity\030\001 \001(\0162\031.e8.Geomet"
-  "ry.RigidityType\022%\n\010vertices\030\002 \003(\0132\023.e8.P"
-  "rimitiveVertex\022(\n\nprimitives\030\003 \003(\0132\024.e8."
-  "PrimitiveIndices\"P\n\014RigidityType\022\013\n\007INVA"
-  "LID\020\000\022\n\n\006STATIC\020\001\022\t\n\005RIGID\020\002\022\016\n\nDEFORMAB"
-  "LE\020\003\022\014\n\010TEARABLE\020\004\"b\n\013GeometryLod\022\n\n\002id\030"
-  "\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\"\n\014geometry_lod\030\003 \003("
-  "\0132\014.e8.Geometry\022\025\n\rmin_distances\030\004 \003(\002b\006"
-  "proto3"
+  "\n\016geometry.proto\022\002e8\032\017primitive.proto\"\356\001"
+  "\n\rGeometryProto\0220\n\010rigidity\030\001 \001(\0162\036.e8.G"
+  "eometryProto.RigidityType\022*\n\010vertices\030\002 "
+  "\003(\0132\030.e8.PrimitiveVertexProto\022-\n\nprimiti"
+  "ves\030\003 \003(\0132\031.e8.PrimitiveIndicesProto\"P\n\014"
+  "RigidityType\022\013\n\007INVALID\020\000\022\n\n\006STATIC\020\001\022\t\n"
+  "\005RIGID\020\002\022\016\n\nDEFORMABLE\020\003\022\014\n\010TEARABLE\020\004\"l"
+  "\n\020GeometryLodProto\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002"
+  " \001(\t\022\'\n\014geometry_lod\030\003 \003(\0132\021.e8.Geometry"
+  "Proto\022\025\n\rmin_distances\030\004 \003(\002b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_geometry_2eproto_deps[1] = {
   &::descriptor_table_primitive_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_geometry_2eproto_sccs[2] = {
-  &scc_info_Geometry_geometry_2eproto.base,
-  &scc_info_GeometryLod_geometry_2eproto.base,
+  &scc_info_GeometryLodProto_geometry_2eproto.base,
+  &scc_info_GeometryProto_geometry_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_geometry_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_geometry_2eproto = {
-  false, false, descriptor_table_protodef_geometry_2eproto, "geometry.proto", 366,
+  false, false, descriptor_table_protodef_geometry_2eproto, "geometry.proto", 396,
   &descriptor_table_geometry_2eproto_once, descriptor_table_geometry_2eproto_sccs, descriptor_table_geometry_2eproto_deps, 2, 1,
   schemas, file_default_instances, TableStruct_geometry_2eproto::offsets,
   file_level_metadata_geometry_2eproto, 2, file_level_enum_descriptors_geometry_2eproto, file_level_service_descriptors_geometry_2eproto,
@@ -121,11 +121,11 @@ const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_geomet
 // Force running AddDescriptors() at dynamic initialization time.
 static bool dynamic_init_dummy_geometry_2eproto = (static_cast<void>(::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_geometry_2eproto)), true);
 namespace e8 {
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* Geometry_RigidityType_descriptor() {
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* GeometryProto_RigidityType_descriptor() {
   ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_geometry_2eproto);
   return file_level_enum_descriptors_geometry_2eproto[0];
 }
-bool Geometry_RigidityType_IsValid(int value) {
+bool GeometryProto_RigidityType_IsValid(int value) {
   switch (value) {
     case 0:
     case 1:
@@ -139,79 +139,79 @@ bool Geometry_RigidityType_IsValid(int value) {
 }
 
 #if (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
-constexpr Geometry_RigidityType Geometry::INVALID;
-constexpr Geometry_RigidityType Geometry::STATIC;
-constexpr Geometry_RigidityType Geometry::RIGID;
-constexpr Geometry_RigidityType Geometry::DEFORMABLE;
-constexpr Geometry_RigidityType Geometry::TEARABLE;
-constexpr Geometry_RigidityType Geometry::RigidityType_MIN;
-constexpr Geometry_RigidityType Geometry::RigidityType_MAX;
-constexpr int Geometry::RigidityType_ARRAYSIZE;
+constexpr GeometryProto_RigidityType GeometryProto::INVALID;
+constexpr GeometryProto_RigidityType GeometryProto::STATIC;
+constexpr GeometryProto_RigidityType GeometryProto::RIGID;
+constexpr GeometryProto_RigidityType GeometryProto::DEFORMABLE;
+constexpr GeometryProto_RigidityType GeometryProto::TEARABLE;
+constexpr GeometryProto_RigidityType GeometryProto::RigidityType_MIN;
+constexpr GeometryProto_RigidityType GeometryProto::RigidityType_MAX;
+constexpr int GeometryProto::RigidityType_ARRAYSIZE;
 #endif  // (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
 
 // ===================================================================
 
-void Geometry::InitAsDefaultInstance() {
+void GeometryProto::InitAsDefaultInstance() {
 }
-class Geometry::_Internal {
+class GeometryProto::_Internal {
  public:
 };
 
-void Geometry::clear_vertices() {
+void GeometryProto::clear_vertices() {
   vertices_.Clear();
 }
-void Geometry::clear_primitives() {
+void GeometryProto::clear_primitives() {
   primitives_.Clear();
 }
-Geometry::Geometry(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+GeometryProto::GeometryProto(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena),
   vertices_(arena),
   primitives_(arena) {
   SharedCtor();
   RegisterArenaDtor(arena);
-  // @@protoc_insertion_point(arena_constructor:e8.Geometry)
+  // @@protoc_insertion_point(arena_constructor:e8.GeometryProto)
 }
-Geometry::Geometry(const Geometry& from)
+GeometryProto::GeometryProto(const GeometryProto& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
       vertices_(from.vertices_),
       primitives_(from.primitives_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   rigidity_ = from.rigidity_;
-  // @@protoc_insertion_point(copy_constructor:e8.Geometry)
+  // @@protoc_insertion_point(copy_constructor:e8.GeometryProto)
 }
 
-void Geometry::SharedCtor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_Geometry_geometry_2eproto.base);
+void GeometryProto::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_GeometryProto_geometry_2eproto.base);
   rigidity_ = 0;
 }
 
-Geometry::~Geometry() {
-  // @@protoc_insertion_point(destructor:e8.Geometry)
+GeometryProto::~GeometryProto() {
+  // @@protoc_insertion_point(destructor:e8.GeometryProto)
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void Geometry::SharedDtor() {
+void GeometryProto::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
 }
 
-void Geometry::ArenaDtor(void* object) {
-  Geometry* _this = reinterpret_cast< Geometry* >(object);
+void GeometryProto::ArenaDtor(void* object) {
+  GeometryProto* _this = reinterpret_cast< GeometryProto* >(object);
   (void)_this;
 }
-void Geometry::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+void GeometryProto::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
 }
-void Geometry::SetCachedSize(int size) const {
+void GeometryProto::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const Geometry& Geometry::default_instance() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_Geometry_geometry_2eproto.base);
+const GeometryProto& GeometryProto::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_GeometryProto_geometry_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void Geometry::Clear() {
-// @@protoc_insertion_point(message_clear_start:e8.Geometry)
+void GeometryProto::Clear() {
+// @@protoc_insertion_point(message_clear_start:e8.GeometryProto)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -222,7 +222,7 @@ void Geometry::Clear() {
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* Geometry::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* GeometryProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
@@ -230,15 +230,15 @@ const char* Geometry::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::i
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     CHK_(ptr);
     switch (tag >> 3) {
-      // .e8.Geometry.RigidityType rigidity = 1;
+      // .e8.GeometryProto.RigidityType rigidity = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
           ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
-          _internal_set_rigidity(static_cast<::e8::Geometry_RigidityType>(val));
+          _internal_set_rigidity(static_cast<::e8::GeometryProto_RigidityType>(val));
         } else goto handle_unusual;
         continue;
-      // repeated .e8.PrimitiveVertex vertices = 2;
+      // repeated .e8.PrimitiveVertexProto vertices = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
           ptr -= 1;
@@ -250,7 +250,7 @@ const char* Geometry::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::i
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<18>(ptr));
         } else goto handle_unusual;
         continue;
-      // repeated .e8.PrimitiveIndices primitives = 3;
+      // repeated .e8.PrimitiveIndicesProto primitives = 3;
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
           ptr -= 1;
@@ -284,20 +284,20 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* Geometry::_InternalSerialize(
+::PROTOBUF_NAMESPACE_ID::uint8* GeometryProto::_InternalSerialize(
     ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:e8.Geometry)
+  // @@protoc_insertion_point(serialize_to_array_start:e8.GeometryProto)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .e8.Geometry.RigidityType rigidity = 1;
+  // .e8.GeometryProto.RigidityType rigidity = 1;
   if (this->rigidity() != 0) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
       1, this->_internal_rigidity(), target);
   }
 
-  // repeated .e8.PrimitiveVertex vertices = 2;
+  // repeated .e8.PrimitiveVertexProto vertices = 2;
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->_internal_vertices_size()); i < n; i++) {
     target = stream->EnsureSpace(target);
@@ -305,7 +305,7 @@ failure:
       InternalWriteMessage(2, this->_internal_vertices(i), target, stream);
   }
 
-  // repeated .e8.PrimitiveIndices primitives = 3;
+  // repeated .e8.PrimitiveIndicesProto primitives = 3;
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->_internal_primitives_size()); i < n; i++) {
     target = stream->EnsureSpace(target);
@@ -317,33 +317,33 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:e8.Geometry)
+  // @@protoc_insertion_point(serialize_to_array_end:e8.GeometryProto)
   return target;
 }
 
-size_t Geometry::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:e8.Geometry)
+size_t GeometryProto::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:e8.GeometryProto)
   size_t total_size = 0;
 
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated .e8.PrimitiveVertex vertices = 2;
+  // repeated .e8.PrimitiveVertexProto vertices = 2;
   total_size += 1UL * this->_internal_vertices_size();
   for (const auto& msg : this->vertices_) {
     total_size +=
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
   }
 
-  // repeated .e8.PrimitiveIndices primitives = 3;
+  // repeated .e8.PrimitiveIndicesProto primitives = 3;
   total_size += 1UL * this->_internal_primitives_size();
   for (const auto& msg : this->primitives_) {
     total_size +=
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
   }
 
-  // .e8.Geometry.RigidityType rigidity = 1;
+  // .e8.GeometryProto.RigidityType rigidity = 1;
   if (this->rigidity() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_rigidity());
@@ -358,23 +358,23 @@ size_t Geometry::ByteSizeLong() const {
   return total_size;
 }
 
-void Geometry::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:e8.Geometry)
+void GeometryProto::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:e8.GeometryProto)
   GOOGLE_DCHECK_NE(&from, this);
-  const Geometry* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<Geometry>(
+  const GeometryProto* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<GeometryProto>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:e8.Geometry)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:e8.GeometryProto)
     ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:e8.Geometry)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:e8.GeometryProto)
     MergeFrom(*source);
   }
 }
 
-void Geometry::MergeFrom(const Geometry& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:e8.Geometry)
+void GeometryProto::MergeFrom(const GeometryProto& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:e8.GeometryProto)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
@@ -387,25 +387,25 @@ void Geometry::MergeFrom(const Geometry& from) {
   }
 }
 
-void Geometry::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:e8.Geometry)
+void GeometryProto::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:e8.GeometryProto)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void Geometry::CopyFrom(const Geometry& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:e8.Geometry)
+void GeometryProto::CopyFrom(const GeometryProto& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:e8.GeometryProto)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool Geometry::IsInitialized() const {
+bool GeometryProto::IsInitialized() const {
   return true;
 }
 
-void Geometry::InternalSwap(Geometry* other) {
+void GeometryProto::InternalSwap(GeometryProto* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   vertices_.InternalSwap(&other->vertices_);
@@ -413,28 +413,28 @@ void Geometry::InternalSwap(Geometry* other) {
   swap(rigidity_, other->rigidity_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata Geometry::GetMetadata() const {
+::PROTOBUF_NAMESPACE_ID::Metadata GeometryProto::GetMetadata() const {
   return GetMetadataStatic();
 }
 
 
 // ===================================================================
 
-void GeometryLod::InitAsDefaultInstance() {
+void GeometryLodProto::InitAsDefaultInstance() {
 }
-class GeometryLod::_Internal {
+class GeometryLodProto::_Internal {
  public:
 };
 
-GeometryLod::GeometryLod(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+GeometryLodProto::GeometryLodProto(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena),
   geometry_lod_(arena),
   min_distances_(arena) {
   SharedCtor();
   RegisterArenaDtor(arena);
-  // @@protoc_insertion_point(arena_constructor:e8.GeometryLod)
+  // @@protoc_insertion_point(arena_constructor:e8.GeometryLodProto)
 }
-GeometryLod::GeometryLod(const GeometryLod& from)
+GeometryLodProto::GeometryLodProto(const GeometryLodProto& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
       geometry_lod_(from.geometry_lod_),
       min_distances_(from.min_distances_) {
@@ -449,44 +449,44 @@ GeometryLod::GeometryLod(const GeometryLod& from)
     name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_name(),
       GetArena());
   }
-  // @@protoc_insertion_point(copy_constructor:e8.GeometryLod)
+  // @@protoc_insertion_point(copy_constructor:e8.GeometryLodProto)
 }
 
-void GeometryLod::SharedCtor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_GeometryLod_geometry_2eproto.base);
+void GeometryLodProto::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_GeometryLodProto_geometry_2eproto.base);
   id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
-GeometryLod::~GeometryLod() {
-  // @@protoc_insertion_point(destructor:e8.GeometryLod)
+GeometryLodProto::~GeometryLodProto() {
+  // @@protoc_insertion_point(destructor:e8.GeometryLodProto)
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void GeometryLod::SharedDtor() {
+void GeometryLodProto::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
   id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
-void GeometryLod::ArenaDtor(void* object) {
-  GeometryLod* _this = reinterpret_cast< GeometryLod* >(object);
+void GeometryLodProto::ArenaDtor(void* object) {
+  GeometryLodProto* _this = reinterpret_cast< GeometryLodProto* >(object);
   (void)_this;
 }
-void GeometryLod::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+void GeometryLodProto::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
 }
-void GeometryLod::SetCachedSize(int size) const {
+void GeometryLodProto::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const GeometryLod& GeometryLod::default_instance() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_GeometryLod_geometry_2eproto.base);
+const GeometryLodProto& GeometryLodProto::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_GeometryLodProto_geometry_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void GeometryLod::Clear() {
-// @@protoc_insertion_point(message_clear_start:e8.GeometryLod)
+void GeometryLodProto::Clear() {
+// @@protoc_insertion_point(message_clear_start:e8.GeometryLodProto)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -498,7 +498,7 @@ void GeometryLod::Clear() {
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* GeometryLod::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* GeometryLodProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
@@ -511,7 +511,7 @@ const char* GeometryLod::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
           auto str = _internal_mutable_id();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "e8.GeometryLod.id"));
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "e8.GeometryLodProto.id"));
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -520,11 +520,11 @@ const char* GeometryLod::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
           auto str = _internal_mutable_name();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "e8.GeometryLod.name"));
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "e8.GeometryLodProto.name"));
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // repeated .e8.Geometry geometry_lod = 3;
+      // repeated .e8.GeometryProto geometry_lod = 3;
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
           ptr -= 1;
@@ -568,9 +568,9 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* GeometryLod::_InternalSerialize(
+::PROTOBUF_NAMESPACE_ID::uint8* GeometryLodProto::_InternalSerialize(
     ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:e8.GeometryLod)
+  // @@protoc_insertion_point(serialize_to_array_start:e8.GeometryLodProto)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -579,7 +579,7 @@ failure:
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_id().data(), static_cast<int>(this->_internal_id().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "e8.GeometryLod.id");
+      "e8.GeometryLodProto.id");
     target = stream->WriteStringMaybeAliased(
         1, this->_internal_id(), target);
   }
@@ -589,12 +589,12 @@ failure:
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_name().data(), static_cast<int>(this->_internal_name().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "e8.GeometryLod.name");
+      "e8.GeometryLodProto.name");
     target = stream->WriteStringMaybeAliased(
         2, this->_internal_name(), target);
   }
 
-  // repeated .e8.Geometry geometry_lod = 3;
+  // repeated .e8.GeometryProto geometry_lod = 3;
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->_internal_geometry_lod_size()); i < n; i++) {
     target = stream->EnsureSpace(target);
@@ -611,19 +611,19 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:e8.GeometryLod)
+  // @@protoc_insertion_point(serialize_to_array_end:e8.GeometryLodProto)
   return target;
 }
 
-size_t GeometryLod::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:e8.GeometryLod)
+size_t GeometryLodProto::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:e8.GeometryLodProto)
   size_t total_size = 0;
 
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated .e8.Geometry geometry_lod = 3;
+  // repeated .e8.GeometryProto geometry_lod = 3;
   total_size += 1UL * this->_internal_geometry_lod_size();
   for (const auto& msg : this->geometry_lod_) {
     total_size +=
@@ -668,23 +668,23 @@ size_t GeometryLod::ByteSizeLong() const {
   return total_size;
 }
 
-void GeometryLod::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:e8.GeometryLod)
+void GeometryLodProto::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:e8.GeometryLodProto)
   GOOGLE_DCHECK_NE(&from, this);
-  const GeometryLod* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<GeometryLod>(
+  const GeometryLodProto* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<GeometryLodProto>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:e8.GeometryLod)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:e8.GeometryLodProto)
     ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:e8.GeometryLod)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:e8.GeometryLodProto)
     MergeFrom(*source);
   }
 }
 
-void GeometryLod::MergeFrom(const GeometryLod& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:e8.GeometryLod)
+void GeometryLodProto::MergeFrom(const GeometryLodProto& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:e8.GeometryLodProto)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
@@ -700,25 +700,25 @@ void GeometryLod::MergeFrom(const GeometryLod& from) {
   }
 }
 
-void GeometryLod::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:e8.GeometryLod)
+void GeometryLodProto::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:e8.GeometryLodProto)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void GeometryLod::CopyFrom(const GeometryLod& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:e8.GeometryLod)
+void GeometryLodProto::CopyFrom(const GeometryLodProto& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:e8.GeometryLodProto)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool GeometryLod::IsInitialized() const {
+bool GeometryLodProto::IsInitialized() const {
   return true;
 }
 
-void GeometryLod::InternalSwap(GeometryLod* other) {
+void GeometryLodProto::InternalSwap(GeometryLodProto* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   geometry_lod_.InternalSwap(&other->geometry_lod_);
@@ -727,7 +727,7 @@ void GeometryLod::InternalSwap(GeometryLod* other) {
   name_.Swap(&other->name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata GeometryLod::GetMetadata() const {
+::PROTOBUF_NAMESPACE_ID::Metadata GeometryLodProto::GetMetadata() const {
   return GetMetadataStatic();
 }
 
@@ -735,11 +735,11 @@ void GeometryLod::InternalSwap(GeometryLod* other) {
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace e8
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::e8::Geometry* Arena::CreateMaybeMessage< ::e8::Geometry >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::e8::Geometry >(arena);
+template<> PROTOBUF_NOINLINE ::e8::GeometryProto* Arena::CreateMaybeMessage< ::e8::GeometryProto >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::e8::GeometryProto >(arena);
 }
-template<> PROTOBUF_NOINLINE ::e8::GeometryLod* Arena::CreateMaybeMessage< ::e8::GeometryLod >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::e8::GeometryLod >(arena);
+template<> PROTOBUF_NOINLINE ::e8::GeometryLodProto* Arena::CreateMaybeMessage< ::e8::GeometryLodProto >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::e8::GeometryLodProto >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

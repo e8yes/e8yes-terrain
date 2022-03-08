@@ -73,7 +73,7 @@ message SceneObjectCollection {
     repeated SceneObjectProto scene_objects = 1;
 
     // A collection of all geometries referenced by entities.
-    map<string, GeometryLod> geometries = 2;
+    map<string, GeometryLodProto> geometries = 2;
 
     // A collection of all physical shapes referenced by the entities.
     map<string, PhysicalShapeProto> physical_shapes = 3;

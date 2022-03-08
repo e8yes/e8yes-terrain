@@ -54,7 +54,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_entity_2eproto::offsets[] PROT
   PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, transform_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, srt_transform_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, bounding_box_),
-  PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, drawable_id_),
+  PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, geometry_id_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, physical_shape_id_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -70,8 +70,8 @@ const char descriptor_table_protodef_entity_2eproto[] PROTOBUF_SECTION_VARIABLE(
   "SceneEntityProto\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001"
   "(\t\022\017\n\007movable\030\003 \001(\010\022\021\n\ttransform\030\004 \003(\002\022\'"
   "\n\rsrt_transform\030\005 \001(\0132\020.e8.SrtTransform\022"
-  "\036\n\014bounding_box\030\006 \001(\0132\010.e8.AABB\022\023\n\013drawa"
-  "ble_id\030\007 \001(\t\022\031\n\021physical_shape_id\030\010 \001(\tb"
+  "\036\n\014bounding_box\030\006 \001(\0132\010.e8.AABB\022\023\n\013geome"
+  "try_id\030\007 \001(\t\022\031\n\021physical_shape_id\030\010 \001(\tb"
   "\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_entity_2eproto_deps[1] = {
@@ -147,9 +147,9 @@ SceneEntityProto::SceneEntityProto(const SceneEntityProto& from)
     name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_name(),
       GetArena());
   }
-  drawable_id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from._internal_drawable_id().empty()) {
-    drawable_id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_drawable_id(),
+  geometry_id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_geometry_id().empty()) {
+    geometry_id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_geometry_id(),
       GetArena());
   }
   physical_shape_id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
@@ -175,7 +175,7 @@ void SceneEntityProto::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_SceneEntityProto_entity_2eproto.base);
   id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  drawable_id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  geometry_id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   physical_shape_id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   ::memset(&srt_transform_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&movable_) -
@@ -192,7 +192,7 @@ void SceneEntityProto::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
   id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  drawable_id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  geometry_id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   physical_shape_id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete srt_transform_;
   if (this != internal_default_instance()) delete bounding_box_;
@@ -222,7 +222,7 @@ void SceneEntityProto::Clear() {
   transform_.Clear();
   id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   name_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  drawable_id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  geometry_id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   physical_shape_id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   if (GetArena() == nullptr && srt_transform_ != nullptr) {
     delete srt_transform_;
@@ -293,12 +293,12 @@ const char* SceneEntityProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPA
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // string drawable_id = 7;
+      // string geometry_id = 7;
       case 7:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
-          auto str = _internal_mutable_drawable_id();
+          auto str = _internal_mutable_geometry_id();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "e8.SceneEntityProto.drawable_id"));
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "e8.SceneEntityProto.geometry_id"));
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -386,14 +386,14 @@ failure:
         6, _Internal::bounding_box(this), target, stream);
   }
 
-  // string drawable_id = 7;
-  if (this->drawable_id().size() > 0) {
+  // string geometry_id = 7;
+  if (this->geometry_id().size() > 0) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->_internal_drawable_id().data(), static_cast<int>(this->_internal_drawable_id().length()),
+      this->_internal_geometry_id().data(), static_cast<int>(this->_internal_geometry_id().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "e8.SceneEntityProto.drawable_id");
+      "e8.SceneEntityProto.geometry_id");
     target = stream->WriteStringMaybeAliased(
-        7, this->_internal_drawable_id(), target);
+        7, this->_internal_geometry_id(), target);
   }
 
   // string physical_shape_id = 8;
@@ -451,11 +451,11 @@ size_t SceneEntityProto::ByteSizeLong() const {
         this->_internal_name());
   }
 
-  // string drawable_id = 7;
-  if (this->drawable_id().size() > 0) {
+  // string geometry_id = 7;
+  if (this->geometry_id().size() > 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-        this->_internal_drawable_id());
+        this->_internal_geometry_id());
   }
 
   // string physical_shape_id = 8;
@@ -522,8 +522,8 @@ void SceneEntityProto::MergeFrom(const SceneEntityProto& from) {
   if (from.name().size() > 0) {
     _internal_set_name(from._internal_name());
   }
-  if (from.drawable_id().size() > 0) {
-    _internal_set_drawable_id(from._internal_drawable_id());
+  if (from.geometry_id().size() > 0) {
+    _internal_set_geometry_id(from._internal_geometry_id());
   }
   if (from.physical_shape_id().size() > 0) {
     _internal_set_physical_shape_id(from._internal_physical_shape_id());
@@ -563,7 +563,7 @@ void SceneEntityProto::InternalSwap(SceneEntityProto* other) {
   transform_.InternalSwap(&other->transform_);
   id_.Swap(&other->id_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   name_.Swap(&other->name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  drawable_id_.Swap(&other->drawable_id_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  geometry_id_.Swap(&other->geometry_id_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   physical_shape_id_.Swap(&other->physical_shape_id_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(SceneEntityProto, movable_)

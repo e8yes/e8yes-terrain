@@ -20,9 +20,10 @@ syntax = "proto3";
 package e8;
 
 /**
- * @brief The PrimitiveVertex message It defines the geometric attributes of a primitive's vertex.
+ * @brief The PrimitiveVertexProto message It defines the geometric attributes of a primitive's
+ * vertex.
  */
-message PrimitiveVertex {
+message PrimitiveVertexProto {
     // Defines the vertex's 3D position. This array has exactly 3 elements.
     repeated float position = 1;
 
@@ -35,10 +36,10 @@ message PrimitiveVertex {
 }
 
 /**
- * @brief PrimitiveIndices message Defines a triangle with vertices referencing from the
+ * @brief PrimitiveIndicesProto message Defines a triangle with vertices referencing from the
  * PrimitiveVertex list.
  */
-message PrimitiveIndices {
+message PrimitiveIndicesProto {
     // 3 vertices of a triangle face with attributes referenced from PrimitiveVertex. This array
     // has exactly 3 elements.
     repeated int32 indices = 1;
