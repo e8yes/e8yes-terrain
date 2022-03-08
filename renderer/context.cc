@@ -39,6 +39,8 @@ constexpr char const *kAppName = "e8 islands";
 constexpr char const *kEngineName = "e8 islands renderer";
 uint32_t const kVersion = VK_MAKE_API_VERSION(0, 0, 0, 1);
 uint32_t const kMinimumVulkanApiVersion = VK_API_VERSION_1_2;
+unsigned const kUniformBufferDescriptorPoolSize = 100;
+unsigned const kCombinedImageSamplerDescriptorPoolSize = 100;
 
 ValidationLayers const kDebugModeValidationLayers{
     //"VK_LAYER_VALVE_steam_overlay_32",
@@ -363,6 +365,32 @@ VkCommandPool CreateCommandPool(VkDevice device, QueueFamilyIndex graphics_queue
     return command_pool;
 }
 
+VkDescriptorPool CreateDescriptorPool(VkDevice device) {
+    VkDescriptorPoolSize uniform_buffer_pool{};
+    uniform_buffer_pool.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    uniform_buffer_pool.descriptorCount = kUniformBufferDescriptorPoolSize;
+
+    VkDescriptorPoolSize combined_image_sampler_pool{};
+    combined_image_sampler_pool.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    combined_image_sampler_pool.descriptorCount = kCombinedImageSamplerDescriptorPoolSize;
+
+    std::vector<VkDescriptorPoolSize> pools{uniform_buffer_pool, combined_image_sampler_pool};
+
+    VkDescriptorPoolCreateInfo desc_pool_info{};
+    desc_pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    desc_pool_info.pPoolSizes = pools.data();
+    desc_pool_info.poolSizeCount = pools.size();
+    desc_pool_info.maxSets =
+        kUniformBufferDescriptorPoolSize + kCombinedImageSamplerDescriptorPoolSize;
+    desc_pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+
+    VkDescriptorPool desc_pool;
+    assert(VK_SUCCESS ==
+           vkCreateDescriptorPool(device, &desc_pool_info, /*pAllocator=*/nullptr, &desc_pool));
+
+    return desc_pool;
+}
+
 VmaAllocator CreateVmaAllocator(VkInstance instance, VkPhysicalDevice selected_physical_device,
                                 VkDevice device) {
     VmaAllocatorCreateInfo allocator_info = {};
@@ -392,11 +420,13 @@ VulkanContext::VulkanContext()
     : instance(VK_NULL_HANDLE), selected_physical_device(VK_NULL_HANDLE), surface(VK_NULL_HANDLE),
       device(VK_NULL_HANDLE), graphics_queue(VK_NULL_HANDLE), present_queue(VK_NULL_HANDLE),
       swap_chain(VK_NULL_HANDLE), swap_chain_image_format{}, swap_chain_image_extent{},
-      command_pool(VK_NULL_HANDLE), allocator(VK_NULL_HANDLE), frame_fence(VK_NULL_HANDLE) {}
+      command_pool(VK_NULL_HANDLE), descriptor_pool(VK_NULL_HANDLE), allocator(VK_NULL_HANDLE),
+      frame_fence(VK_NULL_HANDLE) {}
 
 VulkanContext::~VulkanContext() {
     vkDestroyFence(device, frame_fence, /*pAllocator=*/nullptr);
     vmaDestroyAllocator(allocator);
+    vkDestroyDescriptorPool(device, descriptor_pool, /*pAllocator=*/nullptr);
     vkDestroyCommandPool(device, command_pool, /*pAllocator=*/nullptr);
     for (auto swap_chain_image_view : swap_chain_image_views) {
         vkDestroyImageView(device, swap_chain_image_view, /*pAllocator=*/nullptr);
@@ -435,6 +465,7 @@ std::unique_ptr<VulkanContext> CreateVulkanContext(SDL_Window *target_window) {
         context->device, context->swap_chain_image_format.format, context->swap_chain_images);
 
     context->command_pool = CreateCommandPool(context->device, graphics_queue_family_index);
+    context->descriptor_pool = CreateDescriptorPool(context->device);
 
     context->allocator =
         CreateVmaAllocator(context->instance, context->selected_physical_device, context->device);

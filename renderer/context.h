@@ -51,6 +51,7 @@ struct VulkanContext {
     std::vector<VkImage> swap_chain_images;
     std::vector<VkImageView> swap_chain_image_views;
     VkCommandPool command_pool;
+    VkDescriptorPool descriptor_pool;
     VmaAllocator allocator;
     VkFence frame_fence;
 };
