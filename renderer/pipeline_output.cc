@@ -81,7 +81,8 @@ SwapChainPipelineOutput::SwapChainPipelineOutputImpl::SwapChainPipelineOutputImp
 
     if (with_depth_buffer) {
         depth_attachment_ = CreateDepthAttachment(context->swap_chain_image_extent.width,
-                                                  context->swap_chain_image_extent.height, context);
+                                                  context->swap_chain_image_extent.height,
+                                                  /*samplable=*/false, context);
         render_pass_ =
             CreateRenderPass(std::vector<VkAttachmentDescription>{color_attachments_[0]->desc},
                              depth_attachment_->desc, context);
@@ -146,7 +147,7 @@ struct DepthMapPipelineOutput::DepthMapPipelineOutputImpl {
 
 DepthMapPipelineOutput::DepthMapPipelineOutputImpl::DepthMapPipelineOutputImpl(
     unsigned width, unsigned height, VulkanContext *context) {
-    depth_attachment_ = CreateDepthAttachment(width, height, context);
+    depth_attachment_ = CreateDepthAttachment(width, height, /*samplable=*/true, context);
     render_pass_ = CreateRenderPass(/*color_attachments=*/std::vector<VkAttachmentDescription>(),
                                     depth_attachment_->desc, context);
     frame_buffer_ = CreateFrameBuffer(*render_pass_, width, height,

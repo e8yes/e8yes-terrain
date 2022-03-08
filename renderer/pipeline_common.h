@@ -263,11 +263,12 @@ CreateColorAttachmentsForSwapChain(VulkanContext *context);
  *
  * @param width The width, in pixels, of the depth buffer.
  * @param height The height, in pixels, of the depth buffer.
+ * @param samplable Sets this to true if the depth image will be sampled by a shader.
  * @param context Contextual Vulkan handles.
  * @return A valid unique pointer to the FrameBufferAttachment structure.
  */
-std::unique_ptr<FrameBufferAttachment> CreateDepthAttachment(unsigned width, unsigned height,
-                                                             VulkanContext *context);
+std::unique_ptr<FrameBufferAttachment>
+CreateDepthAttachment(unsigned width, unsigned height, bool samplable, VulkanContext *context);
 
 /**
  * @brief The RenderPassInfo struct Stores a Vulkan object describing the render pass in a graphics

@@ -24,6 +24,7 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
+#include "content/geometry.h"
 #include "renderer/context.h"
 #include "renderer/drawable_instance.h"
 #include "renderer/pipeline_common.h"
@@ -105,9 +106,17 @@ CreateShaderStages(std::string const &vertex_shader_file_path,
 }
 
 ShaderUniformLayout::ShaderUniformLayout(VulkanContext *context)
-    : layout(VK_NULL_HANDLE), context_(context) {}
+    : per_frame_desc_set(VK_NULL_HANDLE), per_pass_desc_set(VK_NULL_HANDLE),
+      per_drawable_desc_set(VK_NULL_HANDLE), layout(VK_NULL_HANDLE), context_(context) {}
 
 ShaderUniformLayout::~ShaderUniformLayout() {
+    vkDestroyDescriptorSetLayout(context_->device, per_drawable_desc_set,
+                                 /*pAllocator=*/nullptr);
+    vkDestroyDescriptorSetLayout(context_->device, per_pass_desc_set,
+                                 /*pAllocator=*/nullptr);
+    vkDestroyDescriptorSetLayout(context_->device, per_frame_desc_set,
+                                 /*pAllocator=*/nullptr);
+
     vkDestroyPipelineLayout(context_->device, layout, /*pAllocator=*/nullptr);
 }
 
@@ -121,8 +130,6 @@ CreateShaderUniformLayout(std::optional<VkPushConstantRange> const &push_constan
 
     VkPipelineLayoutCreateInfo layout_info{};
     layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    layout_info.setLayoutCount = 0;
-    layout_info.pSetLayouts = nullptr;
 
     // Sets push constant layout.
     if (push_constant.has_value()) {
@@ -130,44 +137,43 @@ CreateShaderUniformLayout(std::optional<VkPushConstantRange> const &push_constan
         layout_info.pushConstantRangeCount = 1;
     }
 
-    // Creates and sets descriptor set layout.
-    std::vector<VkDescriptorSetLayout> desc_set_layouts;
-
+    // Creates descriptor set layouts.
+    VkDescriptorSetLayoutCreateInfo per_frame_desc_set_info{};
+    per_frame_desc_set_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     if (!per_frame_desc_set.empty()) {
-        VkDescriptorSetLayoutCreateInfo desc_set_info{};
-        desc_set_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        desc_set_info.pBindings = per_frame_desc_set.data();
-        desc_set_info.bindingCount = per_frame_desc_set.size();
-
-        assert(VK_SUCCESS == vkCreateDescriptorSetLayout(context->device, &desc_set_info,
-                                                         /*pAllocator=*/nullptr,
-                                                         &info->per_frame_desc_set));
-        desc_set_layouts.push_back(info->per_frame_desc_set);
+        per_frame_desc_set_info.pBindings = per_frame_desc_set.data();
+        per_frame_desc_set_info.bindingCount = per_frame_desc_set.size();
     }
+    assert(VK_SUCCESS == vkCreateDescriptorSetLayout(context->device, &per_frame_desc_set_info,
+                                                     /*pAllocator=*/nullptr,
+                                                     &info->per_frame_desc_set));
 
+    VkDescriptorSetLayoutCreateInfo per_pass_desc_set_info{};
+    per_pass_desc_set_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     if (!per_pass_desc_set.empty()) {
-        VkDescriptorSetLayoutCreateInfo desc_set_info{};
-        desc_set_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        desc_set_info.pBindings = per_pass_desc_set.data();
-        desc_set_info.bindingCount = per_pass_desc_set.size();
-
-        assert(VK_SUCCESS == vkCreateDescriptorSetLayout(context->device, &desc_set_info,
-                                                         /*pAllocator=*/nullptr,
-                                                         &info->per_pass_desc_set));
-        desc_set_layouts.push_back(info->per_pass_desc_set);
+        per_pass_desc_set_info.pBindings = per_pass_desc_set.data();
+        per_pass_desc_set_info.bindingCount = per_pass_desc_set.size();
     }
+    assert(VK_SUCCESS == vkCreateDescriptorSetLayout(context->device, &per_pass_desc_set_info,
+                                                     /*pAllocator=*/nullptr,
+                                                     &info->per_pass_desc_set));
 
+    VkDescriptorSetLayoutCreateInfo per_drawable_desc_set_info{};
+    per_drawable_desc_set_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     if (!per_drawable_desc_set.empty()) {
-        VkDescriptorSetLayoutCreateInfo desc_set_info{};
-        desc_set_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        desc_set_info.pBindings = per_drawable_desc_set.data();
-        desc_set_info.bindingCount = per_drawable_desc_set.size();
-
-        assert(VK_SUCCESS == vkCreateDescriptorSetLayout(context->device, &desc_set_info,
-                                                         /*pAllocator=*/nullptr,
-                                                         &info->per_drawable_desc_set));
-        desc_set_layouts.push_back(info->per_drawable_desc_set);
+        per_drawable_desc_set_info.pBindings = per_drawable_desc_set.data();
+        per_drawable_desc_set_info.bindingCount = per_drawable_desc_set.size();
     }
+    assert(VK_SUCCESS == vkCreateDescriptorSetLayout(context->device, &per_drawable_desc_set_info,
+                                                     /*pAllocator=*/nullptr,
+                                                     &info->per_drawable_desc_set));
+
+    // Informs the pipeline about the descriptor set layouts.
+    std::vector<VkDescriptorSetLayout> desc_set_layouts{
+        info->per_frame_desc_set,
+        info->per_pass_desc_set,
+        info->per_drawable_desc_set,
+    };
 
     layout_info.pSetLayouts = desc_set_layouts.data();
     layout_info.setLayoutCount = desc_set_layouts.size();
@@ -226,7 +232,7 @@ std::unique_ptr<FixedStageConfig> CreateFixedStageConfig(VkPolygonMode polygon_m
     info->rasterizer.polygonMode = polygon_mode;
     info->rasterizer.lineWidth = 1.0f;
     info->rasterizer.cullMode = cull_mode;
-    info->rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+    info->rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     info->rasterizer.depthBiasEnable = VK_FALSE;
     info->rasterizer.depthBiasConstantFactor = 0.0f;
     info->rasterizer.depthBiasClamp = 0.0f;
@@ -313,8 +319,8 @@ CreateColorAttachmentsForSwapChain(VulkanContext *context) {
     return infos;
 }
 
-std::unique_ptr<FrameBufferAttachment> CreateDepthAttachment(unsigned width, unsigned height,
-                                                             VulkanContext *context) {
+std::unique_ptr<FrameBufferAttachment>
+CreateDepthAttachment(unsigned width, unsigned height, bool samplable, VulkanContext *context) {
     auto info = std::make_unique<FrameBufferAttachment>(/*swap_chain_image=*/false, context);
 
     VkImageCreateInfo image_info{};
@@ -329,6 +335,9 @@ std::unique_ptr<FrameBufferAttachment> CreateDepthAttachment(unsigned width, uns
     image_info.samples = VK_SAMPLE_COUNT_1_BIT;
     image_info.tiling = VK_IMAGE_TILING_OPTIMAL;
     image_info.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+    if (samplable) {
+        image_info.usage |= VK_IMAGE_USAGE_SAMPLED_BIT;
+    }
 
     VmaAllocationCreateInfo allocation_create_info{};
     allocation_create_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
@@ -361,7 +370,11 @@ std::unique_ptr<FrameBufferAttachment> CreateDepthAttachment(unsigned width, uns
     info->desc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     info->desc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     info->desc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    info->desc.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+    if (samplable) {
+        info->desc.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    } else {
+        info->desc.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+    }
 
     return info;
 }

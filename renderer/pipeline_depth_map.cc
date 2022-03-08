@@ -56,7 +56,7 @@ std::vector<VkVertexInputAttributeDescription> VertexShaderInputAttributes() {
     position_attribute.binding = 0;
     position_attribute.location = 0;
     position_attribute.format = VK_FORMAT_R32G32B32_SFLOAT;
-    position_attribute.offset = kPrimitiveVertexPositionOffset;
+    position_attribute.offset = offsetof(PrimitiveVertex, position);
 
     return std::vector<VkVertexInputAttributeDescription>{position_attribute};
 }
