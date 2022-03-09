@@ -31,6 +31,7 @@ SOURCES += \
     render_pass.cc \
     renderer_depth.cc \
     renderer_solid_color.cc \
+    vram_cache.cc \
     vram_geometry.cc
 
 HEADERS += \
@@ -48,6 +49,7 @@ HEADERS += \
     render_pass.h \
     renderer_depth.h \
     renderer_solid_color.h \
+    vram_cache.h \
     vram_geometry.h
 
 # Default rules for deployment.
