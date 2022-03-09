@@ -40,7 +40,8 @@ template <typename HostObjectPtr, typename GpuObject> class ConstrainedLruVramCa
     using ObjectSizeFn = std::function<uint64_t(HostObjectPtr host_object_ptr)>;
 
     // A functor to upload the specified host object to the GPU.
-    using UploadFn = std::function<void(HostObjectPtr host_object_ptr, GpuObject *gpu_object)>;
+    using UploadFn = std::function<void(HostObjectPtr host_object_ptr, uint64_t old_object_size,
+                                        uint64_t new_object_size, GpuObject *gpu_object)>;
 
     ConstrainedLruVramCache(VramUsageTracker *usage_tracker);
     ConstrainedLruVramCache(ConstrainedLruVramCache const &) = delete;
@@ -72,8 +73,8 @@ template <typename HostObjectPtr, typename GpuObject> class ConstrainedLruVramCa
      * @param upload_fn The upload procedure.
      * @return Returns the uploaded object if it fits in the video memory.
      */
-    GpuObject const *Upload(HostObjectPtr host_object_ptr, bool always_upload,
-                            ObjectSizeFn const &object_size_fn, UploadFn const &upload_fn);
+    GpuObject *Upload(HostObjectPtr host_object_ptr, bool always_upload,
+                      ObjectSizeFn const &object_size_fn, UploadFn const &upload_fn);
 
   private:
     struct CachedGpuObject;
@@ -246,7 +247,7 @@ void ConstrainedLruVramCache<HostObjectPtr, GpuObject>::Reset() {
 }
 
 template <typename HostObjectPtr, typename GpuObject>
-GpuObject const *ConstrainedLruVramCache<HostObjectPtr, GpuObject>::Upload(
+GpuObject *ConstrainedLruVramCache<HostObjectPtr, GpuObject>::Upload(
     HostObjectPtr host_object_ptr, bool always_upload, ObjectSizeFn const &object_size_fn,
     UploadFn const &upload_fn) {
     auto &[_, cached_gpu_object] = *this->Fetch(host_object_ptr);
@@ -261,7 +262,7 @@ GpuObject const *ConstrainedLruVramCache<HostObjectPtr, GpuObject>::Upload(
         return nullptr;
     }
 
-    upload_fn(host_object_ptr, &cached_gpu_object.object);
+    upload_fn(host_object_ptr, old_object_size, new_object_size, &cached_gpu_object.object);
     cached_gpu_object.object_size = new_object_size;
 
     int64_t delta = new_object_size - old_object_size;

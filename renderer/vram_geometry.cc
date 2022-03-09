@@ -19,21 +19,46 @@
 #include <cassert>
 #include <cstdint>
 #include <memory>
-#include <unordered_map>
 #include <vector>
 
-#include "common/tensor.h"
-#include "content/common.h"
 #include "content/geometry.h"
+#include "content/proto/camera.pb.h"
 #include "renderer/context.h"
-#include "renderer/projection.h"
+#include "renderer/vram_cache.h"
 #include "renderer/vram_geometry.h"
 
 namespace e8 {
 namespace {
 
-unsigned VertexBufferSize(std::vector<PrimitiveVertex> const &vertices) {
-    return vertices.size() * sizeof(PrimitiveVertex);
+uint64_t VertexBufferSize(Geometry const *geometry) {
+    return geometry->vertices.size() * sizeof(PrimitiveVertex);
+}
+
+void UploadVertexBuffer(Geometry const *geometry, uint64_t old_buffer_size,
+                        uint64_t new_buffer_size, VulkanContext *context,
+                        GeometryVramTransfer::BufferUploadResult *vertex_buffer_object) {
+    if (new_buffer_size != old_buffer_size) {
+        vertex_buffer_object->Allocate(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, new_buffer_size, context);
+    }
+
+    // Copies vertex data to a staging buffer.
+    void *vertex_buffer_region;
+    assert(VK_SUCCESS == vmaMapMemory(context->allocator, vertex_buffer_object->allocation,
+                                      &vertex_buffer_region));
+
+    memcpy(vertex_buffer_region, geometry->vertices.data(), new_buffer_size);
+
+    vmaUnmapMemory(context->allocator, vertex_buffer_object->allocation);
+}
+
+template <typename TargetMemoryIndexType>
+void CopyIndices(std::vector<Primitive> const &primitives, void *target_memory) {
+    for (unsigned i = 0; i < primitives.size(); ++i) {
+        for (unsigned j = 0; j < 3; ++j) {
+            *(reinterpret_cast<TargetMemoryIndexType *>(target_memory) + 3 * i + j) =
+                static_cast<TargetMemoryIndexType>(primitives[i].vertex_refs(j));
+        }
+    }
 }
 
 unsigned OptimalIndexSize(size_t num_vertices) {
@@ -50,150 +75,85 @@ unsigned OptimalIndexSize(size_t num_vertices) {
     }
 }
 
-unsigned IndexBufferSize(std::vector<Primitive> const &primitives, unsigned index_size) {
-    return primitives.size() * 3 * index_size;
+VkIndexType IndexType(size_t num_vertices) {
+    unsigned index_size = OptimalIndexSize(num_vertices);
+
+    if (index_size == sizeof(uint8_t)) {
+        return VkIndexType::VK_INDEX_TYPE_UINT8_EXT;
+    } else if (index_size == sizeof(uint16_t)) {
+        return VkIndexType::VK_INDEX_TYPE_UINT16;
+    } else if (index_size == sizeof(uint32_t)) {
+        return VkIndexType::VK_INDEX_TYPE_UINT32;
+    } else {
+        assert(false);
+    }
 }
 
-template <typename TargetMemoryIndexType>
-void CopyIndices(std::vector<Primitive> const &primitives, void *target_memory) {
-    for (unsigned i = 0; i < primitives.size(); ++i) {
-        for (unsigned j = 0; j < 3; ++j) {
-            *(reinterpret_cast<TargetMemoryIndexType *>(target_memory) + 3 * i + j) =
-                static_cast<TargetMemoryIndexType>(primitives[i].vertex_refs(j));
-        }
+unsigned IndexBufferSize(Geometry const *geometry) {
+    return geometry->primitives.size() * 3 * OptimalIndexSize(geometry->vertices.size());
+}
+
+void UploadIndexBuffer(Geometry const *geometry, uint64_t old_buffer_size, uint64_t new_buffer_size,
+                       VulkanContext *context,
+                       GeometryVramTransfer::BufferUploadResult *index_buffer_object) {
+    if (new_buffer_size != old_buffer_size) {
+        index_buffer_object->Allocate(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, new_buffer_size, context);
     }
+
+    // Copies index data from to a staging buffer.
+    void *index_buffer_region;
+    assert(VK_SUCCESS ==
+           vmaMapMemory(context->allocator, index_buffer_object->allocation, &index_buffer_region));
+
+    switch (IndexType(geometry->vertices.size())) {
+    case VkIndexType::VK_INDEX_TYPE_UINT8_EXT: {
+        CopyIndices<uint8_t>(geometry->primitives, index_buffer_region);
+        break;
+    }
+    case VkIndexType::VK_INDEX_TYPE_UINT16: {
+        CopyIndices<uint16_t>(geometry->primitives, index_buffer_region);
+        break;
+    }
+    case VkIndexType::VK_INDEX_TYPE_UINT32: {
+        CopyIndices<uint32_t>(geometry->primitives, index_buffer_region);
+        break;
+    }
+    default: {
+        assert(false);
+    }
+    }
+
+    vmaUnmapMemory(context->allocator, index_buffer_object->allocation);
 }
 
 } // namespace
 
-class GeometryVramTransfer::GeometryVramTransferImpl {
-  public:
-    GeometryVramTransferImpl(unsigned capacity, VulkanContext *context);
+struct GeometryVramTransfer::GeometryVramTransferImpl {
+    GeometryVramTransferImpl(VulkanContext *context);
+    ~GeometryVramTransferImpl();
 
-    std::unordered_map<Geometry const *, UploadResult>::iterator Fetch(Geometry const *geometry);
-
-    bool UploadVertices(std::vector<PrimitiveVertex> const &vertices,
-                        std::unique_ptr<BufferUploadResult> *vertex_upload_result);
-
-    bool UploadIndices(std::vector<Primitive> const &primitives, size_t num_vertices,
-                       std::unique_ptr<BufferUploadResult> *index_upload_result,
-                       VkIndexType *index_element_type);
-
-  private:
-    bool AllocateBuffer(unsigned new_size, VkBufferUsageFlags usage,
-                        std::unique_ptr<BufferUploadResult> *buffer_upload_result);
-
-    std::unordered_map<Geometry const *, UploadResult> cache_;
-    VulkanContext *context_;
-    unsigned used_;
-    unsigned const capacity_;
+    ConstrainedLruVramCache<Geometry const *, BufferUploadResult> vertex_cache;
+    ConstrainedLruVramCache<Geometry const *, BufferUploadResult> index_cache;
+    VulkanContext *context;
 };
 
-GeometryVramTransfer::GeometryVramTransferImpl::GeometryVramTransferImpl(unsigned capacity,
-                                                                         VulkanContext *context)
-    : context_(context), used_(0), capacity_(capacity) {}
+GeometryVramTransfer::GeometryVramTransferImpl::GeometryVramTransferImpl(VulkanContext *context)
+    : vertex_cache(&context->geometry_usage), index_cache(&context->geometry_usage),
+      context(context) {}
 
-std::unordered_map<Geometry const *, GeometryVramTransfer::UploadResult>::iterator
-GeometryVramTransfer::GeometryVramTransferImpl::Fetch(Geometry const *geometry) {
-    auto it = cache_.find(geometry);
-    if (it == cache_.end()) {
-        it = cache_.insert(std::make_pair(geometry, UploadResult())).first;
-    }
-    return it;
-}
+GeometryVramTransfer::GeometryVramTransferImpl::~GeometryVramTransferImpl() {}
 
-bool GeometryVramTransfer::GeometryVramTransferImpl::AllocateBuffer(
-    unsigned new_size, VkBufferUsageFlags usage,
-    std::unique_ptr<BufferUploadResult> *buffer_upload_result) {
-    if (*buffer_upload_result != nullptr && new_size == (*buffer_upload_result)->size) {
-        // The size of the requested memory region remains the same. Returns the old memory region.
-        assert((*buffer_upload_result)->buffer != nullptr);
-        assert((*buffer_upload_result)->allocation != nullptr);
-        return true;
-    }
+GeometryVramTransfer::BufferUploadResult::BufferUploadResult()
+    : buffer(VK_NULL_HANDLE), allocation(VK_NULL_HANDLE), size(0), context(nullptr) {}
 
-    if (*buffer_upload_result != nullptr) {
-        // An old memory region has been allocated. We need to re-allocate a region since the vertex
-        // array is of different size now.
-        assert((*buffer_upload_result)->buffer != nullptr);
-        assert((*buffer_upload_result)->allocation != nullptr);
+GeometryVramTransfer::BufferUploadResult::~BufferUploadResult() { this->Free(); }
 
-        used_ -= (*buffer_upload_result)->size;
-        *buffer_upload_result = nullptr;
-    }
+void GeometryVramTransfer::BufferUploadResult::Allocate(VkBufferUsageFlags usage, unsigned size,
+                                                        VulkanContext *context) {
+    this->context = context;
 
-    if (new_size == 0) {
-        // Can't allocate for an empty geometry.
-        return false;
-    }
+    this->Free();
 
-    if (used_ + new_size > capacity_) {
-        // TODO: Destroys LRU items to make room for new objects.
-        return false;
-    }
-
-    // Allocates a new memory region of new_size.
-    *buffer_upload_result = std::make_unique<BufferUploadResult>(usage, new_size, context_);
-
-    used_ += new_size;
-    return true;
-}
-
-bool GeometryVramTransfer::GeometryVramTransferImpl::UploadVertices(
-    std::vector<PrimitiveVertex> const &vertices,
-    std::unique_ptr<BufferUploadResult> *vertex_upload_result) {
-    unsigned new_size = VertexBufferSize(vertices);
-    if (!this->AllocateBuffer(new_size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, vertex_upload_result)) {
-        return false;
-    }
-
-    // Copies vertex data from CPU.
-    void *vertex_buffer_region;
-    assert(VK_SUCCESS == vmaMapMemory(context_->allocator, (*vertex_upload_result)->allocation,
-                                      &vertex_buffer_region));
-
-    memcpy(vertex_buffer_region, vertices.data(), new_size);
-
-    vmaUnmapMemory(context_->allocator, (*vertex_upload_result)->allocation);
-
-    return true;
-}
-
-bool GeometryVramTransfer::GeometryVramTransferImpl::UploadIndices(
-    std::vector<Primitive> const &primitives, size_t num_vertices,
-    std::unique_ptr<BufferUploadResult> *index_upload_result, VkIndexType *index_element_type) {
-    unsigned index_size = OptimalIndexSize(num_vertices);
-    unsigned new_size = IndexBufferSize(primitives, index_size);
-    if (!this->AllocateBuffer(new_size, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, index_upload_result)) {
-        return false;
-    }
-
-    // Copies index data from CPU.
-    void *index_buffer_region;
-    assert(VK_SUCCESS == vmaMapMemory(context_->allocator, (*index_upload_result)->allocation,
-                                      &index_buffer_region));
-
-    if (index_size == sizeof(uint8_t)) {
-        CopyIndices<uint8_t>(primitives, index_buffer_region);
-        *index_element_type = VkIndexType::VK_INDEX_TYPE_UINT8_EXT;
-    } else if (index_size == sizeof(uint16_t)) {
-        CopyIndices<uint16_t>(primitives, index_buffer_region);
-        *index_element_type = VkIndexType::VK_INDEX_TYPE_UINT16;
-    } else if (index_size == sizeof(uint32_t)) {
-        CopyIndices<uint32_t>(primitives, index_buffer_region);
-        *index_element_type = VkIndexType::VK_INDEX_TYPE_UINT32;
-    } else {
-        assert(false);
-    }
-
-    vmaUnmapMemory(context_->allocator, (*index_upload_result)->allocation);
-
-    return true;
-}
-
-GeometryVramTransfer::BufferUploadResult::BufferUploadResult(VkBufferUsageFlags usage,
-                                                             unsigned size, VulkanContext *context)
-    : buffer(VK_NULL_HANDLE), allocation(VK_NULL_HANDLE), size(size), context(context) {
     VkBufferCreateInfo vertex_buffer_info{};
     vertex_buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     vertex_buffer_info.size = size;
@@ -206,7 +166,7 @@ GeometryVramTransfer::BufferUploadResult::BufferUploadResult(VkBufferUsageFlags 
                     /*pAllocationInfo=*/nullptr);
 }
 
-GeometryVramTransfer::BufferUploadResult::~BufferUploadResult() {
+void GeometryVramTransfer::BufferUploadResult::Free() {
     if (this->Valid()) {
         vmaDestroyBuffer(context->allocator, buffer, allocation);
     }
@@ -216,13 +176,14 @@ bool GeometryVramTransfer::BufferUploadResult::Valid() const {
     return buffer != VK_NULL_HANDLE && allocation != VK_NULL_HANDLE;
 }
 
-GeometryVramTransfer::GeometryVramTransfer(VulkanContext *context, unsigned capacity)
-    : pimpl_(std::make_unique<GeometryVramTransfer::GeometryVramTransferImpl>(capacity, context)) {}
+GeometryVramTransfer::GeometryVramTransfer(VulkanContext *context)
+    : pimpl_(std::make_unique<GeometryVramTransfer::GeometryVramTransferImpl>(context)) {}
 
 GeometryVramTransfer::~GeometryVramTransfer() {}
 
 GeometryVramTransfer::UploadResult::UploadResult()
-    : index_element_type(VkIndexType::VK_INDEX_TYPE_MAX_ENUM) {}
+    : vertex_buffer(nullptr), index_buffer(nullptr),
+      index_element_type(VkIndexType::VK_INDEX_TYPE_MAX_ENUM) {}
 
 GeometryVramTransfer::UploadResult::~UploadResult() {}
 
@@ -231,39 +192,32 @@ bool GeometryVramTransfer::UploadResult::Valid() const {
            index_buffer->Valid();
 }
 
-GeometryVramTransfer::UploadResult const *GeometryVramTransfer::Upload(Geometry const *geometry) {
-    auto &[_, cached_upload] = *pimpl_->Fetch(geometry);
-    if (cached_upload.vertex_buffer == nullptr || cached_upload.index_buffer == nullptr) {
-        // Data has never been uploaded before.
-        pimpl_->UploadVertices(geometry->vertices, &cached_upload.vertex_buffer);
-        pimpl_->UploadIndices(geometry->primitives, geometry->vertices.size(),
-                              &cached_upload.index_buffer, &cached_upload.index_element_type);
-        return &cached_upload;
-    }
+GeometryVramTransfer::UploadResult GeometryVramTransfer::Upload(Geometry const *geometry) {
+    UploadResult result;
 
-    switch (geometry->rigidity) {
-    case GeometryProto::DEFORMABLE: {
-        pimpl_->UploadVertices(geometry->vertices, &cached_upload.vertex_buffer);
-        break;
-    }
-    case GeometryProto::TEARABLE: {
-        pimpl_->UploadVertices(geometry->vertices, &cached_upload.vertex_buffer);
-        pimpl_->UploadIndices(geometry->primitives, geometry->vertices.size(),
-                              &cached_upload.index_buffer, &cached_upload.index_element_type);
-        break;
-    }
-    case GeometryProto::STATIC:
-    case GeometryProto::RIGID: {
-        // Nothing needs to be updated, supposedly.
-        break;
-    }
-    default: {
-        assert(false);
-        break;
-    }
-    }
+    result.vertex_buffer = pimpl_->vertex_cache.Upload(
+        geometry,
+        /*always_upload=*/geometry->rigidity == GeometryProto::DEFORMABLE ||
+            geometry->rigidity == GeometryProto::TEARABLE,
+        VertexBufferSize, /*upload_fn=*/
+        [this](Geometry const *geometry, uint64_t old_buffer_size, uint64_t new_buffer_size,
+               GeometryVramTransfer::BufferUploadResult *vertex_buffer_object) {
+            UploadVertexBuffer(geometry, old_buffer_size, new_buffer_size, this->pimpl_->context,
+                               vertex_buffer_object);
+        });
 
-    return &cached_upload;
+    result.index_buffer = pimpl_->index_cache.Upload(
+        geometry, /*always_upload=*/geometry->rigidity == GeometryProto::TEARABLE, IndexBufferSize,
+        /*upload_fn=*/
+        [this](Geometry const *geometry, uint64_t old_buffer_size, uint64_t new_buffer_size,
+               GeometryVramTransfer::BufferUploadResult *vertex_buffer_object) {
+            UploadIndexBuffer(geometry, old_buffer_size, new_buffer_size, this->pimpl_->context,
+                              vertex_buffer_object);
+        });
+
+    result.index_element_type = IndexType(geometry->vertices.size());
+
+    return result;
 }
 
 } // namespace e8

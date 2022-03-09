@@ -18,7 +18,6 @@
 #ifndef ISLANDS_RENDERER_VRAM_GEOMETRY_H
 #define ISLANDS_RENDERER_VRAM_GEOMETRY_H
 
-#include <limits>
 #include <memory>
 #include <vulkan/vulkan.h>
 
@@ -42,16 +41,20 @@ class GeometryVramTransfer {
      * @param capacity Optionally specifies the maximum number of bytes the transferer will use on
      * the GPU device.
      */
-    GeometryVramTransfer(VulkanContext *context,
-                         unsigned capacity = std::numeric_limits<unsigned>::max());
+    GeometryVramTransfer(VulkanContext *context);
     ~GeometryVramTransfer();
 
     /**
      * @brief The BufferUploadResult struct Contains information of an allocated buffer object.
      */
     struct BufferUploadResult {
-        BufferUploadResult(VkBufferUsageFlags usage, unsigned size, VulkanContext *context);
+        BufferUploadResult();
+        BufferUploadResult(BufferUploadResult const &) = delete;
+        BufferUploadResult(BufferUploadResult &&) = default;
         ~BufferUploadResult();
+
+        void Allocate(VkBufferUsageFlags usage, unsigned size, VulkanContext *context);
+        void Free();
 
         /**
          * @brief Valid Indicates if the buffer is valid.
@@ -76,8 +79,6 @@ class GeometryVramTransfer {
      */
     struct UploadResult {
         UploadResult();
-        UploadResult(UploadResult const &) = delete;
-        UploadResult(UploadResult &&other) = default;
         ~UploadResult();
 
         /**
@@ -86,10 +87,10 @@ class GeometryVramTransfer {
         bool Valid() const;
 
         // A valid vertex buffer allocation if not null.
-        std::unique_ptr<BufferUploadResult> vertex_buffer;
+        BufferUploadResult *vertex_buffer;
 
         // A valid index buffer allocation if not null.
-        std::unique_ptr<BufferUploadResult> index_buffer;
+        BufferUploadResult *index_buffer;
 
         // The integer type each index element uses in the upload.
         VkIndexType index_element_type;
@@ -102,13 +103,12 @@ class GeometryVramTransfer {
      * transfer result.
      *
      * @param geometry The geometry to transfer/update.
-     * @return It always returns a valid UploadResult pointer. However, the pointer is only valid
-     * before the next Upload() call.
+     * @return See above.
      */
-    UploadResult const *Upload(Geometry const *geometry);
+    UploadResult Upload(Geometry const *geometry);
 
   private:
-    class GeometryVramTransferImpl;
+    struct GeometryVramTransferImpl;
     std::unique_ptr<GeometryVramTransferImpl> pimpl_;
 };
 

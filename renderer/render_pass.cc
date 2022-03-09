@@ -110,8 +110,8 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
     vkCmdBindPipeline(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline);
 
     for (auto const &instance : drawables) {
-        GeometryVramTransfer::UploadResult const *result = geo_vram->Upload(instance.geometry);
-        if (!result->Valid()) {
+        GeometryVramTransfer::UploadResult result = geo_vram->Upload(instance.geometry);
+        if (!result.Valid()) {
             continue;
         }
 
@@ -119,10 +119,10 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
 
         VkDeviceSize offset = 0;
         vkCmdBindVertexBuffers(cmds, /*firstBinding=*/0, /*bindingCount=*/1,
-                               &result->vertex_buffer->buffer,
+                               &result.vertex_buffer->buffer,
                                /*pOffsets=*/&offset);
-        vkCmdBindIndexBuffer(cmds, result->index_buffer->buffer, /*offset=*/0,
-                             result->index_element_type);
+        vkCmdBindIndexBuffer(cmds, result.index_buffer->buffer, /*offset=*/0,
+                             result.index_element_type);
         vkCmdDrawIndexed(cmds, instance.geometry->primitives.size() * 3,
                          /*instanceCount=*/1, /*firstIndex=*/0, /*vertexOffset=*/0,
                          /*firstInstance=*/0);
