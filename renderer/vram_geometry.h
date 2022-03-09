@@ -20,7 +20,7 @@
 
 #include <limits>
 #include <memory>
-#include <optional>
+#include <vulkan/vulkan.h>
 
 #include "content/geometry.h"
 #include "renderer/context.h"
@@ -30,7 +30,8 @@ namespace e8 {
 
 /**
  * @brief The GeometryVramTransfer class It enables an efficient geometry data transfer from the
- * host machine to the GPU device as well as geometry data storage on the GPU device.
+ * host machine to the GPU device as well as geometry data storage on the GPU device. This class
+ * isn't thread-safe.
  */
 class GeometryVramTransfer {
   public:
@@ -49,8 +50,13 @@ class GeometryVramTransfer {
      * @brief The BufferUploadResult struct Contains information of an allocated buffer object.
      */
     struct BufferUploadResult {
-        BufferUploadResult();
+        BufferUploadResult(VkBufferUsageFlags usage, unsigned size, VulkanContext *context);
         ~BufferUploadResult();
+
+        /**
+         * @brief Valid Indicates if the buffer is valid.
+         */
+        bool Valid() const;
 
         // The allocated buffer object.
         VkBuffer buffer;
@@ -60,6 +66,9 @@ class GeometryVramTransfer {
 
         // The size of the memory region of the buffer object.
         unsigned size;
+
+        // Contextual Vulkan handles.
+        VulkanContext *context;
     };
 
     /**
@@ -67,13 +76,20 @@ class GeometryVramTransfer {
      */
     struct UploadResult {
         UploadResult();
+        UploadResult(UploadResult const &) = delete;
+        UploadResult(UploadResult &&other) = default;
         ~UploadResult();
 
+        /**
+         * @brief Valid Indicates if the upload is valid.
+         */
+        bool Valid() const;
+
         // A valid vertex buffer allocation if not null.
-        std::optional<BufferUploadResult> vertex_buffer;
+        std::unique_ptr<BufferUploadResult> vertex_buffer;
 
         // A valid index buffer allocation if not null.
-        std::optional<BufferUploadResult> index_buffer;
+        std::unique_ptr<BufferUploadResult> index_buffer;
 
         // The integer type each index element uses in the upload.
         VkIndexType index_element_type;
@@ -86,9 +102,10 @@ class GeometryVramTransfer {
      * transfer result.
      *
      * @param geometry The geometry to transfer/update.
-     * @return See the UploadResult structure above.
+     * @return It always returns a valid UploadResult pointer. However, the pointer is only valid
+     * before the next Upload() call.
      */
-    UploadResult Upload(Geometry const *geometry);
+    UploadResult const *Upload(Geometry const *geometry);
 
   private:
     class GeometryVramTransferImpl;
