@@ -68,7 +68,7 @@ Geometry PlaneGeometry(float width, float height, float cell_area, bool movable)
     for (unsigned j = 0; j < num_height_steps; ++j) {
         for (unsigned i = 0; i < num_width_steps; ++i) {
             PrimitiveVertex vertex;
-            vertex.position = vec3{quad_width * i - width / 2, quad_height * j - height / 2, 0};
+            vertex.position = vec3{quad_width * i - width / 2, height / 2 - quad_height * j, 0};
             vertex.normal = vec3{0, 0, 1};
             vertex.tex_coord = vec2{static_cast<float>(i) / (num_width_steps - 1),
                                     static_cast<float>(j) / (num_height_steps - 1)};
