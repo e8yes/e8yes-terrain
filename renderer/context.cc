@@ -416,6 +416,10 @@ VkFence CreateFrameFence(VkDevice device) {
 
 } // namespace
 
+VramUsageTracker::VramUsageTracker(uint64_t capacity) : used(0), capacity(capacity) {}
+
+VramUsageTracker::~VramUsageTracker() {}
+
 VulkanContext::VulkanContext()
     : instance(VK_NULL_HANDLE), selected_physical_device(VK_NULL_HANDLE), surface(VK_NULL_HANDLE),
       device(VK_NULL_HANDLE), graphics_queue(VK_NULL_HANDLE), present_queue(VK_NULL_HANDLE),

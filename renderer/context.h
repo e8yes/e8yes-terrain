@@ -20,6 +20,8 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_vulkan.h>
+#include <cstdint>
+#include <limits>
 #include <memory>
 #include <vector>
 #include <vulkan/vulkan.h>
@@ -27,6 +29,20 @@
 #include "third_party/vma/vk_mem_alloc.h"
 
 namespace e8 {
+
+/**
+ * @brief The VramUsageTracker struct Caps and tracks video memory usage.
+ */
+struct VramUsageTracker {
+    /**
+     * @brief VramUsageTracker Creates a tracker with an optionally capped usage.
+     */
+    VramUsageTracker(uint64_t capacity = std::numeric_limits<uint64_t>::max());
+    ~VramUsageTracker();
+
+    uint64_t used;
+    uint64_t const capacity;
+};
 
 /**
  * @brief The VulkanContext struct A collection of Vulkan handles usable by all parts of the
@@ -54,6 +70,8 @@ struct VulkanContext {
     VkDescriptorPool descriptor_pool;
     VmaAllocator allocator;
     VkFence frame_fence;
+    VramUsageTracker geometry_usage;
+    VramUsageTracker image_usage;
 };
 
 /**
