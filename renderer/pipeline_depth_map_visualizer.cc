@@ -29,6 +29,19 @@
 namespace e8 {
 namespace {
 
+struct PushConstants {
+    PushConstants();
+    ~PushConstants();
+
+    float z_near;
+    float z_far;
+    float alpha;
+};
+
+PushConstants::PushConstants() : z_near(1), z_far(10), alpha(0.0f) {}
+
+PushConstants::~PushConstants() {}
+
 struct SamplerResult {
     SamplerResult(VulkanContext *context);
     ~SamplerResult();
@@ -64,6 +77,11 @@ std::unique_ptr<SamplerResult> CreateDepthMapSampler(VulkanContext *context) {
 }
 
 std::unique_ptr<ShaderUniformLayout> UniformLayout(VulkanContext *context) {
+    VkPushConstantRange push_constant{};
+    push_constant.offset = 0;
+    push_constant.size = sizeof(PushConstants);
+    push_constant.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
     VkDescriptorSetLayoutBinding depth_map_binding{};
     depth_map_binding.binding = 0;
     depth_map_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -71,7 +89,7 @@ std::unique_ptr<ShaderUniformLayout> UniformLayout(VulkanContext *context) {
     depth_map_binding.descriptorCount = 1;
 
     return CreateShaderUniformLayout(
-        /*push_constant=*/std::nullopt,
+        /*push_constant=*/push_constant,
         /*per_frame_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
         /*per_pass_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>{depth_map_binding},
         /*per_drawable_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(), context);
@@ -128,12 +146,11 @@ DepthMapVisualizerPipeline::DepthMapVisualizerPipelineImpl::DepthMapVisualizerPi
     PipelineOutputInterface *visualizer_output, VulkanContext *context)
     : context(context) {
     depth_map_sampler = CreateDepthMapSampler(context);
-
     std::unique_ptr<ShaderUniformLayout> uniform_layout = UniformLayout(context);
     desc_set = CreateDescriptorSet(*uniform_layout, context);
 
     post_processor_pipeline = std::make_unique<PostProcessorPipeline>(
-        kFragmentShaderFilePathDepthMapRaw, std::move(uniform_layout), visualizer_output, context);
+        kFragmentShaderFilePathDepthMap, std::move(uniform_layout), visualizer_output, context);
 }
 
 DepthMapVisualizerPipeline::DepthMapVisualizerPipelineImpl::~DepthMapVisualizerPipelineImpl() {}
@@ -144,10 +161,25 @@ DepthMapVisualizerPipeline::DepthMapVisualizerPipeline(PipelineOutputInterface *
 
 DepthMapVisualizerPipeline::~DepthMapVisualizerPipeline() {}
 
-PipelineOutputInterface *DepthMapVisualizerPipeline::Run(PipelineOutputInterface const &depth_map) {
+PipelineOutputInterface *
+DepthMapVisualizerPipeline::Run(float alpha, std::optional<PerspectiveProjection> projection,
+                                PipelineOutputInterface const &depth_map) {
     return pimpl_->post_processor_pipeline->Run(
         *depth_map.barrier, /*set_uniforms_fn=*/
-        [this, &depth_map](ShaderUniformLayout const &uniform_layout, VkCommandBuffer cmds) {
+        [this, alpha, projection, &depth_map](ShaderUniformLayout const &uniform_layout,
+                                              VkCommandBuffer cmds) {
+            PushConstants push_constants;
+            push_constants.alpha = alpha;
+            if (projection.has_value()) {
+                push_constants.z_near = projection->Frustum().z_near;
+                push_constants.z_far = projection->Frustum().z_far;
+            }
+
+            vkCmdPushConstants(cmds, uniform_layout.layout,
+                               /*stageFlags=*/VK_SHADER_STAGE_FRAGMENT_BIT,
+                               /*offset=*/0,
+                               /*size=*/sizeof(PushConstants), &push_constants);
+
             VkDescriptorImageInfo depth_map_image_info{};
             depth_map_image_info.sampler = this->pimpl_->depth_map_sampler->sampler;
             depth_map_image_info.imageView = depth_map.DepthAttachment()->view;

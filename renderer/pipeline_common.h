@@ -33,7 +33,7 @@ namespace e8 {
 constexpr char const *kVertexShaderFilePathDepthMap = "./depth.vert.spv";
 constexpr char const *kVertexShaderFilePathGeometryMap = "./geometry.vert.spv";
 constexpr char const *kVertexShaderFilePathPostProcessor = "./post_processor.vert.spv";
-constexpr char const *kFragmentShaderFilePathDepthMapRaw = "./depth_raw.frag.spv";
+constexpr char const *kFragmentShaderFilePathDepthMap = "./depth.frag.spv";
 constexpr char const *kFragmentShaderFilePathPostProcessorEmpty = "./post_processor.frag.spv";
 
 /**

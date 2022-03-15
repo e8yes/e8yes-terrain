@@ -85,7 +85,8 @@ void DepthRenderer::DrawFrame(Scene *scene) {
             drawables, camera_projection, start_frame_result->acquire_swap_chain_image_barrier,
             &pimpl_->geo_vram);
 
-        final_output = pimpl_->depth_map_visualizer_pipeline.Run(*depth_map_output);
+        final_output = pimpl_->depth_map_visualizer_pipeline.Run(/*alpha=*/0.0f, camera_projection,
+                                                                 *depth_map_output);
     }
 
     EndFrame(*final_output->barrier, start_frame_result->swap_chain_image_index,

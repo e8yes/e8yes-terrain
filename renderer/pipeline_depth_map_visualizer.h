@@ -19,9 +19,11 @@
 #define PIPELINE_DEPTH_MAP_VISUALIZER_H
 
 #include <memory>
+#include <optional>
 
 #include "renderer/context.h"
 #include "renderer/pipeline_output.h"
+#include "renderer/projection.h"
 
 namespace e8 {
 
@@ -46,10 +48,15 @@ class DepthMapVisualizerPipeline {
      * @brief Run Runs the depth map visualizer graphics pipeline. The pipeline can only be run when
      * the previous run was finished (indicated by the output's barrier).
      *
+     * @param alpha When alpha is zero, the depth map is visualized using the raw NDC value. When
+     * it is set to one, the value is corrected to display the true depth.
+     * @param projection The projection used to create the depth map. If alpha is non-zero, this
+     * argument is required in order to get the correct result.
      * @param depth_map The depth map to be visualized.
      * @return The output object set from the constructor, with a barrier assigned.
      */
-    PipelineOutputInterface *Run(PipelineOutputInterface const &depth_map);
+    PipelineOutputInterface *Run(float alpha, std::optional<PerspectiveProjection> projection,
+                                 PipelineOutputInterface const &depth_map);
 
   private:
     struct DepthMapVisualizerPipelineImpl;
