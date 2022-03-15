@@ -14,7 +14,12 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
+extern PROTOBUF_INTERNAL_EXPORT_camera_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Camera_Basis_camera_2eproto;
 namespace e8 {
+class Camera_BasisDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Camera_Basis> _instance;
+} _Camera_Basis_default_instance_;
 class CameraDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Camera> _instance;
@@ -31,14 +36,37 @@ static void InitDefaultsscc_info_Camera_camera_2eproto() {
   ::e8::Camera::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Camera_camera_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Camera_camera_2eproto}, {}};
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_Camera_camera_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_Camera_camera_2eproto}, {
+      &scc_info_Camera_Basis_camera_2eproto.base,}};
 
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_camera_2eproto[1];
+static void InitDefaultsscc_info_Camera_Basis_camera_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::e8::_Camera_Basis_default_instance_;
+    new (ptr) ::e8::Camera_Basis();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::e8::Camera_Basis::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Camera_Basis_camera_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Camera_Basis_camera_2eproto}, {}};
+
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_camera_2eproto[2];
 static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_camera_2eproto = nullptr;
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_camera_2eproto = nullptr;
 
 const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_camera_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::e8::Camera_Basis, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::e8::Camera_Basis, right_),
+  PROTOBUF_FIELD_OFFSET(::e8::Camera_Basis, down_),
+  PROTOBUF_FIELD_OFFSET(::e8::Camera_Basis, back_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::e8::Camera, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -46,7 +74,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_camera_2eproto::offsets[] PROT
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::e8::Camera, id_),
   PROTOBUF_FIELD_OFFSET(::e8::Camera, position_),
-  PROTOBUF_FIELD_OFFSET(::e8::Camera, rotation_),
+  PROTOBUF_FIELD_OFFSET(::e8::Camera, basis_),
   PROTOBUF_FIELD_OFFSET(::e8::Camera, focal_length_),
   PROTOBUF_FIELD_OFFSET(::e8::Camera, sensor_width_),
   PROTOBUF_FIELD_OFFSET(::e8::Camera, sensor_height_),
@@ -54,31 +82,36 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_camera_2eproto::offsets[] PROT
   PROTOBUF_FIELD_OFFSET(::e8::Camera, image_width_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, sizeof(::e8::Camera)},
+  { 0, -1, sizeof(::e8::Camera_Basis)},
+  { 8, -1, sizeof(::e8::Camera)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_Camera_Basis_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_Camera_default_instance_),
 };
 
 const char descriptor_table_protodef_camera_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\014camera.proto\022\002e8\"\246\001\n\006Camera\022\n\n\002id\030\001 \001("
-  "\t\022\020\n\010position\030\002 \003(\002\022\020\n\010rotation\030\003 \003(\002\022\024\n"
-  "\014focal_length\030\004 \001(\002\022\024\n\014sensor_width\030\005 \001("
-  "\002\022\025\n\rsensor_height\030\006 \001(\002\022\024\n\014max_distance"
-  "\030\007 \001(\002\022\023\n\013image_width\030\010 \001(\005b\006proto3"
+  "\n\014camera.proto\022\002e8\"\351\001\n\006Camera\022\n\n\002id\030\001 \001("
+  "\t\022\020\n\010position\030\002 \003(\002\022\037\n\005basis\030\003 \001(\0132\020.e8."
+  "Camera.Basis\022\024\n\014focal_length\030\004 \001(\002\022\024\n\014se"
+  "nsor_width\030\005 \001(\002\022\025\n\rsensor_height\030\006 \001(\002\022"
+  "\024\n\014max_distance\030\007 \001(\002\022\023\n\013image_width\030\010 \001"
+  "(\005\0322\n\005Basis\022\r\n\005right\030\001 \003(\002\022\014\n\004down\030\002 \003(\002"
+  "\022\014\n\004back\030\003 \003(\002b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_camera_2eproto_deps[1] = {
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_camera_2eproto_sccs[1] = {
+static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_camera_2eproto_sccs[2] = {
   &scc_info_Camera_camera_2eproto.base,
+  &scc_info_Camera_Basis_camera_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_camera_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_camera_2eproto = {
-  false, false, descriptor_table_protodef_camera_2eproto, "camera.proto", 195,
-  &descriptor_table_camera_2eproto_once, descriptor_table_camera_2eproto_sccs, descriptor_table_camera_2eproto_deps, 1, 0,
+  false, false, descriptor_table_protodef_camera_2eproto, "camera.proto", 262,
+  &descriptor_table_camera_2eproto_once, descriptor_table_camera_2eproto_sccs, descriptor_table_camera_2eproto_deps, 2, 0,
   schemas, file_default_instances, TableStruct_camera_2eproto::offsets,
-  file_level_metadata_camera_2eproto, 1, file_level_enum_descriptors_camera_2eproto, file_level_service_descriptors_camera_2eproto,
+  file_level_metadata_camera_2eproto, 2, file_level_enum_descriptors_camera_2eproto, file_level_service_descriptors_camera_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -87,29 +120,314 @@ namespace e8 {
 
 // ===================================================================
 
-void Camera::InitAsDefaultInstance() {
+void Camera_Basis::InitAsDefaultInstance() {
 }
-class Camera::_Internal {
+class Camera_Basis::_Internal {
  public:
 };
 
+Camera_Basis::Camera_Basis(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  right_(arena),
+  down_(arena),
+  back_(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:e8.Camera.Basis)
+}
+Camera_Basis::Camera_Basis(const Camera_Basis& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      right_(from.right_),
+      down_(from.down_),
+      back_(from.back_) {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:e8.Camera.Basis)
+}
+
+void Camera_Basis::SharedCtor() {
+}
+
+Camera_Basis::~Camera_Basis() {
+  // @@protoc_insertion_point(destructor:e8.Camera.Basis)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void Camera_Basis::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void Camera_Basis::ArenaDtor(void* object) {
+  Camera_Basis* _this = reinterpret_cast< Camera_Basis* >(object);
+  (void)_this;
+}
+void Camera_Basis::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void Camera_Basis::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const Camera_Basis& Camera_Basis::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_Camera_Basis_camera_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void Camera_Basis::Clear() {
+// @@protoc_insertion_point(message_clear_start:e8.Camera.Basis)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  right_.Clear();
+  down_.Clear();
+  back_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* Camera_Basis::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // repeated float right = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedFloatParser(_internal_mutable_right(), ptr, ctx);
+          CHK_(ptr);
+        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 13) {
+          _internal_add_right(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr));
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // repeated float down = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedFloatParser(_internal_mutable_down(), ptr, ctx);
+          CHK_(ptr);
+        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 21) {
+          _internal_add_down(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr));
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // repeated float back = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedFloatParser(_internal_mutable_back(), ptr, ctx);
+          CHK_(ptr);
+        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 29) {
+          _internal_add_back(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr));
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* Camera_Basis::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:e8.Camera.Basis)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated float right = 1;
+  if (this->_internal_right_size() > 0) {
+    target = stream->WriteFixedPacked(1, _internal_right(), target);
+  }
+
+  // repeated float down = 2;
+  if (this->_internal_down_size() > 0) {
+    target = stream->WriteFixedPacked(2, _internal_down(), target);
+  }
+
+  // repeated float back = 3;
+  if (this->_internal_back_size() > 0) {
+    target = stream->WriteFixedPacked(3, _internal_back(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:e8.Camera.Basis)
+  return target;
+}
+
+size_t Camera_Basis::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:e8.Camera.Basis)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated float right = 1;
+  {
+    unsigned int count = static_cast<unsigned int>(this->_internal_right_size());
+    size_t data_size = 4UL * count;
+    if (data_size > 0) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+    }
+    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
+    _right_cached_byte_size_.store(cached_size,
+                                    std::memory_order_relaxed);
+    total_size += data_size;
+  }
+
+  // repeated float down = 2;
+  {
+    unsigned int count = static_cast<unsigned int>(this->_internal_down_size());
+    size_t data_size = 4UL * count;
+    if (data_size > 0) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+    }
+    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
+    _down_cached_byte_size_.store(cached_size,
+                                    std::memory_order_relaxed);
+    total_size += data_size;
+  }
+
+  // repeated float back = 3;
+  {
+    unsigned int count = static_cast<unsigned int>(this->_internal_back_size());
+    size_t data_size = 4UL * count;
+    if (data_size > 0) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+    }
+    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
+    _back_cached_byte_size_.store(cached_size,
+                                    std::memory_order_relaxed);
+    total_size += data_size;
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void Camera_Basis::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:e8.Camera.Basis)
+  GOOGLE_DCHECK_NE(&from, this);
+  const Camera_Basis* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<Camera_Basis>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:e8.Camera.Basis)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:e8.Camera.Basis)
+    MergeFrom(*source);
+  }
+}
+
+void Camera_Basis::MergeFrom(const Camera_Basis& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:e8.Camera.Basis)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  right_.MergeFrom(from.right_);
+  down_.MergeFrom(from.down_);
+  back_.MergeFrom(from.back_);
+}
+
+void Camera_Basis::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:e8.Camera.Basis)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Camera_Basis::CopyFrom(const Camera_Basis& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:e8.Camera.Basis)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Camera_Basis::IsInitialized() const {
+  return true;
+}
+
+void Camera_Basis::InternalSwap(Camera_Basis* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  right_.InternalSwap(&other->right_);
+  down_.InternalSwap(&other->down_);
+  back_.InternalSwap(&other->back_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata Camera_Basis::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void Camera::InitAsDefaultInstance() {
+  ::e8::_Camera_default_instance_._instance.get_mutable()->basis_ = const_cast< ::e8::Camera_Basis*>(
+      ::e8::Camera_Basis::internal_default_instance());
+}
+class Camera::_Internal {
+ public:
+  static const ::e8::Camera_Basis& basis(const Camera* msg);
+};
+
+const ::e8::Camera_Basis&
+Camera::_Internal::basis(const Camera* msg) {
+  return *msg->basis_;
+}
 Camera::Camera(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena),
-  position_(arena),
-  rotation_(arena) {
+  position_(arena) {
   SharedCtor();
   RegisterArenaDtor(arena);
   // @@protoc_insertion_point(arena_constructor:e8.Camera)
 }
 Camera::Camera(const Camera& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
-      position_(from.position_),
-      rotation_(from.rotation_) {
+      position_(from.position_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_id().empty()) {
     id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_id(),
       GetArena());
+  }
+  if (from._internal_has_basis()) {
+    basis_ = new ::e8::Camera_Basis(*from.basis_);
+  } else {
+    basis_ = nullptr;
   }
   ::memcpy(&focal_length_, &from.focal_length_,
     static_cast<size_t>(reinterpret_cast<char*>(&image_width_) -
@@ -120,9 +438,9 @@ Camera::Camera(const Camera& from)
 void Camera::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_Camera_camera_2eproto.base);
   id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  ::memset(&focal_length_, 0, static_cast<size_t>(
+  ::memset(&basis_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&image_width_) -
-      reinterpret_cast<char*>(&focal_length_)) + sizeof(image_width_));
+      reinterpret_cast<char*>(&basis_)) + sizeof(image_width_));
 }
 
 Camera::~Camera() {
@@ -134,6 +452,7 @@ Camera::~Camera() {
 void Camera::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
   id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (this != internal_default_instance()) delete basis_;
 }
 
 void Camera::ArenaDtor(void* object) {
@@ -158,8 +477,11 @@ void Camera::Clear() {
   (void) cached_has_bits;
 
   position_.Clear();
-  rotation_.Clear();
   id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (GetArena() == nullptr && basis_ != nullptr) {
+    delete basis_;
+  }
+  basis_ = nullptr;
   ::memset(&focal_length_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&image_width_) -
       reinterpret_cast<char*>(&focal_length_)) + sizeof(image_width_));
@@ -193,14 +515,11 @@ const char* Camera::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::int
           ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
-      // repeated float rotation = 3;
+      // .e8.Camera.Basis basis = 3;
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedFloatParser(_internal_mutable_rotation(), ptr, ctx);
+          ptr = ctx->ParseMessage(_internal_mutable_basis(), ptr);
           CHK_(ptr);
-        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 29) {
-          _internal_add_rotation(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr));
-          ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
       // float focal_length = 4;
@@ -281,9 +600,12 @@ failure:
     target = stream->WriteFixedPacked(2, _internal_position(), target);
   }
 
-  // repeated float rotation = 3;
-  if (this->_internal_rotation_size() > 0) {
-    target = stream->WriteFixedPacked(3, _internal_rotation(), target);
+  // .e8.Camera.Basis basis = 3;
+  if (this->has_basis()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        3, _Internal::basis(this), target, stream);
   }
 
   // float focal_length = 4;
@@ -347,26 +669,18 @@ size_t Camera::ByteSizeLong() const {
     total_size += data_size;
   }
 
-  // repeated float rotation = 3;
-  {
-    unsigned int count = static_cast<unsigned int>(this->_internal_rotation_size());
-    size_t data_size = 4UL * count;
-    if (data_size > 0) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
-    }
-    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
-    _rotation_cached_byte_size_.store(cached_size,
-                                    std::memory_order_relaxed);
-    total_size += data_size;
-  }
-
   // string id = 1;
   if (this->id().size() > 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_id());
+  }
+
+  // .e8.Camera.Basis basis = 3;
+  if (this->has_basis()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *basis_);
   }
 
   // float focal_length = 4;
@@ -428,9 +742,11 @@ void Camera::MergeFrom(const Camera& from) {
   (void) cached_has_bits;
 
   position_.MergeFrom(from.position_);
-  rotation_.MergeFrom(from.rotation_);
   if (from.id().size() > 0) {
     _internal_set_id(from._internal_id());
+  }
+  if (from.has_basis()) {
+    _internal_mutable_basis()->::e8::Camera_Basis::MergeFrom(from._internal_basis());
   }
   if (!(from.focal_length() <= 0 && from.focal_length() >= 0)) {
     _internal_set_focal_length(from._internal_focal_length());
@@ -471,14 +787,13 @@ void Camera::InternalSwap(Camera* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   position_.InternalSwap(&other->position_);
-  rotation_.InternalSwap(&other->rotation_);
   id_.Swap(&other->id_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(Camera, image_width_)
       + sizeof(Camera::image_width_)
-      - PROTOBUF_FIELD_OFFSET(Camera, focal_length_)>(
-          reinterpret_cast<char*>(&focal_length_),
-          reinterpret_cast<char*>(&other->focal_length_));
+      - PROTOBUF_FIELD_OFFSET(Camera, basis_)>(
+          reinterpret_cast<char*>(&basis_),
+          reinterpret_cast<char*>(&other->basis_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata Camera::GetMetadata() const {
@@ -489,6 +804,9 @@ void Camera::InternalSwap(Camera* other) {
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace e8
 PROTOBUF_NAMESPACE_OPEN
+template<> PROTOBUF_NOINLINE ::e8::Camera_Basis* Arena::CreateMaybeMessage< ::e8::Camera_Basis >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::e8::Camera_Basis >(arena);
+}
 template<> PROTOBUF_NOINLINE ::e8::Camera* Arena::CreateMaybeMessage< ::e8::Camera >(Arena* arena) {
   return Arena::CreateMessageInternal< ::e8::Camera >(arena);
 }

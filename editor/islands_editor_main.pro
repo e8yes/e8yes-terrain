@@ -22,6 +22,7 @@ SOURCES += \
     basic/context.cc \
     environment/component_ambient.cc \
     environment/component_camera.cc \
+    object/component_scene_object_gltf.cc \
     procedural/component_procedural_plane.cc \
     scene/component_scene_closer.cc \
     scene/component_scene_loader.cc \
@@ -38,6 +39,7 @@ HEADERS += \
     basic/context.h \
     environment/component_ambient.h \
     environment/component_camera.h \
+    object/component_scene_object_gltf.h \
     procedural/component_procedural_plane.h \
     scene/component_scene_closer.h \
     scene/component_scene_loader.h \
@@ -88,7 +90,7 @@ win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../third_party/vma/rel
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../third_party/vma/debug/ -lislands_common
 else:unix: LIBS += -L$$OUT_PWD/../third_party/vma/ -lvma
 
-INCLUDEPATH += $$PWD/../common
+INCLUDEPATH += $$PWD/../third_party/vma
 DEPENDPATH += $$PWD/../third_party/vma
 
 # Third party UUID.
@@ -96,8 +98,16 @@ win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../third_party/uuid/re
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../third_party/uuid/debug/ -lislands_common
 else:unix: LIBS += -L$$OUT_PWD/../third_party/uuid/ -luuid4
 
-INCLUDEPATH += $$PWD/../common
+INCLUDEPATH += $$PWD/../third_party/uuid
 DEPENDPATH += $$PWD/../third_party/uuid
+
+# Third party Tiny glTF.
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../third_party/tiny_gltf/release/ -lislands_common
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../third_party/tiny_gltf/debug/ -lislands_common
+else:unix: LIBS += -L$$OUT_PWD/../third_party/tiny_gltf/ -ltiny_gltf
+
+INCLUDEPATH += $$PWD/../third_party/tiny_gltf
+DEPENDPATH += $$PWD/../third_party/tiny_gltf
 
 LIBS += -lboost_log
 LIBS += -lboost_thread

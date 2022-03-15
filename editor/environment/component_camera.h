@@ -25,6 +25,9 @@
 
 namespace e8 {
 
+/**
+ * @brief The CameraComponent class Responsible for scene camera interaction.
+ */
 class CameraComponent : public QObject {
     Q_OBJECT
 
@@ -35,7 +38,9 @@ class CameraComponent : public QObject {
 
   public slots:
     void OnChangeScene();
-    void OnChangeCamera();
+    void OnChangeCameraParameters();
+    void OnMoveCamera(char key_pressed);
+    void OnRotateCamera(float dx, float dy);
 
   private:
     ModificationMonitorComponent *modification_monitor_comp_;

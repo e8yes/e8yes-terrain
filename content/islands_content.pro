@@ -17,8 +17,10 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 INCLUDEPATH += ../
 
 SOURCES += \
+    camera.cc \
     common.cc \
     geometry.cc \
+    gltf.cc \
     procedural_basic.cc \
     procedural_object.cc \
     proto/camera.pb.cc \
@@ -37,8 +39,10 @@ SOURCES += \
     structure_linear.cc
 
 HEADERS += \
+    camera.h \
     common.h \
     geometry.h \
+    gltf.h \
     procedural_basic.h \
     procedural_object.h \
     proto/camera.pb.h \

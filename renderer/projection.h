@@ -60,10 +60,13 @@ class PerspectiveProjection : public ProjectionInterface {
      * @param width The width of the viewport.
      * @param height The height of the viewport.
      * @param location The 3D location of the pivot.
-     * @param roll_pitch_yaw A unit vector defining the outward facing direction of the viewport.
+     * @param right
+     * @param down
+     * @param back
      */
     PerspectiveProjection(float near_clip, float far_clip, float width, float height,
-                          vec3 const &location, vec3 const &roll_pitch_yaw);
+                          vec3 const &location, vec3 const &right, vec3 const &down,
+                          vec3 const &back);
 
     /**
      * @brief PerspectiveProjection

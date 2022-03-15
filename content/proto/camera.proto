@@ -23,16 +23,28 @@ package e8;
  * @brief The Camera message Parameters for simulating a digital camera.
  */
 message Camera {
+    /*
+     * @brief The Basis message
+     */
+    message Basis {
+        //
+        repeated float right = 1;
+
+        //
+        repeated float down = 2;
+
+        //
+        repeated float back = 3;
+    };
+
     // ID of this camera.
     string id = 1;
 
     // The camera's location.
     repeated float position = 2;
 
-    // The camera's rotation transform, specified in degree, to apply to each axes of rotation in
-    // the model space. Rotation will first apply to the z axis, then the y axis, finally the x
-    // axis.
-    repeated float rotation = 3;
+    //
+    Basis basis = 3;
 
     // The camera's focal length, in milimeter.
     float focal_length = 4;

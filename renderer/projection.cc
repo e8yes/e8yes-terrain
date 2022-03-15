@@ -27,14 +27,6 @@ namespace {
 
 float const kNearClipDistance = 0.2f;
 
-vec3 ToRadianRollPitchYaw(Camera const &camera) {
-    return vec3{
-        deg2rad(camera.rotation(0)),
-        deg2rad(camera.rotation(1)),
-        deg2rad(camera.rotation(2)),
-    };
-}
-
 } // namespace
 
 ProjectionInterface::ProjectionInterface() {}
@@ -42,11 +34,11 @@ ProjectionInterface::ProjectionInterface() {}
 ProjectionInterface::~ProjectionInterface() {}
 
 PerspectiveProjection::PerspectiveProjection(float near_clip, float far_clip, float width,
-                                             float height, vec3 const &location,
-                                             vec3 const &roll_pitch_yaw)
+                                             float height, vec3 const &location, vec3 const &left,
+                                             vec3 const &up, vec3 const &forward)
     : frustum_(/*left=*/-width / 2.0f, /*right=*/width / 2.0f, /*top=*/height / 2.0f,
                /*bottom=*/-height / 2.0f, /*z_near=*/near_clip, /*z_far=*/far_clip),
-      view_transform_(mat44_roll_pitch_yaw(location, roll_pitch_yaw)) {}
+      view_transform_(mat44_basis_view(location, left, up, forward)) {}
 
 PerspectiveProjection::~PerspectiveProjection() {}
 
@@ -54,7 +46,8 @@ PerspectiveProjection::PerspectiveProjection(Camera const &camera)
     : PerspectiveProjection(kNearClipDistance, camera.max_distance(),
                             kNearClipDistance / camera.focal_length() * camera.sensor_width(),
                             kNearClipDistance / camera.focal_length() * camera.sensor_height(),
-                            ToVec3(camera.position()), ToRadianRollPitchYaw(camera)) {}
+                            ToVec3(camera.position()), ToVec3(camera.basis().right()),
+                            ToVec3(camera.basis().down()), ToVec3(camera.basis().back())) {}
 
 mat44 PerspectiveProjection::ViewTransform() const { return view_transform_; }
 

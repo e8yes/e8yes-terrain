@@ -309,7 +309,7 @@ template <unsigned N, typename T>
 inline std::ostream &operator<<(std::ostream &os, vec<N, T> const &v) {
     os << "(" << v(0);
     for (unsigned i = 1; i < N; i++) {
-        os << "," << v(1);
+        os << "," << v(i);
     }
     os << ")";
     return os;
@@ -856,6 +856,8 @@ inline bool aabb::intersect(ray const &r, float t_min, float t_max, float &t0, f
     return true;
 }
 
+inline mat44 mat44_identity() { return mat44({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}); }
+
 inline mat44 mat44_scale(vec3 const &s) {
     return mat44({s(0), 0, 0, 0, 0, s(1), 0, 0, 0, 0, s(2), 0, 0, 0, 0, 1});
 }
@@ -868,55 +870,109 @@ inline mat44 mat44_basis(vec3 const &u, vec3 const &v, vec3 const &w) {
     return mat44({u(0), u(1), u(2), 0, v(0), v(1), v(2), 0, w(0), w(1), w(2), 0, 0, 0, 0, 1});
 }
 
-inline mat44 mat44_rotate(float a, vec3 const &axis) {
+inline mat33 mat33_basis(vec3 const &u, vec3 const &v, vec3 const &w) {
+    return mat33{u(0), u(1), u(2), v(0), v(1), v(2), w(0), w(1), w(2)};
+}
+
+inline mat33 mat33_rotate(float a, vec3 const &axis) {
     vec3 w = axis.normalize();
 
-    vec3 ref = std::abs(w(1) - 1) < 1e-5f ? vec3({1, 0, 0}) : vec3({0, 1, 0});
+    vec3 ref =
+        std::abs(w(1) - 1) < 1e-5f || std::abs(w(1) + 1) < 1e-5f ? vec3{1, 0, 0} : vec3{0, 1, 0};
 
     vec3 u = w.outer(ref).normalize();
     vec3 v = w.outer(u).normalize();
 
-    mat44 inv_r = mat44_basis(u, v, w);
-    mat44 r = ~inv_r;
+    mat33 inv_r = mat33_basis(u, v, w);
+    mat33 r = ~inv_r;
 
     float cos = std::cos(a);
     float sin = std::sin(a);
 
-    mat44 const &rotw = mat44({cos, sin, 0, 0, -sin, cos, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1});
+    mat33 rotw = mat33{// Row 0
+                       cos, sin, 0,
+                       // Row 1
+                       -sin, cos, 0,
+                       // Row 2
+                       0, 0, 1};
 
     return inv_r * rotw * r;
 }
 
-inline mat44 mat44_lookat(vec3 const &eye, vec3 const &center, vec3 const &up) {
+inline mat44 mat44_rotate(float a, vec3 const &axis) {
+    mat33 t = mat33_rotate(a, axis);
+    return mat44{// Row 0
+                 t(0, 0), t(1, 0), t(2, 0), 0,
+                 // Row 1
+                 t(0, 1), t(1, 1), t(2, 1), 0,
+                 // Row 2
+                 t(0, 2), t(1, 2), t(2, 2), 0,
+                 // Row 3
+                 0, 0, 0, 1};
+}
+
+inline mat44 mat44_lookat_view(vec3 const &eye, vec3 const &center, vec3 const &up) {
     vec3 w = (center - eye).normalize();
     vec3 u_up = up.normalize();
     vec3 v = w.outer(u_up).normalize();
     vec3 u = v.outer(w);
 
-    mat44 inv_l =
-        mat44({v(0), u(0), -w(0), 0, v(1), u(1), -w(1), 0, v(2), u(2), -w(2), 0, 0, 0, 0, 1});
+    mat44 inv_l = mat44{// Row 0
+                        v(0), u(0), -w(0), 0,
+                        // Row 1
+                        v(1), u(1), -w(1), 0,
+                        // Row 2
+                        v(2), u(2), -w(2), 0,
+                        // Row 3
+                        0, 0, 0, 1};
 
     mat44 inv_t = mat44_translate(-eye);
     return inv_l * inv_t;
 }
 
-inline mat44 mat44_roll_pitch_yaw(vec3 const &location, vec3 const &roll_pitch_yaw) {
-    mat44 inv_rot_x = mat44_rotate(-roll_pitch_yaw(0), vec3{1, 0, 0});
-    mat44 inv_rot_y = mat44_rotate(-roll_pitch_yaw(1), vec3{0, 1, 0});
-    mat44 inv_rot_z = mat44_rotate(-roll_pitch_yaw(2), vec3{0, 0, 1});
+inline mat44 mat44_basis_view(vec3 const &eye, vec3 const &right, vec3 const &down,
+                              vec3 const &back) {
+    mat44 view_basis = mat44_basis(right, down, back);
+    mat44 inv_view = ~view_basis;
+
+    mat44 inv_translate = mat44_translate(-eye);
+    return inv_view * inv_translate;
+}
+
+inline mat44 mat44_euler_view(vec3 const &location, vec3 const &euler) {
+    mat44 inv_rot_x = mat44_rotate(-euler(0), vec3{1, 0, 0});
+    mat44 inv_rot_y = mat44_rotate(-euler(1), vec3{0, 1, 0});
+    mat44 inv_rot_z = mat44_rotate(-euler(2), vec3{0, 0, 1});
 
     mat44 inv_t = mat44_translate(-location);
 
     return inv_rot_x * inv_rot_y * inv_rot_z * inv_t;
 }
 
-class frustum {
-  public:
+inline vec3 mat33_recover_euler(mat33 const &rotation) {
+    vec3 euler;
+
+    float sy = std::sqrt(rotation(0, 0) * rotation(0, 0) + rotation(1, 0) * rotation(1, 0));
+
+    bool singular = sy < 1e-5f;
+    if (!singular) {
+        euler(0) = std::atan2(rotation(2, 1), rotation(2, 2));
+        euler(1) = std::atan2(-rotation(2, 0), sy);
+        euler(2) = std::atan2(rotation(1, 0), rotation(0, 0));
+    } else {
+        euler(0) = std::atan2(rotation(1, 2), rotation(1, 1));
+        euler(1) = std::atan2(-rotation(2, 0), sy);
+        euler(2) = 0.0f;
+    }
+
+    return euler;
+}
+
+struct frustum {
     frustum(float left, float right, float bottom, float top, float z_near, float z_far);
 
     mat44 projective_transform() const;
 
-  private:
     float left;
     float right;
     float top;
@@ -959,9 +1015,9 @@ inline mat44 mat44_viewport(float x, float y, float height, float width) {
 
 inline mat44 mat44_normal(mat44 const &affine) { return ~(affine ^ (-1)); }
 
-inline float rad2deg(float rad) { return rad / static_cast<float>(M_PI) * 180; }
+inline float rad2deg(float rad) { return rad / static_cast<float>(M_PI) * 180.0f; }
 
-inline float deg2rad(float deg) { return deg / 180 * static_cast<float>(M_PI); }
+inline float deg2rad(float deg) { return deg / 180.0f * static_cast<float>(M_PI); }
 
 inline void vec3_basis(vec3 const &n, vec3 *u, vec3 *v) {
     *u = ((std::abs(n(0)) > .1f ? vec3({0.0f, 1.0f, 0.0f}) : vec3({1.0f, 1.0f, 1.0f})).outer(n))

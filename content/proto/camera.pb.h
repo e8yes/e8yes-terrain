@@ -47,7 +47,7 @@ struct TableStruct_camera_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[1]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[2]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -58,13 +58,218 @@ namespace e8 {
 class Camera;
 class CameraDefaultTypeInternal;
 extern CameraDefaultTypeInternal _Camera_default_instance_;
+class Camera_Basis;
+class Camera_BasisDefaultTypeInternal;
+extern Camera_BasisDefaultTypeInternal _Camera_Basis_default_instance_;
 }  // namespace e8
 PROTOBUF_NAMESPACE_OPEN
 template<> ::e8::Camera* Arena::CreateMaybeMessage<::e8::Camera>(Arena*);
+template<> ::e8::Camera_Basis* Arena::CreateMaybeMessage<::e8::Camera_Basis>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace e8 {
 
 // ===================================================================
+
+class Camera_Basis PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:e8.Camera.Basis) */ {
+ public:
+  inline Camera_Basis() : Camera_Basis(nullptr) {};
+  virtual ~Camera_Basis();
+
+  Camera_Basis(const Camera_Basis& from);
+  Camera_Basis(Camera_Basis&& from) noexcept
+    : Camera_Basis() {
+    *this = ::std::move(from);
+  }
+
+  inline Camera_Basis& operator=(const Camera_Basis& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Camera_Basis& operator=(Camera_Basis&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const Camera_Basis& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Camera_Basis* internal_default_instance() {
+    return reinterpret_cast<const Camera_Basis*>(
+               &_Camera_Basis_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    0;
+
+  friend void swap(Camera_Basis& a, Camera_Basis& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(Camera_Basis* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(Camera_Basis* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Camera_Basis* New() const final {
+    return CreateMaybeMessage<Camera_Basis>(nullptr);
+  }
+
+  Camera_Basis* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<Camera_Basis>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const Camera_Basis& from);
+  void MergeFrom(const Camera_Basis& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Camera_Basis* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "e8.Camera.Basis";
+  }
+  protected:
+  explicit Camera_Basis(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_camera_2eproto);
+    return ::descriptor_table_camera_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kRightFieldNumber = 1,
+    kDownFieldNumber = 2,
+    kBackFieldNumber = 3,
+  };
+  // repeated float right = 1;
+  int right_size() const;
+  private:
+  int _internal_right_size() const;
+  public:
+  void clear_right();
+  private:
+  float _internal_right(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      _internal_right() const;
+  void _internal_add_right(float value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      _internal_mutable_right();
+  public:
+  float right(int index) const;
+  void set_right(int index, float value);
+  void add_right(float value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      right() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      mutable_right();
+
+  // repeated float down = 2;
+  int down_size() const;
+  private:
+  int _internal_down_size() const;
+  public:
+  void clear_down();
+  private:
+  float _internal_down(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      _internal_down() const;
+  void _internal_add_down(float value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      _internal_mutable_down();
+  public:
+  float down(int index) const;
+  void set_down(int index, float value);
+  void add_down(float value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      down() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      mutable_down();
+
+  // repeated float back = 3;
+  int back_size() const;
+  private:
+  int _internal_back_size() const;
+  public:
+  void clear_back();
+  private:
+  float _internal_back(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      _internal_back() const;
+  void _internal_add_back(float value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      _internal_mutable_back();
+  public:
+  float back(int index) const;
+  void set_back(int index, float value);
+  void add_back(float value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      back() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      mutable_back();
+
+  // @@protoc_insertion_point(class_scope:e8.Camera.Basis)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > right_;
+  mutable std::atomic<int> _right_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > down_;
+  mutable std::atomic<int> _down_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > back_;
+  mutable std::atomic<int> _back_cached_byte_size_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_camera_2eproto;
+};
+// -------------------------------------------------------------------
 
 class Camera PROTOBUF_FINAL :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:e8.Camera) */ {
@@ -108,7 +313,7 @@ class Camera PROTOBUF_FINAL :
                &_Camera_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    0;
+    1;
 
   friend void swap(Camera& a, Camera& b) {
     a.Swap(&b);
@@ -176,12 +381,14 @@ class Camera PROTOBUF_FINAL :
 
   // nested types ----------------------------------------------------
 
+  typedef Camera_Basis Basis;
+
   // accessors -------------------------------------------------------
 
   enum : int {
     kPositionFieldNumber = 2,
-    kRotationFieldNumber = 3,
     kIdFieldNumber = 1,
+    kBasisFieldNumber = 3,
     kFocalLengthFieldNumber = 4,
     kSensorWidthFieldNumber = 5,
     kSensorHeightFieldNumber = 6,
@@ -210,28 +417,6 @@ class Camera PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
       mutable_position();
 
-  // repeated float rotation = 3;
-  int rotation_size() const;
-  private:
-  int _internal_rotation_size() const;
-  public:
-  void clear_rotation();
-  private:
-  float _internal_rotation(int index) const;
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-      _internal_rotation() const;
-  void _internal_add_rotation(float value);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-      _internal_mutable_rotation();
-  public:
-  float rotation(int index) const;
-  void set_rotation(int index, float value);
-  void add_rotation(float value);
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-      rotation() const;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-      mutable_rotation();
-
   // string id = 1;
   void clear_id();
   const std::string& id() const;
@@ -256,6 +441,24 @@ class Camera PROTOBUF_FINAL :
   void _internal_set_id(const std::string& value);
   std::string* _internal_mutable_id();
   public:
+
+  // .e8.Camera.Basis basis = 3;
+  bool has_basis() const;
+  private:
+  bool _internal_has_basis() const;
+  public:
+  void clear_basis();
+  const ::e8::Camera_Basis& basis() const;
+  ::e8::Camera_Basis* release_basis();
+  ::e8::Camera_Basis* mutable_basis();
+  void set_allocated_basis(::e8::Camera_Basis* basis);
+  private:
+  const ::e8::Camera_Basis& _internal_basis() const;
+  ::e8::Camera_Basis* _internal_mutable_basis();
+  public:
+  void unsafe_arena_set_allocated_basis(
+      ::e8::Camera_Basis* basis);
+  ::e8::Camera_Basis* unsafe_arena_release_basis();
 
   // float focal_length = 4;
   void clear_focal_length();
@@ -311,9 +514,8 @@ class Camera PROTOBUF_FINAL :
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > position_;
   mutable std::atomic<int> _position_cached_byte_size_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > rotation_;
-  mutable std::atomic<int> _rotation_cached_byte_size_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr id_;
+  ::e8::Camera_Basis* basis_;
   float focal_length_;
   float sensor_width_;
   float sensor_height_;
@@ -331,6 +533,151 @@ class Camera PROTOBUF_FINAL :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
+// Camera_Basis
+
+// repeated float right = 1;
+inline int Camera_Basis::_internal_right_size() const {
+  return right_.size();
+}
+inline int Camera_Basis::right_size() const {
+  return _internal_right_size();
+}
+inline void Camera_Basis::clear_right() {
+  right_.Clear();
+}
+inline float Camera_Basis::_internal_right(int index) const {
+  return right_.Get(index);
+}
+inline float Camera_Basis::right(int index) const {
+  // @@protoc_insertion_point(field_get:e8.Camera.Basis.right)
+  return _internal_right(index);
+}
+inline void Camera_Basis::set_right(int index, float value) {
+  right_.Set(index, value);
+  // @@protoc_insertion_point(field_set:e8.Camera.Basis.right)
+}
+inline void Camera_Basis::_internal_add_right(float value) {
+  right_.Add(value);
+}
+inline void Camera_Basis::add_right(float value) {
+  _internal_add_right(value);
+  // @@protoc_insertion_point(field_add:e8.Camera.Basis.right)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+Camera_Basis::_internal_right() const {
+  return right_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+Camera_Basis::right() const {
+  // @@protoc_insertion_point(field_list:e8.Camera.Basis.right)
+  return _internal_right();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+Camera_Basis::_internal_mutable_right() {
+  return &right_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+Camera_Basis::mutable_right() {
+  // @@protoc_insertion_point(field_mutable_list:e8.Camera.Basis.right)
+  return _internal_mutable_right();
+}
+
+// repeated float down = 2;
+inline int Camera_Basis::_internal_down_size() const {
+  return down_.size();
+}
+inline int Camera_Basis::down_size() const {
+  return _internal_down_size();
+}
+inline void Camera_Basis::clear_down() {
+  down_.Clear();
+}
+inline float Camera_Basis::_internal_down(int index) const {
+  return down_.Get(index);
+}
+inline float Camera_Basis::down(int index) const {
+  // @@protoc_insertion_point(field_get:e8.Camera.Basis.down)
+  return _internal_down(index);
+}
+inline void Camera_Basis::set_down(int index, float value) {
+  down_.Set(index, value);
+  // @@protoc_insertion_point(field_set:e8.Camera.Basis.down)
+}
+inline void Camera_Basis::_internal_add_down(float value) {
+  down_.Add(value);
+}
+inline void Camera_Basis::add_down(float value) {
+  _internal_add_down(value);
+  // @@protoc_insertion_point(field_add:e8.Camera.Basis.down)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+Camera_Basis::_internal_down() const {
+  return down_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+Camera_Basis::down() const {
+  // @@protoc_insertion_point(field_list:e8.Camera.Basis.down)
+  return _internal_down();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+Camera_Basis::_internal_mutable_down() {
+  return &down_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+Camera_Basis::mutable_down() {
+  // @@protoc_insertion_point(field_mutable_list:e8.Camera.Basis.down)
+  return _internal_mutable_down();
+}
+
+// repeated float back = 3;
+inline int Camera_Basis::_internal_back_size() const {
+  return back_.size();
+}
+inline int Camera_Basis::back_size() const {
+  return _internal_back_size();
+}
+inline void Camera_Basis::clear_back() {
+  back_.Clear();
+}
+inline float Camera_Basis::_internal_back(int index) const {
+  return back_.Get(index);
+}
+inline float Camera_Basis::back(int index) const {
+  // @@protoc_insertion_point(field_get:e8.Camera.Basis.back)
+  return _internal_back(index);
+}
+inline void Camera_Basis::set_back(int index, float value) {
+  back_.Set(index, value);
+  // @@protoc_insertion_point(field_set:e8.Camera.Basis.back)
+}
+inline void Camera_Basis::_internal_add_back(float value) {
+  back_.Add(value);
+}
+inline void Camera_Basis::add_back(float value) {
+  _internal_add_back(value);
+  // @@protoc_insertion_point(field_add:e8.Camera.Basis.back)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+Camera_Basis::_internal_back() const {
+  return back_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+Camera_Basis::back() const {
+  // @@protoc_insertion_point(field_list:e8.Camera.Basis.back)
+  return _internal_back();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+Camera_Basis::_internal_mutable_back() {
+  return &back_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+Camera_Basis::mutable_back() {
+  // @@protoc_insertion_point(field_mutable_list:e8.Camera.Basis.back)
+  return _internal_mutable_back();
+}
+
+// -------------------------------------------------------------------
+
 // Camera
 
 // string id = 1;
@@ -461,51 +808,85 @@ Camera::mutable_position() {
   return _internal_mutable_position();
 }
 
-// repeated float rotation = 3;
-inline int Camera::_internal_rotation_size() const {
-  return rotation_.size();
+// .e8.Camera.Basis basis = 3;
+inline bool Camera::_internal_has_basis() const {
+  return this != internal_default_instance() && basis_ != nullptr;
 }
-inline int Camera::rotation_size() const {
-  return _internal_rotation_size();
+inline bool Camera::has_basis() const {
+  return _internal_has_basis();
 }
-inline void Camera::clear_rotation() {
-  rotation_.Clear();
+inline void Camera::clear_basis() {
+  if (GetArena() == nullptr && basis_ != nullptr) {
+    delete basis_;
+  }
+  basis_ = nullptr;
 }
-inline float Camera::_internal_rotation(int index) const {
-  return rotation_.Get(index);
+inline const ::e8::Camera_Basis& Camera::_internal_basis() const {
+  const ::e8::Camera_Basis* p = basis_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::e8::Camera_Basis*>(
+      &::e8::_Camera_Basis_default_instance_);
 }
-inline float Camera::rotation(int index) const {
-  // @@protoc_insertion_point(field_get:e8.Camera.rotation)
-  return _internal_rotation(index);
+inline const ::e8::Camera_Basis& Camera::basis() const {
+  // @@protoc_insertion_point(field_get:e8.Camera.basis)
+  return _internal_basis();
 }
-inline void Camera::set_rotation(int index, float value) {
-  rotation_.Set(index, value);
-  // @@protoc_insertion_point(field_set:e8.Camera.rotation)
+inline void Camera::unsafe_arena_set_allocated_basis(
+    ::e8::Camera_Basis* basis) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(basis_);
+  }
+  basis_ = basis;
+  if (basis) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.Camera.basis)
 }
-inline void Camera::_internal_add_rotation(float value) {
-  rotation_.Add(value);
+inline ::e8::Camera_Basis* Camera::release_basis() {
+  auto temp = unsafe_arena_release_basis();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
 }
-inline void Camera::add_rotation(float value) {
-  _internal_add_rotation(value);
-  // @@protoc_insertion_point(field_add:e8.Camera.rotation)
+inline ::e8::Camera_Basis* Camera::unsafe_arena_release_basis() {
+  // @@protoc_insertion_point(field_release:e8.Camera.basis)
+  
+  ::e8::Camera_Basis* temp = basis_;
+  basis_ = nullptr;
+  return temp;
 }
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-Camera::_internal_rotation() const {
-  return rotation_;
+inline ::e8::Camera_Basis* Camera::_internal_mutable_basis() {
+  
+  if (basis_ == nullptr) {
+    auto* p = CreateMaybeMessage<::e8::Camera_Basis>(GetArena());
+    basis_ = p;
+  }
+  return basis_;
 }
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-Camera::rotation() const {
-  // @@protoc_insertion_point(field_list:e8.Camera.rotation)
-  return _internal_rotation();
+inline ::e8::Camera_Basis* Camera::mutable_basis() {
+  // @@protoc_insertion_point(field_mutable:e8.Camera.basis)
+  return _internal_mutable_basis();
 }
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-Camera::_internal_mutable_rotation() {
-  return &rotation_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-Camera::mutable_rotation() {
-  // @@protoc_insertion_point(field_mutable_list:e8.Camera.rotation)
-  return _internal_mutable_rotation();
+inline void Camera::set_allocated_basis(::e8::Camera_Basis* basis) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete basis_;
+  }
+  if (basis) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(basis);
+    if (message_arena != submessage_arena) {
+      basis = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, basis, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  basis_ = basis;
+  // @@protoc_insertion_point(field_set_allocated:e8.Camera.basis)
 }
 
 // float focal_length = 4;
@@ -611,6 +992,8 @@ inline void Camera::set_image_width(::PROTOBUF_NAMESPACE_ID::int32 value) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 

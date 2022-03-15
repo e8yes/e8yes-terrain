@@ -24,6 +24,7 @@
 #include <string>
 
 #include "common/tensor.h"
+#include "content/camera.h"
 #include "content/common.h"
 #include "content/procedural_object.h"
 #include "content/proto/scene.pb.h"
@@ -107,8 +108,7 @@ Scene::WriteAccess::~WriteAccess() {
 }
 
 Scene::Scene(SceneProto::StructureType structure_type, std::string const &name)
-    : id(GenerateUuid()), name(name), structure_type(structure_type) {
-    this->CreateDefaultCamera();
+    : id(GenerateUuid()), name(name), structure_type(structure_type), camera(DefaultCamera()) {
     this->CreateSceneEntityStructure();
 }
 
@@ -132,17 +132,6 @@ Scene::Scene(SceneProto const &proto)
 }
 
 Scene::~Scene() {}
-
-void Scene::CreateDefaultCamera() {
-    camera.set_id(GenerateUuid());
-    *camera.mutable_position() = e8::ToProto(vec3{0, 0, 0});
-    *camera.mutable_rotation() = e8::ToProto(vec3{0, 0, 0});
-    camera.set_focal_length(35);
-    camera.set_sensor_width(36);
-    camera.set_sensor_height(24);
-    camera.set_image_width(1024);
-    camera.set_max_distance(1000);
-}
 
 void Scene::CreateSceneEntityStructure() {
     switch (structure_type) {
