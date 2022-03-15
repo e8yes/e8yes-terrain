@@ -123,15 +123,34 @@ aabb ToAabb(AABB const &proto) {
 }
 
 mat44 ToHomogeneousTransform(SrtTransform const &srt_transform) {
-    mat44 scaling = mat44_scale(ToVec3(srt_transform.scaling()));
+    mat44 scaling;
+    if (!srt_transform.scaling().empty()) {
+        scaling = mat44_scale(ToVec3(srt_transform.scaling()));
+    } else {
+        scaling = mat44_identity();
+    }
 
-    mat44 rot_z = mat44_rotate(deg2rad(srt_transform.rotation(2)), vec3{0, 0, 1});
-    mat44 rot_y = mat44_rotate(deg2rad(srt_transform.rotation(1)), vec3{0, 1, 0});
-    mat44 rot_x = mat44_rotate(deg2rad(srt_transform.rotation(0)), vec3{1, 0, 01});
+    mat44 rot_z;
+    mat44 rot_y;
+    mat44 rot_x;
+    if (!srt_transform.rotation().empty()) {
+        rot_z = mat44_rotate(deg2rad(srt_transform.rotation(2)), vec3{0, 0, 1});
+        rot_y = mat44_rotate(deg2rad(srt_transform.rotation(1)), vec3{0, 1, 0});
+        rot_x = mat44_rotate(deg2rad(srt_transform.rotation(0)), vec3{1, 0, 0});
+    } else {
+        rot_z = mat44_identity();
+        rot_y = mat44_identity();
+        rot_x = mat44_identity();
+    }
 
-    mat44 translation = mat44_translate(ToVec3(srt_transform.translation()));
+    mat44 translation;
+    if (!srt_transform.translation().empty()) {
+        translation = mat44_translate(ToVec3(srt_transform.translation()));
+    } else {
+        translation = mat44_identity();
+    }
 
-    return translation * rot_x * rot_y * rot_z * scaling;
+    return translation * rot_z * rot_y * rot_x * scaling;
 }
 
 } // namespace e8
