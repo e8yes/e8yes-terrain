@@ -55,7 +55,7 @@ void RenameSceneToFileName(QString const &target_file_path, Scene *scene,
 }
 
 bool SaveScene(Scene const &scene, std::string const &target_file_path) {
-    std::fstream file(target_file_path, std::ios::out | std::ios::binary);
+    std::fstream file(target_file_path, std::ios::out | std::ios::trunc | std::ios::binary);
     if (!file.is_open()) {
         BOOST_LOG_TRIVIAL(error) << "SaveScene(): Failed to open scene file=[" << target_file_path
                                  << "].";

@@ -54,7 +54,7 @@ Primitive::~Primitive() {}
 PrimitiveIndicesProto Primitive::ToProto() const {
     PrimitiveIndicesProto proto;
     for (unsigned i = 0; i < 3; ++i) {
-        proto.set_indices(i, vertex_refs(i));
+        proto.add_indices(vertex_refs(i));
     }
     return proto;
 }
@@ -106,12 +106,18 @@ GeometryLod::~GeometryLod() {}
 
 GeometryLodProto GeometryLod::ToProto() const {
     GeometryLodProto proto;
+
+    proto.set_id(id);
+    proto.set_name(name);
+
     for (unsigned i = 0; i < lod.size(); ++i) {
         *proto.add_geometry_lod() = lod[i].ToProto();
     }
+
     for (unsigned i = 0; i < lod_min_distances.size(); ++i) {
-        proto.set_min_distances(i, lod_min_distances[i]);
+        proto.add_min_distances(lod_min_distances[i]);
     }
+
     return proto;
 }
 

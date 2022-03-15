@@ -39,7 +39,7 @@ SceneEntity::SceneEntity(
     std::unordered_map<GeometryId, std::shared_ptr<GeometryLod>> const &geometries)
     : id(proto.id()), name(proto.name()), movable(proto.movable()),
       transform(ToMat44(proto.transform())), bounding_box(ToAabb(proto.bounding_box())),
-      geometry_lod_instance(geometries.at(proto.id())) {
+      geometry_lod_instance(geometries.at(proto.geometry_id())) {
     if (proto.has_srt_transform()) {
         srt_transform = proto.srt_transform();
     }
