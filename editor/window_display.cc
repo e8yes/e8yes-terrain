@@ -17,8 +17,13 @@
 
 #include <SDL2/SDL.h>
 #include <cassert>
+#include <iostream>
 #include <memory>
+#include <optional>
+#include <utility>
 
+#include "content/common.h"
+#include "content/proto/primitive.pb.h"
 #include "content/scene.h"
 #include "editor/basic/context.h"
 #include "editor/window_display.h"
@@ -31,8 +36,9 @@ namespace {
 
 constexpr char const *kIslandsDisplayWindowTitle = "e8 islands display";
 
-void RunDisplayLoop(std::shared_ptr<EditorContext> const &editor_context, DepthRenderer *renderer) {
-    while (editor_context->running) {
+void RunDisplayLoop(std::shared_ptr<EditorContext> const &editor_context,
+                    SDL_Window *display_window, DepthRenderer *renderer) {
+    while (editor_context->Running()) {
         std::shared_ptr<Scene> acquired_scene = editor_context->scene;
         if (acquired_scene != nullptr) {
             renderer->DrawFrame(acquired_scene.get());
@@ -43,10 +49,8 @@ void RunDisplayLoop(std::shared_ptr<EditorContext> const &editor_context, DepthR
             continue;
         }
 
-        switch (event.type) {
-        case SDL_QUIT: {
-            break;
-        }
+        if (editor_context->display_window_event_source != nullptr) {
+            editor_context->display_window_event_source->PumpEvent(event, display_window);
         }
     }
 }
@@ -68,7 +72,7 @@ void RunIslandsDisplay(std::shared_ptr<EditorContext> editor_context, unsigned w
         std::unique_ptr<VulkanContext> context = CreateVulkanContext(display_window);
         DepthRenderer renderer(context.get());
 
-        RunDisplayLoop(editor_context, &renderer);
+        RunDisplayLoop(editor_context, display_window, &renderer);
     }
 
     SDL_DestroyWindow(display_window);
