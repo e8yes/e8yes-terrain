@@ -89,7 +89,7 @@ void DepthRenderer::DrawFrame(Scene *scene) {
                                                                  *depth_map_output);
     }
 
-    EndFrame(*final_output->barrier, start_frame_result->swap_chain_image_index,
+    EndFrame(final_output, start_frame_result->swap_chain_image_index,
              /*max_frame_duration=*/std::chrono::seconds(10), pimpl_->context);
 }
 

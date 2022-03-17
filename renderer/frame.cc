@@ -32,8 +32,6 @@ StartFrameResult::StartFrameResult(VulkanContext *context)
 StartFrameResult::~StartFrameResult() {}
 
 std::unique_ptr<StartFrameResult> StartFrame(VulkanContext *context) {
-    assert(VK_SUCCESS == vkResetFences(context->device, /*fenceCount=*/1, &context->frame_fence));
-
     auto result = std::make_unique<StartFrameResult>(context);
 
     VkSemaphore done_signal;
@@ -50,22 +48,21 @@ std::unique_ptr<StartFrameResult> StartFrame(VulkanContext *context) {
     return result;
 }
 
-void EndFrame(GpuBarrier const &final_tasks, unsigned swap_chain_image_index,
+void EndFrame(PipelineOutputInterface *final_ouput, unsigned swap_chain_image_index,
               std::chrono::nanoseconds const &max_frame_duration, VulkanContext *context) {
     VkPresentInfoKHR present_info{};
     present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
     present_info.pSwapchains = &context->swap_chain;
     present_info.swapchainCount = 1;
     present_info.pImageIndices = &swap_chain_image_index;
-    if (!final_tasks.tasks_signal.empty()) {
-        present_info.pWaitSemaphores = final_tasks.tasks_signal.data();
-        present_info.waitSemaphoreCount = final_tasks.tasks_signal.size();
+    if (!final_ouput->barrier->tasks_signal.empty()) {
+        present_info.pWaitSemaphores = final_ouput->barrier->tasks_signal.data();
+        present_info.waitSemaphoreCount = final_ouput->barrier->tasks_signal.size();
     }
 
     assert(VK_SUCCESS == vkQueuePresentKHR(context->present_queue, &present_info));
 
-    assert(VK_SUCCESS == vkWaitForFences(context->device, /*fenceCount=*/1, &context->frame_fence,
-                                         /*waitAll=*/VK_TRUE, max_frame_duration.count()));
+    final_ouput->Fulfill(max_frame_duration);
 }
 
 } // namespace e8

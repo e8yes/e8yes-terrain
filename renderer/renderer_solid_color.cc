@@ -62,7 +62,7 @@ void SolidColorRenderer::DrawFrame(Scene *scene) {
                                             start_frame_result->acquire_swap_chain_image_barrier);
     }
 
-    EndFrame(*final_output->barrier, start_frame_result->swap_chain_image_index,
+    EndFrame(final_output, start_frame_result->swap_chain_image_index,
              /*max_frame_duration=*/std::chrono::seconds(10), pimpl_->context);
 }
 

@@ -154,7 +154,7 @@ PostProcessorPipeline::Run(GpuBarrier const &barrier,
         cmds);
 
     pimpl_->output->barrier =
-        FinishRenderPass(cmds, barrier, pimpl_->output->FinalOutput(), pimpl_->context);
+        FinishRenderPass(cmds, barrier, pimpl_->output->AcquireFence(), pimpl_->context);
 
     return pimpl_->output;
 }

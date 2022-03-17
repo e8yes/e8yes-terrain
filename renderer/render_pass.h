@@ -47,14 +47,14 @@ VkCommandBuffer StartRenderPass(RenderPass const &pass, FrameBuffer const &frame
  * for this render pass.
  *
  * @param cmds The command buffer to be submitted.
- * @param barrier Previous tasks' barrier to allow this render pass to be placed after.
- * @param final Indicates if this render pass is the final task to wait for. This ensures
- * EndFrame() ends the frame only after this render pass is finished.
+ * @param prerequisites Barrier of previous tasks that need to be complete before this render pass
+ * can be run.
+ * @param fence Optional. If provided, the fence will be signaled when this render pass is finished.
  * @param context Contextual Vulkan handles.
  * @return The task barrier for this render pass.
  */
-std::unique_ptr<GpuBarrier> FinishRenderPass(VkCommandBuffer cmds, GpuBarrier const &barrier,
-                                             bool final, VulkanContext *context);
+std::unique_ptr<GpuBarrier> FinishRenderPass(VkCommandBuffer cmds, GpuBarrier const &prerequisites,
+                                             VkFence fence, VulkanContext *context);
 
 // Represents a function which sets the value of uniform variables for drawing the drawable.
 using SetDrawableUniformsFn =

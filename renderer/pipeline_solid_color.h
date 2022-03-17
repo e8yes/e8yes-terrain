@@ -47,10 +47,10 @@ class SolidColorPipeline {
      * previous run was finished (indicated by the output's barrier).
      *
      * @param color The color value to fill into the output.
-     * @param barrier The previous tasks' barrier.
+     * @param prerequisites Dependent tasks.
      * @return The output object set from the constructor, with a barrier assigned.
      */
-    PipelineOutputInterface *Run(vec3 const &color, GpuBarrier const &barrier);
+    PipelineOutputInterface *Run(vec3 const &color, GpuBarrier const &prerequisites);
 
   private:
     struct SolidColorPipelineImpl;

@@ -18,6 +18,7 @@
 #ifndef ISLANDS_RENDERER_PIPELINE_OUTPUT_H
 #define ISLANDS_RENDERER_PIPELINE_OUTPUT_H
 
+#include <chrono>
 #include <memory>
 #include <vector>
 #include <vulkan/vulkan.h>
@@ -72,7 +73,7 @@ struct GpuBarrier {
  */
 class PipelineOutputInterface {
   public:
-    PipelineOutputInterface();
+    PipelineOutputInterface(VulkanContext *context);
     virtual ~PipelineOutputInterface();
 
     /**
@@ -96,9 +97,15 @@ class PipelineOutputInterface {
     virtual FrameBufferAttachment const *DepthAttachment() const = 0;
 
     /**
-     * @brief FinalOutput Returns whether the output is the final step of the rendering process.
+     * @brief RequireFence
      */
-    virtual bool FinalOutput() const = 0;
+    VkFence AcquireFence();
+
+    /**
+     * @brief Fulfill
+     * @param timeout
+     */
+    void Fulfill(std::chrono::nanoseconds const &timeout);
 
   public:
     // The width of the rendered image.
@@ -110,6 +117,12 @@ class PipelineOutputInterface {
     // Barrier of the rendering task. Semaphores in this barrier must all be signaled before the
     // output can be read or used again.
     std::unique_ptr<GpuBarrier> barrier;
+
+    //
+    VkFence fence;
+
+    //
+    VulkanContext *context;
 };
 
 /**
@@ -131,7 +144,6 @@ class SwapChainPipelineOutput : public PipelineOutputInterface {
     RenderPass const &GetRenderPass() const override;
     FrameBufferAttachment const *ColorAttachment() const override;
     FrameBufferAttachment const *DepthAttachment() const override;
-    bool FinalOutput() const override;
 
     /**
      * @brief SetSwapChainImageIndex Sets the swap chain image to be used for storing rendering
@@ -165,7 +177,6 @@ class DepthMapPipelineOutput : public PipelineOutputInterface {
     RenderPass const &GetRenderPass() const override;
     FrameBufferAttachment const *ColorAttachment() const override;
     FrameBufferAttachment const *DepthAttachment() const override;
-    bool FinalOutput() const override;
 
   private:
     struct DepthMapPipelineOutputImpl;

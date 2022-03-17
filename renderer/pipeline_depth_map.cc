@@ -120,7 +120,7 @@ DepthMapPipeline::~DepthMapPipeline() {}
 
 PipelineOutputInterface *DepthMapPipeline::Run(std::vector<DrawableInstance> const &drawables,
                                                ProjectionInterface const &projection,
-                                               GpuBarrier const &barrier,
+                                               GpuBarrier const &prerequisites,
                                                GeometryVramTransfer *geo_vram) {
     VkCommandBuffer cmds = StartRenderPass(pimpl_->output->GetRenderPass(),
                                            *pimpl_->output->GetFrameBuffer(), pimpl_->context);
@@ -141,7 +141,7 @@ PipelineOutputInterface *DepthMapPipeline::Run(std::vector<DrawableInstance> con
         geo_vram, cmds);
 
     pimpl_->output->barrier =
-        FinishRenderPass(cmds, barrier, pimpl_->output->FinalOutput(), pimpl_->context);
+        FinishRenderPass(cmds, prerequisites, pimpl_->output->AcquireFence(), pimpl_->context);
 
     return pimpl_->output;
 }

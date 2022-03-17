@@ -65,8 +65,8 @@ VkCommandBuffer StartRenderPass(RenderPass const &render_pass, FrameBuffer const
     return cmds;
 }
 
-std::unique_ptr<GpuBarrier> FinishRenderPass(VkCommandBuffer cmds, GpuBarrier const &barrier,
-                                             bool final, VulkanContext *context) {
+std::unique_ptr<GpuBarrier> FinishRenderPass(VkCommandBuffer cmds, GpuBarrier const &prerequisites,
+                                             VkFence fence, VulkanContext *context) {
     // Finalizes the render pass and command buffers.
     vkCmdEndRenderPass(cmds);
     assert(VK_SUCCESS == vkEndCommandBuffer(cmds));
@@ -82,9 +82,9 @@ std::unique_ptr<GpuBarrier> FinishRenderPass(VkCommandBuffer cmds, GpuBarrier co
     VkSubmitInfo submit{};
     submit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    if (!barrier.tasks_signal.empty()) {
-        submit.pWaitSemaphores = barrier.tasks_signal.data();
-        submit.waitSemaphoreCount = barrier.tasks_signal.size();
+    if (!prerequisites.tasks_signal.empty()) {
+        submit.pWaitSemaphores = prerequisites.tasks_signal.data();
+        submit.waitSemaphoreCount = prerequisites.tasks_signal.size();
         submit.pWaitDstStageMask = &wait_stage;
     }
     submit.pSignalSemaphores = &done_signal;
@@ -92,13 +92,7 @@ std::unique_ptr<GpuBarrier> FinishRenderPass(VkCommandBuffer cmds, GpuBarrier co
     submit.pCommandBuffers = &cmds;
     submit.commandBufferCount = 1;
 
-    if (final) {
-        assert(VK_SUCCESS == vkQueueSubmit(context->graphics_queue, /*submitCount=*/1, &submit,
-                                           context->frame_fence));
-    } else {
-        assert(VK_SUCCESS == vkQueueSubmit(context->graphics_queue, /*submitCount=*/1, &submit,
-                                           /*fence=*/nullptr));
-    }
+    assert(VK_SUCCESS == vkQueueSubmit(context->graphics_queue, /*submitCount=*/1, &submit, fence));
 
     return std::make_unique<GpuBarrier>(done_signal, cmds, context);
 }

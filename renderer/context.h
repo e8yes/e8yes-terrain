@@ -69,7 +69,6 @@ struct VulkanContext {
     VkCommandPool command_pool;
     VkDescriptorPool descriptor_pool;
     VmaAllocator allocator;
-    VkFence frame_fence;
     VramUsageTracker geometry_usage;
     VramUsageTracker image_usage;
 };

@@ -47,7 +47,8 @@ SolidColorPipeline::SolidColorPipeline(PipelineOutputInterface *output, VulkanCo
 
 SolidColorPipeline::~SolidColorPipeline() {}
 
-PipelineOutputInterface *SolidColorPipeline::Run(vec3 const &color, GpuBarrier const &barrier) {
+PipelineOutputInterface *SolidColorPipeline::Run(vec3 const &color,
+                                                 GpuBarrier const &prerequisites) {
     FrameBuffer *frame_buffer = pimpl_->output->GetFrameBuffer();
 
     frame_buffer->clear_values[0].color.float32[0] = color(0);
@@ -57,7 +58,7 @@ PipelineOutputInterface *SolidColorPipeline::Run(vec3 const &color, GpuBarrier c
     VkCommandBuffer cmds =
         StartRenderPass(pimpl_->output->GetRenderPass(), *frame_buffer, pimpl_->context);
     pimpl_->output->barrier =
-        FinishRenderPass(cmds, barrier, pimpl_->output->FinalOutput(), pimpl_->context);
+        FinishRenderPass(cmds, prerequisites, pimpl_->output->AcquireFence(), pimpl_->context);
 
     return pimpl_->output;
 }

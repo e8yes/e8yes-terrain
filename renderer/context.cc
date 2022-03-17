@@ -404,16 +404,6 @@ VmaAllocator CreateVmaAllocator(VkInstance instance, VkPhysicalDevice selected_p
     return allocator;
 }
 
-VkFence CreateFrameFence(VkDevice device) {
-    VkFenceCreateInfo fence_info{};
-    fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-
-    VkFence frame_fence;
-    assert(VK_SUCCESS == vkCreateFence(device, &fence_info, /*pAllocator=*/nullptr, &frame_fence));
-
-    return frame_fence;
-}
-
 } // namespace
 
 VramUsageTracker::VramUsageTracker(uint64_t capacity) : used(0), capacity(capacity) {}
@@ -424,11 +414,9 @@ VulkanContext::VulkanContext()
     : instance(VK_NULL_HANDLE), selected_physical_device(VK_NULL_HANDLE), surface(VK_NULL_HANDLE),
       device(VK_NULL_HANDLE), graphics_queue(VK_NULL_HANDLE), present_queue(VK_NULL_HANDLE),
       swap_chain(VK_NULL_HANDLE), swap_chain_image_format{}, swap_chain_image_extent{},
-      command_pool(VK_NULL_HANDLE), descriptor_pool(VK_NULL_HANDLE), allocator(VK_NULL_HANDLE),
-      frame_fence(VK_NULL_HANDLE) {}
+      command_pool(VK_NULL_HANDLE), descriptor_pool(VK_NULL_HANDLE), allocator(VK_NULL_HANDLE) {}
 
 VulkanContext::~VulkanContext() {
-    vkDestroyFence(device, frame_fence, /*pAllocator=*/nullptr);
     vmaDestroyAllocator(allocator);
     vkDestroyDescriptorPool(device, descriptor_pool, /*pAllocator=*/nullptr);
     vkDestroyCommandPool(device, command_pool, /*pAllocator=*/nullptr);
@@ -473,8 +461,6 @@ std::unique_ptr<VulkanContext> CreateVulkanContext(SDL_Window *target_window) {
 
     context->allocator =
         CreateVmaAllocator(context->instance, context->selected_physical_device, context->device);
-
-    context->frame_fence = CreateFrameFence(context->device);
 
     return context;
 }

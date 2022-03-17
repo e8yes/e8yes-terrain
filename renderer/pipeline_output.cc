@@ -55,9 +55,28 @@ void GpuBarrier::Merge(std::unique_ptr<GpuBarrier> &&other) {
     other->tasks_cmds.clear();
 }
 
-PipelineOutputInterface::PipelineOutputInterface() : width(0), height(0) {}
+PipelineOutputInterface::PipelineOutputInterface(VulkanContext *context)
+    : width(0), height(0), context(context) {
+    VkFenceCreateInfo fence_info{};
+    fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 
-PipelineOutputInterface::~PipelineOutputInterface() {}
+    assert(VK_SUCCESS ==
+           vkCreateFence(context->device, &fence_info, /*pAllocator=*/nullptr, &fence));
+}
+
+PipelineOutputInterface::~PipelineOutputInterface() {
+    vkDestroyFence(context->device, fence, /*pAllocator=*/nullptr);
+}
+
+VkFence PipelineOutputInterface::AcquireFence() {
+    assert(VK_SUCCESS == vkResetFences(context->device, /*fenceCount=*/1, &fence));
+    return fence;
+}
+
+void PipelineOutputInterface::Fulfill(std::chrono::nanoseconds const &timeout) {
+    assert(VK_SUCCESS == vkWaitForFences(context->device, /*fenceCount=*/1, &fence,
+                                         /*waitAll=*/VK_TRUE, timeout.count()));
+}
 
 struct SwapChainPipelineOutput::SwapChainPipelineOutputImpl {
     SwapChainPipelineOutputImpl(bool with_depth_buffer, VulkanContext *context);
@@ -105,7 +124,8 @@ SwapChainPipelineOutput::SwapChainPipelineOutputImpl::SwapChainPipelineOutputImp
 SwapChainPipelineOutput::SwapChainPipelineOutputImpl::~SwapChainPipelineOutputImpl() {}
 
 SwapChainPipelineOutput::SwapChainPipelineOutput(bool with_depth_buffer, VulkanContext *context)
-    : pimpl_(std::make_unique<SwapChainPipelineOutputImpl>(with_depth_buffer, context)) {
+    : PipelineOutputInterface(context),
+      pimpl_(std::make_unique<SwapChainPipelineOutputImpl>(with_depth_buffer, context)) {
     this->width = context->swap_chain_image_extent.width;
     this->height = context->swap_chain_image_extent.height;
 }
@@ -127,8 +147,6 @@ FrameBufferAttachment const *SwapChainPipelineOutput::ColorAttachment() const {
 FrameBufferAttachment const *SwapChainPipelineOutput::DepthAttachment() const {
     return pimpl_->depth_attachment_.get();
 }
-
-bool SwapChainPipelineOutput::FinalOutput() const { return true; }
 
 void SwapChainPipelineOutput::SetSwapChainImageIndex(unsigned swap_chain_image_index) {
     pimpl_->swap_chain_image_index = swap_chain_image_index;
@@ -159,7 +177,8 @@ DepthMapPipelineOutput::DepthMapPipelineOutputImpl::~DepthMapPipelineOutputImpl(
 
 DepthMapPipelineOutput::DepthMapPipelineOutput(unsigned width, unsigned height,
                                                VulkanContext *context)
-    : pimpl_(std::make_unique<DepthMapPipelineOutputImpl>(width, height, context)) {
+    : PipelineOutputInterface(context),
+      pimpl_(std::make_unique<DepthMapPipelineOutputImpl>(width, height, context)) {
     this->width = width;
     this->height = height;
 }
@@ -175,7 +194,5 @@ FrameBufferAttachment const *DepthMapPipelineOutput::ColorAttachment() const { r
 FrameBufferAttachment const *DepthMapPipelineOutput::DepthAttachment() const {
     return pimpl_->depth_attachment_.get();
 }
-
-bool DepthMapPipelineOutput::FinalOutput() const { return false; }
 
 } // namespace e8

@@ -56,12 +56,12 @@ std::unique_ptr<StartFrameResult> StartFrame(VulkanContext *context);
 /**
  * @brief EndFrame Marks the completion of a frame's rendering process.
  *
- * @param final_tasks The last few tasks which need to be finished before the frame can present.
+ * @param final_ouput The last output to be fulfilled before the frame can present.
  * @param max_frame_duration The greatest possible amount of time the frame's rendering process will
  * take before failing this function. This avoids the function from hanging without bound.
  * @param context Contextual Vulkan handles.
  */
-void EndFrame(GpuBarrier const &final_tasks, unsigned swap_chain_image_index,
+void EndFrame(PipelineOutputInterface *final_ouput, unsigned swap_chain_image_index,
               std::chrono::nanoseconds const &max_frame_duration, VulkanContext *context);
 
 } // namespace e8
