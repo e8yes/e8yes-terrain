@@ -60,6 +60,20 @@ VkShaderModule LoadShader(std::string const &file_name, VulkanContext *context) 
     return shader_module;
 }
 
+VkDescriptorSet CreateDescriptorSet(VkDescriptorSetLayout layout, VulkanContext *context) {
+    VkDescriptorSetAllocateInfo desc_set_alloc_info{};
+    desc_set_alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    desc_set_alloc_info.descriptorPool = context->descriptor_pool;
+    desc_set_alloc_info.pSetLayouts = &layout;
+    desc_set_alloc_info.descriptorSetCount = 1;
+
+    VkDescriptorSet descriptor_set;
+    assert(VK_SUCCESS ==
+           vkAllocateDescriptorSets(context->device, &desc_set_alloc_info, &descriptor_set));
+
+    return descriptor_set;
+}
+
 } // namespace
 
 ShaderStages::ShaderStages(VulkanContext *context) : context_(context) {}
@@ -523,6 +537,119 @@ std::unique_ptr<FrameBuffer> CreateFrameBuffer(RenderPass const &render_pass, un
     }
 
     return info;
+}
+
+UniformBuffer::UniformBuffer(unsigned size, VulkanContext *context) : size(size), context(context) {
+    VkBufferCreateInfo uniform_buffer_info{};
+    uniform_buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    uniform_buffer_info.size = size;
+    uniform_buffer_info.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+
+    VmaAllocationCreateInfo allocation_info{};
+    allocation_info.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
+
+    assert(VK_SUCCESS == vmaCreateBuffer(context->allocator, &uniform_buffer_info, &allocation_info,
+                                         &buffer, &allocation, /*pAllocatorInfo=*/nullptr));
+}
+
+UniformBuffer::~UniformBuffer() { vmaDestroyBuffer(context->allocator, buffer, allocation); }
+
+std::unique_ptr<UniformBuffer> CreateUniformBuffer(unsigned size, VulkanContext *context) {
+    return std::make_unique<UniformBuffer>(size, context);
+}
+
+ImageSampler::ImageSampler(VulkanContext *context) : context(context) {}
+
+ImageSampler::~ImageSampler() {
+    vkDestroySampler(context->device, sampler, /*pAllocator=*/nullptr);
+}
+
+std::unique_ptr<ImageSampler> CreateReadBackSampler(VulkanContext *context) {
+    VkSamplerCreateInfo sampler_info{};
+    sampler_info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    sampler_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    sampler_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    sampler_info.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    sampler_info.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+    sampler_info.compareOp = VK_COMPARE_OP_ALWAYS;
+    sampler_info.magFilter = VK_FILTER_NEAREST;
+    sampler_info.minFilter = VK_FILTER_NEAREST;
+    sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+
+    auto info = std::make_unique<ImageSampler>(context);
+    assert(VK_SUCCESS ==
+           vkCreateSampler(context->device, &sampler_info, /*pAllocator=*/nullptr, &info->sampler));
+
+    return info;
+}
+
+DescriptorSets::DescriptorSets(VulkanContext *context) : context(context) {}
+
+DescriptorSets::~DescriptorSets() {
+    vkFreeDescriptorSets(context->device, context->descriptor_pool,
+                         /*descriptorSetCount=*/1, &frame);
+    vkFreeDescriptorSets(context->device, context->descriptor_pool,
+                         /*descriptorSetCount=*/1, &pass);
+    vkFreeDescriptorSets(context->device, context->descriptor_pool,
+                         /*descriptorSetCount=*/1, &drawable);
+}
+
+std::unique_ptr<DescriptorSets> CreateDescriptorSets(ShaderUniformLayout const &uniform_layout,
+                                                     VulkanContext *context) {
+    auto info = std::make_unique<DescriptorSets>(context);
+
+    info->drawable = CreateDescriptorSet(uniform_layout.per_drawable_desc_set, context);
+    info->pass = CreateDescriptorSet(uniform_layout.per_pass_desc_set, context);
+    info->frame = CreateDescriptorSet(uniform_layout.per_frame_desc_set, context);
+
+    return info;
+}
+
+void WriteUniformBufferDescriptor(void *data, UniformBuffer const &uniform_buffer,
+                                  VkDescriptorSet descriptor_set, unsigned binding,
+                                  VulkanContext *context) {
+    //
+    void *staging_buffer;
+    vmaMapMemory(context->allocator, uniform_buffer.allocation, &staging_buffer);
+    memcpy(staging_buffer, data, uniform_buffer.size);
+    vmaUnmapMemory(context->allocator, uniform_buffer.allocation);
+
+    //
+    VkDescriptorBufferInfo buffer_info{};
+    buffer_info.buffer = uniform_buffer.buffer;
+    buffer_info.offset = 0;
+    buffer_info.range = uniform_buffer.size;
+
+    VkWriteDescriptorSet write_descriptor{};
+    write_descriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    write_descriptor.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    write_descriptor.dstSet = descriptor_set;
+    write_descriptor.dstBinding = binding;
+    write_descriptor.descriptorCount = 1;
+    write_descriptor.pBufferInfo = &buffer_info;
+
+    vkUpdateDescriptorSets(context->device, /*descriptorWriteCount=*/1, &write_descriptor,
+                           /*descriptorCopyCount=*/0, /*pDescriptorCopies=*/nullptr);
+}
+
+void WriteImageDescriptor(VkImageView image_view, VkImageLayout image_layout,
+                          ImageSampler const &image_sampler, VkDescriptorSet descriptor_set,
+                          unsigned binding, VulkanContext *context) {
+    VkDescriptorImageInfo image_info{};
+    image_info.sampler = image_sampler.sampler;
+    image_info.imageView = image_view;
+    image_info.imageLayout = image_layout;
+
+    VkWriteDescriptorSet write_descriptor{};
+    write_descriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    write_descriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    write_descriptor.dstSet = descriptor_set;
+    write_descriptor.dstBinding = binding;
+    write_descriptor.descriptorCount = 1;
+    write_descriptor.pImageInfo = &image_info;
+
+    vkUpdateDescriptorSets(context->device, /*descriptorWriteCount=*/1, &write_descriptor,
+                           /*descriptorCopyCount=*/0, /*pDescriptorCopies=*/nullptr);
 }
 
 } // namespace e8

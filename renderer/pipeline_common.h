@@ -31,9 +31,9 @@ namespace e8 {
 
 // File paths to the shader programs.
 constexpr char const *kVertexShaderFilePathDepthMap = "./depth.vert.spv";
-constexpr char const *kVertexShaderFilePathGeometryMap = "./geometry.vert.spv";
+constexpr char const *kVertexShaderFilePathLightInputs = "./light_inputs.vert.spv";
 constexpr char const *kVertexShaderFilePathPostProcessor = "./post_processor.vert.spv";
-constexpr char const *kFragmentShaderFilePathDepthMap = "./depth.frag.spv";
+constexpr char const *kFragmentShaderFilePathDepthMapVisualizer = "./depth_visualizer.frag.spv";
 constexpr char const *kFragmentShaderFilePathPostProcessorEmpty = "./post_processor.frag.spv";
 
 /**
@@ -394,6 +394,132 @@ std::unique_ptr<FrameBuffer> CreateFrameBuffer(RenderPass const &render_pass, un
                                                std::vector<VkImageView> const &color_attachments,
                                                std::optional<VkImageView> const &depth_attachment,
                                                VulkanContext *context);
+
+/**
+ * @brief The UniformBuffer struct It stores data of a uniform variable/block. It will clean up the
+ * uniform buffer resource by the end of its lifecycle.
+ */
+struct UniformBuffer {
+    /**
+     * @brief UniformBuffer Should be created only by calling CreateUniformBuffer().
+     */
+    UniformBuffer(unsigned size, VulkanContext *context);
+    ~UniformBuffer();
+
+    // A full Vulkan object storing data of the uniform variable/block.
+    VkBuffer buffer;
+
+    // The buffer's allocation.
+    VmaAllocation allocation;
+
+    // The size of the uniform variable/block
+    unsigned size;
+
+    // Contextual Vulkan handles
+    VulkanContext *context;
+};
+
+/**
+ * @brief CreateUniformBuffer Creates a uniform buffer.
+ *
+ * @param size The size of the uniform buffer in byte.
+ * @param context Contextual Vulkan handles.
+ * @return A valid unique pointer to the UniformBuffer structure.
+ */
+std::unique_ptr<UniformBuffer> CreateUniformBuffer(unsigned size, VulkanContext *context);
+
+/**
+ * @brief The ImageSampler struct For image sampling. It will clean up the sampler resource by the
+ * end of its lifecycle.
+ */
+struct ImageSampler {
+    /**
+     * @brief ImageSampler Should be created only by calling CreateReadBackSampler().
+     */
+    ImageSampler(VulkanContext *context);
+    ~ImageSampler();
+
+    // A full Vulkan object storing information of a sampler.
+    VkSampler sampler;
+
+    // Contextual Vulkan handles.
+    VulkanContext *context;
+};
+
+/**
+ * @brief CreateReadBackSampler Creates an image sampler for the purpose of simply reading back
+ * image pixels (no sampling at at).
+ *
+ * @param context Contextual Vulkan handles.
+ * @return A valid unique pointer to the UniformBuffer structure.
+ */
+std::unique_ptr<ImageSampler> CreateReadBackSampler(VulkanContext *context);
+
+/**
+ * @brief The DescriptorSets struct It contains descriptor set instances of the descriptor set
+ * layouts specified in a ShaderUniformLayout. It will clean up the descriptor set resource by the
+ * end of its lifecycle.
+ */
+struct DescriptorSets {
+    /**
+     * @brief DescriptorSets Should be created only by calling CreateDescriptorSets().
+     */
+    DescriptorSets(VulkanContext *context);
+    ~DescriptorSets();
+
+    // Per-drawable descriptor set instance.
+    VkDescriptorSet drawable;
+
+    // Per-pass descriptor set instance.
+    VkDescriptorSet pass;
+
+    // Per-frame descriptor set instance.
+    VkDescriptorSet frame;
+
+    // Contextual Vulkan handles.
+    VulkanContext *context;
+};
+
+/**
+ * @brief CreateDescriptorSets Creates descriptor set instances of the descriptor set layouts
+ * specified in the shader uniform layout.
+ *
+ * @param uniform_layout Contains the descriptor set layouts.
+ * @param context Contextual Vulkan handles.
+ * @return A valid unique pointer to the DescriptorSets structure.
+ */
+std::unique_ptr<DescriptorSets> CreateDescriptorSets(ShaderUniformLayout const &uniform_layout,
+                                                     VulkanContext *context);
+
+/**
+ * @brief WriteUniformBufferDescriptor Writes data (from the host) to the specified uniform buffer
+ * descriptor. The write is synchronous.
+ *
+ * @param data Pointer to the host data. The size of the data must be the same as the size of the
+ * uniform buffer.
+ * @param uniform_buffer The backing uniform buffer to associate with the descriptor.
+ * @param descriptor_set The set the descriptor lives in.
+ * @param binding Binding of the descriptor in the set.
+ * @param context Contextual Vulkan handles.
+ */
+void WriteUniformBufferDescriptor(void *data, UniformBuffer const &uniform_buffer,
+                                  VkDescriptorSet descriptor_set, unsigned binding,
+                                  VulkanContext *context);
+
+/**
+ * @brief WriteImageDescriptor Writes image data (from the device) to the specified combined
+ * image-sampler descriptor. The write is synchronous.
+ *
+ * @param image_view View of the image data.
+ * @param image_layout Layout of the image.
+ * @param image_sampler The sampler used for accessing the image content.
+ * @param descriptor_set The set the descriptor lives in.
+ * @param binding Binding of the descriptor in the set.
+ * @param context Contextual Vulkan handles.
+ */
+void WriteImageDescriptor(VkImageView image_view, VkImageLayout image_layout,
+                          ImageSampler const &image_sampler, VkDescriptorSet descriptor_set,
+                          unsigned binding, VulkanContext *context);
 
 } // namespace e8
 

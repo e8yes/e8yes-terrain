@@ -35,16 +35,22 @@ namespace e8 {
  */
 class PostProcessorPipeline {
   public:
+    //
+    using SetPostProcessorUniformsExFn = std::function<void(
+        ShaderUniformLayout const &uniform_layout, VkDescriptorSet per_pass, VkCommandBuffer cmds)>;
+
     /**
      * @brief PostProcessorPipeline Constructs a custom post processor.
      *
      * @param fragment_shader The fragment shader to create the desired post processing effect.
-     * @param uniform_layout The fragment shader's uniform layout.
+     * @param push_constant
+     * @param per_pass_desc_set
      * @param output To receive output from the post processor.
      * @param context Contextual Vulkan handles.
      */
     PostProcessorPipeline(std::string const &fragment_shader,
-                          std::unique_ptr<ShaderUniformLayout> uniform_layout,
+                          std::optional<VkPushConstantRange> const &push_constant,
+                          std::vector<VkDescriptorSetLayoutBinding> const &per_pass_desc_set,
                           PipelineOutputInterface *output, VulkanContext *context);
 
     /**
@@ -68,7 +74,7 @@ class PostProcessorPipeline {
      * @return The output object set from the constructor, with a barrier assigned.
      */
     PipelineOutputInterface *Run(GpuBarrier const &barrier,
-                                 SetPostProcessorUniformsFn const &set_uniforms_fn = nullptr);
+                                 SetPostProcessorUniformsExFn const &set_uniforms_fn = nullptr);
 
   private:
     struct PostProcessorPipelineImpl;
