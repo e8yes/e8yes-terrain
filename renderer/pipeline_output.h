@@ -49,9 +49,9 @@ struct GpuBarrier {
      * @param context Contextual Vulkan handles.
      */
     GpuBarrier(VkSemaphore task_signal, VkCommandBuffer task_cmds, VulkanContext *context);
-    ~GpuBarrier();
-
     GpuBarrier(GpuBarrier const &) = delete;
+    GpuBarrier(GpuBarrier &&other);
+    ~GpuBarrier();
 
     /**
      * @brief Merge Merges tasks from another barrier.

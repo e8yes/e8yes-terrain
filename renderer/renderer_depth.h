@@ -19,16 +19,19 @@
 #define ISLANDS_RENDERER_DEPTH_H
 
 #include <memory>
+#include <vector>
 
+#include "content/proto/renderer.pb.h"
 #include "content/scene.h"
 #include "renderer/context.h"
+#include "renderer/renderer.h"
 
 namespace e8 {
 
 /**
- * @brief The DepthRenderer class It renders a depth image at the scene's camera angle.
+ * @brief The DepthRenderer class It renders a depth image in grayscale at the scene's camera angle.
  */
-class DepthRenderer {
+class DepthRenderer : public RendererInterface {
   public:
     /**
      * @brief DepthRenderer Constructs a depth renderer.
@@ -36,13 +39,9 @@ class DepthRenderer {
      * @param context Contextual Vulkan handles.
      */
     DepthRenderer(VulkanContext *context);
-    ~DepthRenderer();
+    ~DepthRenderer() override;
 
-    /**
-     * @brief DrawFrame Draws a new frame filled with the scene's depth map in grayscale to the
-     * currently available swap chain image.
-     */
-    void DrawFrame(Scene *scene);
+    void DrawFrame(Scene *scene) override;
 
   private:
     class DepthRendererImpl;

@@ -21,11 +21,11 @@
 #include <vulkan/vulkan.h>
 
 #include "content/common.h"
+#include "content/proto/renderer.pb.h"
 #include "content/scene.h"
 #include "content/scene_entity.h"
 #include "renderer/context.h"
 #include "renderer/drawable_instance.h"
-#include "renderer/frame.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/pipeline_depth_map.h"
 #include "renderer/pipeline_depth_map_visualizer.h"
@@ -33,6 +33,7 @@
 #include "renderer/projection.h"
 #include "renderer/query_fn.h"
 #include "renderer/render_pass.h"
+#include "renderer/renderer.h"
 #include "renderer/renderer_depth.h"
 #include "renderer/vram_geometry.h"
 
@@ -50,7 +51,6 @@ class DepthRenderer::DepthRendererImpl {
     DepthMapVisualizerPipeline depth_map_visualizer_pipeline;
 
     GeometryVramTransfer geo_vram;
-    VulkanContext *context;
 };
 
 DepthRenderer::DepthRendererImpl::DepthRendererImpl(VulkanContext *context)
@@ -58,20 +58,24 @@ DepthRenderer::DepthRendererImpl::DepthRendererImpl(VulkanContext *context)
                        context->swap_chain_image_extent.height, context),
       final_output(/*with_depth_buffer=*/false, context),
       depth_map_pipeline(&depth_map_output, context),
-      depth_map_visualizer_pipeline(&final_output, context), geo_vram(context), context(context) {}
+      depth_map_visualizer_pipeline(&final_output, context), geo_vram(context) {}
 
 DepthRenderer::DepthRendererImpl::~DepthRendererImpl() {}
 
 DepthRenderer::DepthRenderer(VulkanContext *context)
-    : pimpl_(std::make_unique<DepthRendererImpl>(context)) {}
+    : RendererInterface(/*num_stages=*/1, /*max_frame_duration=*/std::chrono::seconds(10), context),
+      pimpl_(std::make_unique<DepthRendererImpl>(context)) {}
 
 DepthRenderer::~DepthRenderer() {}
 
 void DepthRenderer::DrawFrame(Scene *scene) {
-    std::unique_ptr<StartFrameResult> start_frame_result = StartFrame(pimpl_->context);
-    pimpl_->final_output.SetSwapChainImageIndex(start_frame_result->swap_chain_image_index);
+    FrameContext frame_context = this->BeginFrame();
+
+    pimpl_->final_output.SetSwapChainImageIndex(frame_context.swap_chain_image_index);
 
     PipelineOutputInterface *final_output;
+
+    this->BeginStage(/*index=*/1, /*name=*/"Pipeline Preparation");
     {
         Scene::ReadAccess read_access = scene->GainReadAccess();
 
@@ -82,15 +86,15 @@ void DepthRenderer::DrawFrame(Scene *scene) {
         PerspectiveProjection camera_projection(scene->camera);
 
         PipelineOutputInterface *depth_map_output = pimpl_->depth_map_pipeline.Run(
-            drawables, camera_projection, start_frame_result->acquire_swap_chain_image_barrier,
+            drawables, camera_projection, frame_context.acquire_swap_chain_image_barrier,
             &pimpl_->geo_vram);
 
         final_output = pimpl_->depth_map_visualizer_pipeline.Run(/*alpha=*/0.0f, camera_projection,
                                                                  *depth_map_output);
     }
+    this->EndStage(/*index=*/1);
 
-    EndFrame(final_output, start_frame_result->swap_chain_image_index,
-             /*max_frame_duration=*/std::chrono::seconds(10), pimpl_->context);
+    this->EndFrame(frame_context, final_output);
 }
 
 } // namespace e8

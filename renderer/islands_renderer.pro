@@ -19,7 +19,6 @@ INCLUDEPATH += ../
 SOURCES += \
     context.cc \
     drawable_instance.cc \
-    frame.cc \
     pipeline_common.cc \
     pipeline_depth_map.cc \
     pipeline_depth_map_visualizer.cc \
@@ -29,6 +28,7 @@ SOURCES += \
     projection.cc \
     query_fn.cc \
     render_pass.cc \
+    renderer.cc \
     renderer_depth.cc \
     renderer_solid_color.cc \
     vram_cache.cc \
@@ -37,7 +37,6 @@ SOURCES += \
 HEADERS += \
     context.h \
     drawable_instance.h \
-    frame.h \
     pipeline_common.h \
     pipeline_depth_map.h \
     pipeline_depth_map_visualizer.h \
@@ -47,6 +46,7 @@ HEADERS += \
     projection.h \
     query_fn.h \
     render_pass.h \
+    renderer.h \
     renderer_depth.h \
     renderer_solid_color.h \
     vram_cache.h \

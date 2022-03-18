@@ -21,12 +21,13 @@
 #include <vulkan/vulkan.h>
 
 #include "common/tensor.h"
+#include "content/proto/renderer.pb.h"
 #include "content/scene.h"
 #include "renderer/context.h"
-#include "renderer/frame.h"
 #include "renderer/pipeline_output.h"
 #include "renderer/pipeline_solid_color.h"
 #include "renderer/render_pass.h"
+#include "renderer/renderer.h"
 #include "renderer/renderer_solid_color.h"
 
 namespace e8 {
@@ -37,33 +38,32 @@ struct SolidColorRenderer::SolidColorRendererImpl {
 
     SwapChainPipelineOutput output;
     SolidColorPipeline pipeline;
-    VulkanContext *context;
 };
 
 SolidColorRenderer::SolidColorRendererImpl::SolidColorRendererImpl(VulkanContext *context)
-    : output(/*with_depth_buffer=*/false, context), pipeline(&output, context), context(context) {}
+    : output(/*with_depth_buffer=*/false, context), pipeline(&output, context) {}
 
 SolidColorRenderer::SolidColorRendererImpl::~SolidColorRendererImpl() {}
 
 SolidColorRenderer::SolidColorRenderer(VulkanContext *context)
-    : pimpl_(std::make_unique<SolidColorRendererImpl>(context)) {}
+    : RendererInterface(0, /*max_frame_duration=*/std::chrono::seconds(10), context),
+      pimpl_(std::make_unique<SolidColorRendererImpl>(context)) {}
 
 SolidColorRenderer::~SolidColorRenderer() {}
 
 void SolidColorRenderer::DrawFrame(Scene *scene) {
-    std::unique_ptr<StartFrameResult> start_frame_result = StartFrame(pimpl_->context);
+    FrameContext frame_context = this->BeginFrame();
 
-    pimpl_->output.SetSwapChainImageIndex(start_frame_result->swap_chain_image_index);
+    pimpl_->output.SetSwapChainImageIndex(frame_context.swap_chain_image_index);
 
     PipelineOutputInterface *final_output;
     {
         Scene::ReadAccess read_access = scene->GainReadAccess();
         final_output = pimpl_->pipeline.Run(scene->background_color,
-                                            start_frame_result->acquire_swap_chain_image_barrier);
+                                            frame_context.acquire_swap_chain_image_barrier);
     }
 
-    EndFrame(final_output, start_frame_result->swap_chain_image_index,
-             /*max_frame_duration=*/std::chrono::seconds(10), pimpl_->context);
+    this->EndFrame(frame_context, final_output);
 }
 
 } // namespace e8

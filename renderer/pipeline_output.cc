@@ -32,6 +32,15 @@ GpuBarrier::GpuBarrier(VulkanContext *context) : context_(context) {}
 GpuBarrier::GpuBarrier(VkSemaphore task_signal, VkCommandBuffer task_cmds, VulkanContext *context)
     : tasks_signal{task_signal}, tasks_cmds{task_cmds}, context_(context) {}
 
+GpuBarrier::GpuBarrier(GpuBarrier &&other) {
+    tasks_signal = other.tasks_signal;
+    tasks_cmds = other.tasks_cmds;
+    context_ = other.context_;
+
+    other.tasks_signal.clear();
+    other.tasks_cmds.clear();
+}
+
 GpuBarrier::~GpuBarrier() {
     for (auto task_signal : tasks_signal) {
         vkDestroySemaphore(context_->device, task_signal, /*pAllocator=*/nullptr);

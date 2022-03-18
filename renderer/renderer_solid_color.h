@@ -19,9 +19,12 @@
 #define ISLANDS_RENDERER_SOLID_COLOR_H
 
 #include <memory>
+#include <vector>
 
+#include "content/proto/renderer.pb.h"
 #include "content/scene.h"
 #include "renderer/context.h"
+#include "renderer/renderer.h"
 
 namespace e8 {
 
@@ -29,7 +32,7 @@ namespace e8 {
  * @brief The SolidColorRenderer class A testing renderer which fill solid color to the currently
  * available swap chain image.
  */
-class SolidColorRenderer {
+class SolidColorRenderer : public RendererInterface {
   public:
     /**
      * @brief SolidColorRenderer Constructs a solid color renderer.
@@ -37,13 +40,9 @@ class SolidColorRenderer {
      * @param context Contextual Vulkan handles.
      */
     SolidColorRenderer(VulkanContext *context);
-    ~SolidColorRenderer();
+    ~SolidColorRenderer() override;
 
-    /**
-     * @brief DrawFrame Draws a new frame filled with the scene's background color to the currently
-     * available swap chain image.
-     */
-    void DrawFrame(Scene *scene);
+    void DrawFrame(Scene *scene) override;
 
   private:
     struct SolidColorRendererImpl;
