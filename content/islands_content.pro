@@ -30,6 +30,7 @@ SOURCES += \
     proto/primitive.pb.cc \
     proto/procedural_object.pb.cc \
     proto/procedural_shape.pb.cc \
+    proto/renderer.pb.cc \
     proto/scene_object.pb.cc \
     proto/scene.pb.cc \
     scene.cc \
@@ -52,6 +53,7 @@ HEADERS += \
     proto/primitive.pb.h \
     proto/procedural_object.pb.h \
     proto/procedural_shape.pb.h \
+    proto/renderer.pb.h \
     proto/scene_object.pb.h \
     proto/scene.pb.h \
     scene.h \

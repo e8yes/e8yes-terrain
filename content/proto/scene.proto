@@ -21,6 +21,7 @@ package e8;
 
 import "camera.proto";
 import "procedural_object.proto";
+import "renderer.proto";
 import "scene_object.proto";
 
 /**
@@ -60,4 +61,10 @@ message SceneProto {
 
     // A collection of all procedural objects.
     repeated ProceduralObjectProto precedural_objects = 7;
+
+    // The currently selected renderer.
+    RendererType selected_renderer = 8;
+
+    // Parameters for each type of renderer.
+    RendererParameters renderer_params = 9;
 }

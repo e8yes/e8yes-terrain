@@ -1,0 +1,77 @@
+/**
+ * e8yes demo web server.
+ *
+ * <p>Copyright (C) 2020 Chifeng Wen {daviesx66@gmail.com}
+ *
+ * <p>This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * <p>You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
+ */
+
+syntax = "proto3";
+
+package e8;
+
+/**
+ * @brief The RendererType enum All available renderers.
+ */
+enum RendererType {
+    RT_INVALID = 0;
+
+    // Solid color renderer.
+    RT_SOLID_COLOR = 1;
+
+    // Depth renderer.
+    RT_DEPTH = 2;
+
+    // Radiance renderer.
+    RT_RADIANCE = 3;
+
+    // Radiosity renderer.
+    RT_RADIOSITY = 4;
+}
+
+/**
+ * @brief The SolidColorRendererParameters message Parameters for the solid color renderer.
+ */
+message SolidColorRendererParameters {
+}
+
+/**
+ * @brief The DepthRendererParameters message Parameters for the depth renderer.
+ */
+message DepthRendererParameters {
+    // To Switch between NDC depth and true depth. When alpha is zero, the depth map is visualized
+    // using the raw NDC value. When it is set to one, the value is corrected to display the true
+    // depth.
+    float alpha = 1;
+}
+
+/**
+ * @brief The RadianceRendererParameters message Parameters for the radiance renderer.
+ */
+message RadianceRendererParameters {
+}
+
+/**
+ * @brief The RadiosityRendererParameters message Parameters for the radiosity renderer.
+ */
+message RadiosityRendererParameters {
+}
+
+/**
+ * @brief The RendererParameters message parameters for each type of renderer.
+ */
+message RendererParameters {
+    SolidColorRendererParameters solid_color_renderer_params = 1;
+    DepthRendererParameters depth_renderer_params = 2;
+    RadianceRendererParameters radiance_renderer_params = 3;
+    RadiosityRendererParameters radiosity_renderer_params = 4;
+}

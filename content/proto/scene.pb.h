@@ -35,6 +35,7 @@
 #include <google/protobuf/unknown_field_set.h>
 #include "camera.pb.h"
 #include "procedural_object.pb.h"
+#include "renderer.pb.h"
 #include "scene_object.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
@@ -247,7 +248,9 @@ class SceneProto PROTOBUF_FINAL :
     kNameFieldNumber = 2,
     kCameraFieldNumber = 5,
     kSceneObjectsFieldNumber = 6,
+    kRendererParamsFieldNumber = 9,
     kStructureTypeFieldNumber = 3,
+    kSelectedRendererFieldNumber = 8,
   };
   // repeated float background_color = 4;
   int background_color_size() const;
@@ -375,6 +378,24 @@ class SceneProto PROTOBUF_FINAL :
       ::e8::SceneObjectCollection* scene_objects);
   ::e8::SceneObjectCollection* unsafe_arena_release_scene_objects();
 
+  // .e8.RendererParameters renderer_params = 9;
+  bool has_renderer_params() const;
+  private:
+  bool _internal_has_renderer_params() const;
+  public:
+  void clear_renderer_params();
+  const ::e8::RendererParameters& renderer_params() const;
+  ::e8::RendererParameters* release_renderer_params();
+  ::e8::RendererParameters* mutable_renderer_params();
+  void set_allocated_renderer_params(::e8::RendererParameters* renderer_params);
+  private:
+  const ::e8::RendererParameters& _internal_renderer_params() const;
+  ::e8::RendererParameters* _internal_mutable_renderer_params();
+  public:
+  void unsafe_arena_set_allocated_renderer_params(
+      ::e8::RendererParameters* renderer_params);
+  ::e8::RendererParameters* unsafe_arena_release_renderer_params();
+
   // .e8.SceneProto.StructureType structure_type = 3;
   void clear_structure_type();
   ::e8::SceneProto_StructureType structure_type() const;
@@ -382,6 +403,15 @@ class SceneProto PROTOBUF_FINAL :
   private:
   ::e8::SceneProto_StructureType _internal_structure_type() const;
   void _internal_set_structure_type(::e8::SceneProto_StructureType value);
+  public:
+
+  // .e8.RendererType selected_renderer = 8;
+  void clear_selected_renderer();
+  ::e8::RendererType selected_renderer() const;
+  void set_selected_renderer(::e8::RendererType value);
+  private:
+  ::e8::RendererType _internal_selected_renderer() const;
+  void _internal_set_selected_renderer(::e8::RendererType value);
   public:
 
   // @@protoc_insertion_point(class_scope:e8.SceneProto)
@@ -398,7 +428,9 @@ class SceneProto PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
   ::e8::Camera* camera_;
   ::e8::SceneObjectCollection* scene_objects_;
+  ::e8::RendererParameters* renderer_params_;
   int structure_type_;
+  int selected_renderer_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_scene_2eproto;
 };
@@ -826,6 +858,101 @@ inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::ProceduralObjectPr
 SceneProto::precedural_objects() const {
   // @@protoc_insertion_point(field_list:e8.SceneProto.precedural_objects)
   return precedural_objects_;
+}
+
+// .e8.RendererType selected_renderer = 8;
+inline void SceneProto::clear_selected_renderer() {
+  selected_renderer_ = 0;
+}
+inline ::e8::RendererType SceneProto::_internal_selected_renderer() const {
+  return static_cast< ::e8::RendererType >(selected_renderer_);
+}
+inline ::e8::RendererType SceneProto::selected_renderer() const {
+  // @@protoc_insertion_point(field_get:e8.SceneProto.selected_renderer)
+  return _internal_selected_renderer();
+}
+inline void SceneProto::_internal_set_selected_renderer(::e8::RendererType value) {
+  
+  selected_renderer_ = value;
+}
+inline void SceneProto::set_selected_renderer(::e8::RendererType value) {
+  _internal_set_selected_renderer(value);
+  // @@protoc_insertion_point(field_set:e8.SceneProto.selected_renderer)
+}
+
+// .e8.RendererParameters renderer_params = 9;
+inline bool SceneProto::_internal_has_renderer_params() const {
+  return this != internal_default_instance() && renderer_params_ != nullptr;
+}
+inline bool SceneProto::has_renderer_params() const {
+  return _internal_has_renderer_params();
+}
+inline const ::e8::RendererParameters& SceneProto::_internal_renderer_params() const {
+  const ::e8::RendererParameters* p = renderer_params_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::e8::RendererParameters*>(
+      &::e8::_RendererParameters_default_instance_);
+}
+inline const ::e8::RendererParameters& SceneProto::renderer_params() const {
+  // @@protoc_insertion_point(field_get:e8.SceneProto.renderer_params)
+  return _internal_renderer_params();
+}
+inline void SceneProto::unsafe_arena_set_allocated_renderer_params(
+    ::e8::RendererParameters* renderer_params) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(renderer_params_);
+  }
+  renderer_params_ = renderer_params;
+  if (renderer_params) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneProto.renderer_params)
+}
+inline ::e8::RendererParameters* SceneProto::release_renderer_params() {
+  auto temp = unsafe_arena_release_renderer_params();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::e8::RendererParameters* SceneProto::unsafe_arena_release_renderer_params() {
+  // @@protoc_insertion_point(field_release:e8.SceneProto.renderer_params)
+  
+  ::e8::RendererParameters* temp = renderer_params_;
+  renderer_params_ = nullptr;
+  return temp;
+}
+inline ::e8::RendererParameters* SceneProto::_internal_mutable_renderer_params() {
+  
+  if (renderer_params_ == nullptr) {
+    auto* p = CreateMaybeMessage<::e8::RendererParameters>(GetArena());
+    renderer_params_ = p;
+  }
+  return renderer_params_;
+}
+inline ::e8::RendererParameters* SceneProto::mutable_renderer_params() {
+  // @@protoc_insertion_point(field_mutable:e8.SceneProto.renderer_params)
+  return _internal_mutable_renderer_params();
+}
+inline void SceneProto::set_allocated_renderer_params(::e8::RendererParameters* renderer_params) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(renderer_params_);
+  }
+  if (renderer_params) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(renderer_params)->GetArena();
+    if (message_arena != submessage_arena) {
+      renderer_params = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, renderer_params, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  renderer_params_ = renderer_params;
+  // @@protoc_insertion_point(field_set_allocated:e8.SceneProto.renderer_params)
 }
 
 #ifdef __GNUC__
