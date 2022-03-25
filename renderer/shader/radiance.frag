@@ -11,7 +11,7 @@ layout(set = 0, binding = 0) uniform PerFrameConstants {
 
 layout(set = 2, binding = 0) uniform sampler2D albedo_map;
 layout(set = 2, binding = 1) uniform sampler2D metallic_map;
-layout(set = 2, binding = 2) uniform sampler2D radiosity_residual_map;
+layout(set = 2, binding = 2) uniform sampler2D indirect_radiosity_map;
 
 layout(set = 2, binding = 3) uniform sampler2D unshoot_diffuse_radiance_map;
 layout(set = 2, binding = 4) uniform sampler2D unshoot_specular_radiance_map;
@@ -25,7 +25,7 @@ void main() {
 
     vec3 albedo = texture(albedo_map, in_tex_coord).xyz;
     float metallic = texture(metallic_map, in_tex_coord).x;
-    vec3 radiosity_residual = texture(radiosity_residual_map, in_tex_coord).xyz;
+    vec3 indirect_radiosity = texture(indirect_radiosity_map, in_tex_coord).xyz;
     vec3 unshoot_diffuse_radiance = texture(
         unshoot_diffuse_radiance_map, screen_tex_coord).xyz;
     vec3 unshoot_specular_radiance = texture(
@@ -33,7 +33,7 @@ void main() {
 
     vec3 unshoot_radiance = (1.0f - metallic)*unshoot_diffuse_radiance +
         metallic*unshoot_specular_radiance;
-    vec3 radiance = albedo*unshoot_radiance + radiosity_residual/M_PI;
+    vec3 radiance = albedo*unshoot_radiance + indirect_radiosity/M_PI;
 
     out_radiance = vec4(radiance, 1.0f);
 }
