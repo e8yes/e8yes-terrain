@@ -1,0 +1,53 @@
+/**
+ * e8yes demo web server.
+ *
+ * <p>Copyright (C) 2020 Chifeng Wen {daviesx66@gmail.com}
+ *
+ * <p>This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * <p>You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
+ */
+
+syntax = "proto3";
+
+package e8;
+
+/**
+ * @brief the TextureProto message It defines a serializable rectangular image.
+ */
+message TextureProto {
+    /**
+     * @brief the Encoding enum All supported image encodings.
+     */
+    enum Encoding {
+        INVALID = 0;
+
+        // Portable Network Graphics encoding (using lossless compression).
+        PNG = 1;
+    }
+
+    // The encoding used for the image data.
+    Encoding encoding = 1;
+
+    // The width of the image.
+    int32 width = 2;
+
+    // The height of the image.
+    int32 height = 3;
+
+    // The number of channel each pixel carries.
+    int32 channel_count = 4;
+
+    // The number of byte each channel uses.
+    int32 channel_size = 5;
+
+    // The encoded image data.
+    bytes data = 6;
+}

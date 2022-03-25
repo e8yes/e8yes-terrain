@@ -1,0 +1,55 @@
+/**
+ * e8yes demo web server.
+ *
+ * <p>Copyright (C) 2020 Chifeng Wen {daviesx66@gmail.com}
+ *
+ * <p>This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * <p>You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
+ */
+
+syntax = "proto3";
+
+package e8;
+
+/**
+ * @brief the ResourceTable message Stores the necessary metadata of various types of resources.
+ */
+message ResourceTable {
+    /**
+     * @brief the Metadata message Stores the metadata about the resource.
+     */
+    message Metadata {
+        // The resource's file name.
+        string file_name = 1;
+
+        // The number of byte the resource will claim after loading into the memory.
+        int64 resource_size = 2;
+
+        // Indicates if the resource is only temporary. A temporary resource gets cleaned up by the
+        // end of the program run.
+        bool temporary = 3;
+    }
+
+    // All resources must be stored under this path.
+    string current_base_path = 1;
+
+    // Geometry resources.
+    map<int64, Metadata> geometries = 2;
+
+    // Material resources.
+    map<int64, Metadata> materials = 3;
+
+    // Lightmap resources.
+    map<int64, Metadata> light_maps = 4;
+
+    // Physical shape resources.
+    map<int64, Metadata> physical_shapes = 5;
+}
