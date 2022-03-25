@@ -17,9 +17,13 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 INCLUDEPATH += ../
 
 SOURCES += \
+    cache.cc \
+    device.cc \
     tensor.cc
 
 HEADERS += \
+    cache.h \
+    device.h \
     tensor.h
 
 # Default rules for deployment.
