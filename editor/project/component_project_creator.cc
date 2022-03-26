@@ -30,6 +30,7 @@
 #include "editor/basic/component_editor_portal_switcher.h"
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/context.h"
+#include "editor/basic/theme.h"
 #include "editor/environment/component_ambient.h"
 #include "editor/environment/component_camera.h"
 #include "editor/project/component_project_creator.h"
@@ -75,6 +76,7 @@ namespace project_creator_internal {
 
 ProjectCreationDialog::ProjectCreationDialog() : scene_structure(SceneProto::INVALID) {
     ui.setupUi(this);
+    this->setStyleSheet(kQssStyleSheet);
 
     QObject::connect(ui.project_directory_browse_button, &QPushButton::clicked, this,
                      &ProjectCreationDialog::OnClickBrowseButton);
@@ -146,6 +148,7 @@ void ProjectCreatorComponent::OnClickNewProject() {
 
     if (!project_creation_dialog_->Valid()) {
         QMessageBox msg_box;
+        msg_box.setStyleSheet(kQssStyleSheet);
         msg_box.setText("Failed to Create Project");
         msg_box.setInformativeText("Invalid Inputs");
         msg_box.setStandardButtons(QMessageBox::Ok);
@@ -160,6 +163,7 @@ void ProjectCreatorComponent::OnClickNewProject() {
             project_creation_dialog_->scene_structure, ambient_comp_, camera_comp_,
             editor_portal_switcher_comp_, modification_monitor_comp_, scene_view_comp_, context_)) {
         QMessageBox msg_box;
+        msg_box.setStyleSheet(kQssStyleSheet);
         msg_box.setText("Failed to Create Project");
         msg_box.setInformativeText("Internal Error");
         msg_box.setStandardButtons(QMessageBox::Ok);

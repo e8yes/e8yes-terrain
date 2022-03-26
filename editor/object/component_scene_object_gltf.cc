@@ -27,6 +27,7 @@
 #include "content/scene_object.h"
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/context.h"
+#include "editor/basic/theme.h"
 #include "editor/object/component_scene_object_gltf.h"
 #include "editor/scene/component_scene_view.h"
 #include "resource/accessor.h"
@@ -73,6 +74,7 @@ void SceneObjectGltfComponent::OnClickAddGltfSceneObject() {
     if (!AddGltfSceneObjects(gltf_file.toStdString(), context_->game->GetGameData().scene,
                              context_->game->GetGameData().resource_accessor)) {
         QMessageBox msg_box;
+        msg_box.setStyleSheet(kQssStyleSheet);
         msg_box.setText("Empty glTF file");
         msg_box.setStandardButtons(QMessageBox::Ok);
         msg_box.setDefaultButton(QMessageBox::Ok);

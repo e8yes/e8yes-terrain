@@ -23,6 +23,7 @@
 #include "editor/basic/component_editor_portal_switcher.h"
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/context.h"
+#include "editor/basic/theme.h"
 #include "editor/project/component_project_closer.h"
 #include "editor/project/component_project_saver.h"
 #include "editor/scene/component_scene_view.h"
@@ -65,6 +66,7 @@ ProjectCloserComponent::~ProjectCloserComponent() {}
 void ProjectCloserComponent::OnClickCloseProject() {
     if (modification_monitor_comp_->UnsavedModifications()) {
         QMessageBox msg_box;
+        msg_box.setStyleSheet(kQssStyleSheet);
         msg_box.setText("The project has unsaved modifications.");
         msg_box.setDetailedText("Do you want to save them?");
         msg_box.setStandardButtons(QMessageBox::Save | QMessageBox::Close);

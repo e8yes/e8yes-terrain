@@ -25,6 +25,8 @@
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/component_status.h"
 #include "editor/basic/context.h"
+#include "editor/basic/theme.h"
+#include "editor/editor.h"
 #include "editor/environment/component_ambient.h"
 #include "editor/environment/component_camera.h"
 #include "editor/object/component_scene_object_gltf.h"
@@ -33,13 +35,14 @@
 #include "editor/project/component_project_loader.h"
 #include "editor/project/component_project_saver.h"
 #include "editor/scene/component_scene_view.h"
-#include "editor/editor.h"
 
 namespace e8 {
 
 IslandsEditorWindow::IslandsEditorWindow(EditorContext *editor_context, QWidget *parent)
     : QMainWindow(parent) {
     editor_context->ui->setupUi(this);
+
+    this->setStyleSheet(kQssStyleSheet);
 
     status_comp_ = std::make_unique<StatusComponent>(this, editor_context);
     modification_monitor_comp_ =

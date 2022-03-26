@@ -21,6 +21,7 @@ SOURCES += \
     basic/component_status.cc \
     basic/context.cc \
     basic/editor_storyline.cc \
+    basic/theme.cc \
     editor.cc \
     environment/component_ambient.cc \
     environment/component_camera.cc \
@@ -39,6 +40,7 @@ HEADERS += \
     basic/component_status.h \
     basic/context.h \
     basic/editor_storyline.h \
+    basic/theme.h \
     editor.h \
     environment/component_ambient.h \
     environment/component_camera.h \

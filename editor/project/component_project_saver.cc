@@ -31,6 +31,7 @@
 #include "content/scene.h"
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/context.h"
+#include "editor/basic/theme.h"
 #include "editor/project/component_project_saver.h"
 #include "editor/scene/component_scene_view.h"
 
@@ -60,6 +61,7 @@ void ProjectSaverComponent::OnClickSaveProject() {
 
     if (!context_->game->Save()) {
         QMessageBox msg_box;
+        msg_box.setStyleSheet(kQssStyleSheet);
         msg_box.setText("Failed to Save Game");
         msg_box.setStandardButtons(QMessageBox::Ok);
         msg_box.setDefaultButton(QMessageBox::Ok);

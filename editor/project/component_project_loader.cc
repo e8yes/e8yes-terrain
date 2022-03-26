@@ -29,6 +29,7 @@
 #include "editor/basic/component_editor_portal_switcher.h"
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/context.h"
+#include "editor/basic/theme.h"
 #include "editor/environment/component_ambient.h"
 #include "editor/environment/component_camera.h"
 #include "editor/project/component_project_loader.h"
@@ -94,6 +95,7 @@ void ProjectLoaderComponent::OnClickOpenProject() {
                      editor_portal_switcher_comp_, modification_monitor_comp_, scene_view_comp_,
                      context_)) {
         QMessageBox msg_box;
+        msg_box.setStyleSheet(kQssStyleSheet);
         msg_box.setText("Failed to Load Project");
         msg_box.setStandardButtons(QMessageBox::Ok);
         msg_box.setDefaultButton(QMessageBox::Ok);
