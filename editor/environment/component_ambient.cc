@@ -53,7 +53,7 @@ void SetSceneBackgroundColor(QSlider const *red, QSlider const *green, QSlider c
 } // namespace
 
 AmbientComponent::AmbientComponent(ModificationMonitorComponent *modification_monitor_comp,
-                                           EditorContext *context)
+                                   EditorContext *context)
     : context_(context), modification_monitor_comp_(modification_monitor_comp) {
     QObject::connect(context->ui->bg_color_red_slider, &QSlider::valueChanged, this,
                      &AmbientComponent::OnChangeBackgroundColor);
@@ -66,14 +66,15 @@ AmbientComponent::AmbientComponent(ModificationMonitorComponent *modification_mo
 AmbientComponent::~AmbientComponent() {}
 
 void AmbientComponent::OnChangeScene() {
-    SetBackgroundColorSlider(context_->scene.get(), context_->ui->bg_color_red_slider,
+    SetBackgroundColorSlider(context_->game->GetGameData().scene, context_->ui->bg_color_red_slider,
                              context_->ui->bg_color_green_slider,
                              context_->ui->bg_color_blue_slider);
 }
 
 void AmbientComponent::OnChangeBackgroundColor(int /*value*/) {
     SetSceneBackgroundColor(context_->ui->bg_color_red_slider, context_->ui->bg_color_green_slider,
-                            context_->ui->bg_color_blue_slider, context_->scene.get());
+                            context_->ui->bg_color_blue_slider,
+                            context_->game->GetGameData().scene);
 
     modification_monitor_comp_->OnModifyScene();
 }

@@ -33,7 +33,14 @@ namespace {
 void CloseScene(EditorPortalSwitcherComponent *editor_portal_switcher_comp,
                 ModificationMonitorComponent *modification_monitor_comp,
                 SceneViewComponent *scene_view_comp, EditorContext *context) {
-    context->scene = nullptr;
+    if (context->game != nullptr) {
+        context->game->Shutdown();
+        context->game_thread->join();
+
+        context->game = nullptr;
+        context->game_thread = nullptr;
+    }
+
     editor_portal_switcher_comp->SetEditorPortalEnabled(/*enabled=*/false);
     modification_monitor_comp->OnReset();
     scene_view_comp->OnChangeScene();
@@ -57,7 +64,7 @@ SceneCloserComponent::~SceneCloserComponent() {}
 void SceneCloserComponent::OnClickCloseScene() {
     if (modification_monitor_comp_->UnsavedModifications()) {
         QMessageBox msg_box;
-        msg_box.setText("The scene has unsaved modifications.");
+        msg_box.setText("The project has unsaved modifications.");
         msg_box.setDetailedText("Do you want to save them?");
         msg_box.setStandardButtons(QMessageBox::Save | QMessageBox::Close);
         msg_box.setDefaultButton(QMessageBox::Save);

@@ -1,5 +1,5 @@
 /**
- * e8yes demo web.
+ * e8yes demo web server.
  *
  * <p>Copyright (C) 2020 Chifeng Wen {daviesx66@gmail.com}
  *
@@ -15,24 +15,23 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_CONTENT_GLTF_H
-#define ISLANDS_CONTENT_GLTF_H
+syntax = "proto3";
 
-#include <string>
-#include <vector>
-
-#include "content/scene_object.h"
-
-namespace e8 {
+package e8;
 
 /**
- * @brief LoadFromGltf Loads scene objects from a glTF file.
- *
- * @param gltf_file_path The file to be loaded.
- * @return A list of root objects specified in the glTF file.
+ * @brief The SrtTransform message It specifies a class of homogeneous transformation by composing
+ * scaling, axial-rotations and translation.
  */
-std::vector<SceneObject> LoadFromGltf(std::string const &gltf_file_path);
+message SrtTransform {
+     // How much scaling transform should be applied to each axes in the model space.
+    repeated float scaling = 1;
 
-} // namespace e8
+    // How much rotation, in degree, should be applied to each axes of rotation in the model space.
+    // Rotation will first apply to the z axis, then the y axis, finally the x axis.
+    repeated float rotation = 2;
 
-#endif // ISLANDS_CONTENT_GLTF_H
+    // Where the entity should be placed in the world.
+    repeated float translation = 3;
+}
+

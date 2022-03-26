@@ -18,9 +18,12 @@
 #ifndef ISLANDS_RENDERER_DRAWABLE_INSTANCE_H
 #define ISLANDS_RENDERER_DRAWABLE_INSTANCE_H
 
+#include <vector>
+
 #include "common/tensor.h"
-#include "content/proto/geometry.pb.h"
 #include "content/scene_entity.h"
+#include "resource/accessor.h"
+#include "resource/geometry.h"
 
 namespace e8 {
 
@@ -41,7 +44,8 @@ struct DrawableInstance {
  * drawable from the selection, if there is one.
  */
 std::vector<DrawableInstance> ToDrawables(std::vector<SceneEntity const *> const &scene_entities,
-                                          vec3 const &viewer_location);
+                                          vec3 const &viewer_location,
+                                          ResourceAccessor *resource_accessor);
 
 } // namespace e8
 

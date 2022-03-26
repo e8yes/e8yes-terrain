@@ -17,113 +17,59 @@
 
 #include <algorithm>
 #include <cassert>
+#include <chrono>
 #include <cstdint>
 #include <memory>
 #include <vector>
+#include <vulkan/vulkan.h>
 
-#include "content/geometry.h"
+#include "common/cache.h"
+#include "common/device.h"
 #include "content/proto/camera.pb.h"
-#include "renderer/context.h"
-#include "renderer/vram_cache.h"
 #include "renderer/vram_geometry.h"
+#include "resource/geometry.h"
 
 namespace e8 {
 namespace {
 
-uint64_t VertexBufferSize(Geometry const *geometry) {
-    return geometry->vertices.size() * sizeof(PrimitiveVertex);
-}
+std::chrono::nanoseconds const kUploadTimeout = std::chrono::seconds(10);
 
 void UploadVertexBuffer(Geometry const *geometry, uint64_t old_buffer_size,
                         uint64_t new_buffer_size, VulkanContext *context,
-                        GeometryVramTransfer::BufferUploadResult *vertex_buffer_object) {
+                        GeometryVramTransfer::BufferUploadResult *vertex_buffer_object,
+                        VkCommandBuffer cmds) {
+    // Ensures the geometry's vertex buffer was allocated under the same context.
+    assert(geometry->vertices.Valid());
+    assert(geometry->vertices.context == context);
+
     if (new_buffer_size != old_buffer_size) {
         vertex_buffer_object->Allocate(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, new_buffer_size, context);
     }
 
-    // Copies vertex data to a staging buffer.
-    void *vertex_buffer_region;
-    assert(VK_SUCCESS == vmaMapMemory(context->allocator, vertex_buffer_object->allocation,
-                                      &vertex_buffer_region));
+    VkBufferCopy region{};
+    region.size = geometry->VertexBufferSize();
 
-    memcpy(vertex_buffer_region, geometry->vertices.data(), new_buffer_size);
-
-    vmaUnmapMemory(context->allocator, vertex_buffer_object->allocation);
-}
-
-template <typename TargetMemoryIndexType>
-void CopyIndices(std::vector<Primitive> const &primitives, void *target_memory) {
-    for (unsigned i = 0; i < primitives.size(); ++i) {
-        for (unsigned j = 0; j < 3; ++j) {
-            *(reinterpret_cast<TargetMemoryIndexType *>(target_memory) + 3 * i + j) =
-                static_cast<TargetMemoryIndexType>(primitives[i].vertex_refs(j));
-        }
-    }
-}
-
-unsigned OptimalIndexSize(size_t num_vertices) {
-    if (num_vertices <= 1 << 8) {
-        // TODO: Adds indexTypeUint8 device feature.
-        // return sizeof(uint8_t);
-        return sizeof(uint16_t);
-    } else if (num_vertices <= 1 << 16) {
-        return sizeof(uint16_t);
-    } else if (num_vertices <= 1UL << 32) {
-        return sizeof(uint32_t);
-    } else {
-        assert(false);
-    }
-}
-
-VkIndexType IndexType(size_t num_vertices) {
-    unsigned index_size = OptimalIndexSize(num_vertices);
-
-    if (index_size == sizeof(uint8_t)) {
-        return VkIndexType::VK_INDEX_TYPE_UINT8_EXT;
-    } else if (index_size == sizeof(uint16_t)) {
-        return VkIndexType::VK_INDEX_TYPE_UINT16;
-    } else if (index_size == sizeof(uint32_t)) {
-        return VkIndexType::VK_INDEX_TYPE_UINT32;
-    } else {
-        assert(false);
-    }
-}
-
-unsigned IndexBufferSize(Geometry const *geometry) {
-    return geometry->primitives.size() * 3 * OptimalIndexSize(geometry->vertices.size());
+    vkCmdCopyBuffer(cmds, geometry->vertices.buffer, vertex_buffer_object->buffer,
+                    /*regionCount=*/1, &region);
 }
 
 void UploadIndexBuffer(Geometry const *geometry, uint64_t old_buffer_size, uint64_t new_buffer_size,
                        VulkanContext *context,
-                       GeometryVramTransfer::BufferUploadResult *index_buffer_object) {
+                       GeometryVramTransfer::BufferUploadResult *index_buffer_object,
+                       VkCommandBuffer cmds) {
+    // Ensures the geometry's index buffer was allocated under the same context.
+    assert(geometry->indices.Valid());
+    assert(geometry->indices.context == context);
+
     if (new_buffer_size != old_buffer_size) {
         index_buffer_object->Allocate(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, new_buffer_size, context);
     }
 
-    // Copies index data from to a staging buffer.
-    void *index_buffer_region;
-    assert(VK_SUCCESS ==
-           vmaMapMemory(context->allocator, index_buffer_object->allocation, &index_buffer_region));
+    VkBufferCopy region{};
+    region.size = geometry->IndexBufferSize();
 
-    switch (IndexType(geometry->vertices.size())) {
-    case VkIndexType::VK_INDEX_TYPE_UINT8_EXT: {
-        CopyIndices<uint8_t>(geometry->primitives, index_buffer_region);
-        break;
-    }
-    case VkIndexType::VK_INDEX_TYPE_UINT16: {
-        CopyIndices<uint16_t>(geometry->primitives, index_buffer_region);
-        break;
-    }
-    case VkIndexType::VK_INDEX_TYPE_UINT32: {
-        CopyIndices<uint32_t>(geometry->primitives, index_buffer_region);
-        break;
-    }
-    default: {
-        assert(false);
-    }
-    }
-
-    vmaUnmapMemory(context->allocator, index_buffer_object->allocation);
+    vkCmdCopyBuffer(cmds, geometry->indices.buffer, index_buffer_object->buffer, /*regionCount=*/1,
+                    &region);
 }
 
 } // namespace
@@ -132,16 +78,93 @@ struct GeometryVramTransfer::GeometryVramTransferImpl {
     GeometryVramTransferImpl(VulkanContext *context);
     ~GeometryVramTransferImpl();
 
-    ConstrainedLruVramCache<Geometry const *, BufferUploadResult> vertex_cache;
-    ConstrainedLruVramCache<Geometry const *, BufferUploadResult> index_cache;
+    VkCommandBuffer BeginUpload();
+    void EndUpload(VkCommandBuffer cmds);
+    void Upload(Geometry const *geometry, VkCommandBuffer cmds);
+
+    DeviceCache<Geometry const *, BufferUploadResult> vertex_cache;
+    DeviceCache<Geometry const *, BufferUploadResult> index_cache;
+    VkFence fence;
     VulkanContext *context;
 };
 
 GeometryVramTransfer::GeometryVramTransferImpl::GeometryVramTransferImpl(VulkanContext *context)
-    : vertex_cache(&context->geometry_usage), index_cache(&context->geometry_usage),
-      context(context) {}
+    : vertex_cache(&context->geometry_vram_usage), index_cache(&context->geometry_vram_usage),
+      context(context) {
+    VkFenceCreateInfo fence_info{};
+    fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 
-GeometryVramTransfer::GeometryVramTransferImpl::~GeometryVramTransferImpl() {}
+    assert(VK_SUCCESS ==
+           vkCreateFence(context->device, &fence_info, /*pAllocator=*/nullptr, &fence));
+}
+
+GeometryVramTransfer::GeometryVramTransferImpl::~GeometryVramTransferImpl() {
+    vkDestroyFence(context->device, fence, /*pAllocator=*/nullptr);
+}
+
+VkCommandBuffer GeometryVramTransfer::GeometryVramTransferImpl::BeginUpload() {
+    // Allocates a new command buffer for storing buffer upload commands.
+    VkCommandBufferAllocateInfo cmds_allocation_info{};
+    cmds_allocation_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    cmds_allocation_info.commandPool = context->command_pool;
+    cmds_allocation_info.commandBufferCount = 1;
+    cmds_allocation_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+
+    VkCommandBuffer cmds;
+    assert(VK_SUCCESS == vkAllocateCommandBuffers(context->device, &cmds_allocation_info, &cmds));
+
+    VkCommandBufferBeginInfo command_buffer_begin_info{};
+    command_buffer_begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    command_buffer_begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    assert(VK_SUCCESS == vkBeginCommandBuffer(cmds, &command_buffer_begin_info));
+
+    return cmds;
+}
+
+void GeometryVramTransfer::GeometryVramTransferImpl::EndUpload(VkCommandBuffer cmds) {
+    assert(VK_SUCCESS == vkEndCommandBuffer(cmds));
+
+    // Starts copying vertex and index buffers.
+    VkSubmitInfo submit{};
+    submit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submit.pCommandBuffers = &cmds;
+    submit.commandBufferCount = 1;
+
+    assert(VK_SUCCESS == vkQueueSubmit(context->graphics_queue, /*submitCount=*/1, &submit, fence));
+
+    // Waits for the copying to complete and releases the command buffer.
+    assert(VK_SUCCESS == vkWaitForFences(context->device, /*fenceCount=*/1, &fence,
+                                         /*waitAll=*/VK_TRUE, kUploadTimeout.count()));
+    assert(VK_SUCCESS == vkResetFences(context->device, /*fenceCount=*/1, &fence));
+
+    vkFreeCommandBuffers(context->device, context->command_pool, /*commandBufferCount=*/1, &cmds);
+}
+
+void GeometryVramTransfer::GeometryVramTransferImpl::Upload(Geometry const *geometry,
+                                                            VkCommandBuffer cmds) {
+    vertex_cache.Upload(
+        geometry,
+        /*override_old_upload=*/geometry->rigidity == GeometryProto::DEFORMABLE ||
+            geometry->rigidity == GeometryProto::TEARABLE,
+        /*object_size_fn=*/[](Geometry const *geo) { return geo->VertexBufferSize(); },
+        /*upload_fn=*/
+        [this, cmds](Geometry const *geometry, uint64_t old_buffer_size, uint64_t new_buffer_size,
+                     GeometryVramTransfer::BufferUploadResult *vertex_buffer_object) {
+            UploadVertexBuffer(geometry, old_buffer_size, new_buffer_size, context,
+                               vertex_buffer_object, cmds);
+        });
+
+    index_cache.Upload(
+        geometry, /*override_old_upload=*/geometry->rigidity == GeometryProto::TEARABLE,
+        /*object_size_fn=*/[](Geometry const *geo) { return geo->IndexBufferSize(); },
+        /*upload_fn=*/
+        [this, cmds](Geometry const *geometry, uint64_t old_buffer_size, uint64_t new_buffer_size,
+                     GeometryVramTransfer::BufferUploadResult *vertex_buffer_object) {
+            UploadIndexBuffer(geometry, old_buffer_size, new_buffer_size, context,
+                              vertex_buffer_object, cmds);
+        });
+}
 
 GeometryVramTransfer::BufferUploadResult::BufferUploadResult()
     : buffer(VK_NULL_HANDLE), allocation(VK_NULL_HANDLE), size(0), context(nullptr) {}
@@ -157,10 +180,10 @@ void GeometryVramTransfer::BufferUploadResult::Allocate(VkBufferUsageFlags usage
     VkBufferCreateInfo vertex_buffer_info{};
     vertex_buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     vertex_buffer_info.size = size;
-    vertex_buffer_info.usage = usage;
+    vertex_buffer_info.usage = usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 
     VmaAllocationCreateInfo allocation_info{};
-    allocation_info.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
+    allocation_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 
     vmaCreateBuffer(context->allocator, &vertex_buffer_info, &allocation_info, &buffer, &allocation,
                     /*pAllocationInfo=*/nullptr);
@@ -168,54 +191,53 @@ void GeometryVramTransfer::BufferUploadResult::Allocate(VkBufferUsageFlags usage
 
 void GeometryVramTransfer::BufferUploadResult::Free() {
     if (this->Valid()) {
+        assert(context != nullptr);
         vmaDestroyBuffer(context->allocator, buffer, allocation);
     }
 }
 
-bool GeometryVramTransfer::BufferUploadResult::Valid() const {
-    return buffer != VK_NULL_HANDLE && allocation != VK_NULL_HANDLE;
-}
+bool GeometryVramTransfer::BufferUploadResult::Valid() const { return buffer != VK_NULL_HANDLE; }
 
 GeometryVramTransfer::GeometryVramTransfer(VulkanContext *context)
     : pimpl_(std::make_unique<GeometryVramTransfer::GeometryVramTransferImpl>(context)) {}
 
 GeometryVramTransfer::~GeometryVramTransfer() {}
 
-GeometryVramTransfer::UploadResult::UploadResult()
+GeometryVramTransfer::GpuGeometry::GpuGeometry()
     : vertex_buffer(nullptr), index_buffer(nullptr),
       index_element_type(VkIndexType::VK_INDEX_TYPE_MAX_ENUM) {}
 
-GeometryVramTransfer::UploadResult::~UploadResult() {}
+GeometryVramTransfer::GpuGeometry::~GpuGeometry() {}
 
-bool GeometryVramTransfer::UploadResult::Valid() const {
+bool GeometryVramTransfer::GpuGeometry::Valid() const {
     return vertex_buffer != nullptr && vertex_buffer->Valid() && index_buffer != nullptr &&
            index_buffer->Valid();
 }
 
-GeometryVramTransfer::UploadResult GeometryVramTransfer::Upload(Geometry const *geometry) {
-    UploadResult result;
+void GeometryVramTransfer::Prepare() {
+    pimpl_->vertex_cache.Reset();
+    pimpl_->index_cache.Reset();
+}
 
-    result.vertex_buffer = pimpl_->vertex_cache.Upload(
-        geometry,
-        /*always_upload=*/geometry->rigidity == GeometryProto::DEFORMABLE ||
-            geometry->rigidity == GeometryProto::TEARABLE,
-        VertexBufferSize, /*upload_fn=*/
-        [this](Geometry const *geometry, uint64_t old_buffer_size, uint64_t new_buffer_size,
-               GeometryVramTransfer::BufferUploadResult *vertex_buffer_object) {
-            UploadVertexBuffer(geometry, old_buffer_size, new_buffer_size, this->pimpl_->context,
-                               vertex_buffer_object);
-        });
+void GeometryVramTransfer::Upload(std::vector<Geometry const *> const &geometries) {
+    VkCommandBuffer cmds = pimpl_->BeginUpload();
 
-    result.index_buffer = pimpl_->index_cache.Upload(
-        geometry, /*always_upload=*/geometry->rigidity == GeometryProto::TEARABLE, IndexBufferSize,
-        /*upload_fn=*/
-        [this](Geometry const *geometry, uint64_t old_buffer_size, uint64_t new_buffer_size,
-               GeometryVramTransfer::BufferUploadResult *vertex_buffer_object) {
-            UploadIndexBuffer(geometry, old_buffer_size, new_buffer_size, this->pimpl_->context,
-                              vertex_buffer_object);
-        });
+    for (auto geometry : geometries) {
+        pimpl_->Upload(geometry, cmds);
+    }
 
-    result.index_element_type = IndexType(geometry->vertices.size());
+    pimpl_->EndUpload(cmds);
+}
+
+GeometryVramTransfer::GpuGeometry GeometryVramTransfer::Find(Geometry const *geometry) {
+    GpuGeometry result;
+
+    result.vertex_buffer = pimpl_->vertex_cache.Find(geometry);
+    result.index_buffer = pimpl_->index_cache.Find(geometry);
+    assert(result.vertex_buffer != nullptr);
+    assert(result.index_buffer != nullptr);
+
+    result.index_element_type = geometry->IndexElementType();
 
     return result;
 }

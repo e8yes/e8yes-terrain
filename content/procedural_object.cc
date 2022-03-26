@@ -22,28 +22,16 @@
 #include <string>
 #include <vector>
 
+#include "common/device.h"
 #include "content/common.h"
 #include "content/procedural_basic.h"
 #include "content/procedural_object.h"
 #include "content/proto/procedural_object.pb.h"
 #include "content/scene_entity.h"
 #include "content/scene_object.h"
+#include "resource/accessor.h"
 
 namespace e8 {
-namespace {
-
-std::unique_ptr<ProceduralObjectInterface> ToProceduralObject(ProceduralObjectProto const &proto) {
-    switch (proto.type()) {
-    case ProceduralObjectProto::PLANE: {
-        return std::make_unique<ProceduralPlane>(proto);
-    }
-    default: {
-        assert(false);
-    }
-    }
-}
-
-} // namespace
 
 ProceduralObjectInterface::ProceduralObjectInterface(ProceduralObjectName const &name)
     : id(GenerateUuid()), name(name), movable(true) {}
@@ -63,29 +51,15 @@ ProceduralObjectProto ProceduralObjectInterface::_ToBaseProto(
     return proto;
 }
 
-google::protobuf::RepeatedPtrField<ProceduralObjectProto>
-ToProto(std::map<ProceduralObjectId, std::unique_ptr<ProceduralObjectInterface>> const
-            &procedural_objects) {
-    google::protobuf::RepeatedPtrField<ProceduralObjectProto> proto;
-
-    for (auto const &[_, procedural_object] : procedural_objects) {
-        *proto.Add() = procedural_object->ToProto();
+std::unique_ptr<ProceduralObjectInterface> ToProceduralObject(ProceduralObjectProto const &proto) {
+    switch (proto.type()) {
+    case ProceduralObjectProto::PLANE: {
+        return std::make_unique<ProceduralPlane>(proto);
     }
-
-    return proto;
-}
-
-std::map<ProceduralObjectId, std::unique_ptr<ProceduralObjectInterface>>
-ToProceduralObjects(google::protobuf::RepeatedPtrField<ProceduralObjectProto> const &protos) {
-    std::map<ProceduralObjectId, std::unique_ptr<ProceduralObjectInterface>> procedural_objects;
-
-    for (auto const &proto : protos) {
-        std::unique_ptr<ProceduralObjectInterface> procedural_object = ToProceduralObject(proto);
-        procedural_objects.insert(
-            std::make_pair(procedural_object->id, std::move(procedural_object)));
+    default: {
+        assert(false);
     }
-
-    return procedural_objects;
+    }
 }
 
 } // namespace e8

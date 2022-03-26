@@ -18,21 +18,25 @@
 #include <cassert>
 #include <chrono>
 #include <cmath>
+#include <filesystem>
+#include <fstream>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_map>
 #include <vulkan/vulkan.h>
 
-#include "content/proto/renderer.pb.h"
+#include "common/device.h"
 #include "content/scene.h"
-#include "renderer/context.h"
+#include "renderer/proto/renderer.pb.h"
 #include "renderer/renderer.h"
 #include "renderer/renderer_depth.h"
 #include "renderer/renderer_solid_color.h"
 
 namespace e8 {
 namespace {
+
+constexpr char const *kRendererConfigFileName = "renderer.rpb";
 
 float Alpha(unsigned window_width) { return 1.0f - std::pow(1 - 0.95f, 1.0f / window_width); }
 
@@ -145,6 +149,39 @@ std::unique_ptr<RendererInterface> CreateRenderer(RendererType type, VulkanConte
         assert(false);
     }
     }
+}
+
+std::unique_ptr<RendererConfiguration>
+LoadRendererConfiguration(std::filesystem::path const &base_path) {
+    std::fstream config_file(base_path / kRendererConfigFileName, std::ios::in | std::ios::binary);
+    if (!config_file.is_open()) {
+        return nullptr;
+    }
+
+    auto config = std::make_unique<RendererConfiguration>();
+    if (!config->ParseFromIstream(&config_file)) {
+        return nullptr;
+    }
+
+    return config;
+}
+
+bool SaveRendererConfiguration(RendererConfiguration const &config,
+                               std::filesystem::path const &base_path) {
+    std::fstream config_file(base_path / kRendererConfigFileName,
+                             std::ios::out | std::ios::trunc | std::ios::binary);
+    if (!config_file.is_open()) {
+        return false;
+    }
+
+    return config.SerializeToOstream(&config_file);
+}
+
+std::unique_ptr<RendererConfiguration> DefaultRendererConfiguration() {
+    auto config = std::make_unique<RendererConfiguration>();
+    config->set_in_use_renderer_type(RendererType::RT_DEPTH);
+    config->mutable_depth_renderer_params()->set_alpha(1.0f);
+    return config;
 }
 
 } // namespace e8

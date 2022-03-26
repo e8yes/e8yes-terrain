@@ -18,6 +18,7 @@
 #ifndef ISLANDS_RENDERER_SCENE_H
 #define ISLANDS_RENDERER_SCENE_H
 
+#include <filesystem>
 #include <map>
 #include <memory>
 #include <shared_mutex>
@@ -29,11 +30,13 @@
 #include "content/proto/scene_object.pb.h"
 #include "content/scene_object.h"
 #include "content/structure.h"
+#include "resource/accessor.h"
+#include "resource/common.h"
 
 namespace e8 {
 
 // Uniquely identifies a scene.
-using SceneId = std::string;
+using SceneId = Uuid;
 
 /**
  * @brief The Scene class a container for efficient scene object storage and query. This container
@@ -82,8 +85,11 @@ class Scene {
     /**
      * @brief SceneInterface Constructs a scene base class with content provided by the proto
      * object.
+     *
+     * @param proto
+     * @param resource_accessor
      */
-    explicit Scene(SceneProto const &proto);
+    explicit Scene(SceneProto const &proto, ResourceAccessor *resource_accessor);
 
     virtual ~Scene();
 
@@ -126,8 +132,13 @@ class Scene {
 
     /**
      * @brief AddProceduralObject
+     *
+     * @param procedural_object
+     * @param resource_table
+     * @param context
      */
-    bool AddProceduralObject(std::unique_ptr<ProceduralObjectInterface> &&procedural_object);
+    bool AddProceduralObject(std::unique_ptr<ProceduralObjectInterface> &&procedural_object,
+                             ResourceAccessor *resource_accessor);
 
     /**
      * @brief AllRootSceneObjects Returns a list of all root scene objects added to the scene.
@@ -165,6 +176,18 @@ class Scene {
     std::map<SceneObjectId, SceneObject> root_scene_objects_;
     std::unique_ptr<SceneEntityStructureInterface> entity_structure_;
 };
+
+/**
+ * @brief LoadScene Loads scene from the specified base_path. If the loading fails, it returns a
+ * nullptr.
+ */
+std::unique_ptr<Scene> LoadScene(std::filesystem::path const &base_path,
+                                 ResourceAccessor *resource_accessor);
+
+/**
+ * @brief SaveScene Saves the specified scene to disk, under the specified base_path.
+ */
+bool SaveScene(Scene const &scene, std::filesystem::path const &base_path);
 
 } // namespace e8
 

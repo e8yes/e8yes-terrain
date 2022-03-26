@@ -39,8 +39,7 @@ class CameraComponent : public QObject {
   public slots:
     void OnChangeScene();
     void OnChangeCameraParameters();
-    void OnMoveCamera(char key_pressed);
-    void OnRotateCamera(float dx, float dy);
+    void OnChangeCameraParametersFromGame();
 
   private:
     ModificationMonitorComponent *modification_monitor_comp_;

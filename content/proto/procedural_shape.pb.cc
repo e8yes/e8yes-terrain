@@ -17,7 +17,7 @@
 extern PROTOBUF_INTERNAL_EXPORT_procedural_5fshape_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ProceduralBoxProto_procedural_5fshape_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_procedural_5fshape_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ProceduralPlaneProto_procedural_5fshape_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_procedural_5fshape_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ProceduralSphereProto_procedural_5fshape_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_primitive_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_SrtTransform_primitive_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_transform_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_SrtTransform_transform_2eproto;
 namespace e8 {
 class ProceduralPlaneProtoDefaultTypeInternal {
  public:
@@ -80,7 +80,7 @@ static void InitDefaultsscc_info_ProceduralShapeProto_procedural_5fshape_2eproto
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<4> scc_info_ProceduralShapeProto_procedural_5fshape_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 4, 0, InitDefaultsscc_info_ProceduralShapeProto_procedural_5fshape_2eproto}, {
-      &scc_info_SrtTransform_primitive_2eproto.base,
+      &scc_info_SrtTransform_transform_2eproto.base,
       &scc_info_ProceduralPlaneProto_procedural_5fshape_2eproto.base,
       &scc_info_ProceduralBoxProto_procedural_5fshape_2eproto.base,
       &scc_info_ProceduralSphereProto_procedural_5fshape_2eproto.base,}};
@@ -156,7 +156,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_procedural_5fshape_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\026procedural_shape.proto\022\002e8\032\017primitive."
+  "\n\026procedural_shape.proto\022\002e8\032\017transform."
   "proto\"H\n\024ProceduralPlaneProto\022\r\n\005width\030\001"
   " \001(\002\022\016\n\006height\030\002 \001(\002\022\021\n\tcell_area\030\003 \001(\002\""
   "k\n\022ProceduralBoxProto\022\r\n\005width\030\001 \001(\002\022\016\n\006"
@@ -171,7 +171,7 @@ const char descriptor_table_protodef_procedural_5fshape_2eproto[] PROTOBUF_SECTI
   "ProceduralSphereProtoH\000B\007\n\005shapeb\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_procedural_5fshape_2eproto_deps[1] = {
-  &::descriptor_table_primitive_2eproto,
+  &::descriptor_table_transform_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_procedural_5fshape_2eproto_sccs[4] = {
   &scc_info_ProceduralBoxProto_procedural_5fshape_2eproto.base,

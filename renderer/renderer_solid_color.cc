@@ -20,15 +20,16 @@
 #include <optional>
 #include <vulkan/vulkan.h>
 
+#include "common/device.h"
 #include "common/tensor.h"
-#include "content/proto/renderer.pb.h"
 #include "content/scene.h"
-#include "renderer/context.h"
 #include "renderer/pipeline_output.h"
 #include "renderer/pipeline_solid_color.h"
+#include "renderer/proto/renderer.pb.h"
 #include "renderer/render_pass.h"
 #include "renderer/renderer.h"
 #include "renderer/renderer_solid_color.h"
+#include "resource/accessor.h"
 
 namespace e8 {
 
@@ -51,7 +52,7 @@ SolidColorRenderer::SolidColorRenderer(VulkanContext *context)
 
 SolidColorRenderer::~SolidColorRenderer() {}
 
-void SolidColorRenderer::DrawFrame(Scene *scene) {
+void SolidColorRenderer::DrawFrame(Scene *scene, ResourceAccessor * /*resource_accessor*/) {
     FrameContext frame_context = this->BeginFrame();
 
     pimpl_->output.SetSwapChainImageIndex(frame_context.swap_chain_image_index);
@@ -65,5 +66,7 @@ void SolidColorRenderer::DrawFrame(Scene *scene) {
 
     this->EndFrame(frame_context, final_output);
 }
+
+void SolidColorRenderer::ApplyConfiguration(RendererConfiguration const & /*config*/) {}
 
 } // namespace e8

@@ -23,7 +23,7 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
-#include "renderer/context.h"
+#include "common/device.h"
 #include "renderer/pipeline_common.h"
 
 namespace e8 {

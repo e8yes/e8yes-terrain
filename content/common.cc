@@ -16,98 +16,15 @@
  */
 
 #include <cassert>
-#include <google/protobuf/repeated_field.h>
+#include <string>
 
 #include "common/tensor.h"
 #include "content/common.h"
-#include "third_party/uuid/uuid4.h"
+#include "content/proto/bbox.pb.h"
+#include "content/proto/transform.pb.h"
+#include "resource/common.h"
 
 namespace e8 {
-namespace {
-
-std::mutex gUuidGenMutex;
-bool gUuidInitialized = false;
-UUID4_STATE_T gUuidGenState;
-
-} // namespace
-
-std::string GenerateUuid() {
-    std::lock_guard guard(gUuidGenMutex);
-
-    if (!gUuidInitialized) {
-        uuid4_seed(&gUuidGenState);
-        gUuidInitialized = true;
-    }
-
-    UUID4_T uuid;
-    uuid4_gen(&gUuidGenState, &uuid);
-
-    char uuid_string[UUID4_STR_BUFFER_SIZE];
-    uuid4_to_s(uuid, uuid_string, sizeof(uuid_string));
-
-    return std::string(uuid_string);
-}
-
-google::protobuf::RepeatedField<float> ToProto(vec2 const &v) {
-    google::protobuf::RepeatedField<float> proto;
-    proto.Resize(/*new_size=*/2, /*value=*/0);
-    for (unsigned i = 0; i < 2; ++i) {
-        proto[i] = v(i);
-    }
-    return proto;
-}
-
-vec2 ToVec2(google::protobuf::RepeatedField<float> const &proto) {
-    assert(proto.size() == 2);
-
-    vec2 v;
-    for (unsigned i = 0; i < 2; ++i) {
-        v(i) = proto[i];
-    }
-    return v;
-}
-
-google::protobuf::RepeatedField<float> ToProto(vec3 const &v) {
-    google::protobuf::RepeatedField<float> proto;
-    proto.Resize(/*new_size=*/3, /*value=*/0);
-    for (unsigned i = 0; i < 3; ++i) {
-        proto[i] = v(i);
-    }
-    return proto;
-}
-
-vec3 ToVec3(google::protobuf::RepeatedField<float> const &proto) {
-    assert(proto.size() == 3);
-
-    vec3 v;
-    for (unsigned i = 0; i < 3; ++i) {
-        v(i) = proto[i];
-    }
-    return v;
-}
-
-google::protobuf::RepeatedField<float> ToProto(mat44 const &m) {
-    google::protobuf::RepeatedField<float> proto;
-    proto.Resize(/*new_size=*/4 * 4, /*value=*/0);
-    for (unsigned i = 0; i < 4; ++i) {
-        for (unsigned j = 0; j < 4; ++j) {
-            proto[i + j * 4] = m(i, j);
-        }
-    }
-    return proto;
-}
-
-mat44 ToMat44(google::protobuf::RepeatedField<float> const &proto) {
-    assert(proto.size() == 4 * 4);
-
-    mat44 m;
-    for (unsigned i = 0; i < 4; ++i) {
-        for (unsigned j = 0; j < 4; ++j) {
-            m(i, j) = proto[i + j * 4];
-        }
-    }
-    return m;
-}
 
 AABB ToProto(aabb const &a) {
     AABB proto;

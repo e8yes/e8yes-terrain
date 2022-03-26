@@ -93,7 +93,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 
 const char descriptor_table_protodef_camera_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\014camera.proto\022\002e8\"\351\001\n\006Camera\022\n\n\002id\030\001 \001("
-  "\t\022\020\n\010position\030\002 \003(\002\022\037\n\005basis\030\003 \001(\0132\020.e8."
+  "\003\022\020\n\010position\030\002 \003(\002\022\037\n\005basis\030\003 \001(\0132\020.e8."
   "Camera.Basis\022\024\n\014focal_length\030\004 \001(\002\022\024\n\014se"
   "nsor_width\030\005 \001(\002\022\025\n\rsensor_height\030\006 \001(\002\022"
   "\024\n\014max_distance\030\007 \001(\002\022\023\n\013image_width\030\010 \001"
@@ -419,25 +419,19 @@ Camera::Camera(const Camera& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
       position_(from.position_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from._internal_id().empty()) {
-    id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_id(),
-      GetArena());
-  }
   if (from._internal_has_basis()) {
     basis_ = new ::e8::Camera_Basis(*from.basis_);
   } else {
     basis_ = nullptr;
   }
-  ::memcpy(&focal_length_, &from.focal_length_,
+  ::memcpy(&id_, &from.id_,
     static_cast<size_t>(reinterpret_cast<char*>(&image_width_) -
-    reinterpret_cast<char*>(&focal_length_)) + sizeof(image_width_));
+    reinterpret_cast<char*>(&id_)) + sizeof(image_width_));
   // @@protoc_insertion_point(copy_constructor:e8.Camera)
 }
 
 void Camera::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_Camera_camera_2eproto.base);
-  id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   ::memset(&basis_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&image_width_) -
       reinterpret_cast<char*>(&basis_)) + sizeof(image_width_));
@@ -451,7 +445,6 @@ Camera::~Camera() {
 
 void Camera::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
-  id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete basis_;
 }
 
@@ -477,14 +470,13 @@ void Camera::Clear() {
   (void) cached_has_bits;
 
   position_.Clear();
-  id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   if (GetArena() == nullptr && basis_ != nullptr) {
     delete basis_;
   }
   basis_ = nullptr;
-  ::memset(&focal_length_, 0, static_cast<size_t>(
+  ::memset(&id_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&image_width_) -
-      reinterpret_cast<char*>(&focal_length_)) + sizeof(image_width_));
+      reinterpret_cast<char*>(&id_)) + sizeof(image_width_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -496,12 +488,10 @@ const char* Camera::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::int
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     CHK_(ptr);
     switch (tag >> 3) {
-      // string id = 1;
+      // int64 id = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
-          auto str = _internal_mutable_id();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "e8.Camera.id"));
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -585,14 +575,10 @@ failure:
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string id = 1;
-  if (this->id().size() > 0) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->_internal_id().data(), static_cast<int>(this->_internal_id().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "e8.Camera.id");
-    target = stream->WriteStringMaybeAliased(
-        1, this->_internal_id(), target);
+  // int64 id = 1;
+  if (this->id() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(1, this->_internal_id(), target);
   }
 
   // repeated float position = 2;
@@ -669,18 +655,18 @@ size_t Camera::ByteSizeLong() const {
     total_size += data_size;
   }
 
-  // string id = 1;
-  if (this->id().size() > 0) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-        this->_internal_id());
-  }
-
   // .e8.Camera.Basis basis = 3;
   if (this->has_basis()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
         *basis_);
+  }
+
+  // int64 id = 1;
+  if (this->id() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int64Size(
+        this->_internal_id());
   }
 
   // float focal_length = 4;
@@ -742,11 +728,11 @@ void Camera::MergeFrom(const Camera& from) {
   (void) cached_has_bits;
 
   position_.MergeFrom(from.position_);
-  if (from.id().size() > 0) {
-    _internal_set_id(from._internal_id());
-  }
   if (from.has_basis()) {
     _internal_mutable_basis()->::e8::Camera_Basis::MergeFrom(from._internal_basis());
+  }
+  if (from.id() != 0) {
+    _internal_set_id(from._internal_id());
   }
   if (!(from.focal_length() <= 0 && from.focal_length() >= 0)) {
     _internal_set_focal_length(from._internal_focal_length());
@@ -787,7 +773,6 @@ void Camera::InternalSwap(Camera* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   position_.InternalSwap(&other->position_);
-  id_.Swap(&other->id_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(Camera, image_width_)
       + sizeof(Camera::image_width_)

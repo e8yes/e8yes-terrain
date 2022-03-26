@@ -1,4 +1,4 @@
-QT += widgets
+CONFIG -= qt
 
 TEMPLATE = lib
 DEFINES += ISLANDS_RENDERER_LIBRARY
@@ -17,39 +17,39 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 INCLUDEPATH += ../
 
 SOURCES += \
-    context.cc \
     drawable_instance.cc \
     pipeline_common.cc \
     pipeline_depth_map.cc \
     pipeline_depth_map_visualizer.cc \
+    pipeline_light_inputs.cc \
     pipeline_output.cc \
     pipeline_post_processor.cc \
     pipeline_solid_color.cc \
     projection.cc \
+    proto/renderer.pb.cc \
     query_fn.cc \
     render_pass.cc \
     renderer.cc \
     renderer_depth.cc \
     renderer_solid_color.cc \
-    vram_cache.cc \
     vram_geometry.cc
 
 HEADERS += \
-    context.h \
     drawable_instance.h \
     pipeline_common.h \
     pipeline_depth_map.h \
     pipeline_depth_map_visualizer.h \
+    pipeline_light_inputs.h \
     pipeline_output.h \
     pipeline_post_processor.h \
     pipeline_solid_color.h \
     projection.h \
+    proto/renderer.pb.h \
     query_fn.h \
     render_pass.h \
     renderer.h \
     renderer_depth.h \
     renderer_solid_color.h \
-    vram_cache.h \
     vram_geometry.h
 
 # Default rules for deployment.

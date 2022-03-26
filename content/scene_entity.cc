@@ -16,30 +16,29 @@
  */
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 #include "common/tensor.h"
 #include "content/common.h"
-#include "content/geometry.h"
 #include "content/proto/entity.pb.h"
-#include "content/proto/geometry.pb.h"
-#include "content/proto/physical_shape.pb.h"
-#include "content/proto/primitive.pb.h"
 #include "content/scene_entity.h"
+#include "resource/common.h"
+#include "resource/geometry.h"
+#include "resource/proto/geometry.pb.h"
+#include "resource/proto/physical_shape.pb.h"
 
 namespace e8 {
 
 SceneEntity::SceneEntity(SceneEntityName const &name)
-    : id(GenerateUuid()), name(name), movable(true) {}
+    : id(GenerateUuid()), name(name), movable(true), geometry_id(kNullUuid) {}
 
-SceneEntity::SceneEntity(
-    SceneEntityProto const &proto,
-    std::unordered_map<GeometryId, std::shared_ptr<GeometryLod>> const &geometries)
+SceneEntity::SceneEntity(SceneEntityProto const &proto)
     : id(proto.id()), name(proto.name()), movable(proto.movable()),
       transform(ToMat44(proto.transform())), bounding_box(ToAabb(proto.bounding_box())),
-      geometry_lod_instance(geometries.at(proto.geometry_id())) {
+      geometry_id(proto.geometry_id()) {
     if (proto.has_srt_transform()) {
         srt_transform = proto.srt_transform();
     }
@@ -57,7 +56,7 @@ SceneEntityProto SceneEntity::ToProto() const {
         *proto.mutable_srt_transform() = *srt_transform;
     }
     *proto.mutable_bounding_box() = e8::ToProto(bounding_box);
-    proto.set_geometry_id(geometry_lod_instance->id);
+    proto.set_geometry_id(geometry_id);
     return proto;
 }
 

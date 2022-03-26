@@ -18,11 +18,13 @@
 #ifndef ISLANDS_CONTENT_PROCEDURAL_BASIC_H
 #define ISLANDS_CONTENT_PROCEDURAL_BASIC_H
 
+#include "common/device.h"
 #include "common/tensor.h"
 #include "content/common.h"
 #include "content/procedural_object.h"
 #include "content/proto/procedural_object.pb.h"
 #include "content/scene_object.h"
+#include "resource/accessor.h"
 
 namespace e8 {
 
@@ -58,7 +60,7 @@ class ProceduralPlane : public ProceduralObjectInterface {
 
     ~ProceduralPlane();
 
-    SceneObject ToSceneObject() const override;
+    SceneObject ToSceneObject(ResourceAccessor *resource_accessor) const override;
     ProceduralObjectProto ToProto() const override;
 
   public:

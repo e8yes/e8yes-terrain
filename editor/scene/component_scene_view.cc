@@ -29,18 +29,21 @@
 #include "content/scene_object.h"
 #include "editor/basic/context.h"
 #include "editor/scene/component_scene_view.h"
+#include "game/game.h"
+#include "resource/common.h"
 
 namespace e8 {
 namespace {
 
-std::string ItemName(std::string const &name, std::string const &id) {
-    return name + '@' + id.substr(0, 3);
+std::string ItemName(std::string const &name, Uuid const &id) {
+    return name + '@' + std::to_string(id).substr(0, 3);
 }
 
 void AddSceneEntity(SceneEntity const &scene_entity, QTreeWidgetItem *parent_node) {
     QTreeWidgetItem *child = new QTreeWidgetItem();
     child->setText(/*column=*/0, ItemName(scene_entity.name, scene_entity.id).c_str());
-    child->setData(/*column=*/0, /*role=*/Qt::UserRole, QVariant(QString(scene_entity.id.c_str())));
+    child->setData(/*column=*/0, /*role=*/Qt::UserRole,
+                   QVariant(QString(std::to_string(scene_entity.id).c_str())));
     child->setText(/*column=*/1, kSceneEntityType);
     child->setData(/*column=*/1, /*role=*/Qt::UserRole, QVariant(QString(kSceneEntityType)));
 
@@ -52,7 +55,7 @@ void AddSceneObject(SceneObject const &scene_object, QTreeWidgetItem *parent_nod
 
     current_node->setText(/*column=*/0, ItemName(scene_object.name, scene_object.id).c_str());
     current_node->setData(/*column=*/0, /*role=*/Qt::UserRole,
-                          QVariant(QString(scene_object.id.c_str())));
+                          QVariant(QString(std::to_string(scene_object.id).c_str())));
     if (scene_object.Procedural()) {
         current_node->setText(/*column=*/1, kProceduralSceneObjectType);
         current_node->setData(/*column=*/1, /*role=*/Qt::UserRole,
@@ -77,16 +80,19 @@ void AddSceneObject(SceneObject const &scene_object, QTreeWidgetItem *parent_nod
     }
 }
 
-void UpdateSceneView(Scene const *scene, QTreeWidget *scene_view_tree_widget) {
+void UpdateSceneView(Game *game, QTreeWidget *scene_view_tree_widget) {
     scene_view_tree_widget->clear();
 
-    if (scene == nullptr) {
+    if (game == nullptr) {
         return;
     }
 
+    Scene const *scene = game->GetGameData().scene;
+
     QTreeWidgetItem *scene_root = new QTreeWidgetItem();
     scene_root->setText(/*column=*/0, ItemName(scene->name, scene->id).c_str());
-    scene_root->setData(/*column=*/0, /*role=*/Qt::UserRole, QVariant(QString(scene->id.c_str())));
+    scene_root->setData(/*column=*/0, /*role=*/Qt::UserRole,
+                        QVariant(QString(std::to_string(scene->id).c_str())));
     scene_root->setText(/*column=*/1, kSceneType);
     scene_root->setData(/*column=*/1, /*role=*/Qt::UserRole, QVariant(QString(kSceneType)));
 
@@ -106,7 +112,7 @@ SceneViewComponent::SceneViewComponent(EditorContext *context) : context_(contex
 SceneViewComponent::~SceneViewComponent() {}
 
 void SceneViewComponent::OnChangeScene() {
-    UpdateSceneView(context_->scene.get(), context_->ui->scene_view_tree_widget);
+    UpdateSceneView(context_->game.get(), context_->ui->scene_view_tree_widget);
 }
 
 } // namespace e8

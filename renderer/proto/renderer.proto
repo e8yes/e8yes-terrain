@@ -67,11 +67,15 @@ message RadiosityRendererParameters {
 }
 
 /**
- * @brief The RendererParameters message parameters for each type of renderer.
+ * @brief The RendererConfiguration message Renderer configuration.
  */
-message RendererParameters {
-    SolidColorRendererParameters solid_color_renderer_params = 1;
-    DepthRendererParameters depth_renderer_params = 2;
-    RadianceRendererParameters radiance_renderer_params = 3;
-    RadiosityRendererParameters radiosity_renderer_params = 4;
+message RendererConfiguration {
+    // The renderer that is currently in-use.
+    RendererType in_use_renderer_type = 1;
+
+    // Current parameters for each type of renderer.
+    SolidColorRendererParameters solid_color_renderer_params = 2;
+    DepthRendererParameters depth_renderer_params = 3;
+    RadianceRendererParameters radiance_renderer_params = 4;
+    RadiosityRendererParameters radiosity_renderer_params = 5;
 }

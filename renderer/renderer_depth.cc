@@ -20,22 +20,23 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
+#include "common/device.h"
 #include "content/common.h"
-#include "content/proto/renderer.pb.h"
 #include "content/scene.h"
 #include "content/scene_entity.h"
-#include "renderer/context.h"
 #include "renderer/drawable_instance.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/pipeline_depth_map.h"
 #include "renderer/pipeline_depth_map_visualizer.h"
 #include "renderer/pipeline_output.h"
 #include "renderer/projection.h"
+#include "renderer/proto/renderer.pb.h"
 #include "renderer/query_fn.h"
 #include "renderer/render_pass.h"
 #include "renderer/renderer.h"
 #include "renderer/renderer_depth.h"
 #include "renderer/vram_geometry.h"
+#include "resource/accessor.h"
 
 namespace e8 {
 
@@ -51,6 +52,7 @@ class DepthRenderer::DepthRendererImpl {
     DepthMapVisualizerPipeline depth_map_visualizer_pipeline;
 
     GeometryVramTransfer geo_vram;
+    RendererConfiguration config;
 };
 
 DepthRenderer::DepthRendererImpl::DepthRendererImpl(VulkanContext *context)
@@ -68,7 +70,7 @@ DepthRenderer::DepthRenderer(VulkanContext *context)
 
 DepthRenderer::~DepthRenderer() {}
 
-void DepthRenderer::DrawFrame(Scene *scene) {
+void DepthRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor) {
     FrameContext frame_context = this->BeginFrame();
 
     pimpl_->final_output.SetSwapChainImageIndex(frame_context.swap_chain_image_index);
@@ -82,19 +84,24 @@ void DepthRenderer::DrawFrame(Scene *scene) {
         std::vector<SceneEntity const *> scene_entities =
             scene->SceneEntityStructure()->QueryEntities(QueryAllSceneEntities);
         std::vector<DrawableInstance> drawables =
-            ToDrawables(scene_entities, /*viewer_location=*/ToVec3(scene->camera.position()));
+            ToDrawables(scene_entities, /*viewer_location=*/ToVec3(scene->camera.position()),
+                        resource_accessor);
         PerspectiveProjection camera_projection(scene->camera);
 
         PipelineOutputInterface *depth_map_output = pimpl_->depth_map_pipeline.Run(
             drawables, camera_projection, frame_context.acquire_swap_chain_image_barrier,
             &pimpl_->geo_vram);
 
-        final_output = pimpl_->depth_map_visualizer_pipeline.Run(/*alpha=*/0.0f, camera_projection,
-                                                                 *depth_map_output);
+        final_output = pimpl_->depth_map_visualizer_pipeline.Run(
+            pimpl_->config.depth_renderer_params().alpha(), camera_projection, *depth_map_output);
     }
     this->EndStage(/*index=*/1);
 
     this->EndFrame(frame_context, final_output);
+}
+
+void DepthRenderer::ApplyConfiguration(RendererConfiguration const &config) {
+    pimpl_->config = config;
 }
 
 } // namespace e8

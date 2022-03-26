@@ -21,7 +21,7 @@
 #include <memory>
 #include <string>
 
-#include "renderer/context.h"
+#include "common/device.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/pipeline_output.h"
 #include "renderer/render_pass.h"

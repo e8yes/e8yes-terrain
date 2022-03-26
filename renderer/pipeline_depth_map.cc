@@ -23,9 +23,8 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
+#include "common/device.h"
 #include "common/tensor.h"
-#include "content/proto/primitive.pb.h"
-#include "renderer/context.h"
 #include "renderer/drawable_instance.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/pipeline_depth_map.h"

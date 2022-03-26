@@ -21,12 +21,13 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
-#include "renderer/context.h"
+#include "common/device.h"
 #include "renderer/drawable_instance.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/pipeline_output.h"
 #include "renderer/render_pass.h"
 #include "renderer/vram_geometry.h"
+#include "resource/geometry.h"
 
 namespace e8 {
 
@@ -101,11 +102,20 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
                      GraphicsPipeline const &pipeline, ShaderUniformLayout const &uniform_layout,
                      SetDrawableUniformsFn const &set_uniforms_fn, GeometryVramTransfer *geo_vram,
                      VkCommandBuffer cmds) {
+    //
+    std::vector<Geometry const *> geometries(drawables.size());
+    for (unsigned i = 0; i < drawables.size(); ++i) {
+        geometries[i] = drawables[i].geometry;
+    }
+
+    geo_vram->Upload(geometries);
+
+    //
     vkCmdBindPipeline(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline);
 
     for (auto const &instance : drawables) {
-        GeometryVramTransfer::UploadResult result = geo_vram->Upload(instance.geometry);
-        if (!result.Valid()) {
+        GeometryVramTransfer::GpuGeometry gpu_geometry = geo_vram->Find(instance.geometry);
+        if (!gpu_geometry.Valid()) {
             continue;
         }
 
@@ -113,11 +123,12 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
 
         VkDeviceSize offset = 0;
         vkCmdBindVertexBuffers(cmds, /*firstBinding=*/0, /*bindingCount=*/1,
-                               &result.vertex_buffer->buffer,
+                               &gpu_geometry.vertex_buffer->buffer,
                                /*pOffsets=*/&offset);
-        vkCmdBindIndexBuffer(cmds, result.index_buffer->buffer, /*offset=*/0,
-                             result.index_element_type);
-        vkCmdDrawIndexed(cmds, instance.geometry->primitives.size() * 3,
+        vkCmdBindIndexBuffer(cmds, gpu_geometry.index_buffer->buffer, /*offset=*/0,
+                             gpu_geometry.index_element_type);
+
+        vkCmdDrawIndexed(cmds, instance.geometry->index_count,
                          /*instanceCount=*/1, /*firstIndex=*/0, /*vertexOffset=*/0,
                          /*firstInstance=*/0);
     }

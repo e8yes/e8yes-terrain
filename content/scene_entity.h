@@ -25,16 +25,16 @@
 #include <vector>
 
 #include "common/tensor.h"
-#include "content/geometry.h"
 #include "content/proto/entity.pb.h"
-#include "content/proto/geometry.pb.h"
-#include "content/proto/physical_shape.pb.h"
-#include "content/proto/primitive.pb.h"
+#include "resource/common.h"
+#include "resource/geometry.h"
+#include "resource/proto/geometry.pb.h"
+#include "resource/proto/physical_shape.pb.h"
 
 namespace e8 {
 
 // Uniquely identifies a scene entity.
-using SceneEntityId = std::string;
+using SceneEntityId = Uuid;
 
 // Represents a descriptive human readable name of a scene entity.
 using SceneEntityName = std::string;
@@ -58,12 +58,9 @@ struct SceneEntity {
     SceneEntity(SceneEntityName const &name);
 
     /**
-     * @brief SceneEntity Constructs an entity from proto message. Since the proto references the
-     * geometry and physical shape information by only IDs, it requires two maps of actually
-     * instances to correctly fill the entity up.
+     * @brief SceneEntity Constructs an entity from proto message.
      */
-    SceneEntity(SceneEntityProto const &proto,
-                std::unordered_map<GeometryId, std::shared_ptr<GeometryLod>> const &geometries);
+    SceneEntity(SceneEntityProto const &proto);
 
     ~SceneEntity();
 
@@ -91,10 +88,10 @@ struct SceneEntity {
     // An AABB bounding box surrounding the entity's geometry prior to any transformation.
     aabb bounding_box;
 
-    // A geometry instance with information derived from a geometry. A shared pointer allows a large
-    // number of same geometries to be placed at different location of the scene with shared
-    // information.
-    std::shared_ptr<GeometryLod> geometry_lod_instance;
+    // References a geometry with its ID. The actual data needs to be fetched using the resource
+    // table. Referencing a geometry through an ID allows a large number of same geometries to be
+    // placed at different location of the scene while sharing the same data.
+    GeometryId geometry_id;
 
     // TODO: Adds physical shape instance once it's implemented.
 };

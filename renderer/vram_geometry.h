@@ -19,18 +19,19 @@
 #define ISLANDS_RENDERER_VRAM_GEOMETRY_H
 
 #include <memory>
+#include <vector>
 #include <vulkan/vulkan.h>
 
-#include "content/geometry.h"
-#include "renderer/context.h"
+#include "common/device.h"
+#include "renderer/pipeline_output.h"
 #include "renderer/projection.h"
+#include "resource/geometry.h"
 
 namespace e8 {
 
 /**
- * @brief The GeometryVramTransfer class It enables an efficient geometry data transfer from the
- * host machine to the GPU device as well as geometry data storage on the GPU device. This class
- * isn't thread-safe.
+ * @brief The GeometryVramTransfer class It encapsulates an efficient and scalable geometry data
+ * transfer from host machine to GPU device via caching. This class isn't thread-safe.
  */
 class GeometryVramTransfer {
   public:
@@ -75,11 +76,11 @@ class GeometryVramTransfer {
     };
 
     /**
-     * @brief The UploadResult struct Results of the Upload() call.
+     * @brief The GpuGeometry struct Represents a geometry living on the video memory.
      */
-    struct UploadResult {
-        UploadResult();
-        ~UploadResult();
+    struct GpuGeometry {
+        GpuGeometry();
+        ~GpuGeometry();
 
         /**
          * @brief Valid Indicates if the upload is valid.
@@ -97,15 +98,26 @@ class GeometryVramTransfer {
     };
 
     /**
-     * @brief Upload Transfers the vertex and index data of the geometry to the GPU device if it has
-     * not been cached or the geometry is mutable. A geometry is mutable if its rigidity type is
-     * deformable or tearable. If the geometry data have been cached, it returns the previous
-     * transfer result.
-     *
-     * @param geometry The geometry to transfer/update.
-     * @return See above.
+     * @brief Prepare Calls this when all the uploaded GPU geometries are no longer needed, and
+     * therefore, are allowed to be ejected.
      */
-    UploadResult Upload(Geometry const *geometry);
+    void Prepare();
+
+    /**
+     * @brief Upload Transfers the vertex and index data of the specified geometry list to the GPU
+     * device when they has not been there. However, a mutable geometry will always be transferred
+     * regardless of its cache status. A geometry is mutable if its rigidity type is deformable or
+     * tearable. This function blocks until the uploads, if there are any, are complete.
+     *
+     * @param geometries The geometries to be uploaded.
+     */
+    void Upload(std::vector<Geometry const *> const &geometries);
+
+    /**
+     * @brief Find Returns the uploaded geometry. If the specified geometry has not been uploaded,
+     * this function will fail.
+     */
+    GpuGeometry Find(Geometry const *geometry);
 
   private:
     struct GeometryVramTransferImpl;

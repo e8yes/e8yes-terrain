@@ -32,7 +32,8 @@
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
-#include "primitive.pb.h"
+#include "bbox.pb.h"
+#include "transform.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_entity_2eproto
@@ -181,12 +182,12 @@ class SceneEntityProto PROTOBUF_FINAL :
 
   enum : int {
     kTransformFieldNumber = 4,
-    kIdFieldNumber = 1,
     kNameFieldNumber = 2,
-    kGeometryIdFieldNumber = 7,
-    kPhysicalShapeIdFieldNumber = 8,
     kSrtTransformFieldNumber = 5,
     kBoundingBoxFieldNumber = 6,
+    kIdFieldNumber = 1,
+    kGeometryIdFieldNumber = 7,
+    kPhysicalShapeIdFieldNumber = 8,
     kMovableFieldNumber = 3,
   };
   // repeated float transform = 4;
@@ -211,31 +212,6 @@ class SceneEntityProto PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
       mutable_transform();
 
-  // string id = 1;
-  void clear_id();
-  const std::string& id() const;
-  void set_id(const std::string& value);
-  void set_id(std::string&& value);
-  void set_id(const char* value);
-  void set_id(const char* value, size_t size);
-  std::string* mutable_id();
-  std::string* release_id();
-  void set_allocated_id(std::string* id);
-  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
-  std::string* unsafe_arena_release_id();
-  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
-  void unsafe_arena_set_allocated_id(
-      std::string* id);
-  private:
-  const std::string& _internal_id() const;
-  void _internal_set_id(const std::string& value);
-  std::string* _internal_mutable_id();
-  public:
-
   // string name = 2;
   void clear_name();
   const std::string& name() const;
@@ -259,56 +235,6 @@ class SceneEntityProto PROTOBUF_FINAL :
   const std::string& _internal_name() const;
   void _internal_set_name(const std::string& value);
   std::string* _internal_mutable_name();
-  public:
-
-  // string geometry_id = 7;
-  void clear_geometry_id();
-  const std::string& geometry_id() const;
-  void set_geometry_id(const std::string& value);
-  void set_geometry_id(std::string&& value);
-  void set_geometry_id(const char* value);
-  void set_geometry_id(const char* value, size_t size);
-  std::string* mutable_geometry_id();
-  std::string* release_geometry_id();
-  void set_allocated_geometry_id(std::string* geometry_id);
-  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
-  std::string* unsafe_arena_release_geometry_id();
-  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
-  void unsafe_arena_set_allocated_geometry_id(
-      std::string* geometry_id);
-  private:
-  const std::string& _internal_geometry_id() const;
-  void _internal_set_geometry_id(const std::string& value);
-  std::string* _internal_mutable_geometry_id();
-  public:
-
-  // string physical_shape_id = 8;
-  void clear_physical_shape_id();
-  const std::string& physical_shape_id() const;
-  void set_physical_shape_id(const std::string& value);
-  void set_physical_shape_id(std::string&& value);
-  void set_physical_shape_id(const char* value);
-  void set_physical_shape_id(const char* value, size_t size);
-  std::string* mutable_physical_shape_id();
-  std::string* release_physical_shape_id();
-  void set_allocated_physical_shape_id(std::string* physical_shape_id);
-  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
-  std::string* unsafe_arena_release_physical_shape_id();
-  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
-  void unsafe_arena_set_allocated_physical_shape_id(
-      std::string* physical_shape_id);
-  private:
-  const std::string& _internal_physical_shape_id() const;
-  void _internal_set_physical_shape_id(const std::string& value);
-  std::string* _internal_mutable_physical_shape_id();
   public:
 
   // .e8.SrtTransform srt_transform = 5;
@@ -347,6 +273,33 @@ class SceneEntityProto PROTOBUF_FINAL :
       ::e8::AABB* bounding_box);
   ::e8::AABB* unsafe_arena_release_bounding_box();
 
+  // int64 id = 1;
+  void clear_id();
+  ::PROTOBUF_NAMESPACE_ID::int64 id() const;
+  void set_id(::PROTOBUF_NAMESPACE_ID::int64 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int64 _internal_id() const;
+  void _internal_set_id(::PROTOBUF_NAMESPACE_ID::int64 value);
+  public:
+
+  // int64 geometry_id = 7;
+  void clear_geometry_id();
+  ::PROTOBUF_NAMESPACE_ID::int64 geometry_id() const;
+  void set_geometry_id(::PROTOBUF_NAMESPACE_ID::int64 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int64 _internal_geometry_id() const;
+  void _internal_set_geometry_id(::PROTOBUF_NAMESPACE_ID::int64 value);
+  public:
+
+  // int64 physical_shape_id = 8;
+  void clear_physical_shape_id();
+  ::PROTOBUF_NAMESPACE_ID::int64 physical_shape_id() const;
+  void set_physical_shape_id(::PROTOBUF_NAMESPACE_ID::int64 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int64 _internal_physical_shape_id() const;
+  void _internal_set_physical_shape_id(::PROTOBUF_NAMESPACE_ID::int64 value);
+  public:
+
   // bool movable = 3;
   void clear_movable();
   bool movable() const;
@@ -365,12 +318,12 @@ class SceneEntityProto PROTOBUF_FINAL :
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > transform_;
   mutable std::atomic<int> _transform_cached_byte_size_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr id_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr geometry_id_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr physical_shape_id_;
   ::e8::SrtTransform* srt_transform_;
   ::e8::AABB* bounding_box_;
+  ::PROTOBUF_NAMESPACE_ID::int64 id_;
+  ::PROTOBUF_NAMESPACE_ID::int64 geometry_id_;
+  ::PROTOBUF_NAMESPACE_ID::int64 physical_shape_id_;
   bool movable_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_entity_2eproto;
@@ -386,85 +339,24 @@ class SceneEntityProto PROTOBUF_FINAL :
 #endif  // __GNUC__
 // SceneEntityProto
 
-// string id = 1;
+// int64 id = 1;
 inline void SceneEntityProto::clear_id() {
-  id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  id_ = PROTOBUF_LONGLONG(0);
 }
-inline const std::string& SceneEntityProto::id() const {
+inline ::PROTOBUF_NAMESPACE_ID::int64 SceneEntityProto::_internal_id() const {
+  return id_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int64 SceneEntityProto::id() const {
   // @@protoc_insertion_point(field_get:e8.SceneEntityProto.id)
   return _internal_id();
 }
-inline void SceneEntityProto::set_id(const std::string& value) {
+inline void SceneEntityProto::_internal_set_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
+  
+  id_ = value;
+}
+inline void SceneEntityProto::set_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
   _internal_set_id(value);
   // @@protoc_insertion_point(field_set:e8.SceneEntityProto.id)
-}
-inline std::string* SceneEntityProto::mutable_id() {
-  // @@protoc_insertion_point(field_mutable:e8.SceneEntityProto.id)
-  return _internal_mutable_id();
-}
-inline const std::string& SceneEntityProto::_internal_id() const {
-  return id_.Get();
-}
-inline void SceneEntityProto::_internal_set_id(const std::string& value) {
-  
-  id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
-}
-inline void SceneEntityProto::set_id(std::string&& value) {
-  
-  id_.Set(
-    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
-  // @@protoc_insertion_point(field_set_rvalue:e8.SceneEntityProto.id)
-}
-inline void SceneEntityProto::set_id(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
-              GetArena());
-  // @@protoc_insertion_point(field_set_char:e8.SceneEntityProto.id)
-}
-inline void SceneEntityProto::set_id(const char* value,
-    size_t size) {
-  
-  id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
-      reinterpret_cast<const char*>(value), size), GetArena());
-  // @@protoc_insertion_point(field_set_pointer:e8.SceneEntityProto.id)
-}
-inline std::string* SceneEntityProto::_internal_mutable_id() {
-  
-  return id_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline std::string* SceneEntityProto::release_id() {
-  // @@protoc_insertion_point(field_release:e8.SceneEntityProto.id)
-  return id_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline void SceneEntityProto::set_allocated_id(std::string* id) {
-  if (id != nullptr) {
-    
-  } else {
-    
-  }
-  id_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), id,
-      GetArena());
-  // @@protoc_insertion_point(field_set_allocated:e8.SceneEntityProto.id)
-}
-inline std::string* SceneEntityProto::unsafe_arena_release_id() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:e8.SceneEntityProto.id)
-  GOOGLE_DCHECK(GetArena() != nullptr);
-  
-  return id_.UnsafeArenaRelease(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      GetArena());
-}
-inline void SceneEntityProto::unsafe_arena_set_allocated_id(
-    std::string* id) {
-  GOOGLE_DCHECK(GetArena() != nullptr);
-  if (id != nullptr) {
-    
-  } else {
-    
-  }
-  id_.UnsafeArenaSetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      id, GetArena());
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneEntityProto.id)
 }
 
 // string name = 2;
@@ -765,166 +657,44 @@ inline void SceneEntityProto::set_allocated_bounding_box(::e8::AABB* bounding_bo
   // @@protoc_insertion_point(field_set_allocated:e8.SceneEntityProto.bounding_box)
 }
 
-// string geometry_id = 7;
+// int64 geometry_id = 7;
 inline void SceneEntityProto::clear_geometry_id() {
-  geometry_id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  geometry_id_ = PROTOBUF_LONGLONG(0);
 }
-inline const std::string& SceneEntityProto::geometry_id() const {
+inline ::PROTOBUF_NAMESPACE_ID::int64 SceneEntityProto::_internal_geometry_id() const {
+  return geometry_id_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int64 SceneEntityProto::geometry_id() const {
   // @@protoc_insertion_point(field_get:e8.SceneEntityProto.geometry_id)
   return _internal_geometry_id();
 }
-inline void SceneEntityProto::set_geometry_id(const std::string& value) {
+inline void SceneEntityProto::_internal_set_geometry_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
+  
+  geometry_id_ = value;
+}
+inline void SceneEntityProto::set_geometry_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
   _internal_set_geometry_id(value);
   // @@protoc_insertion_point(field_set:e8.SceneEntityProto.geometry_id)
 }
-inline std::string* SceneEntityProto::mutable_geometry_id() {
-  // @@protoc_insertion_point(field_mutable:e8.SceneEntityProto.geometry_id)
-  return _internal_mutable_geometry_id();
-}
-inline const std::string& SceneEntityProto::_internal_geometry_id() const {
-  return geometry_id_.Get();
-}
-inline void SceneEntityProto::_internal_set_geometry_id(const std::string& value) {
-  
-  geometry_id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
-}
-inline void SceneEntityProto::set_geometry_id(std::string&& value) {
-  
-  geometry_id_.Set(
-    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
-  // @@protoc_insertion_point(field_set_rvalue:e8.SceneEntityProto.geometry_id)
-}
-inline void SceneEntityProto::set_geometry_id(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  geometry_id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
-              GetArena());
-  // @@protoc_insertion_point(field_set_char:e8.SceneEntityProto.geometry_id)
-}
-inline void SceneEntityProto::set_geometry_id(const char* value,
-    size_t size) {
-  
-  geometry_id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
-      reinterpret_cast<const char*>(value), size), GetArena());
-  // @@protoc_insertion_point(field_set_pointer:e8.SceneEntityProto.geometry_id)
-}
-inline std::string* SceneEntityProto::_internal_mutable_geometry_id() {
-  
-  return geometry_id_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline std::string* SceneEntityProto::release_geometry_id() {
-  // @@protoc_insertion_point(field_release:e8.SceneEntityProto.geometry_id)
-  return geometry_id_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline void SceneEntityProto::set_allocated_geometry_id(std::string* geometry_id) {
-  if (geometry_id != nullptr) {
-    
-  } else {
-    
-  }
-  geometry_id_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), geometry_id,
-      GetArena());
-  // @@protoc_insertion_point(field_set_allocated:e8.SceneEntityProto.geometry_id)
-}
-inline std::string* SceneEntityProto::unsafe_arena_release_geometry_id() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:e8.SceneEntityProto.geometry_id)
-  GOOGLE_DCHECK(GetArena() != nullptr);
-  
-  return geometry_id_.UnsafeArenaRelease(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      GetArena());
-}
-inline void SceneEntityProto::unsafe_arena_set_allocated_geometry_id(
-    std::string* geometry_id) {
-  GOOGLE_DCHECK(GetArena() != nullptr);
-  if (geometry_id != nullptr) {
-    
-  } else {
-    
-  }
-  geometry_id_.UnsafeArenaSetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      geometry_id, GetArena());
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneEntityProto.geometry_id)
-}
 
-// string physical_shape_id = 8;
+// int64 physical_shape_id = 8;
 inline void SceneEntityProto::clear_physical_shape_id() {
-  physical_shape_id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  physical_shape_id_ = PROTOBUF_LONGLONG(0);
 }
-inline const std::string& SceneEntityProto::physical_shape_id() const {
+inline ::PROTOBUF_NAMESPACE_ID::int64 SceneEntityProto::_internal_physical_shape_id() const {
+  return physical_shape_id_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int64 SceneEntityProto::physical_shape_id() const {
   // @@protoc_insertion_point(field_get:e8.SceneEntityProto.physical_shape_id)
   return _internal_physical_shape_id();
 }
-inline void SceneEntityProto::set_physical_shape_id(const std::string& value) {
+inline void SceneEntityProto::_internal_set_physical_shape_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
+  
+  physical_shape_id_ = value;
+}
+inline void SceneEntityProto::set_physical_shape_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
   _internal_set_physical_shape_id(value);
   // @@protoc_insertion_point(field_set:e8.SceneEntityProto.physical_shape_id)
-}
-inline std::string* SceneEntityProto::mutable_physical_shape_id() {
-  // @@protoc_insertion_point(field_mutable:e8.SceneEntityProto.physical_shape_id)
-  return _internal_mutable_physical_shape_id();
-}
-inline const std::string& SceneEntityProto::_internal_physical_shape_id() const {
-  return physical_shape_id_.Get();
-}
-inline void SceneEntityProto::_internal_set_physical_shape_id(const std::string& value) {
-  
-  physical_shape_id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
-}
-inline void SceneEntityProto::set_physical_shape_id(std::string&& value) {
-  
-  physical_shape_id_.Set(
-    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
-  // @@protoc_insertion_point(field_set_rvalue:e8.SceneEntityProto.physical_shape_id)
-}
-inline void SceneEntityProto::set_physical_shape_id(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  physical_shape_id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
-              GetArena());
-  // @@protoc_insertion_point(field_set_char:e8.SceneEntityProto.physical_shape_id)
-}
-inline void SceneEntityProto::set_physical_shape_id(const char* value,
-    size_t size) {
-  
-  physical_shape_id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
-      reinterpret_cast<const char*>(value), size), GetArena());
-  // @@protoc_insertion_point(field_set_pointer:e8.SceneEntityProto.physical_shape_id)
-}
-inline std::string* SceneEntityProto::_internal_mutable_physical_shape_id() {
-  
-  return physical_shape_id_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline std::string* SceneEntityProto::release_physical_shape_id() {
-  // @@protoc_insertion_point(field_release:e8.SceneEntityProto.physical_shape_id)
-  return physical_shape_id_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline void SceneEntityProto::set_allocated_physical_shape_id(std::string* physical_shape_id) {
-  if (physical_shape_id != nullptr) {
-    
-  } else {
-    
-  }
-  physical_shape_id_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), physical_shape_id,
-      GetArena());
-  // @@protoc_insertion_point(field_set_allocated:e8.SceneEntityProto.physical_shape_id)
-}
-inline std::string* SceneEntityProto::unsafe_arena_release_physical_shape_id() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:e8.SceneEntityProto.physical_shape_id)
-  GOOGLE_DCHECK(GetArena() != nullptr);
-  
-  return physical_shape_id_.UnsafeArenaRelease(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      GetArena());
-}
-inline void SceneEntityProto::unsafe_arena_set_allocated_physical_shape_id(
-    std::string* physical_shape_id) {
-  GOOGLE_DCHECK(GetArena() != nullptr);
-  if (physical_shape_id != nullptr) {
-    
-  } else {
-    
-  }
-  physical_shape_id_.UnsafeArenaSetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      physical_shape_id, GetArena());
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneEntityProto.physical_shape_id)
 }
 
 #ifdef __GNUC__

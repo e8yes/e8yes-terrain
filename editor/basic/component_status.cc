@@ -31,8 +31,9 @@ namespace {
 
 constexpr char const *kEditorWindowSuffix = "e8 islands editor";
 
-QString SceneName(Scene const &scene) {
-    return QString::fromStdString(scene.name + '@' + scene.id.substr(0, 3));
+QString SceneName(Game *game) {
+    Scene const &scene = *game->GetGameData().scene;
+    return QString::fromStdString(scene.name + '@' + std::to_string(scene.id).substr(0, 3));
 }
 
 } // namespace
@@ -45,24 +46,26 @@ StatusComponent::StatusComponent(QMainWindow *editor_window, EditorContext *cont
 StatusComponent::~StatusComponent() {}
 
 void StatusComponent::Update() {
-    if (context_->scene == nullptr) {
+    if (context_->game == nullptr) {
         editor_window_->setWindowTitle(kEditorWindowSuffix);
         return;
     }
 
     if (modified_) {
-        editor_window_->setWindowTitle(SceneName(*context_->scene) + "* - " + kEditorWindowSuffix);
+        editor_window_->setWindowTitle(SceneName(context_->game.get()) + "* - " +
+                                       kEditorWindowSuffix);
     } else {
-        editor_window_->setWindowTitle(SceneName(*context_->scene) + " - " + kEditorWindowSuffix);
+        editor_window_->setWindowTitle(SceneName(context_->game.get()) + " - " +
+                                       kEditorWindowSuffix);
     }
 }
 
 void StatusComponent::OnChangeScene() { this->Update(); }
 
 void StatusComponent::SetModificationStatus(bool modified) {
-    if (context_->scene == nullptr) {
+    if (context_->game == nullptr) {
         BOOST_LOG_TRIVIAL(error) << "SetModificationStatus(): Setting modification status when "
-                                    "the scene has been closed.";
+                                    "the game has been closed.";
         return;
     }
 

@@ -15,26 +15,28 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_EDITOR_DISPLAY_WINDOW_H
-#define ISLANDS_EDITOR_DISPLAY_WINDOW_H
+#ifndef ISLANDS_RESOURCE_LOADER_GLTF_H
+#define ISLANDS_RESOURCE_LOADER_GLTF_H
 
-#include <memory>
+#include <string>
+#include <vector>
 
-#include "editor/basic/context.h"
+#include "common/device.h"
+#include "content/scene_object.h"
+#include "resource/accessor.h"
 
 namespace e8 {
 
 /**
- * @brief RunIslandsDisplay Creates and runs a display task for visual presentation of the editor's
- * current scene state. Note, this function blocks until quit_display is set to true.
+ * @brief LoadFromGltf Loads scene objects from a glTF file.
  *
- * @param editor_context The content source the display draws from and renders.
- * @param window_width The width of the display window.
- * @param window_height The height of the display window.
+ * @param gltf_file_path The file to be loaded.
+ * @param resource_accessor Where glTF resources will be imported.
+ * @return A list of root objects specified in the glTF file.
  */
-void RunIslandsDisplay(std::shared_ptr<EditorContext> editor_context, unsigned window_width,
-                       unsigned window_height);
+std::vector<SceneObject> LoadFromGltf(std::string const &gltf_file_path,
+                                      ResourceAccessor *resource_accessor);
 
 } // namespace e8
 
-#endif // ISLANDS_EDITOR_DISPLAY_WINDOW_H
+#endif // ISLANDS_RESOURCE_LOADER_GLTF_H

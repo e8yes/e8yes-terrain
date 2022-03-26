@@ -35,7 +35,6 @@
 #include <google/protobuf/unknown_field_set.h>
 #include "camera.pb.h"
 #include "procedural_object.pb.h"
-#include "renderer.pb.h"
 #include "scene_object.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
@@ -243,14 +242,12 @@ class SceneProto PROTOBUF_FINAL :
 
   enum : int {
     kBackgroundColorFieldNumber = 4,
+    kSceneObjectsFieldNumber = 6,
     kPreceduralObjectsFieldNumber = 7,
-    kIdFieldNumber = 1,
     kNameFieldNumber = 2,
     kCameraFieldNumber = 5,
-    kSceneObjectsFieldNumber = 6,
-    kRendererParamsFieldNumber = 9,
+    kIdFieldNumber = 1,
     kStructureTypeFieldNumber = 3,
-    kSelectedRendererFieldNumber = 8,
   };
   // repeated float background_color = 4;
   int background_color_size() const;
@@ -274,6 +271,24 @@ class SceneProto PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
       mutable_background_color();
 
+  // repeated .e8.SceneObjectProto scene_objects = 6;
+  int scene_objects_size() const;
+  private:
+  int _internal_scene_objects_size() const;
+  public:
+  void clear_scene_objects();
+  ::e8::SceneObjectProto* mutable_scene_objects(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneObjectProto >*
+      mutable_scene_objects();
+  private:
+  const ::e8::SceneObjectProto& _internal_scene_objects(int index) const;
+  ::e8::SceneObjectProto* _internal_add_scene_objects();
+  public:
+  const ::e8::SceneObjectProto& scene_objects(int index) const;
+  ::e8::SceneObjectProto* add_scene_objects();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneObjectProto >&
+      scene_objects() const;
+
   // repeated .e8.ProceduralObjectProto precedural_objects = 7;
   int precedural_objects_size() const;
   private:
@@ -291,31 +306,6 @@ class SceneProto PROTOBUF_FINAL :
   ::e8::ProceduralObjectProto* add_precedural_objects();
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::ProceduralObjectProto >&
       precedural_objects() const;
-
-  // string id = 1;
-  void clear_id();
-  const std::string& id() const;
-  void set_id(const std::string& value);
-  void set_id(std::string&& value);
-  void set_id(const char* value);
-  void set_id(const char* value, size_t size);
-  std::string* mutable_id();
-  std::string* release_id();
-  void set_allocated_id(std::string* id);
-  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
-  std::string* unsafe_arena_release_id();
-  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
-  void unsafe_arena_set_allocated_id(
-      std::string* id);
-  private:
-  const std::string& _internal_id() const;
-  void _internal_set_id(const std::string& value);
-  std::string* _internal_mutable_id();
-  public:
 
   // string name = 2;
   void clear_name();
@@ -360,41 +350,14 @@ class SceneProto PROTOBUF_FINAL :
       ::e8::Camera* camera);
   ::e8::Camera* unsafe_arena_release_camera();
 
-  // .e8.SceneObjectCollection scene_objects = 6;
-  bool has_scene_objects() const;
+  // int64 id = 1;
+  void clear_id();
+  ::PROTOBUF_NAMESPACE_ID::int64 id() const;
+  void set_id(::PROTOBUF_NAMESPACE_ID::int64 value);
   private:
-  bool _internal_has_scene_objects() const;
+  ::PROTOBUF_NAMESPACE_ID::int64 _internal_id() const;
+  void _internal_set_id(::PROTOBUF_NAMESPACE_ID::int64 value);
   public:
-  void clear_scene_objects();
-  const ::e8::SceneObjectCollection& scene_objects() const;
-  ::e8::SceneObjectCollection* release_scene_objects();
-  ::e8::SceneObjectCollection* mutable_scene_objects();
-  void set_allocated_scene_objects(::e8::SceneObjectCollection* scene_objects);
-  private:
-  const ::e8::SceneObjectCollection& _internal_scene_objects() const;
-  ::e8::SceneObjectCollection* _internal_mutable_scene_objects();
-  public:
-  void unsafe_arena_set_allocated_scene_objects(
-      ::e8::SceneObjectCollection* scene_objects);
-  ::e8::SceneObjectCollection* unsafe_arena_release_scene_objects();
-
-  // .e8.RendererParameters renderer_params = 9;
-  bool has_renderer_params() const;
-  private:
-  bool _internal_has_renderer_params() const;
-  public:
-  void clear_renderer_params();
-  const ::e8::RendererParameters& renderer_params() const;
-  ::e8::RendererParameters* release_renderer_params();
-  ::e8::RendererParameters* mutable_renderer_params();
-  void set_allocated_renderer_params(::e8::RendererParameters* renderer_params);
-  private:
-  const ::e8::RendererParameters& _internal_renderer_params() const;
-  ::e8::RendererParameters* _internal_mutable_renderer_params();
-  public:
-  void unsafe_arena_set_allocated_renderer_params(
-      ::e8::RendererParameters* renderer_params);
-  ::e8::RendererParameters* unsafe_arena_release_renderer_params();
 
   // .e8.SceneProto.StructureType structure_type = 3;
   void clear_structure_type();
@@ -403,15 +366,6 @@ class SceneProto PROTOBUF_FINAL :
   private:
   ::e8::SceneProto_StructureType _internal_structure_type() const;
   void _internal_set_structure_type(::e8::SceneProto_StructureType value);
-  public:
-
-  // .e8.RendererType selected_renderer = 8;
-  void clear_selected_renderer();
-  ::e8::RendererType selected_renderer() const;
-  void set_selected_renderer(::e8::RendererType value);
-  private:
-  ::e8::RendererType _internal_selected_renderer() const;
-  void _internal_set_selected_renderer(::e8::RendererType value);
   public:
 
   // @@protoc_insertion_point(class_scope:e8.SceneProto)
@@ -423,14 +377,12 @@ class SceneProto PROTOBUF_FINAL :
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > background_color_;
   mutable std::atomic<int> _background_color_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneObjectProto > scene_objects_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::ProceduralObjectProto > precedural_objects_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr id_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
   ::e8::Camera* camera_;
-  ::e8::SceneObjectCollection* scene_objects_;
-  ::e8::RendererParameters* renderer_params_;
+  ::PROTOBUF_NAMESPACE_ID::int64 id_;
   int structure_type_;
-  int selected_renderer_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_scene_2eproto;
 };
@@ -445,85 +397,24 @@ class SceneProto PROTOBUF_FINAL :
 #endif  // __GNUC__
 // SceneProto
 
-// string id = 1;
+// int64 id = 1;
 inline void SceneProto::clear_id() {
-  id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  id_ = PROTOBUF_LONGLONG(0);
 }
-inline const std::string& SceneProto::id() const {
+inline ::PROTOBUF_NAMESPACE_ID::int64 SceneProto::_internal_id() const {
+  return id_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int64 SceneProto::id() const {
   // @@protoc_insertion_point(field_get:e8.SceneProto.id)
   return _internal_id();
 }
-inline void SceneProto::set_id(const std::string& value) {
+inline void SceneProto::_internal_set_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
+  
+  id_ = value;
+}
+inline void SceneProto::set_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
   _internal_set_id(value);
   // @@protoc_insertion_point(field_set:e8.SceneProto.id)
-}
-inline std::string* SceneProto::mutable_id() {
-  // @@protoc_insertion_point(field_mutable:e8.SceneProto.id)
-  return _internal_mutable_id();
-}
-inline const std::string& SceneProto::_internal_id() const {
-  return id_.Get();
-}
-inline void SceneProto::_internal_set_id(const std::string& value) {
-  
-  id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
-}
-inline void SceneProto::set_id(std::string&& value) {
-  
-  id_.Set(
-    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
-  // @@protoc_insertion_point(field_set_rvalue:e8.SceneProto.id)
-}
-inline void SceneProto::set_id(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
-              GetArena());
-  // @@protoc_insertion_point(field_set_char:e8.SceneProto.id)
-}
-inline void SceneProto::set_id(const char* value,
-    size_t size) {
-  
-  id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
-      reinterpret_cast<const char*>(value), size), GetArena());
-  // @@protoc_insertion_point(field_set_pointer:e8.SceneProto.id)
-}
-inline std::string* SceneProto::_internal_mutable_id() {
-  
-  return id_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline std::string* SceneProto::release_id() {
-  // @@protoc_insertion_point(field_release:e8.SceneProto.id)
-  return id_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline void SceneProto::set_allocated_id(std::string* id) {
-  if (id != nullptr) {
-    
-  } else {
-    
-  }
-  id_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), id,
-      GetArena());
-  // @@protoc_insertion_point(field_set_allocated:e8.SceneProto.id)
-}
-inline std::string* SceneProto::unsafe_arena_release_id() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:e8.SceneProto.id)
-  GOOGLE_DCHECK(GetArena() != nullptr);
-  
-  return id_.UnsafeArenaRelease(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      GetArena());
-}
-inline void SceneProto::unsafe_arena_set_allocated_id(
-    std::string* id) {
-  GOOGLE_DCHECK(GetArena() != nullptr);
-  if (id != nullptr) {
-    
-  } else {
-    
-  }
-  id_.UnsafeArenaSetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      id, GetArena());
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneProto.id)
 }
 
 // string name = 2;
@@ -749,79 +640,40 @@ inline void SceneProto::set_allocated_camera(::e8::Camera* camera) {
   // @@protoc_insertion_point(field_set_allocated:e8.SceneProto.camera)
 }
 
-// .e8.SceneObjectCollection scene_objects = 6;
-inline bool SceneProto::_internal_has_scene_objects() const {
-  return this != internal_default_instance() && scene_objects_ != nullptr;
+// repeated .e8.SceneObjectProto scene_objects = 6;
+inline int SceneProto::_internal_scene_objects_size() const {
+  return scene_objects_.size();
 }
-inline bool SceneProto::has_scene_objects() const {
-  return _internal_has_scene_objects();
+inline int SceneProto::scene_objects_size() const {
+  return _internal_scene_objects_size();
 }
-inline const ::e8::SceneObjectCollection& SceneProto::_internal_scene_objects() const {
-  const ::e8::SceneObjectCollection* p = scene_objects_;
-  return p != nullptr ? *p : *reinterpret_cast<const ::e8::SceneObjectCollection*>(
-      &::e8::_SceneObjectCollection_default_instance_);
-}
-inline const ::e8::SceneObjectCollection& SceneProto::scene_objects() const {
-  // @@protoc_insertion_point(field_get:e8.SceneProto.scene_objects)
-  return _internal_scene_objects();
-}
-inline void SceneProto::unsafe_arena_set_allocated_scene_objects(
-    ::e8::SceneObjectCollection* scene_objects) {
-  if (GetArena() == nullptr) {
-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(scene_objects_);
-  }
-  scene_objects_ = scene_objects;
-  if (scene_objects) {
-    
-  } else {
-    
-  }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneProto.scene_objects)
-}
-inline ::e8::SceneObjectCollection* SceneProto::release_scene_objects() {
-  auto temp = unsafe_arena_release_scene_objects();
-  if (GetArena() != nullptr) {
-    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
-  }
-  return temp;
-}
-inline ::e8::SceneObjectCollection* SceneProto::unsafe_arena_release_scene_objects() {
-  // @@protoc_insertion_point(field_release:e8.SceneProto.scene_objects)
-  
-  ::e8::SceneObjectCollection* temp = scene_objects_;
-  scene_objects_ = nullptr;
-  return temp;
-}
-inline ::e8::SceneObjectCollection* SceneProto::_internal_mutable_scene_objects() {
-  
-  if (scene_objects_ == nullptr) {
-    auto* p = CreateMaybeMessage<::e8::SceneObjectCollection>(GetArena());
-    scene_objects_ = p;
-  }
-  return scene_objects_;
-}
-inline ::e8::SceneObjectCollection* SceneProto::mutable_scene_objects() {
+inline ::e8::SceneObjectProto* SceneProto::mutable_scene_objects(int index) {
   // @@protoc_insertion_point(field_mutable:e8.SceneProto.scene_objects)
-  return _internal_mutable_scene_objects();
+  return scene_objects_.Mutable(index);
 }
-inline void SceneProto::set_allocated_scene_objects(::e8::SceneObjectCollection* scene_objects) {
-  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
-  if (message_arena == nullptr) {
-    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(scene_objects_);
-  }
-  if (scene_objects) {
-    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
-      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(scene_objects)->GetArena();
-    if (message_arena != submessage_arena) {
-      scene_objects = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
-          message_arena, scene_objects, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  scene_objects_ = scene_objects;
-  // @@protoc_insertion_point(field_set_allocated:e8.SceneProto.scene_objects)
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneObjectProto >*
+SceneProto::mutable_scene_objects() {
+  // @@protoc_insertion_point(field_mutable_list:e8.SceneProto.scene_objects)
+  return &scene_objects_;
+}
+inline const ::e8::SceneObjectProto& SceneProto::_internal_scene_objects(int index) const {
+  return scene_objects_.Get(index);
+}
+inline const ::e8::SceneObjectProto& SceneProto::scene_objects(int index) const {
+  // @@protoc_insertion_point(field_get:e8.SceneProto.scene_objects)
+  return _internal_scene_objects(index);
+}
+inline ::e8::SceneObjectProto* SceneProto::_internal_add_scene_objects() {
+  return scene_objects_.Add();
+}
+inline ::e8::SceneObjectProto* SceneProto::add_scene_objects() {
+  // @@protoc_insertion_point(field_add:e8.SceneProto.scene_objects)
+  return _internal_add_scene_objects();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneObjectProto >&
+SceneProto::scene_objects() const {
+  // @@protoc_insertion_point(field_list:e8.SceneProto.scene_objects)
+  return scene_objects_;
 }
 
 // repeated .e8.ProceduralObjectProto precedural_objects = 7;
@@ -858,101 +710,6 @@ inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::ProceduralObjectPr
 SceneProto::precedural_objects() const {
   // @@protoc_insertion_point(field_list:e8.SceneProto.precedural_objects)
   return precedural_objects_;
-}
-
-// .e8.RendererType selected_renderer = 8;
-inline void SceneProto::clear_selected_renderer() {
-  selected_renderer_ = 0;
-}
-inline ::e8::RendererType SceneProto::_internal_selected_renderer() const {
-  return static_cast< ::e8::RendererType >(selected_renderer_);
-}
-inline ::e8::RendererType SceneProto::selected_renderer() const {
-  // @@protoc_insertion_point(field_get:e8.SceneProto.selected_renderer)
-  return _internal_selected_renderer();
-}
-inline void SceneProto::_internal_set_selected_renderer(::e8::RendererType value) {
-  
-  selected_renderer_ = value;
-}
-inline void SceneProto::set_selected_renderer(::e8::RendererType value) {
-  _internal_set_selected_renderer(value);
-  // @@protoc_insertion_point(field_set:e8.SceneProto.selected_renderer)
-}
-
-// .e8.RendererParameters renderer_params = 9;
-inline bool SceneProto::_internal_has_renderer_params() const {
-  return this != internal_default_instance() && renderer_params_ != nullptr;
-}
-inline bool SceneProto::has_renderer_params() const {
-  return _internal_has_renderer_params();
-}
-inline const ::e8::RendererParameters& SceneProto::_internal_renderer_params() const {
-  const ::e8::RendererParameters* p = renderer_params_;
-  return p != nullptr ? *p : *reinterpret_cast<const ::e8::RendererParameters*>(
-      &::e8::_RendererParameters_default_instance_);
-}
-inline const ::e8::RendererParameters& SceneProto::renderer_params() const {
-  // @@protoc_insertion_point(field_get:e8.SceneProto.renderer_params)
-  return _internal_renderer_params();
-}
-inline void SceneProto::unsafe_arena_set_allocated_renderer_params(
-    ::e8::RendererParameters* renderer_params) {
-  if (GetArena() == nullptr) {
-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(renderer_params_);
-  }
-  renderer_params_ = renderer_params;
-  if (renderer_params) {
-    
-  } else {
-    
-  }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneProto.renderer_params)
-}
-inline ::e8::RendererParameters* SceneProto::release_renderer_params() {
-  auto temp = unsafe_arena_release_renderer_params();
-  if (GetArena() != nullptr) {
-    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
-  }
-  return temp;
-}
-inline ::e8::RendererParameters* SceneProto::unsafe_arena_release_renderer_params() {
-  // @@protoc_insertion_point(field_release:e8.SceneProto.renderer_params)
-  
-  ::e8::RendererParameters* temp = renderer_params_;
-  renderer_params_ = nullptr;
-  return temp;
-}
-inline ::e8::RendererParameters* SceneProto::_internal_mutable_renderer_params() {
-  
-  if (renderer_params_ == nullptr) {
-    auto* p = CreateMaybeMessage<::e8::RendererParameters>(GetArena());
-    renderer_params_ = p;
-  }
-  return renderer_params_;
-}
-inline ::e8::RendererParameters* SceneProto::mutable_renderer_params() {
-  // @@protoc_insertion_point(field_mutable:e8.SceneProto.renderer_params)
-  return _internal_mutable_renderer_params();
-}
-inline void SceneProto::set_allocated_renderer_params(::e8::RendererParameters* renderer_params) {
-  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
-  if (message_arena == nullptr) {
-    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(renderer_params_);
-  }
-  if (renderer_params) {
-    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
-      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(renderer_params)->GetArena();
-    if (message_arena != submessage_arena) {
-      renderer_params = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
-          message_arena, renderer_params, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  renderer_params_ = renderer_params;
-  // @@protoc_insertion_point(field_set_allocated:e8.SceneProto.renderer_params)
 }
 
 #ifdef __GNUC__

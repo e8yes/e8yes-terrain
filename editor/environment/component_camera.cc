@@ -26,7 +26,9 @@
 #include "content/scene.h"
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/context.h"
+#include "editor/basic/editor_storyline.h"
 #include "editor/environment/component_camera.h"
+#include "game/game.h"
 
 namespace e8 {
 namespace {
@@ -105,47 +107,6 @@ void SetSceneCamera(QLineEdit *pos_x, QLineEdit *pos_y, QLineEdit *pos_z, QLineE
     }
 }
 
-enum MoveDirection {
-    FORWARD,
-    BACKWARD,
-    LEFT,
-    RIGHT,
-};
-
-void MoveSceneCamera(MoveDirection direction, Scene *scene) {
-    Scene::WriteAccess write_access = scene->GainWriteAccess();
-
-    Camera::Basis basis = scene->camera.basis();
-    vec3 camera_position = ToVec3(scene->camera.position());
-
-    switch (direction) {
-    case FORWARD: {
-        camera_position = camera_position - 0.1f * ToVec3(basis.back());
-        break;
-    }
-    case BACKWARD: {
-        camera_position = camera_position + 0.1f * ToVec3(basis.back());
-        break;
-    }
-    case LEFT: {
-        camera_position = camera_position - 0.1f * ToVec3(basis.right());
-        break;
-    }
-    case RIGHT: {
-        camera_position = camera_position + 0.1f * ToVec3(basis.right());
-        break;
-    }
-    }
-
-    *scene->camera.mutable_position() = ToProto(camera_position);
-}
-
-void RotateSceneCamera(float dx, float dy, Scene *scene) {
-    Scene::WriteAccess write_access = scene->GainWriteAccess();
-    CameraRotateBasis(/*roll=*/0, dy * 50, -dx * 50, &scene->camera);
-    CameraEnsureLeveling(&scene->camera);
-}
-
 } // namespace
 
 CameraComponent::CameraComponent(ModificationMonitorComponent *modification_monitor_comp,
@@ -190,27 +151,28 @@ CameraComponent::CameraComponent(ModificationMonitorComponent *modification_moni
     QObject::connect(context_->ui->camera_image_width_edit, &QLineEdit::textChanged, this,
                      &CameraComponent::OnChangeCameraParameters);
 
-    QObject::connect(context_->display_window_event_source.get(),
-                     &DisplayWindowEventSource::WasdKeysTriggered, this,
-                     &CameraComponent::OnMoveCamera, Qt::ConnectionType::QueuedConnection);
-    QObject::connect(context_->display_window_event_source.get(),
-                     &DisplayWindowEventSource::MouseDragged, this,
-                     &CameraComponent::OnRotateCamera, Qt::ConnectionType::QueuedConnection);
+    EditorInteractionComponent *interaction_component = static_cast<EditorInteractionComponent *>(
+        context_->editor_storyline->FindComponent(kEditorComponent));
+
+    QObject::connect(&interaction_component->CameraControlTask()->transmitter,
+                     &EditorCameraEventTransmitter::ValueChanged, this,
+                     &CameraComponent::OnChangeCameraParametersFromGame,
+                     Qt::ConnectionType::QueuedConnection);
 }
 
 CameraComponent::~CameraComponent() {}
 
 void CameraComponent::OnChangeScene() {
     SetCameraWidgets(
-        context_->scene.get(), context_->ui->camera_pos_x_edit, context_->ui->camera_pos_y_edit,
-        context_->ui->camera_pos_z_edit, context_->ui->camera_basis_right_x_edit,
-        context_->ui->camera_basis_right_y_edit, context_->ui->camera_basis_right_z_edit,
-        context_->ui->camera_basis_down_x_edit, context_->ui->camera_basis_down_y_edit,
-        context_->ui->camera_basis_down_z_edit, context_->ui->camera_basis_back_x_edit,
-        context_->ui->camera_basis_back_y_edit, context_->ui->camera_basis_back_z_edit,
-        context_->ui->camera_focal_len_edit, context_->ui->camera_sensor_width_edit,
-        context_->ui->camera_sensor_height_edit, context_->ui->camera_max_dist_edit,
-        context_->ui->camera_image_width_edit);
+        context_->game->GetGameData().scene, context_->ui->camera_pos_x_edit,
+        context_->ui->camera_pos_y_edit, context_->ui->camera_pos_z_edit,
+        context_->ui->camera_basis_right_x_edit, context_->ui->camera_basis_right_y_edit,
+        context_->ui->camera_basis_right_z_edit, context_->ui->camera_basis_down_x_edit,
+        context_->ui->camera_basis_down_y_edit, context_->ui->camera_basis_down_z_edit,
+        context_->ui->camera_basis_back_x_edit, context_->ui->camera_basis_back_y_edit,
+        context_->ui->camera_basis_back_z_edit, context_->ui->camera_focal_len_edit,
+        context_->ui->camera_sensor_width_edit, context_->ui->camera_sensor_height_edit,
+        context_->ui->camera_max_dist_edit, context_->ui->camera_image_width_edit);
 }
 
 void CameraComponent::OnChangeCameraParameters() {
@@ -222,46 +184,14 @@ void CameraComponent::OnChangeCameraParameters() {
                    context_->ui->camera_basis_back_y_edit, context_->ui->camera_basis_back_z_edit,
                    context_->ui->camera_focal_len_edit, context_->ui->camera_sensor_width_edit,
                    context_->ui->camera_sensor_height_edit, context_->ui->camera_max_dist_edit,
-                   context_->ui->camera_image_width_edit, context_->scene.get());
+                   context_->ui->camera_image_width_edit, context_->game->GetGameData().scene);
 
     modification_monitor_comp_->OnModifyScene();
 }
 
-void CameraComponent::OnMoveCamera(char key_pressed) {
-    if (context_->scene == nullptr) {
-        return;
-    }
-
-    switch (key_pressed) {
-    case 'w': {
-        MoveSceneCamera(MoveDirection::FORWARD, context_->scene.get());
-        break;
-    }
-    case 'a': {
-        MoveSceneCamera(MoveDirection::LEFT, context_->scene.get());
-        break;
-    }
-    case 's': {
-        MoveSceneCamera(MoveDirection::BACKWARD, context_->scene.get());
-        break;
-    }
-    case 'd': {
-        MoveSceneCamera(MoveDirection::RIGHT, context_->scene.get());
-        break;
-    }
-    }
-
+void CameraComponent::OnChangeCameraParametersFromGame() {
     this->OnChangeScene();
-}
-
-void CameraComponent::OnRotateCamera(float dx, float dy) {
-    if (context_->scene == nullptr) {
-        return;
-    }
-
-    RotateSceneCamera(dx, dy, context_->scene.get());
-
-    this->OnChangeScene();
+    modification_monitor_comp_->OnModifyScene();
 }
 
 } // namespace e8

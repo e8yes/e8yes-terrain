@@ -45,14 +45,12 @@ class IslandsEditorWindow : public QMainWindow {
     Q_OBJECT
 
   public:
-    IslandsEditorWindow(std::shared_ptr<EditorContext> const &editor_context,
-                        QWidget *parent = nullptr);
+    IslandsEditorWindow(EditorContext *editor_context, QWidget *parent = nullptr);
     ~IslandsEditorWindow();
 
     void closeEvent(QCloseEvent *) override;
 
   private:
-    std::shared_ptr<EditorContext> editor_context_;
     std::unique_ptr<StatusComponent> status_comp_;
     std::unique_ptr<ModificationMonitorComponent> modification_monitor_comp_;
     std::unique_ptr<EditorPortalSwitcherComponent> editor_portal_switcher_comp_;
@@ -67,10 +65,10 @@ class IslandsEditorWindow : public QMainWindow {
 };
 
 /**
- * @brief RunIslandsEditorWindow Runs the editor window. This function blocks until the editor
+ * @brief RunEditor Runs the editor window. This function blocks until the editor
  * window is closed.
  */
-void RunIslandsEditorWindow(std::shared_ptr<EditorContext> editor_context, int argc, char *argv[]);
+int RunEditor(int argc, char *argv[]);
 
 } // namespace e8
 

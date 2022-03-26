@@ -37,36 +37,33 @@
 
 namespace e8 {
 
-IslandsEditorWindow::IslandsEditorWindow(std::shared_ptr<EditorContext> const &editor_context,
-                                         QWidget *parent)
-    : QMainWindow(parent), editor_context_(editor_context) {
-    editor_context_->ui->setupUi(this);
+IslandsEditorWindow::IslandsEditorWindow(EditorContext *editor_context, QWidget *parent)
+    : QMainWindow(parent) {
+    editor_context->ui->setupUi(this);
 
-    status_comp_ = std::make_unique<StatusComponent>(this, editor_context.get());
+    status_comp_ = std::make_unique<StatusComponent>(this, editor_context);
     modification_monitor_comp_ =
-        std::make_unique<ModificationMonitorComponent>(status_comp_.get(), editor_context.get());
-    editor_portal_switcher_comp_ =
-        std::make_unique<EditorPortalSwitcherComponent>(editor_context.get());
+        std::make_unique<ModificationMonitorComponent>(status_comp_.get(), editor_context);
+    editor_portal_switcher_comp_ = std::make_unique<EditorPortalSwitcherComponent>(editor_context);
     ambient_comp_ =
-        std::make_unique<AmbientComponent>(modification_monitor_comp_.get(), editor_context.get());
+        std::make_unique<AmbientComponent>(modification_monitor_comp_.get(), editor_context);
     camera_comp_ =
-        std::make_unique<CameraComponent>(modification_monitor_comp_.get(), editor_context.get());
-    scene_view_comp_ = std::make_unique<SceneViewComponent>(editor_context.get());
+        std::make_unique<CameraComponent>(modification_monitor_comp_.get(), editor_context);
+    scene_view_comp_ = std::make_unique<SceneViewComponent>(editor_context);
     scene_saver_comp_ = std::make_unique<SceneSaverComponent>(
-        modification_monitor_comp_.get(), scene_view_comp_.get(), editor_context.get());
+        modification_monitor_comp_.get(), scene_view_comp_.get(), editor_context);
     scene_closer_comp_ = std::make_unique<SceneCloserComponent>(
         editor_portal_switcher_comp_.get(), modification_monitor_comp_.get(),
-        scene_saver_comp_.get(), scene_view_comp_.get(), editor_context.get());
+        scene_saver_comp_.get(), scene_view_comp_.get(), editor_context);
     scene_loader_comp_ = std::make_unique<SceneLoaderComponent>(
         ambient_comp_.get(), camera_comp_.get(), editor_portal_switcher_comp_.get(),
-        modification_monitor_comp_.get(), scene_saver_comp_.get(), scene_view_comp_.get(),
-        editor_context.get());
+        modification_monitor_comp_.get(), scene_view_comp_.get(), editor_context);
     scene_object_gltf_comp_ = std::make_unique<SceneObjectGltfComponent>(
-        modification_monitor_comp_.get(), scene_view_comp_.get(), editor_context.get());
+        modification_monitor_comp_.get(), scene_view_comp_.get(), editor_context);
     procedural_plane_comp_ = std::make_unique<ProceduralPlaneComponent>(
-        modification_monitor_comp_.get(), scene_view_comp_.get(), editor_context.get());
+        modification_monitor_comp_.get(), scene_view_comp_.get(), editor_context);
 
-    QAction::connect(editor_context_->ui->action_exit, &QAction::triggered, this,
+    QAction::connect(editor_context->ui->action_exit, &QAction::triggered, this,
                      &IslandsEditorWindow::close);
 }
 
@@ -74,16 +71,17 @@ IslandsEditorWindow::~IslandsEditorWindow() {}
 
 void IslandsEditorWindow::closeEvent(QCloseEvent *) { scene_closer_comp_->OnClickCloseScene(); }
 
-void RunIslandsEditorWindow(std::shared_ptr<EditorContext> editor_context, int argc, char *argv[]) {
-    editor_context->Init(argc, argv);
+int RunEditor(int argc, char *argv[]) {
+    auto editor_context = std::make_unique<EditorContext>(argc, argv);
 
+    int ret_val;
     {
-        IslandsEditorWindow editor_window(editor_context);
+        IslandsEditorWindow editor_window(editor_context.get());
         editor_window.show();
-        editor_context->app->exec();
+        ret_val = editor_context->app->exec();
     }
 
-    editor_context->Shutdown();
+    return ret_val;
 }
 
 } // namespace e8

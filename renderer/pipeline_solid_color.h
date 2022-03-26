@@ -21,7 +21,7 @@
 #include <memory>
 
 #include "common/tensor.h"
-#include "renderer/context.h"
+#include "common/device.h"
 #include "renderer/pipeline_output.h"
 
 namespace e8 {

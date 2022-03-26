@@ -21,38 +21,39 @@
 #include <QMessageBox>
 #include <QObject>
 #include <boost/log/trivial.hpp>
+#include <filesystem>
 #include <fstream>
 #include <memory>
+#include <thread>
 
-#include "content/proto/scene.pb.h"
-#include "content/scene.h"
-#include "content/structure_linear.h"
 #include "editor/basic/component_editor_portal_switcher.h"
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/context.h"
 #include "editor/environment/component_ambient.h"
 #include "editor/environment/component_camera.h"
 #include "editor/scene/component_scene_loader.h"
-#include "editor/scene/component_scene_saver.h"
 #include "editor/scene/component_scene_view.h"
+#include "game/game.h"
 
 namespace e8 {
 namespace {
 
 constexpr char const *kDefaultSceneName = "Untitled";
 
-bool CreateNewScene(SceneProto::StructureType structure_type, AmbientComponent *ambient_comp,
-                    CameraComponent *camera_comp,
-                    EditorPortalSwitcherComponent *editor_portal_switcher_comp,
-                    ModificationMonitorComponent *modification_monitor_comp,
-                    SceneViewComponent *scene_view_comp, EditorContext *context) {
-    if (context->scene != nullptr) {
+bool CreateNewGame(SceneProto::StructureType structure_type, AmbientComponent *ambient_comp,
+                   CameraComponent *camera_comp,
+                   EditorPortalSwitcherComponent *editor_portal_switcher_comp,
+                   ModificationMonitorComponent *modification_monitor_comp,
+                   SceneViewComponent *scene_view_comp, EditorContext *context) {
+    if (context->game != nullptr) {
         BOOST_LOG_TRIVIAL(error)
-            << "CreateNewScene(): A non-null scene object is in the current editor context.";
+            << "CreateNewScene(): A non-null game is in the current editor context.";
         return false;
     }
 
-    context->scene = std::make_shared<Scene>(structure_type, kDefaultSceneName);
+    context->game = std::make_unique<Game>("/home/davis/sponza", structure_type, kDefaultSceneName);
+    context->game_thread = std::make_unique<std::thread>(RunEditorGame, context->game.get(),
+                                                         context->editor_storyline.get());
 
     editor_portal_switcher_comp->SetEditorPortalEnabled(/*enabled=*/true);
     ambient_comp->OnChangeScene();
@@ -63,33 +64,24 @@ bool CreateNewScene(SceneProto::StructureType structure_type, AmbientComponent *
     return true;
 }
 
-bool LoadScene(std::string const &scene_file, AmbientComponent *ambient_comp,
-               CameraComponent *camera_comp,
-               EditorPortalSwitcherComponent *editor_portal_switcher_comp,
-               ModificationMonitorComponent *modification_monitor_comp,
-               SceneSaverComponent *scene_saver_comp, SceneViewComponent *scene_view_comp,
-               EditorContext *context) {
-    std::fstream file(scene_file, std::ios::in | std::ios::binary);
-    if (!file.is_open()) {
-        BOOST_LOG_TRIVIAL(error) << "LoadScene(): Failed to open scene_file=[" << scene_file
-                                 << "].";
+bool LoadGame(std::filesystem::path const &game_path, AmbientComponent *ambient_comp,
+              CameraComponent *camera_comp,
+              EditorPortalSwitcherComponent *editor_portal_switcher_comp,
+              ModificationMonitorComponent *modification_monitor_comp,
+              SceneViewComponent *scene_view_comp, EditorContext *context) {
+    context->game = std::make_unique<Game>(game_path);
+    if (!context->game->Valid()) {
+        context->game = nullptr;
         return false;
     }
 
-    SceneProto proto;
-    if (!proto.ParseFromIstream(&file)) {
-        BOOST_LOG_TRIVIAL(error) << "LoadScene(): Failed to parse scene_file=[" << scene_file
-                                 << "].";
-        return false;
-    }
-
-    context->scene = std::make_shared<Scene>(proto);
+    context->game_thread = std::make_unique<std::thread>(RunEditorGame, context->game.get(),
+                                                         context->editor_storyline.get());
 
     editor_portal_switcher_comp->SetEditorPortalEnabled(/*enabled=*/true);
     ambient_comp->OnChangeScene();
     camera_comp->OnChangeScene();
     modification_monitor_comp->OnReset();
-    scene_saver_comp->OnChangeLoadPath(scene_file);
     scene_view_comp->OnChangeScene();
 
     return true;
@@ -100,12 +92,12 @@ bool LoadScene(std::string const &scene_file, AmbientComponent *ambient_comp,
 SceneLoaderComponent::SceneLoaderComponent(
     AmbientComponent *ambient_comp, CameraComponent *camera_comp,
     EditorPortalSwitcherComponent *editor_portal_switcher_comp,
-    ModificationMonitorComponent *modification_monitor_comp, SceneSaverComponent *scene_saver_comp,
-    SceneViewComponent *scene_view_comp, EditorContext *context)
+    ModificationMonitorComponent *modification_monitor_comp, SceneViewComponent *scene_view_comp,
+    EditorContext *context)
     : ambient_comp_(ambient_comp), camera_comp_(camera_comp),
       editor_portal_switcher_comp_(editor_portal_switcher_comp),
-      modification_monitor_comp_(modification_monitor_comp), scene_saver_comp_(scene_saver_comp),
-      scene_view_comp_(scene_view_comp), context_(context) {
+      modification_monitor_comp_(modification_monitor_comp), scene_view_comp_(scene_view_comp),
+      context_(context) {
     QAction::connect(context_->ui->action_new_scene_flat, &QAction::triggered, this,
                      &SceneLoaderComponent::OnClickNewSceneLinear);
     QAction::connect(context_->ui->action_new_scene_octree, &QAction::triggered, this,
@@ -117,14 +109,14 @@ SceneLoaderComponent::SceneLoaderComponent(
 SceneLoaderComponent::~SceneLoaderComponent() {}
 
 void SceneLoaderComponent::OnClickNewSceneLinear() {
-    if (context_->scene != nullptr) {
+    if (context_->game != nullptr) {
         BOOST_LOG_TRIVIAL(error) << "OnClickNewSceneLinear(): Invoked with an active scene.";
         return;
     }
 
-    if (!CreateNewScene(/*scene_type=*/SceneProto::LINEAR, ambient_comp_, camera_comp_,
-                        editor_portal_switcher_comp_, modification_monitor_comp_, scene_view_comp_,
-                        context_)) {
+    if (!CreateNewGame(/*scene_type=*/SceneProto::LINEAR, ambient_comp_, camera_comp_,
+                       editor_portal_switcher_comp_, modification_monitor_comp_, scene_view_comp_,
+                       context_)) {
         QMessageBox msg_box;
         msg_box.setText("Failed to Create Scene");
         msg_box.setInformativeText("Internal Error");
@@ -135,30 +127,29 @@ void SceneLoaderComponent::OnClickNewSceneLinear() {
 }
 
 void SceneLoaderComponent::OnClickNewSceneOctree() {
-    if (context_->scene != nullptr) {
+    if (context_->game != nullptr) {
         BOOST_LOG_TRIVIAL(error) << "OnClickNewSceneOctree(): Invoked with an active scene.";
         return;
     }
 
-    if (!CreateNewScene(/*scene_type=*/SceneProto::OCTREE, ambient_comp_, camera_comp_,
-                        editor_portal_switcher_comp_, modification_monitor_comp_, scene_view_comp_,
-                        context_)) {
+    if (!CreateNewGame(/*scene_type=*/SceneProto::OCTREE, ambient_comp_, camera_comp_,
+                       editor_portal_switcher_comp_, modification_monitor_comp_, scene_view_comp_,
+                       context_)) {
     }
 }
 
 void SceneLoaderComponent::OnClickOpenScene() {
-    if (context_->scene != nullptr) {
+    if (context_->game != nullptr) {
         BOOST_LOG_TRIVIAL(error) << "OnClickOpenScene(): Invoked with an active scene.";
         return;
     }
 
-    QString scene_file = QFileDialog::getOpenFileName(
-        /*parent=*/nullptr, /*caption=*/tr("Open Scene"), QDir::homePath(),
-        /*filter=*/tr("e8 islands scene (*.pb)"));
+    QString base_path = QFileDialog::getExistingDirectory(
+        /*parent=*/nullptr, /*caption=*/tr("Open Game"), QDir::homePath());
 
-    if (!LoadScene(scene_file.toStdString(), ambient_comp_, camera_comp_,
-                   editor_portal_switcher_comp_, modification_monitor_comp_, scene_saver_comp_,
-                   scene_view_comp_, context_)) {
+    if (!LoadGame(base_path.toStdString(), ambient_comp_, camera_comp_,
+                  editor_portal_switcher_comp_, modification_monitor_comp_, scene_view_comp_,
+                  context_)) {
         QMessageBox msg_box;
         msg_box.setText("Failed to Load Scene");
         msg_box.setStandardButtons(QMessageBox::Ok);

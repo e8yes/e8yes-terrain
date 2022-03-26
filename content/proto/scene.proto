@@ -21,7 +21,6 @@ package e8;
 
 import "camera.proto";
 import "procedural_object.proto";
-import "renderer.proto";
 import "scene_object.proto";
 
 /**
@@ -42,7 +41,7 @@ message SceneProto {
     }
 
     // Id of the scene.
-    string id = 1;
+    int64 id = 1;
 
     // A descriptive human readable name of the scene.
     string name = 2;
@@ -57,14 +56,8 @@ message SceneProto {
     Camera camera = 5;
 
     // A collection of all scene objects.
-    SceneObjectCollection scene_objects = 6;
+    repeated SceneObjectProto scene_objects = 6;
 
     // A collection of all procedural objects.
     repeated ProceduralObjectProto precedural_objects = 7;
-
-    // The currently selected renderer.
-    RendererType selected_renderer = 8;
-
-    // Parameters for each type of renderer.
-    RendererParameters renderer_params = 9;
 }

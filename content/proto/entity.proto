@@ -19,7 +19,8 @@ syntax = "proto3";
 
 package e8;
 
-import "primitive.proto";
+import "bbox.proto";
+import "transform.proto";
 
 /**
  * @brief The SceneEntityProto message This is a serializable version of the SceneEntity structure.
@@ -32,7 +33,7 @@ import "primitive.proto";
  */
 message SceneEntityProto {
     // ID of this scene entity.
-    string id = 1;
+    int64 id = 1;
 
     // Human readable name of this scene entity.
     string name = 2;
@@ -53,8 +54,8 @@ message SceneEntityProto {
     // A geometry instance with information derived from a GeometryLod. A shared pointer allows a
     // large number of same drawables to be placed at different location of the scene with shared
     // information.
-    string geometry_id = 7;
+    int64 geometry_id = 7;
 
     // Like above, A physical shape instance with information derived from a physical shape.
-    string physical_shape_id = 8;
+    int64 physical_shape_id = 8;
 }

@@ -19,20 +19,22 @@
 #define ISLANDS_RENDERER_H
 
 #include <chrono>
+#include <filesystem>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_map>
 
-#include "content/proto/renderer.pb.h"
+#include "common/device.h"
 #include "content/scene.h"
-#include "renderer/context.h"
 #include "renderer/pipeline_output.h"
+#include "renderer/proto/renderer.pb.h"
+#include "resource/accessor.h"
 
 namespace e8 {
 
 /**
- * @brief The RendererInterface class
+ * @brief The RendererInterface class Common function prototypes where different renderers share.
  */
 class RendererInterface {
   public:
@@ -79,9 +81,15 @@ class RendererInterface {
 
     /**
      * @brief DrawFrame Generates a representation of the scene content on the Vulkan swapchain
-     * image.
+     * image. Note, most of the scene data is dynamically loaded from disk. Uses the
+     * GeometryRamTransfer to access data through a caching layer.
      */
-    virtual void DrawFrame(Scene *scene) = 0;
+    virtual void DrawFrame(Scene *scene, ResourceAccessor *resource_accessor) = 0;
+
+    /**
+     * @brief ApplyConfiguration Applies the specified configuration to the renderer.
+     */
+    virtual void ApplyConfiguration(RendererConfiguration const &config) = 0;
 
     /**
      * @brief GetPerformanceStats Returns the performance stats for each stage of interest.
@@ -117,7 +125,7 @@ class RendererInterface {
     /**
      * @brief EndFrame Marks the completion of a frame's rendering process.
      *
-     * @param frame_context
+     * @param frame_context Created by RendererInterface::BeginFrame().
      * @param final_ouput The last output to be fulfilled before the frame can be presented.
      */
     void EndFrame(FrameContext const &frame_context, PipelineOutputInterface *final_ouput);
@@ -146,6 +154,25 @@ class RendererInterface {
  * @brief CreateRenderer Creates a renderer of the specified type.
  */
 std::unique_ptr<RendererInterface> CreateRenderer(RendererType type, VulkanContext *context);
+
+/**
+ * @brief LoadRendererConfiguration Loads renderer configuration from the base_path. If the loading
+ * fails, it returns a nullptr.
+ */
+std::unique_ptr<RendererConfiguration>
+LoadRendererConfiguration(std::filesystem::path const &base_path);
+
+/**
+ * @brief SaveRendererConfiguration Saves the renderer configuration to disk, under the specified
+ * base_path.
+ */
+bool SaveRendererConfiguration(RendererConfiguration const &config,
+                               std::filesystem::path const &base_path);
+
+/**
+ * @brief DefaultRendererConfiguration Returns a default configuration.
+ */
+std::unique_ptr<RendererConfiguration> DefaultRendererConfiguration();
 
 } // namespace e8
 

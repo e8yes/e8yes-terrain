@@ -20,8 +20,6 @@ syntax = "proto3";
 package e8;
 
 import "entity.proto";
-import "geometry.proto";
-import "physical_shape.proto";
 
 /**
  * @brief The SceneObjectProto message This is a serializable version of the SceneObject object. It
@@ -45,14 +43,14 @@ message SceneObjectProto {
     }
 
     // ID of this scene object.
-    string id = 1;
+    int64 id = 1;
 
     // Human readable name of this scene object.
     string name = 2;
 
     // If this field isn't null, it indicates that this scene object is generated procedural
     // process. The process is fully specified by the procedural object referenced by this ID.
-    string procedural_object_id = 3;
+    int64 procedural_object_id = 3;
 
     // Child nodes.
     oneof children {
@@ -71,10 +69,4 @@ message SceneObjectProto {
 message SceneObjectCollection {
     // An array of root scene objects.
     repeated SceneObjectProto scene_objects = 1;
-
-    // A collection of all geometries referenced by entities.
-    map<string, GeometryLodProto> geometries = 2;
-
-    // A collection of all physical shapes referenced by the entities.
-    map<string, PhysicalShapeProto> physical_shapes = 3;
 };

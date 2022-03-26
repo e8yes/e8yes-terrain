@@ -47,11 +47,13 @@ ProceduralPlaneComponent::~ProceduralPlaneComponent() {}
 
 void ProceduralPlaneComponent::OnClickAddProceduralPlane() {
     {
-        Scene::WriteAccess write_access = context_->scene->GainWriteAccess();
+        GameData game_data = context_->game->GetGameData();
+
+        Scene::WriteAccess write_access = game_data.scene->GainWriteAccess();
 
         auto plane = std::make_unique<ProceduralPlane>(kPlaneObjectName, /*width=*/1, /*height=*/1,
                                                        /*cell_area=*/1);
-        context_->scene->AddProceduralObject(std::move(plane));
+        game_data.scene->AddProceduralObject(std::move(plane), game_data.resource_accessor);
     }
 
     modification_monitor_comp_->OnModifyScene();

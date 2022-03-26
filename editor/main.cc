@@ -15,23 +15,6 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QApplication>
-#include <memory>
-#include <thread>
-
-#include "editor/basic/context.h"
-#include "editor/window_display.h"
 #include "editor/window_editor.h"
 
-int main(int argc, char *argv[]) {
-    auto editor_context = std::make_shared<e8::EditorContext>();
-
-    std::thread editor_thread(e8::RunIslandsEditorWindow, editor_context, argc, argv);
-    std::thread display_thread(e8::RunIslandsDisplay, editor_context, /*width=*/1024,
-                               /*height=*/768);
-
-    editor_thread.join();
-    display_thread.join();
-
-    return 0;
-}
+int main(int argc, char *argv[]) { return e8::RunEditor(argc, argv); }

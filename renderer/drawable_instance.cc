@@ -15,46 +15,58 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "renderer/drawable_instance.h"
+#include <memory>
+#include <vector>
+
 #include "common/tensor.h"
-#include "content/proto/geometry.pb.h"
 #include "content/scene_entity.h"
+#include "renderer/drawable_instance.h"
+#include "resource/accessor.h"
+#include "resource/geometry.h"
 
 namespace e8 {
 namespace {
 
-int SelectLod(vec3 const &viewer_location, SceneEntity const *scene_entity) {
-    float entity_distance = (scene_entity->bounding_box.centroid() - viewer_location).norm();
+Geometry *LoadGeometry(SceneEntity const &scene_entity, vec3 const &viewer_location,
+                       ResourceAccessor *resource_accessor) {
+    std::shared_ptr<GeometryLod> geometry_lod =
+        resource_accessor->LoadGeometry(scene_entity.geometry_id);
+    if (geometry_lod == nullptr) {
+        return nullptr;
+    }
 
-    for (unsigned i = 0; i < scene_entity->geometry_lod_instance->lod_min_distances.size(); ++i) {
-        if (entity_distance >= scene_entity->geometry_lod_instance->lod_min_distances[i]) {
-            return i;
+    float entity_distance = (scene_entity.bounding_box.centroid() - viewer_location).norm();
+
+    for (unsigned i = 0; i < geometry_lod->lod_min_distances.size(); ++i) {
+        if (entity_distance >= geometry_lod->lod_min_distances[i]) {
+            return &geometry_lod->lod[i];
         }
     }
 
-    return -1;
+    return nullptr;
 }
 
 } // namespace
 
 std::vector<DrawableInstance> ToDrawables(std::vector<SceneEntity const *> const &scene_entities,
-                                          vec3 const &viewer_location) {
-    std::vector<DrawableInstance> result;
+                                          vec3 const &viewer_location,
+                                          ResourceAccessor *resource_accessor) {
+    std::vector<DrawableInstance> instances;
 
     for (auto const scene_entity : scene_entities) {
-        int lod_selection = SelectLod(viewer_location, scene_entity);
-        if (lod_selection == -1) {
+        Geometry *geometry = LoadGeometry(*scene_entity, viewer_location, resource_accessor);
+        if (geometry == nullptr) {
             continue;
         }
 
         DrawableInstance drawable;
-        drawable.geometry = &scene_entity->geometry_lod_instance->lod[lod_selection];
+        drawable.geometry = geometry;
         drawable.transform = &scene_entity->transform;
 
-        result.push_back(drawable);
+        instances.push_back(drawable);
     }
 
-    return result;
+    return instances;
 }
 
 } // namespace e8

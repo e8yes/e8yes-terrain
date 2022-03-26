@@ -31,13 +31,8 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
-#include <google/protobuf/map.h>  // IWYU pragma: export
-#include <google/protobuf/map_entry.h>
-#include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/unknown_field_set.h>
 #include "entity.pb.h"
-#include "geometry.pb.h"
-#include "physical_shape.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_scene_5fobject_2eproto
@@ -53,7 +48,7 @@ struct TableStruct_scene_5fobject_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[6]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[4]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -64,12 +59,6 @@ namespace e8 {
 class SceneObjectCollection;
 class SceneObjectCollectionDefaultTypeInternal;
 extern SceneObjectCollectionDefaultTypeInternal _SceneObjectCollection_default_instance_;
-class SceneObjectCollection_GeometriesEntry_DoNotUse;
-class SceneObjectCollection_GeometriesEntry_DoNotUseDefaultTypeInternal;
-extern SceneObjectCollection_GeometriesEntry_DoNotUseDefaultTypeInternal _SceneObjectCollection_GeometriesEntry_DoNotUse_default_instance_;
-class SceneObjectCollection_PhysicalShapesEntry_DoNotUse;
-class SceneObjectCollection_PhysicalShapesEntry_DoNotUseDefaultTypeInternal;
-extern SceneObjectCollection_PhysicalShapesEntry_DoNotUseDefaultTypeInternal _SceneObjectCollection_PhysicalShapesEntry_DoNotUse_default_instance_;
 class SceneObjectProto;
 class SceneObjectProtoDefaultTypeInternal;
 extern SceneObjectProtoDefaultTypeInternal _SceneObjectProto_default_instance_;
@@ -82,8 +71,6 @@ extern SceneObjectProto_SceneObjectChildrenDefaultTypeInternal _SceneObjectProto
 }  // namespace e8
 PROTOBUF_NAMESPACE_OPEN
 template<> ::e8::SceneObjectCollection* Arena::CreateMaybeMessage<::e8::SceneObjectCollection>(Arena*);
-template<> ::e8::SceneObjectCollection_GeometriesEntry_DoNotUse* Arena::CreateMaybeMessage<::e8::SceneObjectCollection_GeometriesEntry_DoNotUse>(Arena*);
-template<> ::e8::SceneObjectCollection_PhysicalShapesEntry_DoNotUse* Arena::CreateMaybeMessage<::e8::SceneObjectCollection_PhysicalShapesEntry_DoNotUse>(Arena*);
 template<> ::e8::SceneObjectProto* Arena::CreateMaybeMessage<::e8::SceneObjectProto>(Arena*);
 template<> ::e8::SceneObjectProto_SceneEntityChildren* Arena::CreateMaybeMessage<::e8::SceneObjectProto_SceneEntityChildren>(Arena*);
 template<> ::e8::SceneObjectProto_SceneObjectChildren* Arena::CreateMaybeMessage<::e8::SceneObjectProto_SceneObjectChildren>(Arena*);
@@ -506,37 +493,12 @@ class SceneObjectProto PROTOBUF_FINAL :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kIdFieldNumber = 1,
     kNameFieldNumber = 2,
+    kIdFieldNumber = 1,
     kProceduralObjectIdFieldNumber = 3,
     kSceneObjectChildrenFieldNumber = 4,
     kSceneEntityChildrenFieldNumber = 5,
   };
-  // string id = 1;
-  void clear_id();
-  const std::string& id() const;
-  void set_id(const std::string& value);
-  void set_id(std::string&& value);
-  void set_id(const char* value);
-  void set_id(const char* value, size_t size);
-  std::string* mutable_id();
-  std::string* release_id();
-  void set_allocated_id(std::string* id);
-  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
-  std::string* unsafe_arena_release_id();
-  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
-  void unsafe_arena_set_allocated_id(
-      std::string* id);
-  private:
-  const std::string& _internal_id() const;
-  void _internal_set_id(const std::string& value);
-  std::string* _internal_mutable_id();
-  public:
-
   // string name = 2;
   void clear_name();
   const std::string& name() const;
@@ -562,29 +524,22 @@ class SceneObjectProto PROTOBUF_FINAL :
   std::string* _internal_mutable_name();
   public:
 
-  // string procedural_object_id = 3;
-  void clear_procedural_object_id();
-  const std::string& procedural_object_id() const;
-  void set_procedural_object_id(const std::string& value);
-  void set_procedural_object_id(std::string&& value);
-  void set_procedural_object_id(const char* value);
-  void set_procedural_object_id(const char* value, size_t size);
-  std::string* mutable_procedural_object_id();
-  std::string* release_procedural_object_id();
-  void set_allocated_procedural_object_id(std::string* procedural_object_id);
-  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
-  std::string* unsafe_arena_release_procedural_object_id();
-  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
-  void unsafe_arena_set_allocated_procedural_object_id(
-      std::string* procedural_object_id);
+  // int64 id = 1;
+  void clear_id();
+  ::PROTOBUF_NAMESPACE_ID::int64 id() const;
+  void set_id(::PROTOBUF_NAMESPACE_ID::int64 value);
   private:
-  const std::string& _internal_procedural_object_id() const;
-  void _internal_set_procedural_object_id(const std::string& value);
-  std::string* _internal_mutable_procedural_object_id();
+  ::PROTOBUF_NAMESPACE_ID::int64 _internal_id() const;
+  void _internal_set_id(::PROTOBUF_NAMESPACE_ID::int64 value);
+  public:
+
+  // int64 procedural_object_id = 3;
+  void clear_procedural_object_id();
+  ::PROTOBUF_NAMESPACE_ID::int64 procedural_object_id() const;
+  void set_procedural_object_id(::PROTOBUF_NAMESPACE_ID::int64 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int64 _internal_procedural_object_id() const;
+  void _internal_set_procedural_object_id(::PROTOBUF_NAMESPACE_ID::int64 value);
   public:
 
   // .e8.SceneObjectProto.SceneObjectChildren scene_object_children = 4;
@@ -637,9 +592,9 @@ class SceneObjectProto PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr id_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr procedural_object_id_;
+  ::PROTOBUF_NAMESPACE_ID::int64 id_;
+  ::PROTOBUF_NAMESPACE_ID::int64 procedural_object_id_;
   union ChildrenUnion {
     ChildrenUnion() {}
     ::e8::SceneObjectProto_SceneObjectChildren* scene_object_children_;
@@ -650,70 +605,6 @@ class SceneObjectProto PROTOBUF_FINAL :
 
   friend struct ::TableStruct_scene_5fobject_2eproto;
 };
-// -------------------------------------------------------------------
-
-class SceneObjectCollection_GeometriesEntry_DoNotUse : public ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<SceneObjectCollection_GeometriesEntry_DoNotUse, 
-    std::string, ::e8::GeometryLodProto,
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE,
-    0 > {
-public:
-  typedef ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<SceneObjectCollection_GeometriesEntry_DoNotUse, 
-    std::string, ::e8::GeometryLodProto,
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE,
-    0 > SuperType;
-  SceneObjectCollection_GeometriesEntry_DoNotUse();
-  SceneObjectCollection_GeometriesEntry_DoNotUse(::PROTOBUF_NAMESPACE_ID::Arena* arena);
-  void MergeFrom(const SceneObjectCollection_GeometriesEntry_DoNotUse& other);
-  static const SceneObjectCollection_GeometriesEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const SceneObjectCollection_GeometriesEntry_DoNotUse*>(&_SceneObjectCollection_GeometriesEntry_DoNotUse_default_instance_); }
-  static bool ValidateKey(std::string* s) {
-    return ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(s->data(), static_cast<int>(s->size()), ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::PARSE, "e8.SceneObjectCollection.GeometriesEntry.key");
- }
-  static bool ValidateValue(void*) { return true; }
-  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& other) final;
-  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
-  private:
-  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_scene_5fobject_2eproto);
-    return ::descriptor_table_scene_5fobject_2eproto.file_level_metadata[3];
-  }
-
-  public:
-};
-
-// -------------------------------------------------------------------
-
-class SceneObjectCollection_PhysicalShapesEntry_DoNotUse : public ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<SceneObjectCollection_PhysicalShapesEntry_DoNotUse, 
-    std::string, ::e8::PhysicalShapeProto,
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE,
-    0 > {
-public:
-  typedef ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<SceneObjectCollection_PhysicalShapesEntry_DoNotUse, 
-    std::string, ::e8::PhysicalShapeProto,
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE,
-    0 > SuperType;
-  SceneObjectCollection_PhysicalShapesEntry_DoNotUse();
-  SceneObjectCollection_PhysicalShapesEntry_DoNotUse(::PROTOBUF_NAMESPACE_ID::Arena* arena);
-  void MergeFrom(const SceneObjectCollection_PhysicalShapesEntry_DoNotUse& other);
-  static const SceneObjectCollection_PhysicalShapesEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const SceneObjectCollection_PhysicalShapesEntry_DoNotUse*>(&_SceneObjectCollection_PhysicalShapesEntry_DoNotUse_default_instance_); }
-  static bool ValidateKey(std::string* s) {
-    return ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(s->data(), static_cast<int>(s->size()), ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::PARSE, "e8.SceneObjectCollection.PhysicalShapesEntry.key");
- }
-  static bool ValidateValue(void*) { return true; }
-  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& other) final;
-  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
-  private:
-  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_scene_5fobject_2eproto);
-    return ::descriptor_table_scene_5fobject_2eproto.file_level_metadata[4];
-  }
-
-  public:
-};
-
 // -------------------------------------------------------------------
 
 class SceneObjectCollection PROTOBUF_FINAL :
@@ -758,7 +649,7 @@ class SceneObjectCollection PROTOBUF_FINAL :
                &_SceneObjectCollection_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    3;
 
   friend void swap(SceneObjectCollection& a, SceneObjectCollection& b) {
     a.Swap(&b);
@@ -826,13 +717,10 @@ class SceneObjectCollection PROTOBUF_FINAL :
 
   // nested types ----------------------------------------------------
 
-
   // accessors -------------------------------------------------------
 
   enum : int {
     kSceneObjectsFieldNumber = 1,
-    kGeometriesFieldNumber = 2,
-    kPhysicalShapesFieldNumber = 3,
   };
   // repeated .e8.SceneObjectProto scene_objects = 1;
   int scene_objects_size() const;
@@ -852,40 +740,6 @@ class SceneObjectCollection PROTOBUF_FINAL :
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneObjectProto >&
       scene_objects() const;
 
-  // map<string, .e8.GeometryLodProto> geometries = 2;
-  int geometries_size() const;
-  private:
-  int _internal_geometries_size() const;
-  public:
-  void clear_geometries();
-  private:
-  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLodProto >&
-      _internal_geometries() const;
-  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLodProto >*
-      _internal_mutable_geometries();
-  public:
-  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLodProto >&
-      geometries() const;
-  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLodProto >*
-      mutable_geometries();
-
-  // map<string, .e8.PhysicalShapeProto> physical_shapes = 3;
-  int physical_shapes_size() const;
-  private:
-  int _internal_physical_shapes_size() const;
-  public:
-  void clear_physical_shapes();
-  private:
-  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::PhysicalShapeProto >&
-      _internal_physical_shapes() const;
-  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::PhysicalShapeProto >*
-      _internal_mutable_physical_shapes();
-  public:
-  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::PhysicalShapeProto >&
-      physical_shapes() const;
-  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::PhysicalShapeProto >*
-      mutable_physical_shapes();
-
   // @@protoc_insertion_point(class_scope:e8.SceneObjectCollection)
  private:
   class _Internal;
@@ -894,18 +748,6 @@ class SceneObjectCollection PROTOBUF_FINAL :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::SceneObjectProto > scene_objects_;
-  ::PROTOBUF_NAMESPACE_ID::internal::MapField<
-      SceneObjectCollection_GeometriesEntry_DoNotUse,
-      std::string, ::e8::GeometryLodProto,
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE,
-      0 > geometries_;
-  ::PROTOBUF_NAMESPACE_ID::internal::MapField<
-      SceneObjectCollection_PhysicalShapesEntry_DoNotUse,
-      std::string, ::e8::PhysicalShapeProto,
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE,
-      0 > physical_shapes_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_scene_5fobject_2eproto;
 };
@@ -1003,85 +845,24 @@ SceneObjectProto_SceneEntityChildren::scene_entities() const {
 
 // SceneObjectProto
 
-// string id = 1;
+// int64 id = 1;
 inline void SceneObjectProto::clear_id() {
-  id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  id_ = PROTOBUF_LONGLONG(0);
 }
-inline const std::string& SceneObjectProto::id() const {
+inline ::PROTOBUF_NAMESPACE_ID::int64 SceneObjectProto::_internal_id() const {
+  return id_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int64 SceneObjectProto::id() const {
   // @@protoc_insertion_point(field_get:e8.SceneObjectProto.id)
   return _internal_id();
 }
-inline void SceneObjectProto::set_id(const std::string& value) {
+inline void SceneObjectProto::_internal_set_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
+  
+  id_ = value;
+}
+inline void SceneObjectProto::set_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
   _internal_set_id(value);
   // @@protoc_insertion_point(field_set:e8.SceneObjectProto.id)
-}
-inline std::string* SceneObjectProto::mutable_id() {
-  // @@protoc_insertion_point(field_mutable:e8.SceneObjectProto.id)
-  return _internal_mutable_id();
-}
-inline const std::string& SceneObjectProto::_internal_id() const {
-  return id_.Get();
-}
-inline void SceneObjectProto::_internal_set_id(const std::string& value) {
-  
-  id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
-}
-inline void SceneObjectProto::set_id(std::string&& value) {
-  
-  id_.Set(
-    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
-  // @@protoc_insertion_point(field_set_rvalue:e8.SceneObjectProto.id)
-}
-inline void SceneObjectProto::set_id(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
-              GetArena());
-  // @@protoc_insertion_point(field_set_char:e8.SceneObjectProto.id)
-}
-inline void SceneObjectProto::set_id(const char* value,
-    size_t size) {
-  
-  id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
-      reinterpret_cast<const char*>(value), size), GetArena());
-  // @@protoc_insertion_point(field_set_pointer:e8.SceneObjectProto.id)
-}
-inline std::string* SceneObjectProto::_internal_mutable_id() {
-  
-  return id_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline std::string* SceneObjectProto::release_id() {
-  // @@protoc_insertion_point(field_release:e8.SceneObjectProto.id)
-  return id_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline void SceneObjectProto::set_allocated_id(std::string* id) {
-  if (id != nullptr) {
-    
-  } else {
-    
-  }
-  id_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), id,
-      GetArena());
-  // @@protoc_insertion_point(field_set_allocated:e8.SceneObjectProto.id)
-}
-inline std::string* SceneObjectProto::unsafe_arena_release_id() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:e8.SceneObjectProto.id)
-  GOOGLE_DCHECK(GetArena() != nullptr);
-  
-  return id_.UnsafeArenaRelease(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      GetArena());
-}
-inline void SceneObjectProto::unsafe_arena_set_allocated_id(
-    std::string* id) {
-  GOOGLE_DCHECK(GetArena() != nullptr);
-  if (id != nullptr) {
-    
-  } else {
-    
-  }
-  id_.UnsafeArenaSetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      id, GetArena());
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneObjectProto.id)
 }
 
 // string name = 2;
@@ -1165,85 +946,24 @@ inline void SceneObjectProto::unsafe_arena_set_allocated_name(
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneObjectProto.name)
 }
 
-// string procedural_object_id = 3;
+// int64 procedural_object_id = 3;
 inline void SceneObjectProto::clear_procedural_object_id() {
-  procedural_object_id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  procedural_object_id_ = PROTOBUF_LONGLONG(0);
 }
-inline const std::string& SceneObjectProto::procedural_object_id() const {
+inline ::PROTOBUF_NAMESPACE_ID::int64 SceneObjectProto::_internal_procedural_object_id() const {
+  return procedural_object_id_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int64 SceneObjectProto::procedural_object_id() const {
   // @@protoc_insertion_point(field_get:e8.SceneObjectProto.procedural_object_id)
   return _internal_procedural_object_id();
 }
-inline void SceneObjectProto::set_procedural_object_id(const std::string& value) {
+inline void SceneObjectProto::_internal_set_procedural_object_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
+  
+  procedural_object_id_ = value;
+}
+inline void SceneObjectProto::set_procedural_object_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
   _internal_set_procedural_object_id(value);
   // @@protoc_insertion_point(field_set:e8.SceneObjectProto.procedural_object_id)
-}
-inline std::string* SceneObjectProto::mutable_procedural_object_id() {
-  // @@protoc_insertion_point(field_mutable:e8.SceneObjectProto.procedural_object_id)
-  return _internal_mutable_procedural_object_id();
-}
-inline const std::string& SceneObjectProto::_internal_procedural_object_id() const {
-  return procedural_object_id_.Get();
-}
-inline void SceneObjectProto::_internal_set_procedural_object_id(const std::string& value) {
-  
-  procedural_object_id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
-}
-inline void SceneObjectProto::set_procedural_object_id(std::string&& value) {
-  
-  procedural_object_id_.Set(
-    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
-  // @@protoc_insertion_point(field_set_rvalue:e8.SceneObjectProto.procedural_object_id)
-}
-inline void SceneObjectProto::set_procedural_object_id(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  procedural_object_id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
-              GetArena());
-  // @@protoc_insertion_point(field_set_char:e8.SceneObjectProto.procedural_object_id)
-}
-inline void SceneObjectProto::set_procedural_object_id(const char* value,
-    size_t size) {
-  
-  procedural_object_id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
-      reinterpret_cast<const char*>(value), size), GetArena());
-  // @@protoc_insertion_point(field_set_pointer:e8.SceneObjectProto.procedural_object_id)
-}
-inline std::string* SceneObjectProto::_internal_mutable_procedural_object_id() {
-  
-  return procedural_object_id_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline std::string* SceneObjectProto::release_procedural_object_id() {
-  // @@protoc_insertion_point(field_release:e8.SceneObjectProto.procedural_object_id)
-  return procedural_object_id_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline void SceneObjectProto::set_allocated_procedural_object_id(std::string* procedural_object_id) {
-  if (procedural_object_id != nullptr) {
-    
-  } else {
-    
-  }
-  procedural_object_id_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), procedural_object_id,
-      GetArena());
-  // @@protoc_insertion_point(field_set_allocated:e8.SceneObjectProto.procedural_object_id)
-}
-inline std::string* SceneObjectProto::unsafe_arena_release_procedural_object_id() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:e8.SceneObjectProto.procedural_object_id)
-  GOOGLE_DCHECK(GetArena() != nullptr);
-  
-  return procedural_object_id_.UnsafeArenaRelease(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      GetArena());
-}
-inline void SceneObjectProto::unsafe_arena_set_allocated_procedural_object_id(
-    std::string* procedural_object_id) {
-  GOOGLE_DCHECK(GetArena() != nullptr);
-  if (procedural_object_id != nullptr) {
-    
-  } else {
-    
-  }
-  procedural_object_id_.UnsafeArenaSetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      procedural_object_id, GetArena());
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneObjectProto.procedural_object_id)
 }
 
 // .e8.SceneObjectProto.SceneObjectChildren scene_object_children = 4;
@@ -1403,10 +1123,6 @@ inline SceneObjectProto::ChildrenCase SceneObjectProto::children_case() const {
 }
 // -------------------------------------------------------------------
 
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-
 // SceneObjectCollection
 
 // repeated .e8.SceneObjectProto scene_objects = 1;
@@ -1448,65 +1164,9 @@ SceneObjectCollection::scene_objects() const {
   return scene_objects_;
 }
 
-// map<string, .e8.GeometryLodProto> geometries = 2;
-inline int SceneObjectCollection::_internal_geometries_size() const {
-  return geometries_.size();
-}
-inline int SceneObjectCollection::geometries_size() const {
-  return _internal_geometries_size();
-}
-inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLodProto >&
-SceneObjectCollection::_internal_geometries() const {
-  return geometries_.GetMap();
-}
-inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLodProto >&
-SceneObjectCollection::geometries() const {
-  // @@protoc_insertion_point(field_map:e8.SceneObjectCollection.geometries)
-  return _internal_geometries();
-}
-inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLodProto >*
-SceneObjectCollection::_internal_mutable_geometries() {
-  return geometries_.MutableMap();
-}
-inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::GeometryLodProto >*
-SceneObjectCollection::mutable_geometries() {
-  // @@protoc_insertion_point(field_mutable_map:e8.SceneObjectCollection.geometries)
-  return _internal_mutable_geometries();
-}
-
-// map<string, .e8.PhysicalShapeProto> physical_shapes = 3;
-inline int SceneObjectCollection::_internal_physical_shapes_size() const {
-  return physical_shapes_.size();
-}
-inline int SceneObjectCollection::physical_shapes_size() const {
-  return _internal_physical_shapes_size();
-}
-inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::PhysicalShapeProto >&
-SceneObjectCollection::_internal_physical_shapes() const {
-  return physical_shapes_.GetMap();
-}
-inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::PhysicalShapeProto >&
-SceneObjectCollection::physical_shapes() const {
-  // @@protoc_insertion_point(field_map:e8.SceneObjectCollection.physical_shapes)
-  return _internal_physical_shapes();
-}
-inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::PhysicalShapeProto >*
-SceneObjectCollection::_internal_mutable_physical_shapes() {
-  return physical_shapes_.MutableMap();
-}
-inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::e8::PhysicalShapeProto >*
-SceneObjectCollection::mutable_physical_shapes() {
-  // @@protoc_insertion_point(field_mutable_map:e8.SceneObjectCollection.physical_shapes)
-  return _internal_mutable_physical_shapes();
-}
-
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

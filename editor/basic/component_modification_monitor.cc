@@ -47,8 +47,8 @@ void ModificationMonitorComponent::OnReset() {
 }
 
 void ModificationMonitorComponent::OnModifyScene() {
-    if (context_->scene == nullptr) {
-        BOOST_LOG_TRIVIAL(error) << "OnModifyScene(): A null scene was modified.";
+    if (context_->game == nullptr) {
+        BOOST_LOG_TRIVIAL(error) << "OnModifyScene(): A null game was modified.";
     }
 
     unsaved_modifications_ = true;

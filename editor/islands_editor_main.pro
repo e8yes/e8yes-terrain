@@ -20,6 +20,7 @@ SOURCES += \
     basic/component_modification_monitor.cc \
     basic/component_status.cc \
     basic/context.cc \
+    basic/editor_storyline.cc \
     environment/component_ambient.cc \
     environment/component_camera.cc \
     object/component_scene_object_gltf.cc \
@@ -29,7 +30,6 @@ SOURCES += \
     scene/component_scene_saver.cc \
     scene/component_scene_view.cc \
     main.cc \
-    window_display.cc \
     window_editor.cc
 
 HEADERS += \
@@ -37,6 +37,7 @@ HEADERS += \
     basic/component_modification_monitor.h \
     basic/component_status.h \
     basic/context.h \
+    basic/editor_storyline.h \
     environment/component_ambient.h \
     environment/component_camera.h \
     object/component_scene_object_gltf.h \
@@ -45,7 +46,6 @@ HEADERS += \
     scene/component_scene_loader.h \
     scene/component_scene_saver.h \
     scene/component_scene_view.h \
-    window_display.h \
     window_editor.h
 
 FORMS += \
@@ -61,6 +61,14 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 # Dependencies
+# Game
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../game/release/ -lislands_renderer
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../game/debug/ -lislands_renderer
+else:unix: LIBS += -L$$OUT_PWD/../game/ -lislands_game
+
+INCLUDEPATH += $$PWD/../game
+DEPENDPATH += $$PWD/../game
+
 # Islands renderer
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../renderer/release/ -lislands_renderer
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../renderer/debug/ -lislands_renderer
@@ -76,6 +84,14 @@ else:unix: LIBS += -L$$OUT_PWD/../content/ -lislands_content
 
 INCLUDEPATH += $$PWD/../content
 DEPENDPATH += $$PWD/../content
+
+# Islands resource.
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../resource/release/ -lislands_resource
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../resource/debug/ -lislands_resource
+else:unix: LIBS += -L$$OUT_PWD/../resource/ -lislands_resource
+
+INCLUDEPATH += $$PWD/../resource
+DEPENDPATH += $$PWD/../resource
 
 # Islands common
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../common/release/ -lislands_common

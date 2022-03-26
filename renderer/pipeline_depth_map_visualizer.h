@@ -21,7 +21,7 @@
 #include <memory>
 #include <optional>
 
-#include "renderer/context.h"
+#include "common/device.h"
 #include "renderer/pipeline_output.h"
 #include "renderer/projection.h"
 

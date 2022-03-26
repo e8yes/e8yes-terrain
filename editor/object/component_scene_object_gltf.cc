@@ -22,19 +22,21 @@
 #include <QString>
 #include <vector>
 
-#include "content/gltf.h"
+#include "content/loader_gltf.h"
 #include "content/scene.h"
 #include "content/scene_object.h"
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/context.h"
 #include "editor/object/component_scene_object_gltf.h"
 #include "editor/scene/component_scene_view.h"
+#include "resource/accessor.h"
 
 namespace e8 {
 namespace {
 
-bool AddGltfSceneObjects(std::string const &gltf_file_path, Scene *scene) {
-    std::vector<SceneObject> scene_objects = LoadFromGltf(gltf_file_path);
+bool AddGltfSceneObjects(std::string const &gltf_file_path, Scene *scene,
+                         ResourceAccessor *resource_context) {
+    std::vector<SceneObject> scene_objects = LoadFromGltf(gltf_file_path, resource_context);
     if (scene_objects.empty()) {
         return false;
     }
@@ -68,7 +70,8 @@ void SceneObjectGltfComponent::OnClickAddGltfSceneObject() {
         /*parent=*/nullptr, /*caption=*/tr("Open glTF File"), QDir::homePath(),
         /*filter=*/tr("glTF File (*.glb *.gltf)"));
 
-    if (!AddGltfSceneObjects(gltf_file.toStdString(), context_->scene.get())) {
+    if (!AddGltfSceneObjects(gltf_file.toStdString(), context_->game->GetGameData().scene,
+                             context_->game->GetGameData().resource_accessor)) {
         QMessageBox msg_box;
         msg_box.setText("Empty glTF file");
         msg_box.setStandardButtons(QMessageBox::Ok);

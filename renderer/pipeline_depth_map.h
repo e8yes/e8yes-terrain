@@ -24,7 +24,7 @@
 #include <vulkan/vulkan.h>
 
 #include "common/tensor.h"
-#include "renderer/context.h"
+#include "common/device.h"
 #include "renderer/drawable_instance.h"
 #include "renderer/pipeline_output.h"
 #include "renderer/projection.h"

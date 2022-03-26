@@ -40,16 +40,12 @@ class SceneSaverComponent : public QObject {
     ~SceneSaverComponent();
 
   public slots:
-    void OnChangeLoadPath(std::optional<std::string> const &load_path);
     void OnClickSaveScene();
 
   private:
     ModificationMonitorComponent *modification_monitor_comp_;
     SceneViewComponent *scene_view_comp_;
     EditorContext *context_;
-
-    bool unsaved_modifications_;
-    std::optional<std::string> load_path_;
 };
 
 } // namespace e8

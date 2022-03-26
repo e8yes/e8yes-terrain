@@ -24,7 +24,7 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
-#include "renderer/context.h"
+#include "common/device.h"
 #include "third_party/vma/vk_mem_alloc.h"
 
 namespace e8 {

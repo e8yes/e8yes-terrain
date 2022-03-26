@@ -21,10 +21,11 @@
 #include <memory>
 #include <vector>
 
-#include "content/proto/renderer.pb.h"
+#include "common/device.h"
 #include "content/scene.h"
-#include "renderer/context.h"
+#include "renderer/proto/renderer.pb.h"
 #include "renderer/renderer.h"
+#include "resource/accessor.h"
 
 namespace e8 {
 
@@ -41,7 +42,9 @@ class DepthRenderer : public RendererInterface {
     DepthRenderer(VulkanContext *context);
     ~DepthRenderer() override;
 
-    void DrawFrame(Scene *scene) override;
+    void DrawFrame(Scene *scene, ResourceAccessor *resource_accessor) override;
+
+    void ApplyConfiguration(RendererConfiguration const &config) override;
 
   private:
     class DepthRendererImpl;

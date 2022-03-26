@@ -19,74 +19,46 @@
 #include <google/protobuf/map.h>
 #include <list>
 #include <map>
-#include <optional>
 #include <string>
 #include <unordered_map>
 
 #include "content/common.h"
-#include "content/geometry.h"
 #include "content/proto/entity.pb.h"
-#include "content/proto/geometry.pb.h"
 #include "content/proto/scene_object.pb.h"
 #include "content/scene_entity.h"
 #include "content/scene_object.h"
+#include "resource/common.h"
 
 namespace e8 {
 
-void CollectGeometries(SceneObject const &scene_object,
-                       google::protobuf::Map<GeometryId, GeometryLodProto> *geometries) {
-    if (scene_object.Procedural()) {
-        return;
-    }
-
-    if (scene_object.HasSceneEntityChildren()) {
-        for (auto const &child_entity : scene_object.child_scene_entities) {
-            if (child_entity.geometry_lod_instance == nullptr) {
-                continue;
-            }
-
-            (*geometries)[child_entity.geometry_lod_instance->id] =
-                child_entity.geometry_lod_instance->ToProto();
-        }
-
-        return;
-    }
-
-    for (auto const &child_object : scene_object.child_scene_objects) {
-        CollectGeometries(child_object, geometries);
-    }
-}
-
 SceneObject::SceneObject(SceneObjectName const &name,
-                         std::optional<ProceduralObjectId> const &procedural_object_id)
+                         ProceduralObjectId const &procedural_object_id)
     : id(GenerateUuid()), name(name), procedural_object_id(procedural_object_id) {}
 
-SceneObject::SceneObject(
-    SceneObjectProto const &proto,
-    std::unordered_map<GeometryId, std::shared_ptr<GeometryLod>> const &geometries)
-    : id(proto.id()), name(proto.name()) {
-    if (!proto.procedural_object_id().empty()) {
-        // Procedural children won't be read from the protobuf message.
-        procedural_object_id = proto.procedural_object_id();
+SceneObject::SceneObject(SceneObjectProto const &proto)
+    : id(proto.id()), name(proto.name()), procedural_object_id(proto.procedural_object_id()) {
+    if (proto.procedural_object_id() != kNullUuid) {
+        // Procedural children never gets written to the protobuf message. Terminates the recursion
+        // here.
         return;
     }
 
     if (proto.has_scene_object_children()) {
         for (auto const &child : proto.scene_object_children().scene_objects()) {
-            this->AddSceneObjectChild(SceneObject(child, geometries));
+            this->AddSceneObjectChild(SceneObject(child));
         }
     }
 
     if (proto.has_scene_entity_children()) {
         for (auto const &child : proto.scene_entity_children().scene_entities()) {
-            this->AddSceneEntityChild(SceneEntity(child, geometries));
+            this->AddSceneEntityChild(SceneEntity(child));
         }
     }
 }
 
 SceneObject::~SceneObject() {}
 
-bool SceneObject::Procedural() const { return procedural_object_id.has_value(); }
+bool SceneObject::Procedural() const { return procedural_object_id != kNullUuid; }
 
 bool SceneObject::HasSceneObjectChildren() const { return !child_scene_objects.empty(); }
 
@@ -107,9 +79,9 @@ SceneObjectProto SceneObject::ToProto() const {
 
     proto.set_id(id);
     proto.set_name(name);
-    if (procedural_object_id.has_value()) {
+    if (procedural_object_id != kNullUuid) {
         // Procedural children will not be put into the protobuf message.
-        proto.set_procedural_object_id(*procedural_object_id);
+        proto.set_procedural_object_id(procedural_object_id);
         return proto;
     }
 
@@ -124,32 +96,6 @@ SceneObjectProto SceneObject::ToProto() const {
     }
 
     return proto;
-}
-
-SceneObjectCollection ToProto(std::map<SceneObjectId, SceneObject> const &scene_objects) {
-    SceneObjectCollection proto;
-
-    for (auto const &[_, scene_object] : scene_objects) {
-        *proto.add_scene_objects() = scene_object.ToProto();
-        CollectGeometries(scene_object, proto.mutable_geometries());
-    }
-
-    return proto;
-}
-
-std::map<SceneObjectId, SceneObject> ToSceneObjects(SceneObjectCollection const &proto) {
-    std::unordered_map<GeometryId, std::shared_ptr<GeometryLod>> geometries;
-    for (auto const &[id, geometry] : proto.geometries()) {
-        geometries[id] = std::make_shared<GeometryLod>(geometry);
-    }
-
-    std::map<SceneObjectId, SceneObject> root_scene_objects;
-    for (auto scene_object_proto : proto.scene_objects()) {
-        root_scene_objects.insert(
-            std::make_pair(scene_object_proto.id(), SceneObject(scene_object_proto, geometries)));
-    }
-
-    return root_scene_objects;
 }
 
 } // namespace e8

@@ -38,7 +38,7 @@ message Camera {
     };
 
     // ID of this camera.
-    string id = 1;
+    int64 id = 1;
 
     // The camera's location.
     repeated float position = 2;

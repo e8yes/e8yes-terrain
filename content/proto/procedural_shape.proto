@@ -19,7 +19,7 @@ syntax = "proto3";
 
 package e8;
 
-import "primitive.proto";
+import "transform.proto";
 
 /**
  * @brief The ProceduralPlaneProto message A one-sided upward facing plane, centered at the origin.

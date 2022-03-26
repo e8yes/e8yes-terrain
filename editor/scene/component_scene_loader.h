@@ -25,7 +25,6 @@
 #include "editor/basic/context.h"
 #include "editor/environment/component_ambient.h"
 #include "editor/environment/component_camera.h"
-#include "editor/scene/component_scene_saver.h"
 #include "editor/scene/component_scene_view.h"
 
 namespace e8 {
@@ -40,8 +39,7 @@ class SceneLoaderComponent : public QObject {
     SceneLoaderComponent(AmbientComponent *ambient_comp, CameraComponent *camera_comp,
                          EditorPortalSwitcherComponent *editor_portal_switcher_comp,
                          ModificationMonitorComponent *modification_monitor_comp,
-                         SceneSaverComponent *scene_saver_comp, SceneViewComponent *scene_view_comp,
-                         EditorContext *context);
+                         SceneViewComponent *scene_view_comp, EditorContext *context);
     ~SceneLoaderComponent();
 
   public slots:
@@ -54,7 +52,6 @@ class SceneLoaderComponent : public QObject {
     CameraComponent *camera_comp_;
     EditorPortalSwitcherComponent *editor_portal_switcher_comp_;
     ModificationMonitorComponent *modification_monitor_comp_;
-    SceneSaverComponent *scene_saver_comp_;
     SceneViewComponent *scene_view_comp_;
 
     EditorContext *context_;

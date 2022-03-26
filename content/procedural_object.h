@@ -24,10 +24,12 @@
 #include <string>
 #include <vector>
 
+#include "common/device.h"
 #include "content/common.h"
 #include "content/proto/procedural_object.pb.h"
 #include "content/scene_entity.h"
 #include "content/scene_object.h"
+#include "resource/accessor.h"
 
 namespace e8 {
 
@@ -57,7 +59,7 @@ class ProceduralObjectInterface {
     /**
      * @brief ToSceneObject Converts a procedural object to a regular scene object.
      */
-    virtual SceneObject ToSceneObject() const = 0;
+    virtual SceneObject ToSceneObject(ResourceAccessor *resource_accessor) const = 0;
 
     /**
      * @brief ToProto Converts a procedural object to a serializable protobuf object.
@@ -80,18 +82,11 @@ class ProceduralObjectInterface {
 };
 
 /**
- * @brief ToProto Turns a collection of procedural objects into protobuf objects.
+ * @brief ToProceduralObject
+ * @param proto
+ * @return
  */
-google::protobuf::RepeatedPtrField<ProceduralObjectProto>
-ToProto(std::map<ProceduralObjectId, std::unique_ptr<ProceduralObjectInterface>> const
-            &procedural_objects);
-
-/**
- * @brief ToProceduralObjects Turns an array of protobuf procedural objects back to a collection of
- * in-memory procedural objects.
- */
-std::map<ProceduralObjectId, std::unique_ptr<ProceduralObjectInterface>>
-ToProceduralObjects(google::protobuf::RepeatedPtrField<ProceduralObjectProto> const &protos);
+std::unique_ptr<ProceduralObjectInterface> ToProceduralObject(ProceduralObjectProto const &proto);
 
 } // namespace e8
 

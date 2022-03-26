@@ -65,9 +65,9 @@ extern RadianceRendererParametersDefaultTypeInternal _RadianceRendererParameters
 class RadiosityRendererParameters;
 class RadiosityRendererParametersDefaultTypeInternal;
 extern RadiosityRendererParametersDefaultTypeInternal _RadiosityRendererParameters_default_instance_;
-class RendererParameters;
-class RendererParametersDefaultTypeInternal;
-extern RendererParametersDefaultTypeInternal _RendererParameters_default_instance_;
+class RendererConfiguration;
+class RendererConfigurationDefaultTypeInternal;
+extern RendererConfigurationDefaultTypeInternal _RendererConfiguration_default_instance_;
 class SolidColorRendererParameters;
 class SolidColorRendererParametersDefaultTypeInternal;
 extern SolidColorRendererParametersDefaultTypeInternal _SolidColorRendererParameters_default_instance_;
@@ -76,7 +76,7 @@ PROTOBUF_NAMESPACE_OPEN
 template<> ::e8::DepthRendererParameters* Arena::CreateMaybeMessage<::e8::DepthRendererParameters>(Arena*);
 template<> ::e8::RadianceRendererParameters* Arena::CreateMaybeMessage<::e8::RadianceRendererParameters>(Arena*);
 template<> ::e8::RadiosityRendererParameters* Arena::CreateMaybeMessage<::e8::RadiosityRendererParameters>(Arena*);
-template<> ::e8::RendererParameters* Arena::CreateMaybeMessage<::e8::RendererParameters>(Arena*);
+template<> ::e8::RendererConfiguration* Arena::CreateMaybeMessage<::e8::RendererConfiguration>(Arena*);
 template<> ::e8::SolidColorRendererParameters* Arena::CreateMaybeMessage<::e8::SolidColorRendererParameters>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace e8 {
@@ -620,23 +620,23 @@ class RadiosityRendererParameters PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
-class RendererParameters PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:e8.RendererParameters) */ {
+class RendererConfiguration PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:e8.RendererConfiguration) */ {
  public:
-  inline RendererParameters() : RendererParameters(nullptr) {};
-  virtual ~RendererParameters();
+  inline RendererConfiguration() : RendererConfiguration(nullptr) {};
+  virtual ~RendererConfiguration();
 
-  RendererParameters(const RendererParameters& from);
-  RendererParameters(RendererParameters&& from) noexcept
-    : RendererParameters() {
+  RendererConfiguration(const RendererConfiguration& from);
+  RendererConfiguration(RendererConfiguration&& from) noexcept
+    : RendererConfiguration() {
     *this = ::std::move(from);
   }
 
-  inline RendererParameters& operator=(const RendererParameters& from) {
+  inline RendererConfiguration& operator=(const RendererConfiguration& from) {
     CopyFrom(from);
     return *this;
   }
-  inline RendererParameters& operator=(RendererParameters&& from) noexcept {
+  inline RendererConfiguration& operator=(RendererConfiguration&& from) noexcept {
     if (GetArena() == from.GetArena()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -654,20 +654,20 @@ class RendererParameters PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const RendererParameters& default_instance();
+  static const RendererConfiguration& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const RendererParameters* internal_default_instance() {
-    return reinterpret_cast<const RendererParameters*>(
-               &_RendererParameters_default_instance_);
+  static inline const RendererConfiguration* internal_default_instance() {
+    return reinterpret_cast<const RendererConfiguration*>(
+               &_RendererConfiguration_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     4;
 
-  friend void swap(RendererParameters& a, RendererParameters& b) {
+  friend void swap(RendererConfiguration& a, RendererConfiguration& b) {
     a.Swap(&b);
   }
-  inline void Swap(RendererParameters* other) {
+  inline void Swap(RendererConfiguration* other) {
     if (other == this) return;
     if (GetArena() == other->GetArena()) {
       InternalSwap(other);
@@ -675,7 +675,7 @@ class RendererParameters PROTOBUF_FINAL :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(RendererParameters* other) {
+  void UnsafeArenaSwap(RendererConfiguration* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -683,17 +683,17 @@ class RendererParameters PROTOBUF_FINAL :
 
   // implements Message ----------------------------------------------
 
-  inline RendererParameters* New() const final {
-    return CreateMaybeMessage<RendererParameters>(nullptr);
+  inline RendererConfiguration* New() const final {
+    return CreateMaybeMessage<RendererConfiguration>(nullptr);
   }
 
-  RendererParameters* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<RendererParameters>(arena);
+  RendererConfiguration* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<RendererConfiguration>(arena);
   }
   void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const RendererParameters& from);
-  void MergeFrom(const RendererParameters& from);
+  void CopyFrom(const RendererConfiguration& from);
+  void MergeFrom(const RendererConfiguration& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -707,13 +707,13 @@ class RendererParameters PROTOBUF_FINAL :
   inline void SharedCtor();
   inline void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(RendererParameters* other);
+  void InternalSwap(RendererConfiguration* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "e8.RendererParameters";
+    return "e8.RendererConfiguration";
   }
   protected:
-  explicit RendererParameters(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  explicit RendererConfiguration(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   private:
   static void ArenaDtor(void* object);
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
@@ -733,12 +733,13 @@ class RendererParameters PROTOBUF_FINAL :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kSolidColorRendererParamsFieldNumber = 1,
-    kDepthRendererParamsFieldNumber = 2,
-    kRadianceRendererParamsFieldNumber = 3,
-    kRadiosityRendererParamsFieldNumber = 4,
+    kSolidColorRendererParamsFieldNumber = 2,
+    kDepthRendererParamsFieldNumber = 3,
+    kRadianceRendererParamsFieldNumber = 4,
+    kRadiosityRendererParamsFieldNumber = 5,
+    kInUseRendererTypeFieldNumber = 1,
   };
-  // .e8.SolidColorRendererParameters solid_color_renderer_params = 1;
+  // .e8.SolidColorRendererParameters solid_color_renderer_params = 2;
   bool has_solid_color_renderer_params() const;
   private:
   bool _internal_has_solid_color_renderer_params() const;
@@ -756,7 +757,7 @@ class RendererParameters PROTOBUF_FINAL :
       ::e8::SolidColorRendererParameters* solid_color_renderer_params);
   ::e8::SolidColorRendererParameters* unsafe_arena_release_solid_color_renderer_params();
 
-  // .e8.DepthRendererParameters depth_renderer_params = 2;
+  // .e8.DepthRendererParameters depth_renderer_params = 3;
   bool has_depth_renderer_params() const;
   private:
   bool _internal_has_depth_renderer_params() const;
@@ -774,7 +775,7 @@ class RendererParameters PROTOBUF_FINAL :
       ::e8::DepthRendererParameters* depth_renderer_params);
   ::e8::DepthRendererParameters* unsafe_arena_release_depth_renderer_params();
 
-  // .e8.RadianceRendererParameters radiance_renderer_params = 3;
+  // .e8.RadianceRendererParameters radiance_renderer_params = 4;
   bool has_radiance_renderer_params() const;
   private:
   bool _internal_has_radiance_renderer_params() const;
@@ -792,7 +793,7 @@ class RendererParameters PROTOBUF_FINAL :
       ::e8::RadianceRendererParameters* radiance_renderer_params);
   ::e8::RadianceRendererParameters* unsafe_arena_release_radiance_renderer_params();
 
-  // .e8.RadiosityRendererParameters radiosity_renderer_params = 4;
+  // .e8.RadiosityRendererParameters radiosity_renderer_params = 5;
   bool has_radiosity_renderer_params() const;
   private:
   bool _internal_has_radiosity_renderer_params() const;
@@ -810,7 +811,16 @@ class RendererParameters PROTOBUF_FINAL :
       ::e8::RadiosityRendererParameters* radiosity_renderer_params);
   ::e8::RadiosityRendererParameters* unsafe_arena_release_radiosity_renderer_params();
 
-  // @@protoc_insertion_point(class_scope:e8.RendererParameters)
+  // .e8.RendererType in_use_renderer_type = 1;
+  void clear_in_use_renderer_type();
+  ::e8::RendererType in_use_renderer_type() const;
+  void set_in_use_renderer_type(::e8::RendererType value);
+  private:
+  ::e8::RendererType _internal_in_use_renderer_type() const;
+  void _internal_set_in_use_renderer_type(::e8::RendererType value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:e8.RendererConfiguration)
  private:
   class _Internal;
 
@@ -821,6 +831,7 @@ class RendererParameters PROTOBUF_FINAL :
   ::e8::DepthRendererParameters* depth_renderer_params_;
   ::e8::RadianceRendererParameters* radiance_renderer_params_;
   ::e8::RadiosityRendererParameters* radiosity_renderer_params_;
+  int in_use_renderer_type_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_renderer_2eproto;
 };
@@ -869,31 +880,51 @@ inline void DepthRendererParameters::set_alpha(float value) {
 
 // -------------------------------------------------------------------
 
-// RendererParameters
+// RendererConfiguration
 
-// .e8.SolidColorRendererParameters solid_color_renderer_params = 1;
-inline bool RendererParameters::_internal_has_solid_color_renderer_params() const {
+// .e8.RendererType in_use_renderer_type = 1;
+inline void RendererConfiguration::clear_in_use_renderer_type() {
+  in_use_renderer_type_ = 0;
+}
+inline ::e8::RendererType RendererConfiguration::_internal_in_use_renderer_type() const {
+  return static_cast< ::e8::RendererType >(in_use_renderer_type_);
+}
+inline ::e8::RendererType RendererConfiguration::in_use_renderer_type() const {
+  // @@protoc_insertion_point(field_get:e8.RendererConfiguration.in_use_renderer_type)
+  return _internal_in_use_renderer_type();
+}
+inline void RendererConfiguration::_internal_set_in_use_renderer_type(::e8::RendererType value) {
+  
+  in_use_renderer_type_ = value;
+}
+inline void RendererConfiguration::set_in_use_renderer_type(::e8::RendererType value) {
+  _internal_set_in_use_renderer_type(value);
+  // @@protoc_insertion_point(field_set:e8.RendererConfiguration.in_use_renderer_type)
+}
+
+// .e8.SolidColorRendererParameters solid_color_renderer_params = 2;
+inline bool RendererConfiguration::_internal_has_solid_color_renderer_params() const {
   return this != internal_default_instance() && solid_color_renderer_params_ != nullptr;
 }
-inline bool RendererParameters::has_solid_color_renderer_params() const {
+inline bool RendererConfiguration::has_solid_color_renderer_params() const {
   return _internal_has_solid_color_renderer_params();
 }
-inline void RendererParameters::clear_solid_color_renderer_params() {
+inline void RendererConfiguration::clear_solid_color_renderer_params() {
   if (GetArena() == nullptr && solid_color_renderer_params_ != nullptr) {
     delete solid_color_renderer_params_;
   }
   solid_color_renderer_params_ = nullptr;
 }
-inline const ::e8::SolidColorRendererParameters& RendererParameters::_internal_solid_color_renderer_params() const {
+inline const ::e8::SolidColorRendererParameters& RendererConfiguration::_internal_solid_color_renderer_params() const {
   const ::e8::SolidColorRendererParameters* p = solid_color_renderer_params_;
   return p != nullptr ? *p : *reinterpret_cast<const ::e8::SolidColorRendererParameters*>(
       &::e8::_SolidColorRendererParameters_default_instance_);
 }
-inline const ::e8::SolidColorRendererParameters& RendererParameters::solid_color_renderer_params() const {
-  // @@protoc_insertion_point(field_get:e8.RendererParameters.solid_color_renderer_params)
+inline const ::e8::SolidColorRendererParameters& RendererConfiguration::solid_color_renderer_params() const {
+  // @@protoc_insertion_point(field_get:e8.RendererConfiguration.solid_color_renderer_params)
   return _internal_solid_color_renderer_params();
 }
-inline void RendererParameters::unsafe_arena_set_allocated_solid_color_renderer_params(
+inline void RendererConfiguration::unsafe_arena_set_allocated_solid_color_renderer_params(
     ::e8::SolidColorRendererParameters* solid_color_renderer_params) {
   if (GetArena() == nullptr) {
     delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(solid_color_renderer_params_);
@@ -904,23 +935,23 @@ inline void RendererParameters::unsafe_arena_set_allocated_solid_color_renderer_
   } else {
     
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.RendererParameters.solid_color_renderer_params)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.RendererConfiguration.solid_color_renderer_params)
 }
-inline ::e8::SolidColorRendererParameters* RendererParameters::release_solid_color_renderer_params() {
+inline ::e8::SolidColorRendererParameters* RendererConfiguration::release_solid_color_renderer_params() {
   auto temp = unsafe_arena_release_solid_color_renderer_params();
   if (GetArena() != nullptr) {
     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
   }
   return temp;
 }
-inline ::e8::SolidColorRendererParameters* RendererParameters::unsafe_arena_release_solid_color_renderer_params() {
-  // @@protoc_insertion_point(field_release:e8.RendererParameters.solid_color_renderer_params)
+inline ::e8::SolidColorRendererParameters* RendererConfiguration::unsafe_arena_release_solid_color_renderer_params() {
+  // @@protoc_insertion_point(field_release:e8.RendererConfiguration.solid_color_renderer_params)
   
   ::e8::SolidColorRendererParameters* temp = solid_color_renderer_params_;
   solid_color_renderer_params_ = nullptr;
   return temp;
 }
-inline ::e8::SolidColorRendererParameters* RendererParameters::_internal_mutable_solid_color_renderer_params() {
+inline ::e8::SolidColorRendererParameters* RendererConfiguration::_internal_mutable_solid_color_renderer_params() {
   
   if (solid_color_renderer_params_ == nullptr) {
     auto* p = CreateMaybeMessage<::e8::SolidColorRendererParameters>(GetArena());
@@ -928,11 +959,11 @@ inline ::e8::SolidColorRendererParameters* RendererParameters::_internal_mutable
   }
   return solid_color_renderer_params_;
 }
-inline ::e8::SolidColorRendererParameters* RendererParameters::mutable_solid_color_renderer_params() {
-  // @@protoc_insertion_point(field_mutable:e8.RendererParameters.solid_color_renderer_params)
+inline ::e8::SolidColorRendererParameters* RendererConfiguration::mutable_solid_color_renderer_params() {
+  // @@protoc_insertion_point(field_mutable:e8.RendererConfiguration.solid_color_renderer_params)
   return _internal_mutable_solid_color_renderer_params();
 }
-inline void RendererParameters::set_allocated_solid_color_renderer_params(::e8::SolidColorRendererParameters* solid_color_renderer_params) {
+inline void RendererConfiguration::set_allocated_solid_color_renderer_params(::e8::SolidColorRendererParameters* solid_color_renderer_params) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
   if (message_arena == nullptr) {
     delete solid_color_renderer_params_;
@@ -949,32 +980,32 @@ inline void RendererParameters::set_allocated_solid_color_renderer_params(::e8::
     
   }
   solid_color_renderer_params_ = solid_color_renderer_params;
-  // @@protoc_insertion_point(field_set_allocated:e8.RendererParameters.solid_color_renderer_params)
+  // @@protoc_insertion_point(field_set_allocated:e8.RendererConfiguration.solid_color_renderer_params)
 }
 
-// .e8.DepthRendererParameters depth_renderer_params = 2;
-inline bool RendererParameters::_internal_has_depth_renderer_params() const {
+// .e8.DepthRendererParameters depth_renderer_params = 3;
+inline bool RendererConfiguration::_internal_has_depth_renderer_params() const {
   return this != internal_default_instance() && depth_renderer_params_ != nullptr;
 }
-inline bool RendererParameters::has_depth_renderer_params() const {
+inline bool RendererConfiguration::has_depth_renderer_params() const {
   return _internal_has_depth_renderer_params();
 }
-inline void RendererParameters::clear_depth_renderer_params() {
+inline void RendererConfiguration::clear_depth_renderer_params() {
   if (GetArena() == nullptr && depth_renderer_params_ != nullptr) {
     delete depth_renderer_params_;
   }
   depth_renderer_params_ = nullptr;
 }
-inline const ::e8::DepthRendererParameters& RendererParameters::_internal_depth_renderer_params() const {
+inline const ::e8::DepthRendererParameters& RendererConfiguration::_internal_depth_renderer_params() const {
   const ::e8::DepthRendererParameters* p = depth_renderer_params_;
   return p != nullptr ? *p : *reinterpret_cast<const ::e8::DepthRendererParameters*>(
       &::e8::_DepthRendererParameters_default_instance_);
 }
-inline const ::e8::DepthRendererParameters& RendererParameters::depth_renderer_params() const {
-  // @@protoc_insertion_point(field_get:e8.RendererParameters.depth_renderer_params)
+inline const ::e8::DepthRendererParameters& RendererConfiguration::depth_renderer_params() const {
+  // @@protoc_insertion_point(field_get:e8.RendererConfiguration.depth_renderer_params)
   return _internal_depth_renderer_params();
 }
-inline void RendererParameters::unsafe_arena_set_allocated_depth_renderer_params(
+inline void RendererConfiguration::unsafe_arena_set_allocated_depth_renderer_params(
     ::e8::DepthRendererParameters* depth_renderer_params) {
   if (GetArena() == nullptr) {
     delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(depth_renderer_params_);
@@ -985,23 +1016,23 @@ inline void RendererParameters::unsafe_arena_set_allocated_depth_renderer_params
   } else {
     
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.RendererParameters.depth_renderer_params)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.RendererConfiguration.depth_renderer_params)
 }
-inline ::e8::DepthRendererParameters* RendererParameters::release_depth_renderer_params() {
+inline ::e8::DepthRendererParameters* RendererConfiguration::release_depth_renderer_params() {
   auto temp = unsafe_arena_release_depth_renderer_params();
   if (GetArena() != nullptr) {
     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
   }
   return temp;
 }
-inline ::e8::DepthRendererParameters* RendererParameters::unsafe_arena_release_depth_renderer_params() {
-  // @@protoc_insertion_point(field_release:e8.RendererParameters.depth_renderer_params)
+inline ::e8::DepthRendererParameters* RendererConfiguration::unsafe_arena_release_depth_renderer_params() {
+  // @@protoc_insertion_point(field_release:e8.RendererConfiguration.depth_renderer_params)
   
   ::e8::DepthRendererParameters* temp = depth_renderer_params_;
   depth_renderer_params_ = nullptr;
   return temp;
 }
-inline ::e8::DepthRendererParameters* RendererParameters::_internal_mutable_depth_renderer_params() {
+inline ::e8::DepthRendererParameters* RendererConfiguration::_internal_mutable_depth_renderer_params() {
   
   if (depth_renderer_params_ == nullptr) {
     auto* p = CreateMaybeMessage<::e8::DepthRendererParameters>(GetArena());
@@ -1009,11 +1040,11 @@ inline ::e8::DepthRendererParameters* RendererParameters::_internal_mutable_dept
   }
   return depth_renderer_params_;
 }
-inline ::e8::DepthRendererParameters* RendererParameters::mutable_depth_renderer_params() {
-  // @@protoc_insertion_point(field_mutable:e8.RendererParameters.depth_renderer_params)
+inline ::e8::DepthRendererParameters* RendererConfiguration::mutable_depth_renderer_params() {
+  // @@protoc_insertion_point(field_mutable:e8.RendererConfiguration.depth_renderer_params)
   return _internal_mutable_depth_renderer_params();
 }
-inline void RendererParameters::set_allocated_depth_renderer_params(::e8::DepthRendererParameters* depth_renderer_params) {
+inline void RendererConfiguration::set_allocated_depth_renderer_params(::e8::DepthRendererParameters* depth_renderer_params) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
   if (message_arena == nullptr) {
     delete depth_renderer_params_;
@@ -1030,32 +1061,32 @@ inline void RendererParameters::set_allocated_depth_renderer_params(::e8::DepthR
     
   }
   depth_renderer_params_ = depth_renderer_params;
-  // @@protoc_insertion_point(field_set_allocated:e8.RendererParameters.depth_renderer_params)
+  // @@protoc_insertion_point(field_set_allocated:e8.RendererConfiguration.depth_renderer_params)
 }
 
-// .e8.RadianceRendererParameters radiance_renderer_params = 3;
-inline bool RendererParameters::_internal_has_radiance_renderer_params() const {
+// .e8.RadianceRendererParameters radiance_renderer_params = 4;
+inline bool RendererConfiguration::_internal_has_radiance_renderer_params() const {
   return this != internal_default_instance() && radiance_renderer_params_ != nullptr;
 }
-inline bool RendererParameters::has_radiance_renderer_params() const {
+inline bool RendererConfiguration::has_radiance_renderer_params() const {
   return _internal_has_radiance_renderer_params();
 }
-inline void RendererParameters::clear_radiance_renderer_params() {
+inline void RendererConfiguration::clear_radiance_renderer_params() {
   if (GetArena() == nullptr && radiance_renderer_params_ != nullptr) {
     delete radiance_renderer_params_;
   }
   radiance_renderer_params_ = nullptr;
 }
-inline const ::e8::RadianceRendererParameters& RendererParameters::_internal_radiance_renderer_params() const {
+inline const ::e8::RadianceRendererParameters& RendererConfiguration::_internal_radiance_renderer_params() const {
   const ::e8::RadianceRendererParameters* p = radiance_renderer_params_;
   return p != nullptr ? *p : *reinterpret_cast<const ::e8::RadianceRendererParameters*>(
       &::e8::_RadianceRendererParameters_default_instance_);
 }
-inline const ::e8::RadianceRendererParameters& RendererParameters::radiance_renderer_params() const {
-  // @@protoc_insertion_point(field_get:e8.RendererParameters.radiance_renderer_params)
+inline const ::e8::RadianceRendererParameters& RendererConfiguration::radiance_renderer_params() const {
+  // @@protoc_insertion_point(field_get:e8.RendererConfiguration.radiance_renderer_params)
   return _internal_radiance_renderer_params();
 }
-inline void RendererParameters::unsafe_arena_set_allocated_radiance_renderer_params(
+inline void RendererConfiguration::unsafe_arena_set_allocated_radiance_renderer_params(
     ::e8::RadianceRendererParameters* radiance_renderer_params) {
   if (GetArena() == nullptr) {
     delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(radiance_renderer_params_);
@@ -1066,23 +1097,23 @@ inline void RendererParameters::unsafe_arena_set_allocated_radiance_renderer_par
   } else {
     
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.RendererParameters.radiance_renderer_params)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.RendererConfiguration.radiance_renderer_params)
 }
-inline ::e8::RadianceRendererParameters* RendererParameters::release_radiance_renderer_params() {
+inline ::e8::RadianceRendererParameters* RendererConfiguration::release_radiance_renderer_params() {
   auto temp = unsafe_arena_release_radiance_renderer_params();
   if (GetArena() != nullptr) {
     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
   }
   return temp;
 }
-inline ::e8::RadianceRendererParameters* RendererParameters::unsafe_arena_release_radiance_renderer_params() {
-  // @@protoc_insertion_point(field_release:e8.RendererParameters.radiance_renderer_params)
+inline ::e8::RadianceRendererParameters* RendererConfiguration::unsafe_arena_release_radiance_renderer_params() {
+  // @@protoc_insertion_point(field_release:e8.RendererConfiguration.radiance_renderer_params)
   
   ::e8::RadianceRendererParameters* temp = radiance_renderer_params_;
   radiance_renderer_params_ = nullptr;
   return temp;
 }
-inline ::e8::RadianceRendererParameters* RendererParameters::_internal_mutable_radiance_renderer_params() {
+inline ::e8::RadianceRendererParameters* RendererConfiguration::_internal_mutable_radiance_renderer_params() {
   
   if (radiance_renderer_params_ == nullptr) {
     auto* p = CreateMaybeMessage<::e8::RadianceRendererParameters>(GetArena());
@@ -1090,11 +1121,11 @@ inline ::e8::RadianceRendererParameters* RendererParameters::_internal_mutable_r
   }
   return radiance_renderer_params_;
 }
-inline ::e8::RadianceRendererParameters* RendererParameters::mutable_radiance_renderer_params() {
-  // @@protoc_insertion_point(field_mutable:e8.RendererParameters.radiance_renderer_params)
+inline ::e8::RadianceRendererParameters* RendererConfiguration::mutable_radiance_renderer_params() {
+  // @@protoc_insertion_point(field_mutable:e8.RendererConfiguration.radiance_renderer_params)
   return _internal_mutable_radiance_renderer_params();
 }
-inline void RendererParameters::set_allocated_radiance_renderer_params(::e8::RadianceRendererParameters* radiance_renderer_params) {
+inline void RendererConfiguration::set_allocated_radiance_renderer_params(::e8::RadianceRendererParameters* radiance_renderer_params) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
   if (message_arena == nullptr) {
     delete radiance_renderer_params_;
@@ -1111,32 +1142,32 @@ inline void RendererParameters::set_allocated_radiance_renderer_params(::e8::Rad
     
   }
   radiance_renderer_params_ = radiance_renderer_params;
-  // @@protoc_insertion_point(field_set_allocated:e8.RendererParameters.radiance_renderer_params)
+  // @@protoc_insertion_point(field_set_allocated:e8.RendererConfiguration.radiance_renderer_params)
 }
 
-// .e8.RadiosityRendererParameters radiosity_renderer_params = 4;
-inline bool RendererParameters::_internal_has_radiosity_renderer_params() const {
+// .e8.RadiosityRendererParameters radiosity_renderer_params = 5;
+inline bool RendererConfiguration::_internal_has_radiosity_renderer_params() const {
   return this != internal_default_instance() && radiosity_renderer_params_ != nullptr;
 }
-inline bool RendererParameters::has_radiosity_renderer_params() const {
+inline bool RendererConfiguration::has_radiosity_renderer_params() const {
   return _internal_has_radiosity_renderer_params();
 }
-inline void RendererParameters::clear_radiosity_renderer_params() {
+inline void RendererConfiguration::clear_radiosity_renderer_params() {
   if (GetArena() == nullptr && radiosity_renderer_params_ != nullptr) {
     delete radiosity_renderer_params_;
   }
   radiosity_renderer_params_ = nullptr;
 }
-inline const ::e8::RadiosityRendererParameters& RendererParameters::_internal_radiosity_renderer_params() const {
+inline const ::e8::RadiosityRendererParameters& RendererConfiguration::_internal_radiosity_renderer_params() const {
   const ::e8::RadiosityRendererParameters* p = radiosity_renderer_params_;
   return p != nullptr ? *p : *reinterpret_cast<const ::e8::RadiosityRendererParameters*>(
       &::e8::_RadiosityRendererParameters_default_instance_);
 }
-inline const ::e8::RadiosityRendererParameters& RendererParameters::radiosity_renderer_params() const {
-  // @@protoc_insertion_point(field_get:e8.RendererParameters.radiosity_renderer_params)
+inline const ::e8::RadiosityRendererParameters& RendererConfiguration::radiosity_renderer_params() const {
+  // @@protoc_insertion_point(field_get:e8.RendererConfiguration.radiosity_renderer_params)
   return _internal_radiosity_renderer_params();
 }
-inline void RendererParameters::unsafe_arena_set_allocated_radiosity_renderer_params(
+inline void RendererConfiguration::unsafe_arena_set_allocated_radiosity_renderer_params(
     ::e8::RadiosityRendererParameters* radiosity_renderer_params) {
   if (GetArena() == nullptr) {
     delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(radiosity_renderer_params_);
@@ -1147,23 +1178,23 @@ inline void RendererParameters::unsafe_arena_set_allocated_radiosity_renderer_pa
   } else {
     
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.RendererParameters.radiosity_renderer_params)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.RendererConfiguration.radiosity_renderer_params)
 }
-inline ::e8::RadiosityRendererParameters* RendererParameters::release_radiosity_renderer_params() {
+inline ::e8::RadiosityRendererParameters* RendererConfiguration::release_radiosity_renderer_params() {
   auto temp = unsafe_arena_release_radiosity_renderer_params();
   if (GetArena() != nullptr) {
     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
   }
   return temp;
 }
-inline ::e8::RadiosityRendererParameters* RendererParameters::unsafe_arena_release_radiosity_renderer_params() {
-  // @@protoc_insertion_point(field_release:e8.RendererParameters.radiosity_renderer_params)
+inline ::e8::RadiosityRendererParameters* RendererConfiguration::unsafe_arena_release_radiosity_renderer_params() {
+  // @@protoc_insertion_point(field_release:e8.RendererConfiguration.radiosity_renderer_params)
   
   ::e8::RadiosityRendererParameters* temp = radiosity_renderer_params_;
   radiosity_renderer_params_ = nullptr;
   return temp;
 }
-inline ::e8::RadiosityRendererParameters* RendererParameters::_internal_mutable_radiosity_renderer_params() {
+inline ::e8::RadiosityRendererParameters* RendererConfiguration::_internal_mutable_radiosity_renderer_params() {
   
   if (radiosity_renderer_params_ == nullptr) {
     auto* p = CreateMaybeMessage<::e8::RadiosityRendererParameters>(GetArena());
@@ -1171,11 +1202,11 @@ inline ::e8::RadiosityRendererParameters* RendererParameters::_internal_mutable_
   }
   return radiosity_renderer_params_;
 }
-inline ::e8::RadiosityRendererParameters* RendererParameters::mutable_radiosity_renderer_params() {
-  // @@protoc_insertion_point(field_mutable:e8.RendererParameters.radiosity_renderer_params)
+inline ::e8::RadiosityRendererParameters* RendererConfiguration::mutable_radiosity_renderer_params() {
+  // @@protoc_insertion_point(field_mutable:e8.RendererConfiguration.radiosity_renderer_params)
   return _internal_mutable_radiosity_renderer_params();
 }
-inline void RendererParameters::set_allocated_radiosity_renderer_params(::e8::RadiosityRendererParameters* radiosity_renderer_params) {
+inline void RendererConfiguration::set_allocated_radiosity_renderer_params(::e8::RadiosityRendererParameters* radiosity_renderer_params) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
   if (message_arena == nullptr) {
     delete radiosity_renderer_params_;
@@ -1192,7 +1223,7 @@ inline void RendererParameters::set_allocated_radiosity_renderer_params(::e8::Ra
     
   }
   radiosity_renderer_params_ = radiosity_renderer_params;
-  // @@protoc_insertion_point(field_set_allocated:e8.RendererParameters.radiosity_renderer_params)
+  // @@protoc_insertion_point(field_set_allocated:e8.RendererConfiguration.radiosity_renderer_params)
 }
 
 #ifdef __GNUC__

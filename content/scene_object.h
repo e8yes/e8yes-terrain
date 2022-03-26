@@ -19,21 +19,17 @@
 #define ISLANDS_CONTENT_SCENE_OBJECT_H
 
 #include <list>
-#include <map>
-#include <optional>
 #include <string>
-#include <unordered_map>
 
 #include "content/common.h"
-#include "content/geometry.h"
-#include "content/proto/geometry.pb.h"
 #include "content/proto/scene_object.pb.h"
 #include "content/scene_entity.h"
+#include "resource/common.h"
 
 namespace e8 {
 
 // Uniquely identifies a scene object.
-using SceneObjectId = std::string;
+using SceneObjectId = Uuid;
 
 // Represents a descriptive human readable name of a scene object.
 using SceneObjectName = std::string;
@@ -50,15 +46,12 @@ struct SceneObject {
      * procedural process referenced by the ID.
      */
     SceneObject(SceneObjectName const &name,
-                std::optional<ProceduralObjectId> const &procedural_object_id = std::nullopt);
+                ProceduralObjectId const &procedural_object_id = kNullUuid);
 
     /**
-     * @brief SceneObject Reconstructs a scene object from a protobuf object. Since the entity proto
-     * references the geometry and physical shape information by only IDs, it requires two maps of
-     * actually instances to correctly fill the entity up.
+     * @brief SceneObject Reconstructs a scene object from a protobuf object.
      */
-    SceneObject(SceneObjectProto const &proto,
-                std::unordered_map<GeometryId, std::shared_ptr<GeometryLod>> const &geometries);
+    SceneObject(SceneObjectProto const &proto);
 
     ~SceneObject();
 
@@ -105,26 +98,12 @@ struct SceneObject {
 
     // If this field isn't null, it indicates that this scene object is generated procedural
     // process. The process is fully specified by the procedural object referenced by this ID.
-    std::optional<ProceduralObjectId> procedural_object_id;
+    ProceduralObjectId procedural_object_id;
 
     // Children must either be a list of scene objects or scene entities.
     std::list<SceneObject> child_scene_objects;
     std::list<SceneEntity> child_scene_entities;
 };
-
-/**
- * @brief ToProto Transforms a collection of scene objects to a SceneObjectCollection message. See
- * the proto definition for what it is. Note, for procedural objects, only the root procedural node
- * will be put into the protobuf message.
- */
-SceneObjectCollection ToProto(std::map<SceneObjectId, SceneObject> const &scene_objects);
-
-/**
- * @brief ToSceneObjects Transforms a proto description of a collection of scene objects back to an
- * in-memory SceneObject collection. Note, procedural scene entities will not be restored in the
- * result map. Only the procedural ID is set.
- */
-std::map<SceneObjectId, SceneObject> ToSceneObjects(SceneObjectCollection const &proto);
 
 } // namespace e8
 

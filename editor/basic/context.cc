@@ -17,36 +17,30 @@
 
 #include <QApplication>
 #include <QList>
-#include <QObject>
 #include <QWidget>
-#include <SDL2/SDL.h>
 #include <memory>
-#include <string>
 #include <vector>
 
-#include "content/scene.h"
 #include "editor/basic/context.h"
+#include "editor/basic/editor_storyline.h"
+#include "game/game.h"
+#include "game/storyline.h"
 #include "ui_window_editor.h"
 
 namespace e8 {
 
-EditorContext::EditorContext() : running(false) {}
+EditorContext::EditorContext(int &argc, char *argv[])
+    : app(std::make_unique<QApplication>(argc, argv)),
+      ui(std::make_unique<Ui::IslandsEditorWindow>()), editor_storyline(CreateEditorStoryline()) {}
 
-EditorContext::~EditorContext() {}
-
-void EditorContext::Init(int &argc, char *argv[]) {
-    app = std::make_unique<QApplication>(argc, argv);
-    ui = std::make_unique<Ui::IslandsEditorWindow>();
-    display_window_event_source = std::make_unique<DisplayWindowEventSource>();
-    running = true;
+EditorContext::~EditorContext() {
+    if (game != nullptr) {
+        game->Shutdown();
+        game_thread->join();
+    }
 }
 
-void EditorContext::Shutdown() {
-    app = nullptr;
-    running = false;
-}
-
-bool EditorContext::Running() { return running; }
+void RunEditorGame(Game *game, Storyline *editor_storyline) { game->Run(editor_storyline); }
 
 void DeepScanWidget(QWidget *target, std::vector<QWidget *> *result) {
     if (target == nullptr) {
@@ -58,43 +52,6 @@ void DeepScanWidget(QWidget *target, std::vector<QWidget *> *result) {
     QList<QWidget *> children = target->findChildren<QWidget *>();
     for (auto child : children) {
         result->push_back(child);
-    }
-}
-
-DisplayWindowEventSource::DisplayWindowEventSource() {}
-
-DisplayWindowEventSource::~DisplayWindowEventSource() {}
-
-void DisplayWindowEventSource::PumpEvent(SDL_Event const &event, SDL_Window *display_window) {
-    switch (event.type) {
-    case SDL_KEYDOWN: {
-        switch (event.key.keysym.sym) {
-        case 'w':
-        case 'a':
-        case 's':
-        case 'd':
-            emit WasdKeysTriggered(static_cast<char>(event.key.keysym.sym));
-            break;
-        }
-        break;
-    }
-    }
-
-    if (event.motion.state & SDL_BUTTON_LMASK) {
-        int width;
-        int height;
-        SDL_GL_GetDrawableSize(display_window, &width, &height);
-
-        float dx = 0;
-        float dy = 0;
-        if (std::abs(event.motion.xrel) < width) {
-            dx = static_cast<float>(event.motion.xrel) / width;
-        }
-        if (std::abs(event.motion.yrel) < height) {
-            dy = static_cast<float>(event.motion.yrel) / height;
-        }
-
-        emit MouseDragged(dx, dy);
     }
 }
 

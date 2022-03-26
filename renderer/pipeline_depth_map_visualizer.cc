@@ -20,7 +20,7 @@
 #include <optional>
 #include <vulkan/vulkan.h>
 
-#include "renderer/context.h"
+#include "common/device.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/pipeline_depth_map_visualizer.h"
 #include "renderer/pipeline_output.h"

@@ -387,8 +387,8 @@ class Camera PROTOBUF_FINAL :
 
   enum : int {
     kPositionFieldNumber = 2,
-    kIdFieldNumber = 1,
     kBasisFieldNumber = 3,
+    kIdFieldNumber = 1,
     kFocalLengthFieldNumber = 4,
     kSensorWidthFieldNumber = 5,
     kSensorHeightFieldNumber = 6,
@@ -417,31 +417,6 @@ class Camera PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
       mutable_position();
 
-  // string id = 1;
-  void clear_id();
-  const std::string& id() const;
-  void set_id(const std::string& value);
-  void set_id(std::string&& value);
-  void set_id(const char* value);
-  void set_id(const char* value, size_t size);
-  std::string* mutable_id();
-  std::string* release_id();
-  void set_allocated_id(std::string* id);
-  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
-  std::string* unsafe_arena_release_id();
-  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
-  void unsafe_arena_set_allocated_id(
-      std::string* id);
-  private:
-  const std::string& _internal_id() const;
-  void _internal_set_id(const std::string& value);
-  std::string* _internal_mutable_id();
-  public:
-
   // .e8.Camera.Basis basis = 3;
   bool has_basis() const;
   private:
@@ -459,6 +434,15 @@ class Camera PROTOBUF_FINAL :
   void unsafe_arena_set_allocated_basis(
       ::e8::Camera_Basis* basis);
   ::e8::Camera_Basis* unsafe_arena_release_basis();
+
+  // int64 id = 1;
+  void clear_id();
+  ::PROTOBUF_NAMESPACE_ID::int64 id() const;
+  void set_id(::PROTOBUF_NAMESPACE_ID::int64 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int64 _internal_id() const;
+  void _internal_set_id(::PROTOBUF_NAMESPACE_ID::int64 value);
+  public:
 
   // float focal_length = 4;
   void clear_focal_length();
@@ -514,8 +498,8 @@ class Camera PROTOBUF_FINAL :
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > position_;
   mutable std::atomic<int> _position_cached_byte_size_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr id_;
   ::e8::Camera_Basis* basis_;
+  ::PROTOBUF_NAMESPACE_ID::int64 id_;
   float focal_length_;
   float sensor_width_;
   float sensor_height_;
@@ -680,85 +664,24 @@ Camera_Basis::mutable_back() {
 
 // Camera
 
-// string id = 1;
+// int64 id = 1;
 inline void Camera::clear_id() {
-  id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  id_ = PROTOBUF_LONGLONG(0);
 }
-inline const std::string& Camera::id() const {
+inline ::PROTOBUF_NAMESPACE_ID::int64 Camera::_internal_id() const {
+  return id_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int64 Camera::id() const {
   // @@protoc_insertion_point(field_get:e8.Camera.id)
   return _internal_id();
 }
-inline void Camera::set_id(const std::string& value) {
+inline void Camera::_internal_set_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
+  
+  id_ = value;
+}
+inline void Camera::set_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
   _internal_set_id(value);
   // @@protoc_insertion_point(field_set:e8.Camera.id)
-}
-inline std::string* Camera::mutable_id() {
-  // @@protoc_insertion_point(field_mutable:e8.Camera.id)
-  return _internal_mutable_id();
-}
-inline const std::string& Camera::_internal_id() const {
-  return id_.Get();
-}
-inline void Camera::_internal_set_id(const std::string& value) {
-  
-  id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
-}
-inline void Camera::set_id(std::string&& value) {
-  
-  id_.Set(
-    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
-  // @@protoc_insertion_point(field_set_rvalue:e8.Camera.id)
-}
-inline void Camera::set_id(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
-              GetArena());
-  // @@protoc_insertion_point(field_set_char:e8.Camera.id)
-}
-inline void Camera::set_id(const char* value,
-    size_t size) {
-  
-  id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
-      reinterpret_cast<const char*>(value), size), GetArena());
-  // @@protoc_insertion_point(field_set_pointer:e8.Camera.id)
-}
-inline std::string* Camera::_internal_mutable_id() {
-  
-  return id_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline std::string* Camera::release_id() {
-  // @@protoc_insertion_point(field_release:e8.Camera.id)
-  return id_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline void Camera::set_allocated_id(std::string* id) {
-  if (id != nullptr) {
-    
-  } else {
-    
-  }
-  id_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), id,
-      GetArena());
-  // @@protoc_insertion_point(field_set_allocated:e8.Camera.id)
-}
-inline std::string* Camera::unsafe_arena_release_id() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:e8.Camera.id)
-  GOOGLE_DCHECK(GetArena() != nullptr);
-  
-  return id_.UnsafeArenaRelease(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      GetArena());
-}
-inline void Camera::unsafe_arena_set_allocated_id(
-    std::string* id) {
-  GOOGLE_DCHECK(GetArena() != nullptr);
-  if (id != nullptr) {
-    
-  } else {
-    
-  }
-  id_.UnsafeArenaSetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      id, GetArena());
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.Camera.id)
 }
 
 // repeated float position = 2;
