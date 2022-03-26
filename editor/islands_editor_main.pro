@@ -26,6 +26,7 @@ SOURCES += \
     object/component_scene_object_gltf.cc \
     procedural/component_procedural_plane.cc \
     project/component_project_closer.cc \
+    project/component_project_creator.cc \
     project/component_project_loader.cc \
     project/component_project_saver.cc \
     scene/component_scene_view.cc \
@@ -43,6 +44,7 @@ HEADERS += \
     object/component_scene_object_gltf.h \
     procedural/component_procedural_plane.h \
     project/component_project_closer.h \
+    project/component_project_creator.h \
     project/component_project_loader.h \
     project/component_project_saver.h \
     scene/component_scene_view.h \
@@ -50,6 +52,7 @@ HEADERS += \
 
 FORMS += \
     procedural/component_procedural_plane.ui \
+    project/component_project_creator.ui \
     window_editor.ui
 
 TRANSLATIONS += \

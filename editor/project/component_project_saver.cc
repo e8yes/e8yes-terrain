@@ -41,7 +41,7 @@ ProjectSaverComponent::ProjectSaverComponent(
     EditorContext *context)
     : modification_monitor_comp_(modification_monitor_comp), scene_view_comp_(scene_view_comp),
       context_(context) {
-    QAction::connect(context_->ui->action_save_scene, &QAction::triggered, this,
+    QAction::connect(context_->ui->action_save_project, &QAction::triggered, this,
                      &ProjectSaverComponent::OnClickSaveProject);
 }
 

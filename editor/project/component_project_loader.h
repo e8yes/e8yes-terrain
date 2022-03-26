@@ -30,7 +30,7 @@
 namespace e8 {
 
 /**
- * @brief The ProjectLoaderComponent class It's responsible for scene loading interactions.
+ * @brief The ProjectLoaderComponent class Responsible for scene loading interactions.
  */
 class ProjectLoaderComponent : public QObject {
     Q_OBJECT
@@ -43,7 +43,6 @@ class ProjectLoaderComponent : public QObject {
     ~ProjectLoaderComponent();
 
   public slots:
-    void OnClickNewProject();
     void OnClickOpenProject();
 
   private:

@@ -50,12 +50,15 @@ IslandsEditorWindow::IslandsEditorWindow(EditorContext *editor_context, QWidget 
     camera_comp_ =
         std::make_unique<CameraComponent>(modification_monitor_comp_.get(), editor_context);
     scene_view_comp_ = std::make_unique<SceneViewComponent>(editor_context);
-    scene_saver_comp_ = std::make_unique<ProjectSaverComponent>(
+    project_saver_comp_ = std::make_unique<ProjectSaverComponent>(
         modification_monitor_comp_.get(), scene_view_comp_.get(), editor_context);
-    scene_closer_comp_ = std::make_unique<ProjectCloserComponent>(
+    project_closer_comp_ = std::make_unique<ProjectCloserComponent>(
         editor_portal_switcher_comp_.get(), modification_monitor_comp_.get(),
-        scene_saver_comp_.get(), scene_view_comp_.get(), editor_context);
-    scene_loader_comp_ = std::make_unique<ProjectLoaderComponent>(
+        project_saver_comp_.get(), scene_view_comp_.get(), editor_context);
+    project_creator_comp_ = std::make_unique<ProjectCreatorComponent>(
+        ambient_comp_.get(), camera_comp_.get(), editor_portal_switcher_comp_.get(),
+        modification_monitor_comp_.get(), scene_view_comp_.get(), editor_context);
+    project_loader_comp_ = std::make_unique<ProjectLoaderComponent>(
         ambient_comp_.get(), camera_comp_.get(), editor_portal_switcher_comp_.get(),
         modification_monitor_comp_.get(), scene_view_comp_.get(), editor_context);
     scene_object_gltf_comp_ = std::make_unique<SceneObjectGltfComponent>(
@@ -69,7 +72,7 @@ IslandsEditorWindow::IslandsEditorWindow(EditorContext *editor_context, QWidget 
 
 IslandsEditorWindow::~IslandsEditorWindow() {}
 
-void IslandsEditorWindow::closeEvent(QCloseEvent *) { scene_closer_comp_->OnClickCloseProject(); }
+void IslandsEditorWindow::closeEvent(QCloseEvent *) { project_closer_comp_->OnClickCloseProject(); }
 
 int RunEditor(int argc, char *argv[]) {
     auto editor_context = std::make_unique<EditorContext>(argc, argv);

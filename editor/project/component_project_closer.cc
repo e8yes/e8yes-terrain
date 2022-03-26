@@ -50,12 +50,13 @@ void CloseProject(EditorPortalSwitcherComponent *editor_portal_switcher_comp,
 
 ProjectCloserComponent::ProjectCloserComponent(
     EditorPortalSwitcherComponent *editor_portal_switcher_comp,
-    ModificationMonitorComponent *modification_monitor_comp, ProjectSaverComponent *scene_saver_comp,
-    SceneViewComponent *scene_view_comp, EditorContext *context)
+    ModificationMonitorComponent *modification_monitor_comp,
+    ProjectSaverComponent *scene_saver_comp, SceneViewComponent *scene_view_comp,
+    EditorContext *context)
     : editor_portal_switcher_comp_(editor_portal_switcher_comp),
       modification_monitor_comp_(modification_monitor_comp), scene_saver_comp_(scene_saver_comp),
       scene_view_comp_(scene_view_comp), context_(context) {
-    QAction::connect(context_->ui->action_close_scene, &QAction::triggered, this,
+    QAction::connect(context_->ui->action_close_project, &QAction::triggered, this,
                      &ProjectCloserComponent::OnClickCloseProject);
 }
 

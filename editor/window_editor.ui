@@ -538,17 +538,10 @@ QCheckBox::indicator:disabled, QRadioButton::indicator:disabled
     <property name="title">
      <string>File</string>
     </property>
-    <widget class="QMenu" name="menu_new_scene">
-     <property name="title">
-      <string>New Scene</string>
-     </property>
-     <addaction name="action_new_scene_flat"/>
-     <addaction name="action_new_scene_octree"/>
-    </widget>
-    <addaction name="menu_new_scene"/>
-    <addaction name="action_open_scene"/>
-    <addaction name="action_save_scene"/>
-    <addaction name="action_close_scene"/>
+    <addaction name="action_new_project"/>
+    <addaction name="action_open_project"/>
+    <addaction name="action_save_project"/>
+    <addaction name="action_close_project"/>
     <addaction name="separator"/>
     <addaction name="action_exit"/>
    </widget>
@@ -664,7 +657,7 @@ QCheckBox::indicator:disabled, QRadioButton::indicator:disabled
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>380</width>
+              <width>554</width>
               <height>819</height>
              </rect>
             </property>
@@ -1045,7 +1038,7 @@ QCheckBox::indicator:disabled, QRadioButton::indicator:disabled
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>387</width>
+              <width>561</width>
               <height>574</height>
              </rect>
             </property>
@@ -1238,7 +1231,7 @@ QCheckBox::indicator:disabled, QRadioButton::indicator:disabled
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>387</width>
+              <width>561</width>
               <height>574</height>
              </rect>
             </property>
@@ -1353,7 +1346,7 @@ QCheckBox::indicator:disabled, QRadioButton::indicator:disabled
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>387</width>
+              <width>561</width>
               <height>574</height>
              </rect>
             </property>
@@ -1474,31 +1467,31 @@ QCheckBox::indicator:disabled, QRadioButton::indicator:disabled
    </widget>
   </widget>
   <widget class="QStatusBar" name="status_bar"/>
-  <action name="action_open_scene">
+  <action name="action_open_project">
    <property name="text">
-    <string>Open Scene</string>
+    <string>Open Project</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="action_save_scene">
+  <action name="action_save_project">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Save Scene</string>
+    <string>Save Project</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="action_close_scene">
+  <action name="action_close_project">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Close Scene</string>
+    <string>Close Project</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+W</string>
@@ -1550,6 +1543,11 @@ QCheckBox::indicator:disabled, QRadioButton::indicator:disabled
   <action name="action_about_this_software">
    <property name="text">
     <string>This Software</string>
+   </property>
+  </action>
+  <action name="action_new_project">
+   <property name="text">
+    <string>New Project</string>
    </property>
   </action>
  </widget>

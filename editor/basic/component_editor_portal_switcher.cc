@@ -27,19 +27,16 @@
 namespace e8 {
 namespace {
 
-void SetSceneCreationWidgetsEnabled(bool enabled, Ui::IslandsEditorWindow *ui) {
+void SetProjectCreationWidgetsEnabled(bool enabled, Ui::IslandsEditorWindow *ui) {
     std::vector<QAction *> actions{
-        ui->action_new_scene_flat,
-        ui->action_new_scene_octree,
-        ui->action_open_scene,
+        ui->action_new_project,
+        ui->action_open_project,
     };
     for (auto action : actions) {
         action->setEnabled(enabled);
     }
 
-    std::vector<QWidget *> widgets{
-        ui->menu_new_scene,
-    };
+    std::vector<QWidget *> widgets{};
     for (auto widget : widgets) {
         widget->setEnabled(enabled);
     }
@@ -47,8 +44,8 @@ void SetSceneCreationWidgetsEnabled(bool enabled, Ui::IslandsEditorWindow *ui) {
 
 void SetSceneEditingWidgetsEnabled(bool enabled, Ui::IslandsEditorWindow *ui) {
     std::vector<QAction *> actions{
-        ui->action_close_scene,
-        ui->action_save_scene,
+        ui->action_close_project,
+        ui->action_save_project,
     };
     for (auto action : actions) {
         action->setEnabled(enabled);
@@ -73,7 +70,7 @@ EditorPortalSwitcherComponent::EditorPortalSwitcherComponent(EditorContext *cont
 EditorPortalSwitcherComponent::~EditorPortalSwitcherComponent() {}
 
 void EditorPortalSwitcherComponent::SetEditorPortalEnabled(bool enabled) {
-    SetSceneCreationWidgetsEnabled(/*enabled=*/!enabled, context_->ui.get());
+    SetProjectCreationWidgetsEnabled(/*enabled=*/!enabled, context_->ui.get());
     SetSceneEditingWidgetsEnabled(/*enabled=*/enabled, context_->ui.get());
 }
 

@@ -38,32 +38,6 @@
 namespace e8 {
 namespace {
 
-constexpr char const *kDefaultSceneName = "Untitled";
-
-bool CreateNewProject(SceneProto::StructureType structure_type, AmbientComponent *ambient_comp,
-                      CameraComponent *camera_comp,
-                      EditorPortalSwitcherComponent *editor_portal_switcher_comp,
-                      ModificationMonitorComponent *modification_monitor_comp,
-                      SceneViewComponent *scene_view_comp, EditorContext *context) {
-    if (context->game != nullptr) {
-        BOOST_LOG_TRIVIAL(error)
-            << "CreateNewScene(): A non-null game is in the current editor context.";
-        return false;
-    }
-
-    context->game = std::make_unique<Game>("/home/davis/sponza", structure_type, kDefaultSceneName);
-    context->game_thread = std::make_unique<std::thread>(RunEditorGame, context->game.get(),
-                                                         context->editor_storyline.get());
-
-    editor_portal_switcher_comp->SetEditorPortalEnabled(/*enabled=*/true);
-    ambient_comp->OnChangeScene();
-    camera_comp->OnChangeScene();
-    modification_monitor_comp->OnModifyScene();
-    scene_view_comp->OnChangeScene();
-
-    return true;
-}
-
 bool LoadProject(std::filesystem::path const &game_path, AmbientComponent *ambient_comp,
                  CameraComponent *camera_comp,
                  EditorPortalSwitcherComponent *editor_portal_switcher_comp,
@@ -98,46 +72,29 @@ ProjectLoaderComponent::ProjectLoaderComponent(
       editor_portal_switcher_comp_(editor_portal_switcher_comp),
       modification_monitor_comp_(modification_monitor_comp), scene_view_comp_(scene_view_comp),
       context_(context) {
-    QAction::connect(context_->ui->action_new_scene_flat, &QAction::triggered, this,
-                     &ProjectLoaderComponent::OnClickNewProject);
-    QAction::connect(context_->ui->action_open_scene, &QAction::triggered, this,
+    QAction::connect(context_->ui->action_open_project, &QAction::triggered, this,
                      &ProjectLoaderComponent::OnClickOpenProject);
 }
 
 ProjectLoaderComponent::~ProjectLoaderComponent() {}
 
-void ProjectLoaderComponent::OnClickNewProject() {
-    if (context_->game != nullptr) {
-        BOOST_LOG_TRIVIAL(error) << "OnClickNewSceneLinear(): Invoked with an active scene.";
-        return;
-    }
-
-    if (!CreateNewProject(/*scene_type=*/SceneProto::LINEAR, ambient_comp_, camera_comp_,
-                          editor_portal_switcher_comp_, modification_monitor_comp_,
-                          scene_view_comp_, context_)) {
-        QMessageBox msg_box;
-        msg_box.setText("Failed to Create Scene");
-        msg_box.setInformativeText("Internal Error");
-        msg_box.setStandardButtons(QMessageBox::Ok);
-        msg_box.setDefaultButton(QMessageBox::Ok);
-        msg_box.exec();
-    }
-}
-
 void ProjectLoaderComponent::OnClickOpenProject() {
     if (context_->game != nullptr) {
-        BOOST_LOG_TRIVIAL(error) << "OnClickOpenScene(): Invoked with an active scene.";
+        BOOST_LOG_TRIVIAL(error) << "OnClickOpenProject(): Invoked with an active scene.";
         return;
     }
 
     QString base_path = QFileDialog::getExistingDirectory(
-        /*parent=*/nullptr, /*caption=*/tr("Open Game"), QDir::homePath());
+        /*parent=*/nullptr, /*caption=*/tr("Open Project"), QDir::homePath());
+    if (base_path.length() == 0) {
+        return;
+    }
 
     if (!LoadProject(base_path.toStdString(), ambient_comp_, camera_comp_,
                      editor_portal_switcher_comp_, modification_monitor_comp_, scene_view_comp_,
                      context_)) {
         QMessageBox msg_box;
-        msg_box.setText("Failed to Load Scene");
+        msg_box.setText("Failed to Load Project");
         msg_box.setStandardButtons(QMessageBox::Ok);
         msg_box.setDefaultButton(QMessageBox::Ok);
         msg_box.exec();

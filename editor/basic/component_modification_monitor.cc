@@ -27,7 +27,7 @@ namespace e8 {
 namespace {
 
 void SetSaverEnabled(bool enabled, Ui::IslandsEditorWindow *ui) {
-    ui->action_save_scene->setEnabled(enabled);
+    ui->action_save_project->setEnabled(enabled);
 }
 
 } // namespace
