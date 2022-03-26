@@ -36,7 +36,7 @@ std::filesystem::path GeometryFilePath(GeometryId const &id, ResourceTable const
 }
 
 std::filesystem::path GeometryFileName(GeometryProto const &geometry) {
-    return std::to_string(geometry.id()) + ".gpb";
+    return std::to_string(static_cast<GeometryId>(geometry.id())) + ".gpb";
 }
 
 std::filesystem::path GeometryFilePath(std::filesystem::path const &base_path,

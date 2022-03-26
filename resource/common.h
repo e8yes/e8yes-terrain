@@ -27,7 +27,7 @@
 namespace e8 {
 
 // Unique IDs to assign to each resource.
-using Uuid = int64_t;
+using Uuid = uint64_t;
 
 // An ID reserved for representing null values.
 Uuid const kNullUuid = 0;
