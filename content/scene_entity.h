@@ -26,6 +26,7 @@
 
 #include "common/tensor.h"
 #include "content/proto/entity.pb.h"
+#include "content/proto/lod.pb.h"
 #include "resource/common.h"
 #include "resource/geometry.h"
 #include "resource/proto/geometry.pb.h"
@@ -88,12 +89,8 @@ struct SceneEntity {
     // An AABB bounding box surrounding the entity's geometry prior to any transformation.
     aabb bounding_box;
 
-    // References a geometry with its ID. The actual data needs to be fetched using the resource
-    // table. Referencing a geometry through an ID allows a large number of same geometries to be
-    // placed at different location of the scene while sharing the same data.
-    GeometryId geometry_id;
-
-    // TODO: Adds physical shape instance once it's implemented.
+    // A list of LOD references stored in decreasing level of detail.
+    SceneEntityResources resources;
 };
 
 /**

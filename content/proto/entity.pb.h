@@ -33,6 +33,7 @@
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
 #include "bbox.pb.h"
+#include "lod.pb.h"
 #include "transform.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
@@ -185,9 +186,8 @@ class SceneEntityProto PROTOBUF_FINAL :
     kNameFieldNumber = 2,
     kSrtTransformFieldNumber = 5,
     kBoundingBoxFieldNumber = 6,
+    kResourcesFieldNumber = 7,
     kIdFieldNumber = 1,
-    kGeometryIdFieldNumber = 7,
-    kPhysicalShapeIdFieldNumber = 8,
     kMovableFieldNumber = 3,
   };
   // repeated float transform = 4;
@@ -273,6 +273,24 @@ class SceneEntityProto PROTOBUF_FINAL :
       ::e8::AABB* bounding_box);
   ::e8::AABB* unsafe_arena_release_bounding_box();
 
+  // .e8.SceneEntityResources resources = 7;
+  bool has_resources() const;
+  private:
+  bool _internal_has_resources() const;
+  public:
+  void clear_resources();
+  const ::e8::SceneEntityResources& resources() const;
+  ::e8::SceneEntityResources* release_resources();
+  ::e8::SceneEntityResources* mutable_resources();
+  void set_allocated_resources(::e8::SceneEntityResources* resources);
+  private:
+  const ::e8::SceneEntityResources& _internal_resources() const;
+  ::e8::SceneEntityResources* _internal_mutable_resources();
+  public:
+  void unsafe_arena_set_allocated_resources(
+      ::e8::SceneEntityResources* resources);
+  ::e8::SceneEntityResources* unsafe_arena_release_resources();
+
   // int64 id = 1;
   void clear_id();
   ::PROTOBUF_NAMESPACE_ID::int64 id() const;
@@ -280,24 +298,6 @@ class SceneEntityProto PROTOBUF_FINAL :
   private:
   ::PROTOBUF_NAMESPACE_ID::int64 _internal_id() const;
   void _internal_set_id(::PROTOBUF_NAMESPACE_ID::int64 value);
-  public:
-
-  // int64 geometry_id = 7;
-  void clear_geometry_id();
-  ::PROTOBUF_NAMESPACE_ID::int64 geometry_id() const;
-  void set_geometry_id(::PROTOBUF_NAMESPACE_ID::int64 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int64 _internal_geometry_id() const;
-  void _internal_set_geometry_id(::PROTOBUF_NAMESPACE_ID::int64 value);
-  public:
-
-  // int64 physical_shape_id = 8;
-  void clear_physical_shape_id();
-  ::PROTOBUF_NAMESPACE_ID::int64 physical_shape_id() const;
-  void set_physical_shape_id(::PROTOBUF_NAMESPACE_ID::int64 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int64 _internal_physical_shape_id() const;
-  void _internal_set_physical_shape_id(::PROTOBUF_NAMESPACE_ID::int64 value);
   public:
 
   // bool movable = 3;
@@ -321,9 +321,8 @@ class SceneEntityProto PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
   ::e8::SrtTransform* srt_transform_;
   ::e8::AABB* bounding_box_;
+  ::e8::SceneEntityResources* resources_;
   ::PROTOBUF_NAMESPACE_ID::int64 id_;
-  ::PROTOBUF_NAMESPACE_ID::int64 geometry_id_;
-  ::PROTOBUF_NAMESPACE_ID::int64 physical_shape_id_;
   bool movable_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_entity_2eproto;
@@ -657,44 +656,79 @@ inline void SceneEntityProto::set_allocated_bounding_box(::e8::AABB* bounding_bo
   // @@protoc_insertion_point(field_set_allocated:e8.SceneEntityProto.bounding_box)
 }
 
-// int64 geometry_id = 7;
-inline void SceneEntityProto::clear_geometry_id() {
-  geometry_id_ = PROTOBUF_LONGLONG(0);
+// .e8.SceneEntityResources resources = 7;
+inline bool SceneEntityProto::_internal_has_resources() const {
+  return this != internal_default_instance() && resources_ != nullptr;
 }
-inline ::PROTOBUF_NAMESPACE_ID::int64 SceneEntityProto::_internal_geometry_id() const {
-  return geometry_id_;
+inline bool SceneEntityProto::has_resources() const {
+  return _internal_has_resources();
 }
-inline ::PROTOBUF_NAMESPACE_ID::int64 SceneEntityProto::geometry_id() const {
-  // @@protoc_insertion_point(field_get:e8.SceneEntityProto.geometry_id)
-  return _internal_geometry_id();
+inline const ::e8::SceneEntityResources& SceneEntityProto::_internal_resources() const {
+  const ::e8::SceneEntityResources* p = resources_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::e8::SceneEntityResources*>(
+      &::e8::_SceneEntityResources_default_instance_);
 }
-inline void SceneEntityProto::_internal_set_geometry_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
+inline const ::e8::SceneEntityResources& SceneEntityProto::resources() const {
+  // @@protoc_insertion_point(field_get:e8.SceneEntityProto.resources)
+  return _internal_resources();
+}
+inline void SceneEntityProto::unsafe_arena_set_allocated_resources(
+    ::e8::SceneEntityResources* resources) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(resources_);
+  }
+  resources_ = resources;
+  if (resources) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneEntityProto.resources)
+}
+inline ::e8::SceneEntityResources* SceneEntityProto::release_resources() {
+  auto temp = unsafe_arena_release_resources();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::e8::SceneEntityResources* SceneEntityProto::unsafe_arena_release_resources() {
+  // @@protoc_insertion_point(field_release:e8.SceneEntityProto.resources)
   
-  geometry_id_ = value;
+  ::e8::SceneEntityResources* temp = resources_;
+  resources_ = nullptr;
+  return temp;
 }
-inline void SceneEntityProto::set_geometry_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
-  _internal_set_geometry_id(value);
-  // @@protoc_insertion_point(field_set:e8.SceneEntityProto.geometry_id)
-}
-
-// int64 physical_shape_id = 8;
-inline void SceneEntityProto::clear_physical_shape_id() {
-  physical_shape_id_ = PROTOBUF_LONGLONG(0);
-}
-inline ::PROTOBUF_NAMESPACE_ID::int64 SceneEntityProto::_internal_physical_shape_id() const {
-  return physical_shape_id_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int64 SceneEntityProto::physical_shape_id() const {
-  // @@protoc_insertion_point(field_get:e8.SceneEntityProto.physical_shape_id)
-  return _internal_physical_shape_id();
-}
-inline void SceneEntityProto::_internal_set_physical_shape_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
+inline ::e8::SceneEntityResources* SceneEntityProto::_internal_mutable_resources() {
   
-  physical_shape_id_ = value;
+  if (resources_ == nullptr) {
+    auto* p = CreateMaybeMessage<::e8::SceneEntityResources>(GetArena());
+    resources_ = p;
+  }
+  return resources_;
 }
-inline void SceneEntityProto::set_physical_shape_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
-  _internal_set_physical_shape_id(value);
-  // @@protoc_insertion_point(field_set:e8.SceneEntityProto.physical_shape_id)
+inline ::e8::SceneEntityResources* SceneEntityProto::mutable_resources() {
+  // @@protoc_insertion_point(field_mutable:e8.SceneEntityProto.resources)
+  return _internal_mutable_resources();
+}
+inline void SceneEntityProto::set_allocated_resources(::e8::SceneEntityResources* resources) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(resources_);
+  }
+  if (resources) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(resources)->GetArena();
+    if (message_arena != submessage_arena) {
+      resources = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, resources, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  resources_ = resources;
+  // @@protoc_insertion_point(field_set_allocated:e8.SceneEntityProto.resources)
 }
 
 #ifdef __GNUC__

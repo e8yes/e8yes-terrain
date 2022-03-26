@@ -22,24 +22,20 @@
 #include "content/scene_entity.h"
 #include "renderer/drawable_instance.h"
 #include "resource/accessor.h"
+#include "resource/common.h"
 #include "resource/geometry.h"
 
 namespace e8 {
 namespace {
 
-Geometry *LoadGeometry(SceneEntity const &scene_entity, vec3 const &viewer_location,
-                       ResourceAccessor *resource_accessor) {
-    std::shared_ptr<GeometryLod> geometry_lod =
-        resource_accessor->LoadGeometry(scene_entity.geometry_id);
-    if (geometry_lod == nullptr) {
-        return nullptr;
-    }
-
+SceneEntityResources::Lod const *SelectResourceLod(SceneEntity const &scene_entity,
+                                                   vec3 const &viewer_location) {
     float entity_distance = (scene_entity.bounding_box.centroid() - viewer_location).norm();
 
-    for (unsigned i = 0; i < geometry_lod->lod_min_distances.size(); ++i) {
-        if (entity_distance >= geometry_lod->lod_min_distances[i]) {
-            return &geometry_lod->lod[i];
+    // Finds the applicable resource with the least level of detail.
+    for (int i = scene_entity.resources.lods_size() - 1; i >= 0; --i) {
+        if (entity_distance >= scene_entity.resources.lods(i).apply_after_distance()) {
+            return &scene_entity.resources.lods(i);
         }
     }
 
@@ -54,13 +50,15 @@ std::vector<DrawableInstance> ToDrawables(std::vector<SceneEntity const *> const
     std::vector<DrawableInstance> instances;
 
     for (auto const scene_entity : scene_entities) {
-        Geometry *geometry = LoadGeometry(*scene_entity, viewer_location, resource_accessor);
-        if (geometry == nullptr) {
+        SceneEntityResources::Lod const *lod = SelectResourceLod(*scene_entity, viewer_location);
+        if (lod == nullptr || lod->geometry_id() == kNullUuid) {
             continue;
         }
 
+        std::shared_ptr<Geometry> geometry = resource_accessor->LoadGeometry(lod->geometry_id());
+
         DrawableInstance drawable;
-        drawable.geometry = geometry;
+        drawable.geometry = geometry.get();
         drawable.transform = &scene_entity->transform;
 
         instances.push_back(drawable);

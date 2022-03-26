@@ -33,12 +33,12 @@
 namespace e8 {
 
 SceneEntity::SceneEntity(SceneEntityName const &name)
-    : id(GenerateUuid()), name(name), movable(true), geometry_id(kNullUuid) {}
+    : id(GenerateUuid()), name(name), movable(true) {}
 
 SceneEntity::SceneEntity(SceneEntityProto const &proto)
     : id(proto.id()), name(proto.name()), movable(proto.movable()),
       transform(ToMat44(proto.transform())), bounding_box(ToAabb(proto.bounding_box())),
-      geometry_id(proto.geometry_id()) {
+      resources(proto.resources()) {
     if (proto.has_srt_transform()) {
         srt_transform = proto.srt_transform();
     }
@@ -56,7 +56,7 @@ SceneEntityProto SceneEntity::ToProto() const {
         *proto.mutable_srt_transform() = *srt_transform;
     }
     *proto.mutable_bounding_box() = e8::ToProto(bounding_box);
-    proto.set_geometry_id(geometry_id);
+    *proto.mutable_resources() = resources;
     return proto;
 }
 

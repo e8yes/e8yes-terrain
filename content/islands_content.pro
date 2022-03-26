@@ -25,6 +25,7 @@ SOURCES += \
     proto/bbox.pb.cc \
     proto/camera.pb.cc \
     proto/entity.pb.cc \
+    proto/lod.pb.cc \
     proto/procedural_object.pb.cc \
     proto/procedural_shape.pb.cc \
     proto/scene_object.pb.cc \
@@ -45,6 +46,7 @@ HEADERS += \
     proto/bbox.pb.h \
     proto/camera.pb.h \
     proto/entity.pb.h \
+    proto/lod.pb.h \
     proto/procedural_object.pb.h \
     proto/procedural_shape.pb.h \
     proto/scene_object.pb.h \

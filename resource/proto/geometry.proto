@@ -46,34 +46,16 @@ message GeometryProto {
         TEARABLE = 4;
     };
 
+    // ID of this geometry.
+    int64 id = 1;
+
     // The type of rigidity to be expected for this geometry.
-    RigidityType rigidity = 1;
+    RigidityType rigidity = 2;
 
     // A list of vertices defining the geometry of this geometry.
-    repeated PrimitiveVertexProto vertices = 2;
+    repeated PrimitiveVertexProto vertices = 3;
 
     // Defines triangle primitives by referencing the vertices of each triangle from the vertex 
     // list returned by the above function.
-    repeated PrimitiveIndicesProto primitives = 3;
-};
-
-/**
- * @brief The GeometryLod message Allows complex geometry to be represented with less detail at
- * distance.
- */
-message GeometryLodProto {
-    // ID of this geometry design.
-    int64 id = 1;
-
-    // A descriptive human readable name of this geometry.
-    string name = 2;
-
-    // LOD of this geometry design in descending level of detail.
-    repeated GeometryProto geometry_lod = 3;
-
-    // A list the same length as the geometry_lod specifying the minimum distance the geometry LOD is
-    // from the viewer before it can be applied to the rendering process. Therefore, the distances
-    // are expected to be in ascending order. The renderer will pick the geometry with the least
-    // possible detail when possible.
-    repeated float min_distances = 4;
+    repeated PrimitiveIndicesProto primitives = 4;
 };

@@ -133,14 +133,21 @@ struct Geometry {
     Geometry &operator=(Geometry &&other) = default;
 
     /**
-     * @brief FromProto Constructs a geometry from proto message.
+     * @brief FromDisk Recovers data from disk. If the data isn't available, this function will
+     * fail. It uses the specified ID to look up resource metadata from the resource table, then it
+     * recovers the geometries from data on disk to Vulkan buffer memory associated with the Vulkan
+     * context.
      */
-    void FromProto(GeometryProto const &proto, VulkanContext *context);
+    void FromDisk(GeometryId const &id, ResourceTable const &table, VulkanContext *context);
 
     /**
-     * @brief ToProto Exports the geometry's data as protobuf object.
+     * @brief ToDisk It saves the geometry data to disk and populates the geometry resource's
+     * metadata to the specified resource table.
+     *
+     * @param temporary Indicates if the geometry resource is only temporary. This allows the
+     * resource table to conduct cleanup operations properly.
      */
-    GeometryProto ToProto() const;
+    void ToDisk(bool temporary, ResourceTable *table) const;
 
     /**
      * @brief IndexElementType The integer type each index element uses in the upload.
@@ -162,6 +169,9 @@ struct Geometry {
      */
     uint64_t IndexBufferSize() const;
 
+    // ID of this geometry.
+    GeometryId id;
+
     // The type of rigidity to be expected for this geometry.
     GeometryProto::RigidityType rigidity;
 
@@ -182,56 +192,13 @@ struct Geometry {
 };
 
 /**
- * @brief The GeometryLod struct Allows complex geometry to be represented with less detail at
- * distance.
- */
-struct GeometryLod {
-    GeometryLod();
-    GeometryLod(GeometryLod const &) = delete;
-    GeometryLod(GeometryLod &&other) = default;
-    ~GeometryLod();
-
-    /**
-     * @brief FromDisk Recovers data from disk. If the data isn't available, this function will
-     * fail. It uses the specified ID to look up resource metadata from the resource table, then it
-     * recovers the geometries from data on disk to Vulkan buffer memory associated with the Vulkan
-     * context.
-     */
-    void FromDisk(GeometryId const &id, ResourceTable const &table, VulkanContext *context);
-
-    /**
-     * @brief ToDisk It saves the geometry data to disk and populates the geometry resource's
-     * metadata to the specified resource table.
-     *
-     * @param temporary Indicates if the geometry resource is only temporary. This allows the
-     * resource table to conduct cleanup operations properly.
-     */
-    void ToDisk(bool temporary, ResourceTable *table) const;
-
-    // ID of this geometry design.
-    GeometryId id;
-
-    // A descriptive human readable name of this geometry.
-    GeometryName name;
-
-    // LOD of this geometry design in descending level of detail.
-    std::vector<Geometry> lod;
-
-    // A list the same length as the geometry_lod specifying the minimum distance the geometry LOD
-    // is from the viewer before it can be applied to the rendering process. Therefore, the
-    // distances are expected to be in ascending order. The renderer will pick the geometry with the
-    // least possible detail when possible.
-    std::vector<float> lod_min_distances;
-};
-
-/**
- * @brief SaveGeometryProto Saves the specified geometry LOD proto to disk and populates the
- * geometry resource's metadata to the specified resource table.
+ * @brief SaveGeometryProto Saves the specified geometry proto to disk and populates the geometry
+ * resource's metadata to the specified resource table.
  *
  * @param temporary Indicates if the geometry resource is only temporary. This allows the
  * resource table to conduct cleanup operations properly.
  */
-void SaveGeometryProto(GeometryLodProto const &proto, bool temporary, ResourceTable *table);
+void SaveGeometryProto(GeometryProto const &proto, bool temporary, ResourceTable *table);
 
 } // namespace e8
 

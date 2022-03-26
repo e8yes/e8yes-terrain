@@ -49,7 +49,7 @@ struct TableStruct_geometry_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[2]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[1]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -57,15 +57,11 @@ struct TableStruct_geometry_2eproto {
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_geometry_2eproto;
 namespace e8 {
-class GeometryLodProto;
-class GeometryLodProtoDefaultTypeInternal;
-extern GeometryLodProtoDefaultTypeInternal _GeometryLodProto_default_instance_;
 class GeometryProto;
 class GeometryProtoDefaultTypeInternal;
 extern GeometryProtoDefaultTypeInternal _GeometryProto_default_instance_;
 }  // namespace e8
 PROTOBUF_NAMESPACE_OPEN
-template<> ::e8::GeometryLodProto* Arena::CreateMaybeMessage<::e8::GeometryLodProto>(Arena*);
 template<> ::e8::GeometryProto* Arena::CreateMaybeMessage<::e8::GeometryProto>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace e8 {
@@ -249,11 +245,12 @@ class GeometryProto PROTOBUF_FINAL :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kVerticesFieldNumber = 2,
-    kPrimitivesFieldNumber = 3,
-    kRigidityFieldNumber = 1,
+    kVerticesFieldNumber = 3,
+    kPrimitivesFieldNumber = 4,
+    kIdFieldNumber = 1,
+    kRigidityFieldNumber = 2,
   };
-  // repeated .e8.PrimitiveVertexProto vertices = 2;
+  // repeated .e8.PrimitiveVertexProto vertices = 3;
   int vertices_size() const;
   private:
   int _internal_vertices_size() const;
@@ -271,7 +268,7 @@ class GeometryProto PROTOBUF_FINAL :
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::PrimitiveVertexProto >&
       vertices() const;
 
-  // repeated .e8.PrimitiveIndicesProto primitives = 3;
+  // repeated .e8.PrimitiveIndicesProto primitives = 4;
   int primitives_size() const;
   private:
   int _internal_primitives_size() const;
@@ -289,7 +286,16 @@ class GeometryProto PROTOBUF_FINAL :
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::PrimitiveIndicesProto >&
       primitives() const;
 
-  // .e8.GeometryProto.RigidityType rigidity = 1;
+  // int64 id = 1;
+  void clear_id();
+  ::PROTOBUF_NAMESPACE_ID::int64 id() const;
+  void set_id(::PROTOBUF_NAMESPACE_ID::int64 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int64 _internal_id() const;
+  void _internal_set_id(::PROTOBUF_NAMESPACE_ID::int64 value);
+  public:
+
+  // .e8.GeometryProto.RigidityType rigidity = 2;
   void clear_rigidity();
   ::e8::GeometryProto_RigidityType rigidity() const;
   void set_rigidity(::e8::GeometryProto_RigidityType value);
@@ -307,216 +313,8 @@ class GeometryProto PROTOBUF_FINAL :
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::PrimitiveVertexProto > vertices_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::PrimitiveIndicesProto > primitives_;
-  int rigidity_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_geometry_2eproto;
-};
-// -------------------------------------------------------------------
-
-class GeometryLodProto PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:e8.GeometryLodProto) */ {
- public:
-  inline GeometryLodProto() : GeometryLodProto(nullptr) {};
-  virtual ~GeometryLodProto();
-
-  GeometryLodProto(const GeometryLodProto& from);
-  GeometryLodProto(GeometryLodProto&& from) noexcept
-    : GeometryLodProto() {
-    *this = ::std::move(from);
-  }
-
-  inline GeometryLodProto& operator=(const GeometryLodProto& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline GeometryLodProto& operator=(GeometryLodProto&& from) noexcept {
-    if (GetArena() == from.GetArena()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
-    return GetMetadataStatic().descriptor;
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
-    return GetMetadataStatic().reflection;
-  }
-  static const GeometryLodProto& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const GeometryLodProto* internal_default_instance() {
-    return reinterpret_cast<const GeometryLodProto*>(
-               &_GeometryLodProto_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    1;
-
-  friend void swap(GeometryLodProto& a, GeometryLodProto& b) {
-    a.Swap(&b);
-  }
-  inline void Swap(GeometryLodProto* other) {
-    if (other == this) return;
-    if (GetArena() == other->GetArena()) {
-      InternalSwap(other);
-    } else {
-      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
-    }
-  }
-  void UnsafeArenaSwap(GeometryLodProto* other) {
-    if (other == this) return;
-    GOOGLE_DCHECK(GetArena() == other->GetArena());
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline GeometryLodProto* New() const final {
-    return CreateMaybeMessage<GeometryLodProto>(nullptr);
-  }
-
-  GeometryLodProto* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<GeometryLodProto>(arena);
-  }
-  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const GeometryLodProto& from);
-  void MergeFrom(const GeometryLodProto& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
-  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
-      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  inline void SharedCtor();
-  inline void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(GeometryLodProto* other);
-  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
-  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "e8.GeometryLodProto";
-  }
-  protected:
-  explicit GeometryLodProto(::PROTOBUF_NAMESPACE_ID::Arena* arena);
-  private:
-  static void ArenaDtor(void* object);
-  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
-  public:
-
-  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
-  private:
-  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_geometry_2eproto);
-    return ::descriptor_table_geometry_2eproto.file_level_metadata[kIndexInFileMessages];
-  }
-
-  public:
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  enum : int {
-    kGeometryLodFieldNumber = 3,
-    kMinDistancesFieldNumber = 4,
-    kNameFieldNumber = 2,
-    kIdFieldNumber = 1,
-  };
-  // repeated .e8.GeometryProto geometry_lod = 3;
-  int geometry_lod_size() const;
-  private:
-  int _internal_geometry_lod_size() const;
-  public:
-  void clear_geometry_lod();
-  ::e8::GeometryProto* mutable_geometry_lod(int index);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::GeometryProto >*
-      mutable_geometry_lod();
-  private:
-  const ::e8::GeometryProto& _internal_geometry_lod(int index) const;
-  ::e8::GeometryProto* _internal_add_geometry_lod();
-  public:
-  const ::e8::GeometryProto& geometry_lod(int index) const;
-  ::e8::GeometryProto* add_geometry_lod();
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::GeometryProto >&
-      geometry_lod() const;
-
-  // repeated float min_distances = 4;
-  int min_distances_size() const;
-  private:
-  int _internal_min_distances_size() const;
-  public:
-  void clear_min_distances();
-  private:
-  float _internal_min_distances(int index) const;
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-      _internal_min_distances() const;
-  void _internal_add_min_distances(float value);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-      _internal_mutable_min_distances();
-  public:
-  float min_distances(int index) const;
-  void set_min_distances(int index, float value);
-  void add_min_distances(float value);
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-      min_distances() const;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-      mutable_min_distances();
-
-  // string name = 2;
-  void clear_name();
-  const std::string& name() const;
-  void set_name(const std::string& value);
-  void set_name(std::string&& value);
-  void set_name(const char* value);
-  void set_name(const char* value, size_t size);
-  std::string* mutable_name();
-  std::string* release_name();
-  void set_allocated_name(std::string* name);
-  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
-  std::string* unsafe_arena_release_name();
-  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
-  void unsafe_arena_set_allocated_name(
-      std::string* name);
-  private:
-  const std::string& _internal_name() const;
-  void _internal_set_name(const std::string& value);
-  std::string* _internal_mutable_name();
-  public:
-
-  // int64 id = 1;
-  void clear_id();
-  ::PROTOBUF_NAMESPACE_ID::int64 id() const;
-  void set_id(::PROTOBUF_NAMESPACE_ID::int64 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int64 _internal_id() const;
-  void _internal_set_id(::PROTOBUF_NAMESPACE_ID::int64 value);
-  public:
-
-  // @@protoc_insertion_point(class_scope:e8.GeometryLodProto)
- private:
-  class _Internal;
-
-  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
-  typedef void InternalArenaConstructable_;
-  typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::GeometryProto > geometry_lod_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > min_distances_;
-  mutable std::atomic<int> _min_distances_cached_byte_size_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
   ::PROTOBUF_NAMESPACE_ID::int64 id_;
+  int rigidity_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_geometry_2eproto;
 };
@@ -531,7 +329,27 @@ class GeometryLodProto PROTOBUF_FINAL :
 #endif  // __GNUC__
 // GeometryProto
 
-// .e8.GeometryProto.RigidityType rigidity = 1;
+// int64 id = 1;
+inline void GeometryProto::clear_id() {
+  id_ = PROTOBUF_LONGLONG(0);
+}
+inline ::PROTOBUF_NAMESPACE_ID::int64 GeometryProto::_internal_id() const {
+  return id_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int64 GeometryProto::id() const {
+  // @@protoc_insertion_point(field_get:e8.GeometryProto.id)
+  return _internal_id();
+}
+inline void GeometryProto::_internal_set_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
+  
+  id_ = value;
+}
+inline void GeometryProto::set_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
+  _internal_set_id(value);
+  // @@protoc_insertion_point(field_set:e8.GeometryProto.id)
+}
+
+// .e8.GeometryProto.RigidityType rigidity = 2;
 inline void GeometryProto::clear_rigidity() {
   rigidity_ = 0;
 }
@@ -551,7 +369,7 @@ inline void GeometryProto::set_rigidity(::e8::GeometryProto_RigidityType value) 
   // @@protoc_insertion_point(field_set:e8.GeometryProto.rigidity)
 }
 
-// repeated .e8.PrimitiveVertexProto vertices = 2;
+// repeated .e8.PrimitiveVertexProto vertices = 3;
 inline int GeometryProto::_internal_vertices_size() const {
   return vertices_.size();
 }
@@ -587,7 +405,7 @@ GeometryProto::vertices() const {
   return vertices_;
 }
 
-// repeated .e8.PrimitiveIndicesProto primitives = 3;
+// repeated .e8.PrimitiveIndicesProto primitives = 4;
 inline int GeometryProto::_internal_primitives_size() const {
   return primitives_.size();
 }
@@ -623,202 +441,9 @@ GeometryProto::primitives() const {
   return primitives_;
 }
 
-// -------------------------------------------------------------------
-
-// GeometryLodProto
-
-// int64 id = 1;
-inline void GeometryLodProto::clear_id() {
-  id_ = PROTOBUF_LONGLONG(0);
-}
-inline ::PROTOBUF_NAMESPACE_ID::int64 GeometryLodProto::_internal_id() const {
-  return id_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int64 GeometryLodProto::id() const {
-  // @@protoc_insertion_point(field_get:e8.GeometryLodProto.id)
-  return _internal_id();
-}
-inline void GeometryLodProto::_internal_set_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
-  
-  id_ = value;
-}
-inline void GeometryLodProto::set_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
-  _internal_set_id(value);
-  // @@protoc_insertion_point(field_set:e8.GeometryLodProto.id)
-}
-
-// string name = 2;
-inline void GeometryLodProto::clear_name() {
-  name_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline const std::string& GeometryLodProto::name() const {
-  // @@protoc_insertion_point(field_get:e8.GeometryLodProto.name)
-  return _internal_name();
-}
-inline void GeometryLodProto::set_name(const std::string& value) {
-  _internal_set_name(value);
-  // @@protoc_insertion_point(field_set:e8.GeometryLodProto.name)
-}
-inline std::string* GeometryLodProto::mutable_name() {
-  // @@protoc_insertion_point(field_mutable:e8.GeometryLodProto.name)
-  return _internal_mutable_name();
-}
-inline const std::string& GeometryLodProto::_internal_name() const {
-  return name_.Get();
-}
-inline void GeometryLodProto::_internal_set_name(const std::string& value) {
-  
-  name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
-}
-inline void GeometryLodProto::set_name(std::string&& value) {
-  
-  name_.Set(
-    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
-  // @@protoc_insertion_point(field_set_rvalue:e8.GeometryLodProto.name)
-}
-inline void GeometryLodProto::set_name(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
-              GetArena());
-  // @@protoc_insertion_point(field_set_char:e8.GeometryLodProto.name)
-}
-inline void GeometryLodProto::set_name(const char* value,
-    size_t size) {
-  
-  name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
-      reinterpret_cast<const char*>(value), size), GetArena());
-  // @@protoc_insertion_point(field_set_pointer:e8.GeometryLodProto.name)
-}
-inline std::string* GeometryLodProto::_internal_mutable_name() {
-  
-  return name_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline std::string* GeometryLodProto::release_name() {
-  // @@protoc_insertion_point(field_release:e8.GeometryLodProto.name)
-  return name_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline void GeometryLodProto::set_allocated_name(std::string* name) {
-  if (name != nullptr) {
-    
-  } else {
-    
-  }
-  name_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), name,
-      GetArena());
-  // @@protoc_insertion_point(field_set_allocated:e8.GeometryLodProto.name)
-}
-inline std::string* GeometryLodProto::unsafe_arena_release_name() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:e8.GeometryLodProto.name)
-  GOOGLE_DCHECK(GetArena() != nullptr);
-  
-  return name_.UnsafeArenaRelease(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      GetArena());
-}
-inline void GeometryLodProto::unsafe_arena_set_allocated_name(
-    std::string* name) {
-  GOOGLE_DCHECK(GetArena() != nullptr);
-  if (name != nullptr) {
-    
-  } else {
-    
-  }
-  name_.UnsafeArenaSetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      name, GetArena());
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.GeometryLodProto.name)
-}
-
-// repeated .e8.GeometryProto geometry_lod = 3;
-inline int GeometryLodProto::_internal_geometry_lod_size() const {
-  return geometry_lod_.size();
-}
-inline int GeometryLodProto::geometry_lod_size() const {
-  return _internal_geometry_lod_size();
-}
-inline void GeometryLodProto::clear_geometry_lod() {
-  geometry_lod_.Clear();
-}
-inline ::e8::GeometryProto* GeometryLodProto::mutable_geometry_lod(int index) {
-  // @@protoc_insertion_point(field_mutable:e8.GeometryLodProto.geometry_lod)
-  return geometry_lod_.Mutable(index);
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::GeometryProto >*
-GeometryLodProto::mutable_geometry_lod() {
-  // @@protoc_insertion_point(field_mutable_list:e8.GeometryLodProto.geometry_lod)
-  return &geometry_lod_;
-}
-inline const ::e8::GeometryProto& GeometryLodProto::_internal_geometry_lod(int index) const {
-  return geometry_lod_.Get(index);
-}
-inline const ::e8::GeometryProto& GeometryLodProto::geometry_lod(int index) const {
-  // @@protoc_insertion_point(field_get:e8.GeometryLodProto.geometry_lod)
-  return _internal_geometry_lod(index);
-}
-inline ::e8::GeometryProto* GeometryLodProto::_internal_add_geometry_lod() {
-  return geometry_lod_.Add();
-}
-inline ::e8::GeometryProto* GeometryLodProto::add_geometry_lod() {
-  // @@protoc_insertion_point(field_add:e8.GeometryLodProto.geometry_lod)
-  return _internal_add_geometry_lod();
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::e8::GeometryProto >&
-GeometryLodProto::geometry_lod() const {
-  // @@protoc_insertion_point(field_list:e8.GeometryLodProto.geometry_lod)
-  return geometry_lod_;
-}
-
-// repeated float min_distances = 4;
-inline int GeometryLodProto::_internal_min_distances_size() const {
-  return min_distances_.size();
-}
-inline int GeometryLodProto::min_distances_size() const {
-  return _internal_min_distances_size();
-}
-inline void GeometryLodProto::clear_min_distances() {
-  min_distances_.Clear();
-}
-inline float GeometryLodProto::_internal_min_distances(int index) const {
-  return min_distances_.Get(index);
-}
-inline float GeometryLodProto::min_distances(int index) const {
-  // @@protoc_insertion_point(field_get:e8.GeometryLodProto.min_distances)
-  return _internal_min_distances(index);
-}
-inline void GeometryLodProto::set_min_distances(int index, float value) {
-  min_distances_.Set(index, value);
-  // @@protoc_insertion_point(field_set:e8.GeometryLodProto.min_distances)
-}
-inline void GeometryLodProto::_internal_add_min_distances(float value) {
-  min_distances_.Add(value);
-}
-inline void GeometryLodProto::add_min_distances(float value) {
-  _internal_add_min_distances(value);
-  // @@protoc_insertion_point(field_add:e8.GeometryLodProto.min_distances)
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-GeometryLodProto::_internal_min_distances() const {
-  return min_distances_;
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-GeometryLodProto::min_distances() const {
-  // @@protoc_insertion_point(field_list:e8.GeometryLodProto.min_distances)
-  return _internal_min_distances();
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-GeometryLodProto::_internal_mutable_min_distances() {
-  return &min_distances_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-GeometryLodProto::mutable_min_distances() {
-  // @@protoc_insertion_point(field_mutable_list:e8.GeometryLodProto.min_distances)
-  return _internal_mutable_min_distances();
-}
-
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
 
 // @@protoc_insertion_point(namespace_scope)
 

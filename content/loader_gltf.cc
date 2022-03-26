@@ -24,6 +24,7 @@
 
 #include "common/device.h"
 #include "content/loader_gltf.h"
+#include "content/proto/lod.pb.h"
 #include "content/scene_entity.h"
 #include "content/scene_object.h"
 #include "resource/accessor.h"
@@ -187,21 +188,16 @@ std::vector<unsigned char> GetVertexBuffer(unsigned attribute_index, tinygltf::M
     return buffer_data;
 }
 
-std::optional<GeometryLodProto> LoadGeometry(tinygltf::Primitive const &primitive,
-                                             GeometryName const &name,
-                                             tinygltf::Model const &model) {
+std::optional<GeometryProto> LoadGeometry(tinygltf::Primitive const &primitive,
+                                          tinygltf::Model const &model) {
     if (!HasRequiredVertexAttributes(primitive)) {
         return std::nullopt;
     }
 
     // Builds a geometry LOD proto with only the highest level of detail.
-    GeometryLodProto geometry_lod_proto;
-    geometry_lod_proto.set_id(GenerateUuid());
-    geometry_lod_proto.set_name(name);
-    geometry_lod_proto.add_min_distances(0.0f);
-
-    GeometryProto *geometry_proto = geometry_lod_proto.add_geometry_lod();
-    geometry_proto->set_rigidity(GeometryProto::RIGID);
+    GeometryProto geometry_proto;
+    geometry_proto.set_id(GenerateUuid());
+    geometry_proto.set_rigidity(GeometryProto::RIGID);
 
     // Loads vertex indices.
     tinygltf::Accessor index_accessor = model.accessors[primitive.indices];
@@ -216,7 +212,7 @@ std::optional<GeometryLodProto> LoadGeometry(tinygltf::Primitive const &primitiv
     assert(count % 3 == 0);
 
     for (unsigned i = 0; i < count / 3; ++i) {
-        PrimitiveIndicesProto *primitive = geometry_proto->add_primitives();
+        PrimitiveIndicesProto *primitive = geometry_proto.add_primitives();
         for (unsigned j = 0; j < 3; ++j) {
             unsigned index = IndexElement(index_buffer_data, stride, i * 3 + j);
             primitive->add_indices(index);
@@ -235,7 +231,7 @@ std::optional<GeometryLodProto> LoadGeometry(tinygltf::Primitive const &primitiv
     }
 
     for (unsigned i = 0; i < position_count; i++) {
-        *geometry_proto->add_vertices()->mutable_position() =
+        *geometry_proto.add_vertices()->mutable_position() =
             Vec3Element(position_data.data(), position_stride, i);
     }
 
@@ -251,7 +247,7 @@ std::optional<GeometryLodProto> LoadGeometry(tinygltf::Primitive const &primitiv
     }
 
     for (unsigned i = 0; i < normal_count; i++) {
-        *geometry_proto->mutable_vertices(i)->mutable_normal() =
+        *geometry_proto.mutable_vertices(i)->mutable_normal() =
             Vec3Element(normal_data.data(), normal_stride, i);
     }
 
@@ -268,11 +264,11 @@ std::optional<GeometryLodProto> LoadGeometry(tinygltf::Primitive const &primitiv
     }
 
     for (unsigned i = 0; i < texcoord_count; i++) {
-        *geometry_proto->mutable_vertices(i)->mutable_texcoord() =
+        *geometry_proto.mutable_vertices(i)->mutable_texcoord() =
             Vec2Element(texcoord_data.data(), texcoord_stride, i);
     }
 
-    return geometry_lod_proto;
+    return geometry_proto;
 }
 
 std::optional<SceneEntity> LoadSceneEntity(tinygltf::Primitive const &primitive,
@@ -280,7 +276,7 @@ std::optional<SceneEntity> LoadSceneEntity(tinygltf::Primitive const &primitive,
                                            tinygltf::Model const &model, mat44 const &transform,
                                            ResourceAccessor *resource_accessor) {
     // Materializes resources into the form workable by the rest of the system.
-    std::optional<GeometryLodProto> geometry_proto = LoadGeometry(primitive, name, model);
+    std::optional<GeometryProto> geometry_proto = LoadGeometry(primitive, model);
     if (!geometry_proto.has_value()) {
         return std::nullopt;
     }
@@ -289,9 +285,11 @@ std::optional<SceneEntity> LoadSceneEntity(tinygltf::Primitive const &primitive,
 
     // Constructs a scene entity and attaches resources to it.
     SceneEntity scene_entity(name);
-    assert(geometry_proto->geometry_lod_size() > 0);
-    scene_entity.bounding_box = BoundingBoxOf(geometry_proto->geometry_lod(0));
-    scene_entity.geometry_id = geometry_proto->id();
+    scene_entity.bounding_box = BoundingBoxOf(*geometry_proto);
+
+    SceneEntityResources::Lod *lod = scene_entity.resources.add_lods();
+    lod->set_apply_after_distance(0.0f);
+    lod->set_geometry_id(geometry_proto->id());
 
     SceneEntitySetTransform(transform, &scene_entity);
 

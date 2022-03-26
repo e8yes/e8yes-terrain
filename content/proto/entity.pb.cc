@@ -15,6 +15,7 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 extern PROTOBUF_INTERNAL_EXPORT_bbox_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_AABB_bbox_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_lod_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_SceneEntityResources_lod_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_transform_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_SrtTransform_transform_2eproto;
 namespace e8 {
 class SceneEntityProtoDefaultTypeInternal {
@@ -33,10 +34,11 @@ static void InitDefaultsscc_info_SceneEntityProto_entity_2eproto() {
   ::e8::SceneEntityProto::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_SceneEntityProto_entity_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 2, 0, InitDefaultsscc_info_SceneEntityProto_entity_2eproto}, {
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<3> scc_info_SceneEntityProto_entity_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 3, 0, InitDefaultsscc_info_SceneEntityProto_entity_2eproto}, {
       &scc_info_SrtTransform_transform_2eproto.base,
-      &scc_info_AABB_bbox_2eproto.base,}};
+      &scc_info_AABB_bbox_2eproto.base,
+      &scc_info_SceneEntityResources_lod_2eproto.base,}};
 
 static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_entity_2eproto[1];
 static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_entity_2eproto = nullptr;
@@ -54,8 +56,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_entity_2eproto::offsets[] PROT
   PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, transform_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, srt_transform_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, bounding_box_),
-  PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, geometry_id_),
-  PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, physical_shape_id_),
+  PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, resources_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::e8::SceneEntityProto)},
@@ -66,16 +67,17 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_entity_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\014entity.proto\022\002e8\032\nbbox.proto\032\017transfor"
-  "m.proto\"\311\001\n\020SceneEntityProto\022\n\n\002id\030\001 \001(\003"
-  "\022\014\n\004name\030\002 \001(\t\022\017\n\007movable\030\003 \001(\010\022\021\n\ttrans"
-  "form\030\004 \003(\002\022\'\n\rsrt_transform\030\005 \001(\0132\020.e8.S"
-  "rtTransform\022\036\n\014bounding_box\030\006 \001(\0132\010.e8.A"
-  "ABB\022\023\n\013geometry_id\030\007 \001(\003\022\031\n\021physical_sha"
-  "pe_id\030\010 \001(\003b\006proto3"
+  "\n\014entity.proto\022\002e8\032\nbbox.proto\032\tlod.prot"
+  "o\032\017transform.proto\"\306\001\n\020SceneEntityProto\022"
+  "\n\n\002id\030\001 \001(\003\022\014\n\004name\030\002 \001(\t\022\017\n\007movable\030\003 \001"
+  "(\010\022\021\n\ttransform\030\004 \003(\002\022\'\n\rsrt_transform\030\005"
+  " \001(\0132\020.e8.SrtTransform\022\036\n\014bounding_box\030\006"
+  " \001(\0132\010.e8.AABB\022+\n\tresources\030\007 \001(\0132\030.e8.S"
+  "ceneEntityResourcesb\006proto3"
   ;
-static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_entity_2eproto_deps[2] = {
+static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_entity_2eproto_deps[3] = {
   &::descriptor_table_bbox_2eproto,
+  &::descriptor_table_lod_2eproto,
   &::descriptor_table_transform_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_entity_2eproto_sccs[1] = {
@@ -83,8 +85,8 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_ent
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_entity_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_entity_2eproto = {
-  false, false, descriptor_table_protodef_entity_2eproto, "entity.proto", 259,
-  &descriptor_table_entity_2eproto_once, descriptor_table_entity_2eproto_sccs, descriptor_table_entity_2eproto_deps, 1, 2,
+  false, false, descriptor_table_protodef_entity_2eproto, "entity.proto", 267,
+  &descriptor_table_entity_2eproto_once, descriptor_table_entity_2eproto_sccs, descriptor_table_entity_2eproto_deps, 1, 3,
   schemas, file_default_instances, TableStruct_entity_2eproto::offsets,
   file_level_metadata_entity_2eproto, 1, file_level_enum_descriptors_entity_2eproto, file_level_service_descriptors_entity_2eproto,
 };
@@ -100,11 +102,14 @@ void SceneEntityProto::InitAsDefaultInstance() {
       ::e8::SrtTransform::internal_default_instance());
   ::e8::_SceneEntityProto_default_instance_._instance.get_mutable()->bounding_box_ = const_cast< ::e8::AABB*>(
       ::e8::AABB::internal_default_instance());
+  ::e8::_SceneEntityProto_default_instance_._instance.get_mutable()->resources_ = const_cast< ::e8::SceneEntityResources*>(
+      ::e8::SceneEntityResources::internal_default_instance());
 }
 class SceneEntityProto::_Internal {
  public:
   static const ::e8::SrtTransform& srt_transform(const SceneEntityProto* msg);
   static const ::e8::AABB& bounding_box(const SceneEntityProto* msg);
+  static const ::e8::SceneEntityResources& resources(const SceneEntityProto* msg);
 };
 
 const ::e8::SrtTransform&
@@ -114,6 +119,10 @@ SceneEntityProto::_Internal::srt_transform(const SceneEntityProto* msg) {
 const ::e8::AABB&
 SceneEntityProto::_Internal::bounding_box(const SceneEntityProto* msg) {
   return *msg->bounding_box_;
+}
+const ::e8::SceneEntityResources&
+SceneEntityProto::_Internal::resources(const SceneEntityProto* msg) {
+  return *msg->resources_;
 }
 void SceneEntityProto::clear_srt_transform() {
   if (GetArena() == nullptr && srt_transform_ != nullptr) {
@@ -126,6 +135,12 @@ void SceneEntityProto::clear_bounding_box() {
     delete bounding_box_;
   }
   bounding_box_ = nullptr;
+}
+void SceneEntityProto::clear_resources() {
+  if (GetArena() == nullptr && resources_ != nullptr) {
+    delete resources_;
+  }
+  resources_ = nullptr;
 }
 SceneEntityProto::SceneEntityProto(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena),
@@ -153,6 +168,11 @@ SceneEntityProto::SceneEntityProto(const SceneEntityProto& from)
   } else {
     bounding_box_ = nullptr;
   }
+  if (from._internal_has_resources()) {
+    resources_ = new ::e8::SceneEntityResources(*from.resources_);
+  } else {
+    resources_ = nullptr;
+  }
   ::memcpy(&id_, &from.id_,
     static_cast<size_t>(reinterpret_cast<char*>(&movable_) -
     reinterpret_cast<char*>(&id_)) + sizeof(movable_));
@@ -178,6 +198,7 @@ void SceneEntityProto::SharedDtor() {
   name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete srt_transform_;
   if (this != internal_default_instance()) delete bounding_box_;
+  if (this != internal_default_instance()) delete resources_;
 }
 
 void SceneEntityProto::ArenaDtor(void* object) {
@@ -211,6 +232,10 @@ void SceneEntityProto::Clear() {
     delete bounding_box_;
   }
   bounding_box_ = nullptr;
+  if (GetArena() == nullptr && resources_ != nullptr) {
+    delete resources_;
+  }
+  resources_ = nullptr;
   ::memset(&id_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&movable_) -
       reinterpret_cast<char*>(&id_)) + sizeof(movable_));
@@ -272,17 +297,10 @@ const char* SceneEntityProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPA
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // int64 geometry_id = 7;
+      // .e8.SceneEntityResources resources = 7;
       case 7:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 56)) {
-          geometry_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else goto handle_unusual;
-        continue;
-      // int64 physical_shape_id = 8;
-      case 8:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 64)) {
-          physical_shape_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
+          ptr = ctx->ParseMessage(_internal_mutable_resources(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -357,16 +375,12 @@ failure:
         6, _Internal::bounding_box(this), target, stream);
   }
 
-  // int64 geometry_id = 7;
-  if (this->geometry_id() != 0) {
+  // .e8.SceneEntityResources resources = 7;
+  if (this->has_resources()) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(7, this->_internal_geometry_id(), target);
-  }
-
-  // int64 physical_shape_id = 8;
-  if (this->physical_shape_id() != 0) {
-    target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(8, this->_internal_physical_shape_id(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        7, _Internal::resources(this), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -421,25 +435,18 @@ size_t SceneEntityProto::ByteSizeLong() const {
         *bounding_box_);
   }
 
+  // .e8.SceneEntityResources resources = 7;
+  if (this->has_resources()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *resources_);
+  }
+
   // int64 id = 1;
   if (this->id() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int64Size(
         this->_internal_id());
-  }
-
-  // int64 geometry_id = 7;
-  if (this->geometry_id() != 0) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int64Size(
-        this->_internal_geometry_id());
-  }
-
-  // int64 physical_shape_id = 8;
-  if (this->physical_shape_id() != 0) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int64Size(
-        this->_internal_physical_shape_id());
   }
 
   // bool movable = 3;
@@ -488,14 +495,11 @@ void SceneEntityProto::MergeFrom(const SceneEntityProto& from) {
   if (from.has_bounding_box()) {
     _internal_mutable_bounding_box()->::e8::AABB::MergeFrom(from._internal_bounding_box());
   }
+  if (from.has_resources()) {
+    _internal_mutable_resources()->::e8::SceneEntityResources::MergeFrom(from._internal_resources());
+  }
   if (from.id() != 0) {
     _internal_set_id(from._internal_id());
-  }
-  if (from.geometry_id() != 0) {
-    _internal_set_geometry_id(from._internal_geometry_id());
-  }
-  if (from.physical_shape_id() != 0) {
-    _internal_set_physical_shape_id(from._internal_physical_shape_id());
   }
   if (from.movable() != 0) {
     _internal_set_movable(from._internal_movable());

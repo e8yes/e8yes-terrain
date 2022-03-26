@@ -65,13 +65,13 @@ class ResourceAccessor {
      * @param temporary Indicates if the resource is only temporary. A temporary resource will get
      * cleaned up by the end of this object's lifecycle.
      */
-    void AddGeometry(GeometryLodProto const &proto, bool temporary);
+    void AddGeometry(GeometryProto const &proto, bool temporary);
 
     /**
      * @brief LoadGeometry Loads an existing geometry pointed by the specifed ID. If the load fails,
      * this function will also fail.
      */
-    std::shared_ptr<GeometryLod> LoadGeometry(GeometryId const &id);
+    std::shared_ptr<Geometry> LoadGeometry(GeometryId const &id);
 
     /**
      * @brief RemoveGeometry Removes the geometry pointed to by the ID. If such geometry doesn't

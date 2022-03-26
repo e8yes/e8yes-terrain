@@ -20,6 +20,7 @@ syntax = "proto3";
 package e8;
 
 import "bbox.proto";
+import "lod.proto";
 import "transform.proto";
 
 /**
@@ -51,11 +52,6 @@ message SceneEntityProto {
     // An AABB bounding box (before a placement transform) surrounding the entity's geometry.
     AABB bounding_box = 6;
 
-    // A geometry instance with information derived from a GeometryLod. A shared pointer allows a
-    // large number of same drawables to be placed at different location of the scene with shared
-    // information.
-    int64 geometry_id = 7;
-
-    // Like above, A physical shape instance with information derived from a physical shape.
-    int64 physical_shape_id = 8;
+    // Resource references attached to this entity.
+    SceneEntityResources resources = 7;
 }

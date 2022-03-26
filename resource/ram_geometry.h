@@ -43,11 +43,11 @@ class GeometryRamTransfer {
      * @brief Load Loads a geometry pointed to by its ID and metadata in the resource table from
      * disk if it hasn't been in the cache.
      */
-    std::shared_ptr<GeometryLod> Load(GeometryId const &id, ResourceTable const &resource_table,
-                                      VulkanContext *context);
+    std::shared_ptr<Geometry> Load(GeometryId const &id, ResourceTable const &resource_table,
+                                   VulkanContext *context);
 
   private:
-    DeviceCache<GeometryId, std::shared_ptr<GeometryLod>> cache_;
+    DeviceCache<GeometryId, std::shared_ptr<Geometry>> cache_;
 };
 
 } // namespace e8

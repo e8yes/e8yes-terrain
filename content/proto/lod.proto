@@ -1,0 +1,49 @@
+/**
+ * e8yes demo web server.
+ *
+ * <p>Copyright (C) 2020 Chifeng Wen {daviesx66@gmail.com}
+ *
+ * <p>This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *reset
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * <p>You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
+ */
+
+syntax = "proto3";
+
+package e8;
+
+/**
+ * @brief the SceneEntityResources message Stores LODs of resource references.
+ */
+message SceneEntityResources {
+    /**
+     * @brief the Lod message Stores references to different kind of resources of same level of
+     * detail.
+     */
+    message Lod {
+        // Applies this LOD only when the viewer is further than this distance (in meter).
+        float apply_after_distance = 1;
+
+        // Geometry reference.
+        int64 geometry_id = 2;
+
+        // Material reference.
+        int64 material_id = 3;
+
+        // Light map reference.
+        int64 light_map_id = 4;
+
+        // Physical shape reference.
+        int64 physical_shape_id = 5;
+    }
+
+    // A list of LOD references stored in decreasing level of detail.
+    repeated Lod lods = 1;
+}

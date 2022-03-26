@@ -35,12 +35,12 @@ std::filesystem::path GeometryFilePath(GeometryId const &id, ResourceTable const
     return base_path / (std::to_string(id) + ".gpb");
 }
 
-std::filesystem::path GeometryFileName(GeometryLodProto const &geometry) {
+std::filesystem::path GeometryFileName(GeometryProto const &geometry) {
     return std::to_string(geometry.id()) + ".gpb";
 }
 
 std::filesystem::path GeometryFilePath(std::filesystem::path const &base_path,
-                                       GeometryLodProto const &geometry) {
+                                       GeometryProto const &geometry) {
     return base_path / GeometryFileName(geometry);
 }
 
@@ -144,11 +144,22 @@ void Geometry::VulkanBuffer::EndAccess() const {
 
 bool Geometry::VulkanBuffer::Valid() const { return buffer != VK_NULL_HANDLE; }
 
-Geometry::Geometry() : rigidity(GeometryProto::INVALID), vertex_count(0), index_count(0) {}
+Geometry::Geometry()
+    : id(GenerateUuid()), rigidity(GeometryProto::INVALID), vertex_count(0), index_count(0) {}
 
 Geometry::~Geometry() {}
 
-void Geometry::FromProto(GeometryProto const &proto, VulkanContext *context) {
+void Geometry::FromDisk(GeometryId const &geometry_id, ResourceTable const &table,
+                        VulkanContext *context) {
+    // Loads protobuf object from disk.
+    std::filesystem::path file_path = GeometryFilePath(geometry_id, table);
+    std::fstream proto_file(file_path, std::ios::in | std::ios::binary);
+    assert(proto_file.is_open());
+
+    GeometryProto proto;
+    assert(proto.ParseFromIstream(&proto_file));
+
+    // Builds vertex and index buffers.
     vertex_count = proto.vertices_size();
     index_count = proto.primitives_size() * 3;
 
@@ -180,11 +191,12 @@ void Geometry::FromProto(GeometryProto const &proto, VulkanContext *context) {
     indices.EndAccess();
 }
 
-GeometryProto Geometry::ToProto() const {
+void Geometry::ToDisk(bool temporary, ResourceTable *table) const {
     assert(vertices.Valid());
     assert(indices.Valid());
 
     GeometryProto proto;
+    proto.set_id(id);
     proto.set_rigidity(rigidity);
 
     // Extracts vertex data.
@@ -214,7 +226,7 @@ GeometryProto Geometry::ToProto() const {
     }
     indices.EndAccess();
 
-    return proto;
+    SaveGeometryProto(proto, temporary, table);
 }
 
 VkIndexType Geometry::IndexElementType() const {
@@ -252,46 +264,7 @@ uint64_t Geometry::VertexBufferSize() const { return vertex_count * sizeof(Primi
 
 uint64_t Geometry::IndexBufferSize() const { return index_count * this->IndexElementSize(); }
 
-GeometryLod::GeometryLod() : id(GenerateUuid()) {}
-
-GeometryLod::~GeometryLod() {}
-
-void GeometryLod::FromDisk(GeometryId const &geometry_id, ResourceTable const &table,
-                           VulkanContext *context) {
-    std::filesystem::path file_path = GeometryFilePath(geometry_id, table);
-    std::fstream proto_file(file_path, std::ios::in | std::ios::binary);
-    assert(proto_file.is_open());
-
-    GeometryLodProto proto;
-    assert(proto.ParseFromIstream(&proto_file));
-
-    id = proto.id();
-    name = proto.name();
-    lod.resize(proto.geometry_lod_size());
-    lod_min_distances.resize(proto.min_distances_size());
-    assert(lod.size() == lod_min_distances.size());
-
-    for (int i = 0; i < proto.geometry_lod_size(); ++i) {
-        lod[i].FromProto(proto.geometry_lod(i), context);
-        lod_min_distances[i] = proto.min_distances(i);
-    }
-}
-
-void GeometryLod::ToDisk(bool temporary, ResourceTable *table) const {
-    GeometryLodProto proto;
-    proto.set_id(id);
-    proto.set_name(name);
-
-    for (unsigned i = 0; i < lod.size(); ++i) {
-        *proto.add_geometry_lod() = lod[i].ToProto();
-        proto.add_min_distances(lod_min_distances[i]);
-    }
-
-    SaveGeometryProto(proto, temporary, table);
-}
-
-void SaveGeometryProto(GeometryLodProto const &geometry_proto, bool temporary,
-                       ResourceTable *table) {
+void SaveGeometryProto(GeometryProto const &geometry_proto, bool temporary, ResourceTable *table) {
     assert(geometry_proto.id() != kNullUuid);
 
     // Writes out the geometry.

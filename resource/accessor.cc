@@ -60,11 +60,11 @@ ResourceAccessor::~ResourceAccessor() {
 
 bool ResourceAccessor::Valid() const { return transient_table_ != nullptr; }
 
-void ResourceAccessor::AddGeometry(GeometryLodProto const &proto, bool temporary) {
+void ResourceAccessor::AddGeometry(GeometryProto const &proto, bool temporary) {
     SaveGeometryProto(proto, temporary, transient_table_.get());
 }
 
-std::shared_ptr<GeometryLod> ResourceAccessor::LoadGeometry(GeometryId const &id) {
+std::shared_ptr<Geometry> ResourceAccessor::LoadGeometry(GeometryId const &id) {
     return geometry_ram_transfer_->Load(id, *transient_table_, device_);
 }
 
