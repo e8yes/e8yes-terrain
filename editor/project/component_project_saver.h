@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef COMPONENT_SCENE_SAVER_H
-#define COMPONENT_SCENE_SAVER_H
+#ifndef ISLANDS_EDITOR_COMPONENT_PROJECT_SAVER_H
+#define ISLANDS_EDITOR_COMPONENT_PROJECT_SAVER_H
 
 #include <QObject>
 #include <optional>
@@ -29,18 +29,18 @@
 namespace e8 {
 
 /**
- * @brief The SceneSaverComponent class It's responsible for the scene saving interactions.
+ * @brief The ProjectSaverComponent class It's responsible for the scene saving interactions.
  */
-class SceneSaverComponent : public QObject {
+class ProjectSaverComponent : public QObject {
     Q_OBJECT
 
   public:
-    SceneSaverComponent(ModificationMonitorComponent *modification_monitor_comp,
-                        SceneViewComponent *scene_view_comp, EditorContext *context);
-    ~SceneSaverComponent();
+    ProjectSaverComponent(ModificationMonitorComponent *modification_monitor_comp,
+                          SceneViewComponent *scene_view_comp, EditorContext *context);
+    ~ProjectSaverComponent();
 
   public slots:
-    void OnClickSaveScene();
+    void OnClickSaveProject();
 
   private:
     ModificationMonitorComponent *modification_monitor_comp_;
@@ -50,4 +50,4 @@ class SceneSaverComponent : public QObject {
 
 } // namespace e8
 
-#endif // COMPONENT_SCENE_SAVER_H
+#endif // ISLANDS_EDITOR_COMPONENT_PROJECT_SAVER_H

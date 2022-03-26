@@ -31,23 +31,23 @@
 #include "content/scene.h"
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/context.h"
-#include "editor/scene/component_scene_saver.h"
+#include "editor/project/component_project_saver.h"
 #include "editor/scene/component_scene_view.h"
 
 namespace e8 {
 
-SceneSaverComponent::SceneSaverComponent(ModificationMonitorComponent *modification_monitor_comp,
-                                         SceneViewComponent *scene_view_comp,
-                                         EditorContext *context)
+ProjectSaverComponent::ProjectSaverComponent(
+    ModificationMonitorComponent *modification_monitor_comp, SceneViewComponent *scene_view_comp,
+    EditorContext *context)
     : modification_monitor_comp_(modification_monitor_comp), scene_view_comp_(scene_view_comp),
       context_(context) {
     QAction::connect(context_->ui->action_save_scene, &QAction::triggered, this,
-                     &SceneSaverComponent::OnClickSaveScene);
+                     &ProjectSaverComponent::OnClickSaveProject);
 }
 
-SceneSaverComponent::~SceneSaverComponent() {}
+ProjectSaverComponent::~ProjectSaverComponent() {}
 
-void SceneSaverComponent::OnClickSaveScene() {
+void ProjectSaverComponent::OnClickSaveProject() {
     if (context_->game == nullptr) {
         BOOST_LOG_TRIVIAL(error) << "SceneSaverComponent(): Nothing to save.";
         return;

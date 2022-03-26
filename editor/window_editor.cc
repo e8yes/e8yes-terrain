@@ -29,9 +29,9 @@
 #include "editor/environment/component_camera.h"
 #include "editor/object/component_scene_object_gltf.h"
 #include "editor/procedural/component_procedural_plane.h"
-#include "editor/scene/component_scene_closer.h"
-#include "editor/scene/component_scene_loader.h"
-#include "editor/scene/component_scene_saver.h"
+#include "editor/project/component_project_closer.h"
+#include "editor/project/component_project_loader.h"
+#include "editor/project/component_project_saver.h"
 #include "editor/scene/component_scene_view.h"
 #include "editor/window_editor.h"
 
@@ -50,12 +50,12 @@ IslandsEditorWindow::IslandsEditorWindow(EditorContext *editor_context, QWidget 
     camera_comp_ =
         std::make_unique<CameraComponent>(modification_monitor_comp_.get(), editor_context);
     scene_view_comp_ = std::make_unique<SceneViewComponent>(editor_context);
-    scene_saver_comp_ = std::make_unique<SceneSaverComponent>(
+    scene_saver_comp_ = std::make_unique<ProjectSaverComponent>(
         modification_monitor_comp_.get(), scene_view_comp_.get(), editor_context);
-    scene_closer_comp_ = std::make_unique<SceneCloserComponent>(
+    scene_closer_comp_ = std::make_unique<ProjectCloserComponent>(
         editor_portal_switcher_comp_.get(), modification_monitor_comp_.get(),
         scene_saver_comp_.get(), scene_view_comp_.get(), editor_context);
-    scene_loader_comp_ = std::make_unique<SceneLoaderComponent>(
+    scene_loader_comp_ = std::make_unique<ProjectLoaderComponent>(
         ambient_comp_.get(), camera_comp_.get(), editor_portal_switcher_comp_.get(),
         modification_monitor_comp_.get(), scene_view_comp_.get(), editor_context);
     scene_object_gltf_comp_ = std::make_unique<SceneObjectGltfComponent>(
@@ -69,7 +69,7 @@ IslandsEditorWindow::IslandsEditorWindow(EditorContext *editor_context, QWidget 
 
 IslandsEditorWindow::~IslandsEditorWindow() {}
 
-void IslandsEditorWindow::closeEvent(QCloseEvent *) { scene_closer_comp_->OnClickCloseScene(); }
+void IslandsEditorWindow::closeEvent(QCloseEvent *) { scene_closer_comp_->OnClickCloseProject(); }
 
 int RunEditor(int argc, char *argv[]) {
     auto editor_context = std::make_unique<EditorContext>(argc, argv);

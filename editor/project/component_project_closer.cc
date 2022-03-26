@@ -23,16 +23,16 @@
 #include "editor/basic/component_editor_portal_switcher.h"
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/context.h"
-#include "editor/scene/component_scene_closer.h"
-#include "editor/scene/component_scene_saver.h"
+#include "editor/project/component_project_closer.h"
+#include "editor/project/component_project_saver.h"
 #include "editor/scene/component_scene_view.h"
 
 namespace e8 {
 namespace {
 
-void CloseScene(EditorPortalSwitcherComponent *editor_portal_switcher_comp,
-                ModificationMonitorComponent *modification_monitor_comp,
-                SceneViewComponent *scene_view_comp, EditorContext *context) {
+void CloseProject(EditorPortalSwitcherComponent *editor_portal_switcher_comp,
+                  ModificationMonitorComponent *modification_monitor_comp,
+                  SceneViewComponent *scene_view_comp, EditorContext *context) {
     if (context->game != nullptr) {
         context->game->Shutdown();
         context->game_thread->join();
@@ -48,20 +48,20 @@ void CloseScene(EditorPortalSwitcherComponent *editor_portal_switcher_comp,
 
 } // namespace
 
-SceneCloserComponent::SceneCloserComponent(
+ProjectCloserComponent::ProjectCloserComponent(
     EditorPortalSwitcherComponent *editor_portal_switcher_comp,
-    ModificationMonitorComponent *modification_monitor_comp, SceneSaverComponent *scene_saver_comp,
+    ModificationMonitorComponent *modification_monitor_comp, ProjectSaverComponent *scene_saver_comp,
     SceneViewComponent *scene_view_comp, EditorContext *context)
     : editor_portal_switcher_comp_(editor_portal_switcher_comp),
       modification_monitor_comp_(modification_monitor_comp), scene_saver_comp_(scene_saver_comp),
       scene_view_comp_(scene_view_comp), context_(context) {
     QAction::connect(context_->ui->action_close_scene, &QAction::triggered, this,
-                     &SceneCloserComponent::OnClickCloseScene);
+                     &ProjectCloserComponent::OnClickCloseProject);
 }
 
-SceneCloserComponent::~SceneCloserComponent() {}
+ProjectCloserComponent::~ProjectCloserComponent() {}
 
-void SceneCloserComponent::OnClickCloseScene() {
+void ProjectCloserComponent::OnClickCloseProject() {
     if (modification_monitor_comp_->UnsavedModifications()) {
         QMessageBox msg_box;
         msg_box.setText("The project has unsaved modifications.");
@@ -70,16 +70,16 @@ void SceneCloserComponent::OnClickCloseScene() {
         msg_box.setDefaultButton(QMessageBox::Save);
 
         if (QMessageBox::Save == msg_box.exec()) {
-            scene_saver_comp_->OnClickSaveScene();
+            scene_saver_comp_->OnClickSaveProject();
         }
     }
 
-    CloseScene(editor_portal_switcher_comp_, modification_monitor_comp_, scene_view_comp_,
-               context_);
+    CloseProject(editor_portal_switcher_comp_, modification_monitor_comp_, scene_view_comp_,
+                 context_);
 }
 
-void SceneCloserComponent::OnClickExitApplication() {
-    this->OnClickCloseScene();
+void ProjectCloserComponent::OnClickExitApplication() {
+    this->OnClickCloseProject();
     QApplication::exit();
 }
 

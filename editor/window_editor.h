@@ -31,9 +31,9 @@
 #include "editor/environment/component_camera.h"
 #include "editor/object/component_scene_object_gltf.h"
 #include "editor/procedural/component_procedural_plane.h"
-#include "editor/scene/component_scene_closer.h"
-#include "editor/scene/component_scene_loader.h"
-#include "editor/scene/component_scene_saver.h"
+#include "editor/project/component_project_closer.h"
+#include "editor/project/component_project_loader.h"
+#include "editor/project/component_project_saver.h"
 #include "editor/scene/component_scene_view.h"
 
 namespace e8 {
@@ -57,9 +57,9 @@ class IslandsEditorWindow : public QMainWindow {
     std::unique_ptr<AmbientComponent> ambient_comp_;
     std::unique_ptr<CameraComponent> camera_comp_;
     std::unique_ptr<SceneViewComponent> scene_view_comp_;
-    std::unique_ptr<SceneSaverComponent> scene_saver_comp_;
-    std::unique_ptr<SceneCloserComponent> scene_closer_comp_;
-    std::unique_ptr<SceneLoaderComponent> scene_loader_comp_;
+    std::unique_ptr<ProjectSaverComponent> scene_saver_comp_;
+    std::unique_ptr<ProjectCloserComponent> scene_closer_comp_;
+    std::unique_ptr<ProjectLoaderComponent> scene_loader_comp_;
     std::unique_ptr<SceneObjectGltfComponent> scene_object_gltf_comp_;
     std::unique_ptr<ProceduralPlaneComponent> procedural_plane_comp_;
 };

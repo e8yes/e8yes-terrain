@@ -25,9 +25,9 @@ SOURCES += \
     environment/component_camera.cc \
     object/component_scene_object_gltf.cc \
     procedural/component_procedural_plane.cc \
-    scene/component_scene_closer.cc \
-    scene/component_scene_loader.cc \
-    scene/component_scene_saver.cc \
+    project/component_project_closer.cc \
+    project/component_project_loader.cc \
+    project/component_project_saver.cc \
     scene/component_scene_view.cc \
     main.cc \
     window_editor.cc
@@ -42,9 +42,9 @@ HEADERS += \
     environment/component_camera.h \
     object/component_scene_object_gltf.h \
     procedural/component_procedural_plane.h \
-    scene/component_scene_closer.h \
-    scene/component_scene_loader.h \
-    scene/component_scene_saver.h \
+    project/component_project_closer.h \
+    project/component_project_loader.h \
+    project/component_project_saver.h \
     scene/component_scene_view.h \
     window_editor.h
 
