@@ -33,7 +33,7 @@
 #include "editor/project/component_project_loader.h"
 #include "editor/project/component_project_saver.h"
 #include "editor/scene/component_scene_view.h"
-#include "editor/window_editor.h"
+#include "editor/editor.h"
 
 namespace e8 {
 

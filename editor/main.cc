@@ -15,6 +15,6 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "editor/window_editor.h"
+#include "editor/editor.h"
 
 int main(int argc, char *argv[]) { return e8::RunEditor(argc, argv); }

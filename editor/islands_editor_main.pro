@@ -21,6 +21,7 @@ SOURCES += \
     basic/component_status.cc \
     basic/context.cc \
     basic/editor_storyline.cc \
+    editor.cc \
     environment/component_ambient.cc \
     environment/component_camera.cc \
     object/component_scene_object_gltf.cc \
@@ -30,8 +31,7 @@ SOURCES += \
     project/component_project_loader.cc \
     project/component_project_saver.cc \
     scene/component_scene_view.cc \
-    main.cc \
-    window_editor.cc
+    main.cc
 
 HEADERS += \
     basic/component_editor_portal_switcher.h \
@@ -39,6 +39,7 @@ HEADERS += \
     basic/component_status.h \
     basic/context.h \
     basic/editor_storyline.h \
+    editor.h \
     environment/component_ambient.h \
     environment/component_camera.h \
     object/component_scene_object_gltf.h \
@@ -47,13 +48,12 @@ HEADERS += \
     project/component_project_creator.h \
     project/component_project_loader.h \
     project/component_project_saver.h \
-    scene/component_scene_view.h \
-    window_editor.h
+    scene/component_scene_view.h
 
 FORMS += \
+    editor_window.ui \
     procedural/component_procedural_plane.ui \
-    project/component_project_creator.ui \
-    window_editor.ui
+    project/component_project_creator.ui
 
 TRANSLATIONS += \
     e8terrain_en_US.ts

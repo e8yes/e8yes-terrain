@@ -22,7 +22,7 @@
 
 #include "editor/basic/component_editor_portal_switcher.h"
 #include "editor/basic/context.h"
-#include "ui_window_editor.h"
+#include "ui_editor_window.h"
 
 namespace e8 {
 namespace {

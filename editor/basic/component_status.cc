@@ -24,7 +24,7 @@
 #include "content/scene.h"
 #include "editor/basic/component_status.h"
 #include "editor/basic/context.h"
-#include "ui_window_editor.h"
+#include "ui_editor_window.h"
 
 namespace e8 {
 namespace {

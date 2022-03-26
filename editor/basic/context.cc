@@ -25,7 +25,7 @@
 #include "editor/basic/editor_storyline.h"
 #include "game/game.h"
 #include "game/storyline.h"
-#include "ui_window_editor.h"
+#include "ui_editor_window.h"
 
 namespace e8 {
 

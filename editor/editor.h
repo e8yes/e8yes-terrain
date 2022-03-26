@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_EDITOR_WINDOW_H
-#define ISLANDS_EDITOR_WINDOW_H
+#ifndef ISLANDS_EDITOR_H
+#define ISLANDS_EDITOR_H
 
 #include <QCloseEvent>
 #include <QMainWindow>
@@ -74,4 +74,4 @@ int RunEditor(int argc, char *argv[]);
 
 } // namespace e8
 
-#endif // ISLANDS_EDITOR_WINDOW_H
+#endif // ISLANDS_EDITOR_H
