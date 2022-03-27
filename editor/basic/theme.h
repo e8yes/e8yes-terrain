@@ -431,6 +431,7 @@ QTabWidget::pane
 
 QTextEdit
 {
+    border: none;
     background-color: #242424;
 }
 

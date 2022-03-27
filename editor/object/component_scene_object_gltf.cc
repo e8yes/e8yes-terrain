@@ -81,8 +81,8 @@ void SceneObjectGltfComponent::OnClickAddGltfSceneObject() {
         msg_box.exec();
     }
 
-    modification_monitor_comp_->OnModifyScene();
-    scene_view_comp_->OnChangeScene();
+    modification_monitor_comp_->OnModifyProject();
+    scene_view_comp_->OnChangeProject();
 }
 
 } // namespace e8

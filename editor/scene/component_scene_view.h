@@ -42,7 +42,7 @@ class SceneViewComponent : public QObject {
     ~SceneViewComponent();
 
   public slots:
-    void OnChangeScene();
+    void OnChangeProject();
 
   private:
     EditorContext *context_;

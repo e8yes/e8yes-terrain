@@ -162,7 +162,7 @@ CameraComponent::CameraComponent(ModificationMonitorComponent *modification_moni
 
 CameraComponent::~CameraComponent() {}
 
-void CameraComponent::OnChangeScene() {
+void CameraComponent::OnChangeProject() {
     SetCameraWidgets(
         context_->game->GetGameData().scene, context_->ui->camera_pos_x_edit,
         context_->ui->camera_pos_y_edit, context_->ui->camera_pos_z_edit,
@@ -186,12 +186,12 @@ void CameraComponent::OnChangeCameraParameters() {
                    context_->ui->camera_sensor_height_edit, context_->ui->camera_max_dist_edit,
                    context_->ui->camera_image_width_edit, context_->game->GetGameData().scene);
 
-    modification_monitor_comp_->OnModifyScene();
+    modification_monitor_comp_->OnModifyProject();
 }
 
 void CameraComponent::OnChangeCameraParametersFromGame() {
-    this->OnChangeScene();
-    modification_monitor_comp_->OnModifyScene();
+    this->OnChangeProject();
+    modification_monitor_comp_->OnModifyProject();
 }
 
 } // namespace e8

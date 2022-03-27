@@ -70,6 +70,7 @@ class RendererInterface {
     /**
      * @brief RendererInterface Constructs a base class.
      *
+     * @param type The renderer's type.
      * @param num_stages The total number of stages of interest for a renderer subclass.
      * @param max_frame_duration The greatest possible amount of time the frame's rendering process
      * will take before failing this function. This avoids the function from hanging without bound.
@@ -90,6 +91,11 @@ class RendererInterface {
      * @brief ApplyConfiguration Applies the specified configuration to the renderer.
      */
     virtual void ApplyConfiguration(RendererConfiguration const &config) = 0;
+
+    /**
+     * @brief Type Returns the renderer's type
+     */
+    RendererType Type() const;
 
     /**
      * @brief GetPerformanceStats Returns the performance stats for each stage of interest.

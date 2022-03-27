@@ -28,6 +28,7 @@
 #include "editor/basic/component_editor_portal_switcher.h"
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/context.h"
+#include "editor/display/component_renderer.h"
 #include "editor/environment/component_ambient.h"
 #include "editor/environment/component_camera.h"
 #include "editor/project/component_project_loader.h"
@@ -69,7 +70,8 @@ class ProjectCreatorComponent : public QObject {
     ProjectCreatorComponent(AmbientComponent *ambient_comp, CameraComponent *camera_comp,
                             EditorPortalSwitcherComponent *editor_portal_switcher_comp,
                             ModificationMonitorComponent *modification_monitor_comp,
-                            SceneViewComponent *scene_view_comp, EditorContext *context);
+                            RendererComponent *renderer_comp, SceneViewComponent *scene_view_comp,
+                            EditorContext *context);
     ~ProjectCreatorComponent();
 
   public slots:
@@ -82,6 +84,7 @@ class ProjectCreatorComponent : public QObject {
     CameraComponent *camera_comp_;
     EditorPortalSwitcherComponent *editor_portal_switcher_comp_;
     ModificationMonitorComponent *modification_monitor_comp_;
+    RendererComponent *renderer_comp_;
     SceneViewComponent *scene_view_comp_;
 
     EditorContext *context_;

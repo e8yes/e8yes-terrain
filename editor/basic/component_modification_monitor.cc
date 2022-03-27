@@ -46,7 +46,7 @@ void ModificationMonitorComponent::OnReset() {
     status_comp_->SetModificationStatus(false);
 }
 
-void ModificationMonitorComponent::OnModifyScene() {
+void ModificationMonitorComponent::OnModifyProject() {
     if (context_->game == nullptr) {
         BOOST_LOG_TRIVIAL(error) << "OnModifyScene(): A null game was modified.";
     }

@@ -56,8 +56,8 @@ void ProceduralPlaneComponent::OnClickAddProceduralPlane() {
         game_data.scene->AddProceduralObject(std::move(plane), game_data.resource_accessor);
     }
 
-    modification_monitor_comp_->OnModifyScene();
-    scene_view_comp_->OnChangeScene();
+    modification_monitor_comp_->OnModifyProject();
+    scene_view_comp_->OnChangeProject();
 }
 
 } // namespace e8

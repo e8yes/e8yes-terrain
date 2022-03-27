@@ -80,7 +80,6 @@ Game::Game(std::filesystem::path const &base_path, SceneProto::StructureType sce
                                                             device_context_.get());
     scene_ = std::make_unique<Scene>(scene_structure, scene_name);
     renderer_config_ = DefaultRendererConfiguration();
-    renderer_ = CreateRenderer(renderer_config_->in_use_renderer_type(), device_context_.get());
 
     assert(this->Valid());
 }
@@ -104,8 +103,6 @@ Game::Game(std::filesystem::path const &base_path) : base_path_(base_path), done
         return;
     }
 
-    renderer_ = CreateRenderer(renderer_config_->in_use_renderer_type(), device_context_.get());
-
     assert(this->Valid());
 }
 
@@ -120,18 +117,30 @@ void Game::Run(Storyline *storyline) {
     assert(device_context_ != nullptr);
     assert(resource_accessor_ != nullptr);
     assert(scene_ != nullptr);
-    assert(renderer_ != nullptr);
+    assert(renderer_config_ != nullptr);
 
-    UserInputs system_inputs;
-
-    GameData game_data;
-    game_data.scene = scene_.get();
+    RendererConfiguration current_renderer_config;
 
     while (!done_) {
+        if (renderer_ == nullptr || renderer_config_->in_use_renderer_type() !=
+                                        current_renderer_config.in_use_renderer_type()) {
+            current_renderer_config.set_in_use_renderer_type(
+                renderer_config_->in_use_renderer_type());
+            renderer_ = CreateRenderer(current_renderer_config.in_use_renderer_type(),
+                                       device_context_.get());
+        }
+
+        if (renderer_config_->DebugString() != current_renderer_config.DebugString()) {
+            current_renderer_config = *renderer_config_;
+            renderer_->ApplyConfiguration(current_renderer_config);
+        }
+
         renderer_->DrawFrame(scene_.get(), resource_accessor_.get());
 
-        UpdateSystemInputs(*display_, &system_inputs);
-        storyline->ProcessFrame(system_inputs, &game_data);
+        UserInputs user_inputs;
+        UpdateSystemInputs(*display_, &user_inputs);
+        GameData game_data = this->GetGameData();
+        storyline->ProcessFrame(user_inputs, &game_data);
     }
 
     done_ = false;
@@ -160,6 +169,7 @@ GameData Game::GetGameData() {
     game_data.resource_accessor = resource_accessor_.get();
     game_data.scene = scene_.get();
     game_data.renderer_config = renderer_config_.get();
+    game_data.renderer = renderer_.get();
     return game_data;
 }
 

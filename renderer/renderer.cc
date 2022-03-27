@@ -179,7 +179,7 @@ bool SaveRendererConfiguration(RendererConfiguration const &config,
 
 std::unique_ptr<RendererConfiguration> DefaultRendererConfiguration() {
     auto config = std::make_unique<RendererConfiguration>();
-    config->set_in_use_renderer_type(RendererType::RT_DEPTH);
+    config->set_in_use_renderer_type(RendererType::RT_SOLID_COLOR);
     config->mutable_depth_renderer_params()->set_alpha(1.0f);
     return config;
 }

@@ -36,6 +36,9 @@ struct GameData {
 
     // Current renderer configuration.
     RendererConfiguration *renderer_config;
+
+    // The renderer currently in-use.
+    RendererInterface *renderer;
 };
 
 /**

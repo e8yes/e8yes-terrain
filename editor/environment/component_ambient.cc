@@ -65,7 +65,7 @@ AmbientComponent::AmbientComponent(ModificationMonitorComponent *modification_mo
 
 AmbientComponent::~AmbientComponent() {}
 
-void AmbientComponent::OnChangeScene() {
+void AmbientComponent::OnChangeProject() {
     SetBackgroundColorSlider(context_->game->GetGameData().scene, context_->ui->bg_color_red_slider,
                              context_->ui->bg_color_green_slider,
                              context_->ui->bg_color_blue_slider);
@@ -76,7 +76,7 @@ void AmbientComponent::OnChangeBackgroundColor(int /*value*/) {
                             context_->ui->bg_color_blue_slider,
                             context_->game->GetGameData().scene);
 
-    modification_monitor_comp_->OnModifyScene();
+    modification_monitor_comp_->OnModifyProject();
 }
 
 } // namespace e8

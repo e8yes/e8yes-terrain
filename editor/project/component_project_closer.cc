@@ -44,7 +44,7 @@ void CloseProject(EditorPortalSwitcherComponent *editor_portal_switcher_comp,
 
     editor_portal_switcher_comp->SetEditorPortalEnabled(/*enabled=*/false);
     modification_monitor_comp->OnReset();
-    scene_view_comp->OnChangeScene();
+    scene_view_comp->OnChangeProject();
 }
 
 } // namespace

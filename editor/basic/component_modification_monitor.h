@@ -43,7 +43,7 @@ class ModificationMonitorComponent : public QObject {
 
   public slots:
     void OnReset();
-    void OnModifyScene();
+    void OnModifyProject();
 
   private:
     StatusComponent *status_comp_;

@@ -50,7 +50,8 @@ bool CreateNewProject(std::string const &project_name,
                       CameraComponent *camera_comp,
                       EditorPortalSwitcherComponent *editor_portal_switcher_comp,
                       ModificationMonitorComponent *modification_monitor_comp,
-                      SceneViewComponent *scene_view_comp, EditorContext *context) {
+                      RendererComponent *renderer_comp, SceneViewComponent *scene_view_comp,
+                      EditorContext *context) {
     if (context->game != nullptr) {
         BOOST_LOG_TRIVIAL(error)
             << "CreateNewProject(): A non-null game is in the current editor context.";
@@ -62,10 +63,11 @@ bool CreateNewProject(std::string const &project_name,
                                                          context->editor_storyline.get());
 
     editor_portal_switcher_comp->SetEditorPortalEnabled(/*enabled=*/true);
-    ambient_comp->OnChangeScene();
-    camera_comp->OnChangeScene();
-    modification_monitor_comp->OnModifyScene();
-    scene_view_comp->OnChangeScene();
+    ambient_comp->OnChangeProject();
+    camera_comp->OnChangeProject();
+    modification_monitor_comp->OnModifyProject();
+    renderer_comp->OnChangeProject();
+    scene_view_comp->OnChangeProject();
 
     return true;
 }
@@ -125,13 +127,13 @@ void ProjectCreationDialog::OnAcceptInputs() {
 ProjectCreatorComponent::ProjectCreatorComponent(
     AmbientComponent *ambient_comp, CameraComponent *camera_comp,
     EditorPortalSwitcherComponent *editor_portal_switcher_comp,
-    ModificationMonitorComponent *modification_monitor_comp, SceneViewComponent *scene_view_comp,
-    EditorContext *context)
+    ModificationMonitorComponent *modification_monitor_comp, RendererComponent *renderer_comp,
+    SceneViewComponent *scene_view_comp, EditorContext *context)
     : project_creation_dialog_(std::make_unique<project_creator_internal::ProjectCreationDialog>()),
       ambient_comp_(ambient_comp), camera_comp_(camera_comp),
       editor_portal_switcher_comp_(editor_portal_switcher_comp),
-      modification_monitor_comp_(modification_monitor_comp), scene_view_comp_(scene_view_comp),
-      context_(context) {
+      modification_monitor_comp_(modification_monitor_comp), renderer_comp_(renderer_comp),
+      scene_view_comp_(scene_view_comp), context_(context) {
     QAction::connect(context_->ui->action_new_project, &QAction::triggered, this,
                      &ProjectCreatorComponent::OnClickNewProject);
 }
@@ -158,10 +160,11 @@ void ProjectCreatorComponent::OnClickNewProject() {
         return;
     }
 
-    if (!CreateNewProject(
-            project_creation_dialog_->project_name, project_creation_dialog_->project_directory,
-            project_creation_dialog_->scene_structure, ambient_comp_, camera_comp_,
-            editor_portal_switcher_comp_, modification_monitor_comp_, scene_view_comp_, context_)) {
+    if (!CreateNewProject(project_creation_dialog_->project_name,
+                          project_creation_dialog_->project_directory,
+                          project_creation_dialog_->scene_structure, ambient_comp_, camera_comp_,
+                          editor_portal_switcher_comp_, modification_monitor_comp_, renderer_comp_,
+                          scene_view_comp_, context_)) {
         QMessageBox msg_box;
         msg_box.setStyleSheet(kQssStyleSheet);
         msg_box.setText("Failed to Create Project");

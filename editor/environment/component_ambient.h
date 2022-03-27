@@ -37,7 +37,7 @@ class AmbientComponent : public QObject {
     ~AmbientComponent();
 
   public slots:
-    void OnChangeScene();
+    void OnChangeProject();
     void OnChangeBackgroundColor(int value);
 
   private:

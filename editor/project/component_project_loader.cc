@@ -43,7 +43,8 @@ bool LoadProject(std::filesystem::path const &game_path, AmbientComponent *ambie
                  CameraComponent *camera_comp,
                  EditorPortalSwitcherComponent *editor_portal_switcher_comp,
                  ModificationMonitorComponent *modification_monitor_comp,
-                 SceneViewComponent *scene_view_comp, EditorContext *context) {
+                 RendererComponent *renderer_comp, SceneViewComponent *scene_view_comp,
+                 EditorContext *context) {
     context->game = std::make_unique<Game>(game_path);
     if (!context->game->Valid()) {
         context->game = nullptr;
@@ -54,10 +55,11 @@ bool LoadProject(std::filesystem::path const &game_path, AmbientComponent *ambie
                                                          context->editor_storyline.get());
 
     editor_portal_switcher_comp->SetEditorPortalEnabled(/*enabled=*/true);
-    ambient_comp->OnChangeScene();
-    camera_comp->OnChangeScene();
+    ambient_comp->OnChangeProject();
+    camera_comp->OnChangeProject();
     modification_monitor_comp->OnReset();
-    scene_view_comp->OnChangeScene();
+    renderer_comp->OnChangeProject();
+    scene_view_comp->OnChangeProject();
 
     return true;
 }
@@ -67,12 +69,12 @@ bool LoadProject(std::filesystem::path const &game_path, AmbientComponent *ambie
 ProjectLoaderComponent::ProjectLoaderComponent(
     AmbientComponent *ambient_comp, CameraComponent *camera_comp,
     EditorPortalSwitcherComponent *editor_portal_switcher_comp,
-    ModificationMonitorComponent *modification_monitor_comp, SceneViewComponent *scene_view_comp,
-    EditorContext *context)
+    ModificationMonitorComponent *modification_monitor_comp, RendererComponent *renderer_comp,
+    SceneViewComponent *scene_view_comp, EditorContext *context)
     : ambient_comp_(ambient_comp), camera_comp_(camera_comp),
       editor_portal_switcher_comp_(editor_portal_switcher_comp),
-      modification_monitor_comp_(modification_monitor_comp), scene_view_comp_(scene_view_comp),
-      context_(context) {
+      modification_monitor_comp_(modification_monitor_comp), renderer_comp_(renderer_comp),
+      scene_view_comp_(scene_view_comp), context_(context) {
     QAction::connect(context_->ui->action_open_project, &QAction::triggered, this,
                      &ProjectLoaderComponent::OnClickOpenProject);
 }
@@ -81,7 +83,7 @@ ProjectLoaderComponent::~ProjectLoaderComponent() {}
 
 void ProjectLoaderComponent::OnClickOpenProject() {
     if (context_->game != nullptr) {
-        BOOST_LOG_TRIVIAL(error) << "OnClickOpenProject(): Invoked with an active scene.";
+        BOOST_LOG_TRIVIAL(error) << "OnClickOpenProject(): Invoked with an active project.";
         return;
     }
 
@@ -92,8 +94,8 @@ void ProjectLoaderComponent::OnClickOpenProject() {
     }
 
     if (!LoadProject(base_path.toStdString(), ambient_comp_, camera_comp_,
-                     editor_portal_switcher_comp_, modification_monitor_comp_, scene_view_comp_,
-                     context_)) {
+                     editor_portal_switcher_comp_, modification_monitor_comp_, renderer_comp_,
+                     scene_view_comp_, context_)) {
         QMessageBox msg_box;
         msg_box.setStyleSheet(kQssStyleSheet);
         msg_box.setText("Failed to Load Project");

@@ -111,7 +111,7 @@ SceneViewComponent::SceneViewComponent(EditorContext *context) : context_(contex
 
 SceneViewComponent::~SceneViewComponent() {}
 
-void SceneViewComponent::OnChangeScene() {
+void SceneViewComponent::OnChangeProject() {
     UpdateSceneView(context_->game.get(), context_->ui->scene_view_tree_widget);
 }
 

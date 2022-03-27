@@ -27,6 +27,7 @@
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/component_status.h"
 #include "editor/basic/context.h"
+#include "editor/display/component_renderer.h"
 #include "editor/environment/component_ambient.h"
 #include "editor/environment/component_camera.h"
 #include "editor/object/component_scene_object_gltf.h"
@@ -57,6 +58,7 @@ class IslandsEditorWindow : public QMainWindow {
     std::unique_ptr<EditorPortalSwitcherComponent> editor_portal_switcher_comp_;
     std::unique_ptr<AmbientComponent> ambient_comp_;
     std::unique_ptr<CameraComponent> camera_comp_;
+    std::unique_ptr<RendererComponent> renderer_comp_;
     std::unique_ptr<SceneViewComponent> scene_view_comp_;
     std::unique_ptr<ProjectSaverComponent> project_saver_comp_;
     std::unique_ptr<ProjectCloserComponent> project_closer_comp_;

@@ -37,7 +37,7 @@ class CameraComponent : public QObject {
     ~CameraComponent();
 
   public slots:
-    void OnChangeScene();
+    void OnChangeProject();
     void OnChangeCameraParameters();
     void OnChangeCameraParametersFromGame();
 

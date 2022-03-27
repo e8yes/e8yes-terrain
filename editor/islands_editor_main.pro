@@ -22,6 +22,7 @@ SOURCES += \
     basic/context.cc \
     basic/editor_storyline.cc \
     basic/theme.cc \
+    display/component_renderer.cc \
     editor.cc \
     environment/component_ambient.cc \
     environment/component_camera.cc \
@@ -41,6 +42,7 @@ HEADERS += \
     basic/context.h \
     basic/editor_storyline.h \
     basic/theme.h \
+    display/component_renderer.h \
     editor.h \
     environment/component_ambient.h \
     environment/component_camera.h \
@@ -53,6 +55,8 @@ HEADERS += \
     scene/component_scene_view.h
 
 FORMS += \
+    display/renderer_depth_parameters.ui \
+    display/renderer_solid_color_parameters.ui \
     editor_window.ui \
     procedural/component_procedural_plane.ui \
     project/component_project_creator.ui

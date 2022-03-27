@@ -187,7 +187,7 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>543</width>
+              <width>537</width>
               <height>839</height>
              </rect>
             </property>
@@ -568,7 +568,7 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>557</width>
+              <width>551</width>
               <height>587</height>
              </rect>
             </property>
@@ -761,7 +761,7 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>557</width>
+              <width>551</width>
               <height>587</height>
              </rect>
             </property>
@@ -876,7 +876,7 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>557</width>
+              <width>551</width>
               <height>587</height>
              </rect>
             </property>
@@ -905,72 +905,16 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QRadioButton" name="position_rend_radial">
+                 <widget class="QRadioButton" name="radiance_rend_radial">
                   <property name="text">
-                   <string>Position</string>
+                   <string>Radiance</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QRadioButton" name="normal_rend_radial">
+                 <widget class="QRadioButton" name="radiosity_rend_radial">
                   <property name="text">
-                   <string>Normal</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QRadioButton" name="albedo_rend_radial">
-                  <property name="text">
-                   <string>Albedo</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QRadioButton" name="radiance_residual_rend_radial">
-                  <property name="text">
-                   <string>Radiance Residual</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QRadioButton" name="roughness_rend_radial">
-                  <property name="text">
-                   <string>Roughness</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QRadioButton" name="metalness_rend_radial">
-                  <property name="text">
-                   <string>Metalness</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QRadioButton" name="mat_idx_rend_radial">
-                  <property name="text">
-                   <string>Per Object Material Index</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QRadioButton" name="scene_struct_rend_radial">
-                  <property name="text">
-                   <string>Scene Structure Result</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QRadioButton" name="bake_result_rend_radial">
-                  <property name="text">
-                   <string>Bake Result</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QRadioButton" name="combined_result_rend_radial">
-                  <property name="text">
-                   <string>Combined Result</string>
+                   <string>Radiosity</string>
                   </property>
                  </widget>
                 </item>
@@ -982,7 +926,26 @@
                <property name="title">
                 <string>Parameters</string>
                </property>
-               <layout class="QVBoxLayout" name="verticalLayout_10"/>
+               <layout class="QGridLayout" name="gridLayout_3"/>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="display_performance_group">
+               <property name="title">
+                <string>Performance</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_20">
+                <item>
+                 <widget class="QTextEdit" name="display_performance_edit">
+                  <property name="readOnly">
+                   <bool>true</bool>
+                  </property>
+                  <property name="placeholderText">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </item>
             </layout>
