@@ -28,6 +28,8 @@
 namespace e8 {
 namespace {
 
+unsigned const kRendererPerformanceUpdateInterval = 30;
+
 enum MoveDirection {
     FORWARD,
     BACKWARD,
@@ -117,20 +119,43 @@ void EditorCameraControlTask::OnFrame(UserInputs const &user_inputs, GameData *g
     }
 }
 
-EditorInteractionComponent::EditorInteractionComponent() {
-    tasks.push_back(std::make_unique<EditorCameraControlTask>());
+RendererPerformanceUpdateEventTransmitter::RendererPerformanceUpdateEventTransmitter() {}
+
+RendererPerformanceUpdateEventTransmitter::~RendererPerformanceUpdateEventTransmitter() {}
+
+void RendererPerformanceUpdateEventTransmitter::Notify() { emit UpdateRequired(); }
+
+RendererPerformanceUpdateTask::RendererPerformanceUpdateTask() : frame_counter(0) {}
+
+RendererPerformanceUpdateTask::~RendererPerformanceUpdateTask() {}
+
+void RendererPerformanceUpdateTask::OnFrame(UserInputs const & /*user_inputs*/,
+                                            GameData * /*game_data*/) {
+    if (frame_counter % kRendererPerformanceUpdateInterval == 0) {
+        transmitter.Notify();
+    }
+
+    ++frame_counter;
 }
 
-EditorInteractionComponent::~EditorInteractionComponent() {}
+EditorStoryComponent::EditorStoryComponent() {
+    tasks.push_back(std::make_unique<EditorCameraControlTask>());
+    tasks.push_back(std::make_unique<RendererPerformanceUpdateTask>());
+}
 
-EditorCameraControlTask *EditorInteractionComponent::CameraControlTask() {
-    assert(tasks.size() == 1);
+EditorStoryComponent::~EditorStoryComponent() {}
+
+EditorCameraControlTask *EditorStoryComponent::GetCameraControlTask() {
     return static_cast<EditorCameraControlTask *>(tasks[0].get());
+}
+
+RendererPerformanceUpdateTask *EditorStoryComponent::GetRendererPerformanceUpdateTask() {
+    return static_cast<RendererPerformanceUpdateTask *>(tasks[1].get());
 }
 
 std::unique_ptr<Storyline> CreateEditorStoryline() {
     auto storyline = std::make_unique<Storyline>();
-    storyline->AddComponent(kEditorComponent, std::make_unique<EditorInteractionComponent>());
+    storyline->AddComponent(kEditorComponent, std::make_unique<EditorStoryComponent>());
     storyline->StartFrom(kEditorComponent);
     return storyline;
 }

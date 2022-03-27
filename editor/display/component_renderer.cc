@@ -20,16 +20,25 @@
 #include <QObject>
 #include <QRadioButton>
 #include <QSlider>
+#include <QTextEdit>
 #include <QWidget>
 #include <boost/log/trivial.hpp>
 #include <cassert>
 #include <memory>
+#include <sstream>
+#include <vector>
 
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/context.h"
+#include "editor/basic/editor_storyline.h"
 #include "editor/display/component_renderer.h"
+#include "game/game.h"
+#include "game/task.h"
 #include "renderer/proto/renderer.pb.h"
+#include "renderer/renderer.h"
 #include "ui_renderer_depth_parameters.h"
+#include "ui_renderer_radiance_parameters.h"
+#include "ui_renderer_radiosity_parameters.h"
 #include "ui_renderer_solid_color_parameters.h"
 
 namespace e8 {
@@ -80,9 +89,13 @@ void DisplayRendererParameters(RendererConfiguration const &config,
         break;
     }
     case RendererType::RT_RADIANCE: {
+        renderer_params_widget =
+            new display_internal::RadianceRendererParameters(modification_monitor_comp, context);
         break;
     }
     case RendererType::RT_RADIOSITY: {
+        renderer_params_widget =
+            new display_internal::RadiosityRendererParameters(modification_monitor_comp, context);
         break;
     }
     default: {
@@ -91,6 +104,23 @@ void DisplayRendererParameters(RendererConfiguration const &config,
     }
 
     layout->addWidget(renderer_params_widget, /*row=*/0, /*column=*/0);
+}
+
+void DisplayPerformanceStats(std::vector<RendererInterface::StagePerformance> const &performance,
+                             QTextEdit *display_performance_edit) {
+    std::stringstream stream;
+
+    for (auto const &stage : performance) {
+        stream << "Stage=[" << stage.name << "]" << std::endl;
+        stream << "last_1_frame_ms=[" << stage.last_1_frame_ms << "]" << std::endl;
+        stream << "last_10_frame_ms=[" << stage.last_10_frame_ms << "]" << std::endl;
+        stream << "last_100_frame_ms=[" << stage.last_100_frame_ms << "]" << std::endl;
+        stream << "last_1000_frame_ms=[" << stage.last_1000_frame_ms << "]" << std::endl;
+        stream << "-----------------------------------" << std::endl;
+    }
+
+    std::string stats_string = stream.str();
+    display_performance_edit->setText(stats_string.c_str());
 }
 
 } // namespace
@@ -133,6 +163,22 @@ void DepthRendererParameters::OnChangeAlpha() {
     modification_monitor_comp_->OnModifyProject();
 }
 
+RadianceRendererParameters::RadianceRendererParameters(
+    ModificationMonitorComponent *modification_monitor_comp, EditorContext *context)
+    : modification_monitor_comp_(modification_monitor_comp), context_(context) {
+    ui_.setupUi(this);
+}
+
+RadianceRendererParameters::~RadianceRendererParameters() {}
+
+RadiosityRendererParameters::RadiosityRendererParameters(
+    ModificationMonitorComponent *modification_monitor_comp, EditorContext *context)
+    : modification_monitor_comp_(modification_monitor_comp), context_(context) {
+    ui_.setupUi(this);
+}
+
+RadiosityRendererParameters::~RadiosityRendererParameters() {}
+
 } // namespace display_internal
 
 RendererComponent::RendererComponent(ModificationMonitorComponent *modification_monitor_comp,
@@ -149,6 +195,15 @@ RendererComponent::RendererComponent(ModificationMonitorComponent *modification_
                      &RendererComponent::OnClickRadianceRenderer);
     QObject::connect(context->ui->radiosity_rend_radial, &QRadioButton::clicked, this,
                      &RendererComponent::OnClickRadiosityRenderer);
+
+    auto story_comp = static_cast<EditorStoryComponent *>(
+        context_->editor_storyline->FindComponent(kEditorComponent));
+    RendererPerformanceUpdateTask *perf_update_task =
+        story_comp->GetRendererPerformanceUpdateTask();
+
+    QObject::connect(&perf_update_task->transmitter,
+                     &RendererPerformanceUpdateEventTransmitter::UpdateRequired, this,
+                     &RendererComponent::OnUpdateRendererPerformanceStatistics);
 }
 
 RendererComponent::~RendererComponent() {}
@@ -169,6 +224,12 @@ void RendererComponent::OnChangeProject() {
 }
 
 void RendererComponent::OnClickSolidColorRenderer() {
+    if (context_->game == nullptr) {
+        BOOST_LOG_TRIVIAL(error)
+            << "RendererComponent::OnClickSolidColorRenderer(): Invoked with an empty project.";
+        return;
+    }
+
     RendererConfiguration *config = context_->game->GetGameData().renderer_config;
     config->set_in_use_renderer_type(RendererType::RT_SOLID_COLOR);
 
@@ -179,6 +240,12 @@ void RendererComponent::OnClickSolidColorRenderer() {
 }
 
 void RendererComponent::OnClickDepthRenderer() {
+    if (context_->game == nullptr) {
+        BOOST_LOG_TRIVIAL(error)
+            << "RendererComponent::OnClickDepthRenderer(): Invoked with an empty project.";
+        return;
+    }
+
     RendererConfiguration *config = context_->game->GetGameData().renderer_config;
     config->set_in_use_renderer_type(RendererType::RT_DEPTH);
 
@@ -189,6 +256,12 @@ void RendererComponent::OnClickDepthRenderer() {
 }
 
 void RendererComponent::OnClickRadianceRenderer() {
+    if (context_->game == nullptr) {
+        BOOST_LOG_TRIVIAL(error)
+            << "RendererComponent::OnClickRadianceRenderer(): Invoked with an empty project.";
+        return;
+    }
+
     RendererConfiguration *config = context_->game->GetGameData().renderer_config;
     config->set_in_use_renderer_type(RendererType::RT_RADIANCE);
 
@@ -199,6 +272,12 @@ void RendererComponent::OnClickRadianceRenderer() {
 }
 
 void RendererComponent::OnClickRadiosityRenderer() {
+    if (context_->game == nullptr) {
+        BOOST_LOG_TRIVIAL(error)
+            << "RendererComponent::OnClickRadiosityRenderer(): Invoked with an empty project.";
+        return;
+    }
+
     RendererConfiguration *config = context_->game->GetGameData().renderer_config;
     config->set_in_use_renderer_type(RendererType::RT_RADIOSITY);
 
@@ -206,6 +285,19 @@ void RendererComponent::OnClickRadiosityRenderer() {
                               context_->ui->display_param_group);
 
     modification_monitor_comp_->OnModifyProject();
+}
+
+void RendererComponent::OnUpdateRendererPerformanceStatistics() {
+    if (context_->game == nullptr) {
+        BOOST_LOG_TRIVIAL(error) << "RendererComponent::OnUpdateRendererPerformanceStatistics(): "
+                                    "Invoked with an empty project.";
+        return;
+    }
+
+    RendererInterface *renderer = context_->game->GetGameData().renderer;
+    std::vector<RendererInterface::StagePerformance> performance = renderer->GetPerformanceStats();
+
+    DisplayPerformanceStats(performance, context_->ui->display_performance_edit);
 }
 
 } // namespace e8

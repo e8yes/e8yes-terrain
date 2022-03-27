@@ -25,6 +25,8 @@
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/context.h"
 #include "ui_renderer_depth_parameters.h"
+#include "ui_renderer_radiance_parameters.h"
+#include "ui_renderer_radiosity_parameters.h"
 #include "ui_renderer_solid_color_parameters.h"
 
 namespace e8 {
@@ -63,6 +65,36 @@ class DepthRendererParameters : public QWidget {
     EditorContext *context_;
 };
 
+class RadianceRendererParameters : public QWidget {
+    Q_OBJECT
+
+  public:
+    RadianceRendererParameters(ModificationMonitorComponent *modification_monitor_comp,
+                               EditorContext *context);
+    ~RadianceRendererParameters();
+
+  private:
+    Ui::RadianceRendererParameters ui_;
+
+    ModificationMonitorComponent *modification_monitor_comp_;
+    EditorContext *context_;
+};
+
+class RadiosityRendererParameters : public QWidget {
+    Q_OBJECT
+
+  public:
+    RadiosityRendererParameters(ModificationMonitorComponent *modification_monitor_comp,
+                                EditorContext *context);
+    ~RadiosityRendererParameters();
+
+  private:
+    Ui::RadiosityRendererParameters ui_;
+
+    ModificationMonitorComponent *modification_monitor_comp_;
+    EditorContext *context_;
+};
+
 } // namespace display_internal
 
 /**
@@ -82,6 +114,7 @@ class RendererComponent : public QObject {
     void OnClickDepthRenderer();
     void OnClickRadianceRenderer();
     void OnClickRadiosityRenderer();
+    void OnUpdateRendererPerformanceStatistics();
 
   private:
     ModificationMonitorComponent *modification_monitor_comp_;

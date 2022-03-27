@@ -151,10 +151,10 @@ CameraComponent::CameraComponent(ModificationMonitorComponent *modification_moni
     QObject::connect(context_->ui->camera_image_width_edit, &QLineEdit::textChanged, this,
                      &CameraComponent::OnChangeCameraParameters);
 
-    EditorInteractionComponent *interaction_component = static_cast<EditorInteractionComponent *>(
+    EditorStoryComponent *interaction_component = static_cast<EditorStoryComponent *>(
         context_->editor_storyline->FindComponent(kEditorComponent));
 
-    QObject::connect(&interaction_component->CameraControlTask()->transmitter,
+    QObject::connect(&interaction_component->GetCameraControlTask()->transmitter,
                      &EditorCameraEventTransmitter::ValueChanged, this,
                      &CameraComponent::OnChangeCameraParametersFromGame,
                      Qt::ConnectionType::QueuedConnection);

@@ -120,15 +120,30 @@ void RendererInterface::EndStage(unsigned index) {
     float time_spent_millis = time_spent_micros / 1000.0f;
 
     stage_performance_[index].last_1_frame_ms = time_spent_millis;
-    stage_performance_[index].last_10_frame_ms =
-        Alpha(10) * time_spent_millis +
-        (1.0f - Alpha(10)) * stage_performance_[index].last_10_frame_ms;
-    stage_performance_[index].last_100_frame_ms =
-        Alpha(100) * time_spent_millis +
-        (1.0f - Alpha(100)) * stage_performance_[index].last_100_frame_ms;
-    stage_performance_[index].last_1000_frame_ms =
-        Alpha(1000) * time_spent_millis +
-        (1.0f - Alpha(1000)) * stage_performance_[index].last_1000_frame_ms;
+
+    if (stage_performance_[index].last_10_frame_ms == 0) {
+        stage_performance_[index].last_10_frame_ms = time_spent_millis;
+    } else {
+        stage_performance_[index].last_10_frame_ms =
+            Alpha(10) * time_spent_millis +
+            (1.0f - Alpha(10)) * stage_performance_[index].last_10_frame_ms;
+    }
+
+    if (stage_performance_[index].last_100_frame_ms == 0) {
+        stage_performance_[index].last_100_frame_ms = time_spent_millis;
+    } else {
+        stage_performance_[index].last_100_frame_ms =
+            Alpha(100) * time_spent_millis +
+            (1.0f - Alpha(100)) * stage_performance_[index].last_100_frame_ms;
+    }
+
+    if (stage_performance_[index].last_1000_frame_ms == 0) {
+        stage_performance_[index].last_1000_frame_ms = time_spent_millis;
+    } else {
+        stage_performance_[index].last_1000_frame_ms =
+            Alpha(1000) * time_spent_millis +
+            (1.0f - Alpha(1000)) * stage_performance_[index].last_1000_frame_ms;
+    }
 }
 
 std::unique_ptr<RendererInterface> CreateRenderer(RendererType type, VulkanContext *context) {

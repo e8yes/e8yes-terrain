@@ -63,14 +63,48 @@ struct EditorCameraControlTask : public TaskInterface {
 };
 
 /**
- * @brief The EditorInteractionComponent struct The only story component in the editor storyline.
- * It's responsible for running the task that handles editor interactions.
+ * @brief The RendererPerformanceUpdateEventTransmitter class Allows the editor UI to be notified
+ * when renderer performance statistics accumulates enough changes.
  */
-struct EditorInteractionComponent : public StoryComponentInterface {
-    EditorInteractionComponent();
-    ~EditorInteractionComponent();
+class RendererPerformanceUpdateEventTransmitter : public QObject {
+    Q_OBJECT
 
-    EditorCameraControlTask *CameraControlTask();
+  public:
+    RendererPerformanceUpdateEventTransmitter();
+    ~RendererPerformanceUpdateEventTransmitter();
+
+  public:
+    void Notify();
+
+  signals:
+    void UpdateRequired();
+};
+
+/**
+ * @brief The RendererPerformanceUpdateTask struct A task to keep the UI showing renderer
+ * performance statistics in a regular interval.
+ */
+struct RendererPerformanceUpdateTask : public TaskInterface {
+    RendererPerformanceUpdateTask();
+    ~RendererPerformanceUpdateTask();
+
+    void OnFrame(UserInputs const &user_inputs, GameData *game_data) override;
+
+    RendererPerformanceUpdateEventTransmitter transmitter;
+    unsigned frame_counter;
+};
+
+/**
+ * @brief The EditorStoryComponent struct The only story component in the editor storyline. It's
+ * responsible for running editor tasks.
+ */
+struct EditorStoryComponent : public StoryComponentInterface {
+    EditorStoryComponent();
+    ~EditorStoryComponent();
+
+    EditorCameraControlTask *GetCameraControlTask();
+
+    RendererPerformanceUpdateTask *GetRendererPerformanceUpdateTask();
 };
 
 /**
