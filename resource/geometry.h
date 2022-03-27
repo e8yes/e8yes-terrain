@@ -31,10 +31,10 @@
 
 namespace e8 {
 
-// It uniquely identifies a geometry design with its LOD series.
+// It uniquely identifies a geometry design.
 using GeometryId = Uuid;
 
-// A descriptive human readable name of a geometry LOD series.
+// A descriptive human readable name for a geometry.
 using GeometryName = std::string;
 
 /**
@@ -155,17 +155,17 @@ struct Geometry {
     VkIndexType IndexElementType() const;
 
     /**
-     * @brief IndexElementSize
+     * @brief IndexElementSize Returns the size of each index element, in byte.
      */
     unsigned IndexElementSize() const;
 
     /**
-     * @brief VertexBufferSize
+     * @brief VertexBufferSize Returns the size of the vertex buffer, in byte.
      */
     uint64_t VertexBufferSize() const;
 
     /**
-     * @brief IndexBufferSize
+     * @brief IndexBufferSize Returns the size of the index buffer, in byte.
      */
     uint64_t IndexBufferSize() const;
 

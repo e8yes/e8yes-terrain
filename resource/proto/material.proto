@@ -23,11 +23,11 @@ import "texture.proto";
 
 /**
  * @brief the MaterialProto message A serializable version of the material class. It defines the
- * appearance of the entities that use this material.
+ * appearance of the surface of entities that use this material.
  */
 message MaterialProto {
     // ID of this material design.
-    string id = 1;
+    int64 id = 1;
 
     // A descriptive human readable name of this material.
     string name = 2;

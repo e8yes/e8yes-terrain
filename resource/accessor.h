@@ -24,9 +24,12 @@
 
 #include "common/device.h"
 #include "resource/geometry.h"
+#include "resource/material.h"
 #include "resource/proto/geometry.pb.h"
+#include "resource/proto/material.pb.h"
 #include "resource/proto/table.pb.h"
 #include "resource/ram_geometry.h"
+#include "resource/ram_material.h"
 
 namespace e8 {
 
@@ -80,6 +83,27 @@ class ResourceAccessor {
     void RemoveGeometry(GeometryId const &id);
 
     /**
+     * @brief AddGeometry Adds a new material resource.
+     *
+     * @param proto The protobuf object that defines the geometry data.
+     * @param temporary Indicates if the resource is only temporary. A temporary resource will get
+     * cleaned up by the end of this object's lifecycle.
+     */
+    void AddMaterial(MaterialProto const &proto, bool temporary);
+
+    /**
+     * @brief LoadMaterial Loads an existing material pointed by the specifed ID. If the load fails,
+     * this function will also fail.
+     */
+    std::shared_ptr<Material> LoadMaterial(MaterialId const &id);
+
+    /**
+     * @brief RemoveGeometry Removes the material pointed to by the ID. If such material doesn't
+     * exist, it does nothing.
+     */
+    void RemoveMaterial(MaterialId const &id);
+
+    /**
      * @brief Commit Saves transient changes to the disk.
      */
     bool Commit();
@@ -89,6 +113,7 @@ class ResourceAccessor {
     std::unique_ptr<ResourceTable> transient_table_;
     std::unique_ptr<ResourceTable> persisted_table_;
     std::unique_ptr<GeometryRamTransfer> geometry_ram_transfer_;
+    std::unique_ptr<MaterialRamTransfer> material_ram_transfer_;
 };
 
 } // namespace e8

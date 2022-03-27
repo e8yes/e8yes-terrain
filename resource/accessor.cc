@@ -23,9 +23,12 @@
 #include "common/device.h"
 #include "resource/accessor.h"
 #include "resource/geometry.h"
+#include "resource/material.h"
 #include "resource/proto/geometry.pb.h"
+#include "resource/proto/material.pb.h"
 #include "resource/proto/table.pb.h"
 #include "resource/ram_geometry.h"
+#include "resource/ram_material.h"
 #include "resource/table.h"
 
 namespace e8 {
@@ -47,6 +50,7 @@ ResourceAccessor::ResourceAccessor(std::filesystem::path const &base_path, bool 
     transient_table_ = std::make_unique<ResourceTable>(*persisted_table_);
 
     geometry_ram_transfer_ = std::make_unique<GeometryRamTransfer>(&device->geometry_ram_usage);
+    material_ram_transfer_ = std::make_unique<MaterialRamTransfer>(&device->image_ram_usage);
 }
 
 ResourceAccessor::~ResourceAccessor() {
@@ -70,6 +74,18 @@ std::shared_ptr<Geometry> ResourceAccessor::LoadGeometry(GeometryId const &id) {
 
 void ResourceAccessor::RemoveGeometry(GeometryId const &id) {
     transient_table_->mutable_geometries()->erase(id);
+}
+
+void ResourceAccessor::AddMaterial(MaterialProto const &proto, bool temporary) {
+    SaveMaterialProto(proto, temporary, transient_table_.get());
+}
+
+std::shared_ptr<Material> ResourceAccessor::LoadMaterial(MaterialId const &id) {
+    return material_ram_transfer_->Load(id, *transient_table_, device_);
+}
+
+void ResourceAccessor::RemoveMaterial(MaterialId const &id) {
+    transient_table_->mutable_materials()->erase(id);
 }
 
 bool ResourceAccessor::Commit() {

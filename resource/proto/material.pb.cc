@@ -62,7 +62,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 
 const char descriptor_table_protodef_material_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\016material.proto\022\002e8\032\rtexture.proto\"\222\001\n\r"
-  "MaterialProto\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022"
+  "MaterialProto\022\n\n\002id\030\001 \001(\003\022\014\n\004name\030\002 \001(\t\022"
   " \n\006albedo\030\003 \001(\0132\020.e8.TextureProto\022 \n\006nor"
   "mal\030\004 \001(\0132\020.e8.TextureProto\022#\n\troughness"
   "\030\005 \001(\0132\020.e8.TextureProtob\006proto3"
@@ -141,11 +141,6 @@ MaterialProto::MaterialProto(::PROTOBUF_NAMESPACE_ID::Arena* arena)
 MaterialProto::MaterialProto(const MaterialProto& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from._internal_id().empty()) {
-    id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_id(),
-      GetArena());
-  }
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_name().empty()) {
     name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_name(),
@@ -166,16 +161,16 @@ MaterialProto::MaterialProto(const MaterialProto& from)
   } else {
     roughness_ = nullptr;
   }
+  id_ = from.id_;
   // @@protoc_insertion_point(copy_constructor:e8.MaterialProto)
 }
 
 void MaterialProto::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_MaterialProto_material_2eproto.base);
-  id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   ::memset(&albedo_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&roughness_) -
-      reinterpret_cast<char*>(&albedo_)) + sizeof(roughness_));
+      reinterpret_cast<char*>(&id_) -
+      reinterpret_cast<char*>(&albedo_)) + sizeof(id_));
 }
 
 MaterialProto::~MaterialProto() {
@@ -186,7 +181,6 @@ MaterialProto::~MaterialProto() {
 
 void MaterialProto::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
-  id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete albedo_;
   if (this != internal_default_instance()) delete normal_;
@@ -214,7 +208,6 @@ void MaterialProto::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   name_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   if (GetArena() == nullptr && albedo_ != nullptr) {
     delete albedo_;
@@ -228,6 +221,7 @@ void MaterialProto::Clear() {
     delete roughness_;
   }
   roughness_ = nullptr;
+  id_ = PROTOBUF_LONGLONG(0);
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -239,12 +233,10 @@ const char* MaterialProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     CHK_(ptr);
     switch (tag >> 3) {
-      // string id = 1;
+      // int64 id = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
-          auto str = _internal_mutable_id();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "e8.MaterialProto.id"));
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -306,14 +298,10 @@ failure:
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string id = 1;
-  if (this->id().size() > 0) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->_internal_id().data(), static_cast<int>(this->_internal_id().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "e8.MaterialProto.id");
-    target = stream->WriteStringMaybeAliased(
-        1, this->_internal_id(), target);
+  // int64 id = 1;
+  if (this->id() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(1, this->_internal_id(), target);
   }
 
   // string name = 2;
@@ -366,13 +354,6 @@ size_t MaterialProto::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // string id = 1;
-  if (this->id().size() > 0) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-        this->_internal_id());
-  }
-
   // string name = 2;
   if (this->name().size() > 0) {
     total_size += 1 +
@@ -399,6 +380,13 @@ size_t MaterialProto::ByteSizeLong() const {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
         *roughness_);
+  }
+
+  // int64 id = 1;
+  if (this->id() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int64Size(
+        this->_internal_id());
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -432,9 +420,6 @@ void MaterialProto::MergeFrom(const MaterialProto& from) {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.id().size() > 0) {
-    _internal_set_id(from._internal_id());
-  }
   if (from.name().size() > 0) {
     _internal_set_name(from._internal_name());
   }
@@ -446,6 +431,9 @@ void MaterialProto::MergeFrom(const MaterialProto& from) {
   }
   if (from.has_roughness()) {
     _internal_mutable_roughness()->::e8::TextureProto::MergeFrom(from._internal_roughness());
+  }
+  if (from.id() != 0) {
+    _internal_set_id(from._internal_id());
   }
 }
 
@@ -470,11 +458,10 @@ bool MaterialProto::IsInitialized() const {
 void MaterialProto::InternalSwap(MaterialProto* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
-  id_.Swap(&other->id_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   name_.Swap(&other->name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(MaterialProto, roughness_)
-      + sizeof(MaterialProto::roughness_)
+      PROTOBUF_FIELD_OFFSET(MaterialProto, id_)
+      + sizeof(MaterialProto::id_)
       - PROTOBUF_FIELD_OFFSET(MaterialProto, albedo_)>(
           reinterpret_cast<char*>(&albedo_),
           reinterpret_cast<char*>(&other->albedo_));

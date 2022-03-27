@@ -20,6 +20,7 @@ SOURCES += \
     accessor.cc \
     common.cc \
     geometry.cc \
+    material.cc \
     proto/geometry.pb.cc \
     proto/light_map.pb.cc \
     proto/material.pb.cc \
@@ -28,12 +29,14 @@ SOURCES += \
     proto/table.pb.cc \
     proto/texture.pb.cc \
     ram_geometry.cc \
+    ram_material.cc \
     table.cc
 
 HEADERS += \
     accessor.h \
     common.h \
     geometry.h \
+    material.h \
     proto/geometry.pb.h \
     proto/light_map.pb.h \
     proto/material.pb.h \
@@ -42,6 +45,7 @@ HEADERS += \
     proto/table.pb.h \
     proto/texture.pb.h \
     ram_geometry.h \
+    ram_material.h \
     table.h
 
 # Default rules for deployment.

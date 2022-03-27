@@ -42,7 +42,7 @@ message TextureProto {
     // The height of the image.
     int32 height = 3;
 
-    // The number of channel each pixel carries.
+    // The number of channel each image pixel carries.
     int32 channel_count = 4;
 
     // The number of byte each channel uses.
