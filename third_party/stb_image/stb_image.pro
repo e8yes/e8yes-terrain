@@ -1,9 +1,9 @@
 CONFIG -= qt
 
-TARGET = tiny_gltf
+TARGET = stb_image
 TEMPLATE = lib
 
-DEFINES += THIRD_PARTY_TINY_GLTF_LIBRARY
+DEFINES += THIRD_PARTY_STB_IMAGE_LIBRARY
 
 CONFIG += c++17
 
@@ -18,10 +18,11 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 INCLUDEPATH += ../../
 
 SOURCES += \
-    tiny_gltf.cc
+    stb_image.cc
 
 HEADERS += \
-    tiny_gltf.h
+    stb_image.h \
+    stb_image_write.h
 
 # Default rules for deployment.
 unix {

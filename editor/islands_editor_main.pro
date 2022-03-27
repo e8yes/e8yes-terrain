@@ -136,6 +136,14 @@ else:unix: LIBS += -L$$OUT_PWD/../third_party/tiny_gltf/ -ltiny_gltf
 INCLUDEPATH += $$PWD/../third_party/tiny_gltf
 DEPENDPATH += $$PWD/../third_party/tiny_gltf
 
+# Third party STB image.
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../third_party/stb_image/release/ -lstb_image
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../third_party/stb_image/debug/ -lstb_image
+else:unix: LIBS += -L$$OUT_PWD/../third_party/stb_image/ -lstb_image
+
+INCLUDEPATH += $$PWD/../third_party/stb_image
+DEPENDPATH += $$PWD/../third_party/stb_image
+
 LIBS += -lboost_log
 LIBS += -lboost_thread
 LIBS += -lprotobuf
