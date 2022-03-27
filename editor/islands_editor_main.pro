@@ -1,8 +1,10 @@
-QT       += core gui
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT += core
+QT += gui
+QT += widgets
 
 CONFIG += c++17
+
+DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 
 QMAKE_CXXFLAGS += -std=c++17
 QMAKE_CXXFLAGS += -DBOOST_LOG_DYN_LINK
@@ -10,8 +12,6 @@ QMAKE_CXXFLAGS_RELEASE -= -O2
 QMAKE_CXXFLAGS_RELEASE += -O3 -flto -march=native -g
 QMAKE_LFLAGS_RELEASE -= -Wl,-O1
 QMAKE_LFLAGS_RELEASE += -O3 -flto -march=native
-
-DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 
 INCLUDEPATH += ../
 
@@ -72,42 +72,42 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 # Dependencies
-# Game
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../game/release/ -lislands_renderer
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../game/debug/ -lislands_renderer
-else:unix: LIBS += -L$$OUT_PWD/../game/ -lislands_game
+# Islands game
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../game/release/ -lgame
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../game/debug/ -lgame
+else:unix: LIBS += -L$$OUT_PWD/../game/ -lgame
 
 INCLUDEPATH += $$PWD/../game
 DEPENDPATH += $$PWD/../game
 
 # Islands renderer
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../renderer/release/ -lislands_renderer
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../renderer/debug/ -lislands_renderer
-else:unix: LIBS += -L$$OUT_PWD/../renderer/ -lislands_renderer
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../renderer/release/ -lrenderer
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../renderer/debug/ -lrenderer
+else:unix: LIBS += -L$$OUT_PWD/../renderer/ -lrenderer
 
 INCLUDEPATH += $$PWD/../renderer
 DEPENDPATH += $$PWD/../renderer
 
 # Islands content.
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../content/release/ -lislands_content
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../content/debug/ -lislands_content
-else:unix: LIBS += -L$$OUT_PWD/../content/ -lislands_content
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../content/release/ -lcontent
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../content/debug/ -lcontent
+else:unix: LIBS += -L$$OUT_PWD/../content/ -lcontent
 
 INCLUDEPATH += $$PWD/../content
 DEPENDPATH += $$PWD/../content
 
 # Islands resource.
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../resource/release/ -lislands_resource
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../resource/debug/ -lislands_resource
-else:unix: LIBS += -L$$OUT_PWD/../resource/ -lislands_resource
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../resource/release/ -lresource
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../resource/debug/ -lresource
+else:unix: LIBS += -L$$OUT_PWD/../resource/ -lresource
 
 INCLUDEPATH += $$PWD/../resource
 DEPENDPATH += $$PWD/../resource
 
 # Islands common
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../common/release/ -lislands_common
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../common/debug/ -lislands_common
-else:unix: LIBS += -L$$OUT_PWD/../common/ -lislands_common
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../common/release/ -lcommon
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../common/debug/ -lcommon
+else:unix: LIBS += -L$$OUT_PWD/../common/ -lcommon
 
 INCLUDEPATH += $$PWD/../common
 DEPENDPATH += $$PWD/../common
