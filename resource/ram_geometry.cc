@@ -15,6 +15,7 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/log/trivial.hpp>
 #include <memory>
 
 #include "common/cache.h"
@@ -32,6 +33,8 @@ uint64_t ResourceSize(GeometryId const &geometry_id, ResourceTable const &table)
 
 void LoadGeometry(GeometryId const &geometry_id, ResourceTable const &table, VulkanContext *context,
                   std::shared_ptr<Geometry> *geometry) {
+    BOOST_LOG_TRIVIAL(info) << "LoadGeometry(): ID=[" << geometry_id << "].";
+
     *geometry = std::make_shared<Geometry>();
     (*geometry)->FromDisk(geometry_id, table, context);
 }
