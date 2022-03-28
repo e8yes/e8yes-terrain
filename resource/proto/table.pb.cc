@@ -15,7 +15,6 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 extern PROTOBUF_INTERNAL_EXPORT_table_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_ResourceTable_GeometriesEntry_DoNotUse_table_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_table_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_ResourceTable_IndirectLightMapsEntry_DoNotUse_table_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_table_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_ResourceTable_LightMapsEntry_DoNotUse_table_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_table_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_ResourceTable_MaterialsEntry_DoNotUse_table_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_table_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ResourceTable_Metadata_table_2eproto;
@@ -37,10 +36,6 @@ class ResourceTable_LightMapsEntry_DoNotUseDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<ResourceTable_LightMapsEntry_DoNotUse> _instance;
 } _ResourceTable_LightMapsEntry_DoNotUse_default_instance_;
-class ResourceTable_IndirectLightMapsEntry_DoNotUseDefaultTypeInternal {
- public:
-  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<ResourceTable_IndirectLightMapsEntry_DoNotUse> _instance;
-} _ResourceTable_IndirectLightMapsEntry_DoNotUse_default_instance_;
 class ResourceTable_PhysicalShapesEntry_DoNotUseDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<ResourceTable_PhysicalShapesEntry_DoNotUse> _instance;
@@ -61,12 +56,11 @@ static void InitDefaultsscc_info_ResourceTable_table_2eproto() {
   ::e8::ResourceTable::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<5> scc_info_ResourceTable_table_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 5, 0, InitDefaultsscc_info_ResourceTable_table_2eproto}, {
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<4> scc_info_ResourceTable_table_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 4, 0, InitDefaultsscc_info_ResourceTable_table_2eproto}, {
       &scc_info_ResourceTable_GeometriesEntry_DoNotUse_table_2eproto.base,
       &scc_info_ResourceTable_MaterialsEntry_DoNotUse_table_2eproto.base,
       &scc_info_ResourceTable_LightMapsEntry_DoNotUse_table_2eproto.base,
-      &scc_info_ResourceTable_IndirectLightMapsEntry_DoNotUse_table_2eproto.base,
       &scc_info_ResourceTable_PhysicalShapesEntry_DoNotUse_table_2eproto.base,}};
 
 static void InitDefaultsscc_info_ResourceTable_GeometriesEntry_DoNotUse_table_2eproto() {
@@ -81,20 +75,6 @@ static void InitDefaultsscc_info_ResourceTable_GeometriesEntry_DoNotUse_table_2e
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_ResourceTable_GeometriesEntry_DoNotUse_table_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_ResourceTable_GeometriesEntry_DoNotUse_table_2eproto}, {
-      &scc_info_ResourceTable_Metadata_table_2eproto.base,}};
-
-static void InitDefaultsscc_info_ResourceTable_IndirectLightMapsEntry_DoNotUse_table_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::e8::_ResourceTable_IndirectLightMapsEntry_DoNotUse_default_instance_;
-    new (ptr) ::e8::ResourceTable_IndirectLightMapsEntry_DoNotUse();
-  }
-  ::e8::ResourceTable_IndirectLightMapsEntry_DoNotUse::InitAsDefaultInstance();
-}
-
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_ResourceTable_IndirectLightMapsEntry_DoNotUse_table_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_ResourceTable_IndirectLightMapsEntry_DoNotUse_table_2eproto}, {
       &scc_info_ResourceTable_Metadata_table_2eproto.base,}};
 
 static void InitDefaultsscc_info_ResourceTable_LightMapsEntry_DoNotUse_table_2eproto() {
@@ -153,7 +133,7 @@ static void InitDefaultsscc_info_ResourceTable_PhysicalShapesEntry_DoNotUse_tabl
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_ResourceTable_PhysicalShapesEntry_DoNotUse_table_2eproto}, {
       &scc_info_ResourceTable_Metadata_table_2eproto.base,}};
 
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_table_2eproto[7];
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_table_2eproto[6];
 static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_table_2eproto = nullptr;
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_table_2eproto = nullptr;
 
@@ -193,15 +173,6 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_table_2eproto::offsets[] PROTO
   PROTOBUF_FIELD_OFFSET(::e8::ResourceTable_LightMapsEntry_DoNotUse, value_),
   0,
   1,
-  PROTOBUF_FIELD_OFFSET(::e8::ResourceTable_IndirectLightMapsEntry_DoNotUse, _has_bits_),
-  PROTOBUF_FIELD_OFFSET(::e8::ResourceTable_IndirectLightMapsEntry_DoNotUse, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::e8::ResourceTable_IndirectLightMapsEntry_DoNotUse, key_),
-  PROTOBUF_FIELD_OFFSET(::e8::ResourceTable_IndirectLightMapsEntry_DoNotUse, value_),
-  0,
-  1,
   PROTOBUF_FIELD_OFFSET(::e8::ResourceTable_PhysicalShapesEntry_DoNotUse, _has_bits_),
   PROTOBUF_FIELD_OFFSET(::e8::ResourceTable_PhysicalShapesEntry_DoNotUse, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -220,7 +191,6 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_table_2eproto::offsets[] PROTO
   PROTOBUF_FIELD_OFFSET(::e8::ResourceTable, geometries_),
   PROTOBUF_FIELD_OFFSET(::e8::ResourceTable, materials_),
   PROTOBUF_FIELD_OFFSET(::e8::ResourceTable, light_maps_),
-  PROTOBUF_FIELD_OFFSET(::e8::ResourceTable, indirect_light_maps_),
   PROTOBUF_FIELD_OFFSET(::e8::ResourceTable, physical_shapes_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -228,9 +198,8 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 8, 15, sizeof(::e8::ResourceTable_GeometriesEntry_DoNotUse)},
   { 17, 24, sizeof(::e8::ResourceTable_MaterialsEntry_DoNotUse)},
   { 26, 33, sizeof(::e8::ResourceTable_LightMapsEntry_DoNotUse)},
-  { 35, 42, sizeof(::e8::ResourceTable_IndirectLightMapsEntry_DoNotUse)},
-  { 44, 51, sizeof(::e8::ResourceTable_PhysicalShapesEntry_DoNotUse)},
-  { 53, -1, sizeof(::e8::ResourceTable)},
+  { 35, 42, sizeof(::e8::ResourceTable_PhysicalShapesEntry_DoNotUse)},
+  { 44, -1, sizeof(::e8::ResourceTable)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -238,41 +207,35 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_ResourceTable_GeometriesEntry_DoNotUse_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_ResourceTable_MaterialsEntry_DoNotUse_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_ResourceTable_LightMapsEntry_DoNotUse_default_instance_),
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_ResourceTable_IndirectLightMapsEntry_DoNotUse_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_ResourceTable_PhysicalShapesEntry_DoNotUse_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::e8::_ResourceTable_default_instance_),
 };
 
 const char descriptor_table_protodef_table_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\013table.proto\022\002e8\"\260\006\n\rResourceTable\022\031\n\021c"
+  "\n\013table.proto\022\002e8\"\223\005\n\rResourceTable\022\031\n\021c"
   "urrent_base_path\030\001 \001(\t\0225\n\ngeometries\030\002 \003"
   "(\0132!.e8.ResourceTable.GeometriesEntry\0223\n"
   "\tmaterials\030\003 \003(\0132 .e8.ResourceTable.Mate"
   "rialsEntry\0224\n\nlight_maps\030\004 \003(\0132 .e8.Reso"
-  "urceTable.LightMapsEntry\022E\n\023indirect_lig"
-  "ht_maps\030\005 \003(\0132(.e8.ResourceTable.Indirec"
-  "tLightMapsEntry\022>\n\017physical_shapes\030\006 \003(\013"
-  "2%.e8.ResourceTable.PhysicalShapesEntry\032"
-  "G\n\010Metadata\022\021\n\tfile_name\030\001 \001(\t\022\025\n\rresour"
-  "ce_size\030\002 \001(\003\022\021\n\ttemporary\030\003 \001(\010\032M\n\017Geom"
-  "etriesEntry\022\013\n\003key\030\001 \001(\003\022)\n\005value\030\002 \001(\0132"
-  "\032.e8.ResourceTable.Metadata:\0028\001\032L\n\016Mater"
-  "ialsEntry\022\013\n\003key\030\001 \001(\003\022)\n\005value\030\002 \001(\0132\032."
-  "e8.ResourceTable.Metadata:\0028\001\032L\n\016LightMa"
-  "psEntry\022\013\n\003key\030\001 \001(\003\022)\n\005value\030\002 \001(\0132\032.e8"
-  ".ResourceTable.Metadata:\0028\001\032T\n\026IndirectL"
-  "ightMapsEntry\022\013\n\003key\030\001 \001(\003\022)\n\005value\030\002 \001("
-  "\0132\032.e8.ResourceTable.Metadata:\0028\001\032Q\n\023Phy"
-  "sicalShapesEntry\022\013\n\003key\030\001 \001(\003\022)\n\005value\030\002"
-  " \001(\0132\032.e8.ResourceTable.Metadata:\0028\001b\006pr"
-  "oto3"
+  "urceTable.LightMapsEntry\022>\n\017physical_sha"
+  "pes\030\005 \003(\0132%.e8.ResourceTable.PhysicalSha"
+  "pesEntry\032G\n\010Metadata\022\021\n\tfile_name\030\001 \001(\t\022"
+  "\025\n\rresource_size\030\002 \001(\003\022\021\n\ttemporary\030\003 \001("
+  "\010\032M\n\017GeometriesEntry\022\013\n\003key\030\001 \001(\003\022)\n\005val"
+  "ue\030\002 \001(\0132\032.e8.ResourceTable.Metadata:\0028\001"
+  "\032L\n\016MaterialsEntry\022\013\n\003key\030\001 \001(\003\022)\n\005value"
+  "\030\002 \001(\0132\032.e8.ResourceTable.Metadata:\0028\001\032L"
+  "\n\016LightMapsEntry\022\013\n\003key\030\001 \001(\003\022)\n\005value\030\002"
+  " \001(\0132\032.e8.ResourceTable.Metadata:\0028\001\032Q\n\023"
+  "PhysicalShapesEntry\022\013\n\003key\030\001 \001(\003\022)\n\005valu"
+  "e\030\002 \001(\0132\032.e8.ResourceTable.Metadata:\0028\001b"
+  "\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_table_2eproto_deps[1] = {
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_table_2eproto_sccs[7] = {
+static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_table_2eproto_sccs[6] = {
   &scc_info_ResourceTable_table_2eproto.base,
   &scc_info_ResourceTable_GeometriesEntry_DoNotUse_table_2eproto.base,
-  &scc_info_ResourceTable_IndirectLightMapsEntry_DoNotUse_table_2eproto.base,
   &scc_info_ResourceTable_LightMapsEntry_DoNotUse_table_2eproto.base,
   &scc_info_ResourceTable_MaterialsEntry_DoNotUse_table_2eproto.base,
   &scc_info_ResourceTable_Metadata_table_2eproto.base,
@@ -280,10 +243,10 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_tab
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_table_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_table_2eproto = {
-  false, false, descriptor_table_protodef_table_2eproto, "table.proto", 844,
-  &descriptor_table_table_2eproto_once, descriptor_table_table_2eproto_sccs, descriptor_table_table_2eproto_deps, 7, 0,
+  false, false, descriptor_table_protodef_table_2eproto, "table.proto", 687,
+  &descriptor_table_table_2eproto_once, descriptor_table_table_2eproto_sccs, descriptor_table_table_2eproto_deps, 6, 0,
   schemas, file_default_instances, TableStruct_table_2eproto::offsets,
-  file_level_metadata_table_2eproto, 7, file_level_enum_descriptors_table_2eproto, file_level_service_descriptors_table_2eproto,
+  file_level_metadata_table_2eproto, 6, file_level_enum_descriptors_table_2eproto, file_level_service_descriptors_table_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -611,23 +574,6 @@ void ResourceTable_LightMapsEntry_DoNotUse::MergeFrom(
 
 // ===================================================================
 
-ResourceTable_IndirectLightMapsEntry_DoNotUse::ResourceTable_IndirectLightMapsEntry_DoNotUse() {}
-ResourceTable_IndirectLightMapsEntry_DoNotUse::ResourceTable_IndirectLightMapsEntry_DoNotUse(::PROTOBUF_NAMESPACE_ID::Arena* arena)
-    : SuperType(arena) {}
-void ResourceTable_IndirectLightMapsEntry_DoNotUse::MergeFrom(const ResourceTable_IndirectLightMapsEntry_DoNotUse& other) {
-  MergeFromInternal(other);
-}
-::PROTOBUF_NAMESPACE_ID::Metadata ResourceTable_IndirectLightMapsEntry_DoNotUse::GetMetadata() const {
-  return GetMetadataStatic();
-}
-void ResourceTable_IndirectLightMapsEntry_DoNotUse::MergeFrom(
-    const ::PROTOBUF_NAMESPACE_ID::Message& other) {
-  ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom(other);
-}
-
-
-// ===================================================================
-
 ResourceTable_PhysicalShapesEntry_DoNotUse::ResourceTable_PhysicalShapesEntry_DoNotUse() {}
 ResourceTable_PhysicalShapesEntry_DoNotUse::ResourceTable_PhysicalShapesEntry_DoNotUse(::PROTOBUF_NAMESPACE_ID::Arena* arena)
     : SuperType(arena) {}
@@ -656,7 +602,6 @@ ResourceTable::ResourceTable(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   geometries_(arena),
   materials_(arena),
   light_maps_(arena),
-  indirect_light_maps_(arena),
   physical_shapes_(arena) {
   SharedCtor();
   RegisterArenaDtor(arena);
@@ -668,7 +613,6 @@ ResourceTable::ResourceTable(const ResourceTable& from)
   geometries_.MergeFrom(from.geometries_);
   materials_.MergeFrom(from.materials_);
   light_maps_.MergeFrom(from.light_maps_);
-  indirect_light_maps_.MergeFrom(from.indirect_light_maps_);
   physical_shapes_.MergeFrom(from.physical_shapes_);
   current_base_path_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_current_base_path().empty()) {
@@ -718,7 +662,6 @@ void ResourceTable::Clear() {
   geometries_.Clear();
   materials_.Clear();
   light_maps_.Clear();
-  indirect_light_maps_.Clear();
   physical_shapes_.Clear();
   current_base_path_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
@@ -777,28 +720,16 @@ const char* ResourceTable::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<34>(ptr));
         } else goto handle_unusual;
         continue;
-      // map<int64, .e8.ResourceTable.Metadata> indirect_light_maps = 5;
+      // map<int64, .e8.ResourceTable.Metadata> physical_shapes = 5;
       case 5:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
-          ptr -= 1;
-          do {
-            ptr += 1;
-            ptr = ctx->ParseMessage(&indirect_light_maps_, ptr);
-            CHK_(ptr);
-            if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<42>(ptr));
-        } else goto handle_unusual;
-        continue;
-      // map<int64, .e8.ResourceTable.Metadata> physical_shapes = 6;
-      case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
           ptr -= 1;
           do {
             ptr += 1;
             ptr = ctx->ParseMessage(&physical_shapes_, ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<50>(ptr));
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<42>(ptr));
         } else goto handle_unusual;
         continue;
       default: {
@@ -932,38 +863,7 @@ failure:
     }
   }
 
-  // map<int64, .e8.ResourceTable.Metadata> indirect_light_maps = 5;
-  if (!this->_internal_indirect_light_maps().empty()) {
-    typedef ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::e8::ResourceTable_Metadata >::const_pointer
-        ConstPtr;
-    typedef ::PROTOBUF_NAMESPACE_ID::internal::SortItem< ::PROTOBUF_NAMESPACE_ID::int64, ConstPtr > SortItem;
-    typedef ::PROTOBUF_NAMESPACE_ID::internal::CompareByFirstField<SortItem> Less;
-
-    if (stream->IsSerializationDeterministic() &&
-        this->_internal_indirect_light_maps().size() > 1) {
-      ::std::unique_ptr<SortItem[]> items(
-          new SortItem[this->_internal_indirect_light_maps().size()]);
-      typedef ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::e8::ResourceTable_Metadata >::size_type size_type;
-      size_type n = 0;
-      for (::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::e8::ResourceTable_Metadata >::const_iterator
-          it = this->_internal_indirect_light_maps().begin();
-          it != this->_internal_indirect_light_maps().end(); ++it, ++n) {
-        items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
-      }
-      ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
-      for (size_type i = 0; i < n; i++) {
-        target = ResourceTable_IndirectLightMapsEntry_DoNotUse::Funcs::InternalSerialize(5, items[static_cast<ptrdiff_t>(i)].second->first, items[static_cast<ptrdiff_t>(i)].second->second, target, stream);
-      }
-    } else {
-      for (::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::e8::ResourceTable_Metadata >::const_iterator
-          it = this->_internal_indirect_light_maps().begin();
-          it != this->_internal_indirect_light_maps().end(); ++it) {
-        target = ResourceTable_IndirectLightMapsEntry_DoNotUse::Funcs::InternalSerialize(5, it->first, it->second, target, stream);
-      }
-    }
-  }
-
-  // map<int64, .e8.ResourceTable.Metadata> physical_shapes = 6;
+  // map<int64, .e8.ResourceTable.Metadata> physical_shapes = 5;
   if (!this->_internal_physical_shapes().empty()) {
     typedef ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::e8::ResourceTable_Metadata >::const_pointer
         ConstPtr;
@@ -983,13 +883,13 @@ failure:
       }
       ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
       for (size_type i = 0; i < n; i++) {
-        target = ResourceTable_PhysicalShapesEntry_DoNotUse::Funcs::InternalSerialize(6, items[static_cast<ptrdiff_t>(i)].second->first, items[static_cast<ptrdiff_t>(i)].second->second, target, stream);
+        target = ResourceTable_PhysicalShapesEntry_DoNotUse::Funcs::InternalSerialize(5, items[static_cast<ptrdiff_t>(i)].second->first, items[static_cast<ptrdiff_t>(i)].second->second, target, stream);
       }
     } else {
       for (::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::e8::ResourceTable_Metadata >::const_iterator
           it = this->_internal_physical_shapes().begin();
           it != this->_internal_physical_shapes().end(); ++it) {
-        target = ResourceTable_PhysicalShapesEntry_DoNotUse::Funcs::InternalSerialize(6, it->first, it->second, target, stream);
+        target = ResourceTable_PhysicalShapesEntry_DoNotUse::Funcs::InternalSerialize(5, it->first, it->second, target, stream);
       }
     }
   }
@@ -1037,16 +937,7 @@ size_t ResourceTable::ByteSizeLong() const {
     total_size += ResourceTable_LightMapsEntry_DoNotUse::Funcs::ByteSizeLong(it->first, it->second);
   }
 
-  // map<int64, .e8.ResourceTable.Metadata> indirect_light_maps = 5;
-  total_size += 1 *
-      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(this->_internal_indirect_light_maps_size());
-  for (::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::e8::ResourceTable_Metadata >::const_iterator
-      it = this->_internal_indirect_light_maps().begin();
-      it != this->_internal_indirect_light_maps().end(); ++it) {
-    total_size += ResourceTable_IndirectLightMapsEntry_DoNotUse::Funcs::ByteSizeLong(it->first, it->second);
-  }
-
-  // map<int64, .e8.ResourceTable.Metadata> physical_shapes = 6;
+  // map<int64, .e8.ResourceTable.Metadata> physical_shapes = 5;
   total_size += 1 *
       ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(this->_internal_physical_shapes_size());
   for (::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::e8::ResourceTable_Metadata >::const_iterator
@@ -1096,7 +987,6 @@ void ResourceTable::MergeFrom(const ResourceTable& from) {
   geometries_.MergeFrom(from.geometries_);
   materials_.MergeFrom(from.materials_);
   light_maps_.MergeFrom(from.light_maps_);
-  indirect_light_maps_.MergeFrom(from.indirect_light_maps_);
   physical_shapes_.MergeFrom(from.physical_shapes_);
   if (from.current_base_path().size() > 0) {
     _internal_set_current_base_path(from._internal_current_base_path());
@@ -1127,7 +1017,6 @@ void ResourceTable::InternalSwap(ResourceTable* other) {
   geometries_.Swap(&other->geometries_);
   materials_.Swap(&other->materials_);
   light_maps_.Swap(&other->light_maps_);
-  indirect_light_maps_.Swap(&other->indirect_light_maps_);
   physical_shapes_.Swap(&other->physical_shapes_);
   current_base_path_.Swap(&other->current_base_path_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
@@ -1151,9 +1040,6 @@ template<> PROTOBUF_NOINLINE ::e8::ResourceTable_MaterialsEntry_DoNotUse* Arena:
 }
 template<> PROTOBUF_NOINLINE ::e8::ResourceTable_LightMapsEntry_DoNotUse* Arena::CreateMaybeMessage< ::e8::ResourceTable_LightMapsEntry_DoNotUse >(Arena* arena) {
   return Arena::CreateMessageInternal< ::e8::ResourceTable_LightMapsEntry_DoNotUse >(arena);
-}
-template<> PROTOBUF_NOINLINE ::e8::ResourceTable_IndirectLightMapsEntry_DoNotUse* Arena::CreateMaybeMessage< ::e8::ResourceTable_IndirectLightMapsEntry_DoNotUse >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::e8::ResourceTable_IndirectLightMapsEntry_DoNotUse >(arena);
 }
 template<> PROTOBUF_NOINLINE ::e8::ResourceTable_PhysicalShapesEntry_DoNotUse* Arena::CreateMaybeMessage< ::e8::ResourceTable_PhysicalShapesEntry_DoNotUse >(Arena* arena) {
   return Arena::CreateMessageInternal< ::e8::ResourceTable_PhysicalShapesEntry_DoNotUse >(arena);

@@ -50,9 +50,6 @@ message ResourceTable {
     // Lightmap resources.
     map<int64, Metadata> light_maps = 4;
 
-    // Indirect lightmap resources.
-    map<int64, Metadata> indirect_light_maps = 5;
-
     // Physical shape resources.
-    map<int64, Metadata> physical_shapes = 6;
+    map<int64, Metadata> physical_shapes = 5;
 }
