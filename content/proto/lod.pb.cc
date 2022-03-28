@@ -68,6 +68,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_lod_2eproto::offsets[] PROTOBU
   PROTOBUF_FIELD_OFFSET(::e8::SceneEntityResources_Lod, geometry_id_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneEntityResources_Lod, material_id_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneEntityResources_Lod, light_map_id_),
+  PROTOBUF_FIELD_OFFSET(::e8::SceneEntityResources_Lod, indirect_light_map_id_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneEntityResources_Lod, physical_shape_id_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::e8::SceneEntityResources, _internal_metadata_),
@@ -78,7 +79,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_lod_2eproto::offsets[] PROTOBU
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::e8::SceneEntityResources_Lod)},
-  { 10, -1, sizeof(::e8::SceneEntityResources)},
+  { 11, -1, sizeof(::e8::SceneEntityResources)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -87,12 +88,13 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_lod_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\tlod.proto\022\002e8\"\302\001\n\024SceneEntityResources"
+  "\n\tlod.proto\022\002e8\"\342\001\n\024SceneEntityResources"
   "\022*\n\004lods\030\001 \003(\0132\034.e8.SceneEntityResources"
-  ".Lod\032~\n\003Lod\022\034\n\024apply_after_distance\030\001 \001("
-  "\002\022\023\n\013geometry_id\030\002 \001(\003\022\023\n\013material_id\030\003 "
-  "\001(\003\022\024\n\014light_map_id\030\004 \001(\003\022\031\n\021physical_sh"
-  "ape_id\030\005 \001(\003b\006proto3"
+  ".Lod\032\235\001\n\003Lod\022\034\n\024apply_after_distance\030\001 \001"
+  "(\002\022\023\n\013geometry_id\030\002 \001(\003\022\023\n\013material_id\030\003"
+  " \001(\003\022\024\n\014light_map_id\030\004 \001(\003\022\035\n\025indirect_l"
+  "ight_map_id\030\005 \001(\003\022\031\n\021physical_shape_id\030\006"
+  " \001(\003b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_lod_2eproto_deps[1] = {
 };
@@ -102,7 +104,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_lod
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_lod_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_lod_2eproto = {
-  false, false, descriptor_table_protodef_lod_2eproto, "lod.proto", 220,
+  false, false, descriptor_table_protodef_lod_2eproto, "lod.proto", 252,
   &descriptor_table_lod_2eproto_once, descriptor_table_lod_2eproto_sccs, descriptor_table_lod_2eproto_deps, 2, 0,
   schemas, file_default_instances, TableStruct_lod_2eproto::offsets,
   file_level_metadata_lod_2eproto, 2, file_level_enum_descriptors_lod_2eproto, file_level_service_descriptors_lod_2eproto,
@@ -214,9 +216,16 @@ const char* SceneEntityResources_Lod::_InternalParse(const char* ptr, ::PROTOBUF
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // int64 physical_shape_id = 5;
+      // int64 indirect_light_map_id = 5;
       case 5:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
+          indirect_light_map_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // int64 physical_shape_id = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 48)) {
           physical_shape_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
@@ -273,10 +282,16 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(4, this->_internal_light_map_id(), target);
   }
 
-  // int64 physical_shape_id = 5;
+  // int64 indirect_light_map_id = 5;
+  if (this->indirect_light_map_id() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(5, this->_internal_indirect_light_map_id(), target);
+  }
+
+  // int64 physical_shape_id = 6;
   if (this->physical_shape_id() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(5, this->_internal_physical_shape_id(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(6, this->_internal_physical_shape_id(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -316,7 +331,14 @@ size_t SceneEntityResources_Lod::ByteSizeLong() const {
         this->_internal_light_map_id());
   }
 
-  // int64 physical_shape_id = 5;
+  // int64 indirect_light_map_id = 5;
+  if (this->indirect_light_map_id() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int64Size(
+        this->_internal_indirect_light_map_id());
+  }
+
+  // int64 physical_shape_id = 6;
   if (this->physical_shape_id() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int64Size(
@@ -367,6 +389,9 @@ void SceneEntityResources_Lod::MergeFrom(const SceneEntityResources_Lod& from) {
   }
   if (from.light_map_id() != 0) {
     _internal_set_light_map_id(from._internal_light_map_id());
+  }
+  if (from.indirect_light_map_id() != 0) {
+    _internal_set_indirect_light_map_id(from._internal_indirect_light_map_id());
   }
   if (from.physical_shape_id() != 0) {
     _internal_set_physical_shape_id(from._internal_physical_shape_id());

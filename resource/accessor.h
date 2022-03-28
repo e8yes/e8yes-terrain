@@ -24,11 +24,13 @@
 
 #include "common/device.h"
 #include "resource/geometry.h"
+#include "resource/light_map.h"
 #include "resource/material.h"
 #include "resource/proto/geometry.pb.h"
 #include "resource/proto/material.pb.h"
 #include "resource/proto/table.pb.h"
 #include "resource/ram_geometry.h"
+#include "resource/ram_light_map.h"
 #include "resource/ram_material.h"
 
 namespace e8 {
@@ -104,6 +106,18 @@ class ResourceAccessor {
     void RemoveMaterial(MaterialId const &id);
 
     /**
+     * @brief LoadLightMap Loads an existing light map pointed by the specifed ID. If the load
+     * fails, this function will also fail.
+     */
+    std::shared_ptr<LightMap> LoadLightMap(LightMapId const &id);
+
+    /**
+     * @brief RemoveLightMap Removes the light map pointed to by the ID. If such light map doesn't
+     * exist, it does nothing.
+     */
+    void RemoveLightMap(LightMapId const &id);
+
+    /**
      * @brief Commit Saves transient changes to the disk.
      */
     bool Commit();
@@ -114,6 +128,7 @@ class ResourceAccessor {
     std::unique_ptr<ResourceTable> persisted_table_;
     std::unique_ptr<GeometryRamTransfer> geometry_ram_transfer_;
     std::unique_ptr<MaterialRamTransfer> material_ram_transfer_;
+    std::unique_ptr<LightMapRamTransfer> light_map_ram_transfer_;
 };
 
 } // namespace e8

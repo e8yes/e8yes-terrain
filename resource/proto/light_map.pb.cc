@@ -48,8 +48,6 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_light_5fmap_2eproto::offsets[]
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::e8::LightMapProto, id_),
   PROTOBUF_FIELD_OFFSET(::e8::LightMapProto, radiosity_),
-  PROTOBUF_FIELD_OFFSET(::e8::LightMapProto, direct_radiosity_),
-  PROTOBUF_FIELD_OFFSET(::e8::LightMapProto, indirect_radiosity_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::e8::LightMapProto)},
@@ -60,12 +58,9 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_light_5fmap_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\017light_map.proto\022\002e8\032\rtexture.proto\"\232\001\n"
-  "\rLightMapProto\022\n\n\002id\030\001 \001(\t\022#\n\tradiosity\030"
-  "\002 \001(\0132\020.e8.TextureProto\022*\n\020direct_radios"
-  "ity\030\003 \001(\0132\020.e8.TextureProto\022,\n\022indirect_"
-  "radiosity\030\004 \001(\0132\020.e8.TextureProtob\006proto"
-  "3"
+  "\n\017light_map.proto\022\002e8\032\rtexture.proto\"@\n\r"
+  "LightMapProto\022\n\n\002id\030\001 \001(\003\022#\n\tradiosity\030\002"
+  " \001(\0132\020.e8.TextureProtob\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_light_5fmap_2eproto_deps[1] = {
   &::descriptor_table_texture_2eproto,
@@ -75,7 +70,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_lig
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_light_5fmap_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_light_5fmap_2eproto = {
-  false, false, descriptor_table_protodef_light_5fmap_2eproto, "light_map.proto", 201,
+  false, false, descriptor_table_protodef_light_5fmap_2eproto, "light_map.proto", 110,
   &descriptor_table_light_5fmap_2eproto_once, descriptor_table_light_5fmap_2eproto_sccs, descriptor_table_light_5fmap_2eproto_deps, 1, 1,
   schemas, file_default_instances, TableStruct_light_5fmap_2eproto::offsets,
   file_level_metadata_light_5fmap_2eproto, 1, file_level_enum_descriptors_light_5fmap_2eproto, file_level_service_descriptors_light_5fmap_2eproto,
@@ -90,47 +85,21 @@ namespace e8 {
 void LightMapProto::InitAsDefaultInstance() {
   ::e8::_LightMapProto_default_instance_._instance.get_mutable()->radiosity_ = const_cast< ::e8::TextureProto*>(
       ::e8::TextureProto::internal_default_instance());
-  ::e8::_LightMapProto_default_instance_._instance.get_mutable()->direct_radiosity_ = const_cast< ::e8::TextureProto*>(
-      ::e8::TextureProto::internal_default_instance());
-  ::e8::_LightMapProto_default_instance_._instance.get_mutable()->indirect_radiosity_ = const_cast< ::e8::TextureProto*>(
-      ::e8::TextureProto::internal_default_instance());
 }
 class LightMapProto::_Internal {
  public:
   static const ::e8::TextureProto& radiosity(const LightMapProto* msg);
-  static const ::e8::TextureProto& direct_radiosity(const LightMapProto* msg);
-  static const ::e8::TextureProto& indirect_radiosity(const LightMapProto* msg);
 };
 
 const ::e8::TextureProto&
 LightMapProto::_Internal::radiosity(const LightMapProto* msg) {
   return *msg->radiosity_;
 }
-const ::e8::TextureProto&
-LightMapProto::_Internal::direct_radiosity(const LightMapProto* msg) {
-  return *msg->direct_radiosity_;
-}
-const ::e8::TextureProto&
-LightMapProto::_Internal::indirect_radiosity(const LightMapProto* msg) {
-  return *msg->indirect_radiosity_;
-}
 void LightMapProto::clear_radiosity() {
   if (GetArena() == nullptr && radiosity_ != nullptr) {
     delete radiosity_;
   }
   radiosity_ = nullptr;
-}
-void LightMapProto::clear_direct_radiosity() {
-  if (GetArena() == nullptr && direct_radiosity_ != nullptr) {
-    delete direct_radiosity_;
-  }
-  direct_radiosity_ = nullptr;
-}
-void LightMapProto::clear_indirect_radiosity() {
-  if (GetArena() == nullptr && indirect_radiosity_ != nullptr) {
-    delete indirect_radiosity_;
-  }
-  indirect_radiosity_ = nullptr;
 }
 LightMapProto::LightMapProto(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
@@ -141,35 +110,20 @@ LightMapProto::LightMapProto(::PROTOBUF_NAMESPACE_ID::Arena* arena)
 LightMapProto::LightMapProto(const LightMapProto& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from._internal_id().empty()) {
-    id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_id(),
-      GetArena());
-  }
   if (from._internal_has_radiosity()) {
     radiosity_ = new ::e8::TextureProto(*from.radiosity_);
   } else {
     radiosity_ = nullptr;
   }
-  if (from._internal_has_direct_radiosity()) {
-    direct_radiosity_ = new ::e8::TextureProto(*from.direct_radiosity_);
-  } else {
-    direct_radiosity_ = nullptr;
-  }
-  if (from._internal_has_indirect_radiosity()) {
-    indirect_radiosity_ = new ::e8::TextureProto(*from.indirect_radiosity_);
-  } else {
-    indirect_radiosity_ = nullptr;
-  }
+  id_ = from.id_;
   // @@protoc_insertion_point(copy_constructor:e8.LightMapProto)
 }
 
 void LightMapProto::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_LightMapProto_light_5fmap_2eproto.base);
-  id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   ::memset(&radiosity_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&indirect_radiosity_) -
-      reinterpret_cast<char*>(&radiosity_)) + sizeof(indirect_radiosity_));
+      reinterpret_cast<char*>(&id_) -
+      reinterpret_cast<char*>(&radiosity_)) + sizeof(id_));
 }
 
 LightMapProto::~LightMapProto() {
@@ -180,10 +134,7 @@ LightMapProto::~LightMapProto() {
 
 void LightMapProto::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
-  id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete radiosity_;
-  if (this != internal_default_instance()) delete direct_radiosity_;
-  if (this != internal_default_instance()) delete indirect_radiosity_;
 }
 
 void LightMapProto::ArenaDtor(void* object) {
@@ -207,19 +158,11 @@ void LightMapProto::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   if (GetArena() == nullptr && radiosity_ != nullptr) {
     delete radiosity_;
   }
   radiosity_ = nullptr;
-  if (GetArena() == nullptr && direct_radiosity_ != nullptr) {
-    delete direct_radiosity_;
-  }
-  direct_radiosity_ = nullptr;
-  if (GetArena() == nullptr && indirect_radiosity_ != nullptr) {
-    delete indirect_radiosity_;
-  }
-  indirect_radiosity_ = nullptr;
+  id_ = PROTOBUF_LONGLONG(0);
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -231,12 +174,10 @@ const char* LightMapProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     CHK_(ptr);
     switch (tag >> 3) {
-      // string id = 1;
+      // int64 id = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
-          auto str = _internal_mutable_id();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "e8.LightMapProto.id"));
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -244,20 +185,6 @@ const char* LightMapProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
           ptr = ctx->ParseMessage(_internal_mutable_radiosity(), ptr);
-          CHK_(ptr);
-        } else goto handle_unusual;
-        continue;
-      // .e8.TextureProto direct_radiosity = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
-          ptr = ctx->ParseMessage(_internal_mutable_direct_radiosity(), ptr);
-          CHK_(ptr);
-        } else goto handle_unusual;
-        continue;
-      // .e8.TextureProto indirect_radiosity = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
-          ptr = ctx->ParseMessage(_internal_mutable_indirect_radiosity(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -289,14 +216,10 @@ failure:
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string id = 1;
-  if (this->id().size() > 0) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->_internal_id().data(), static_cast<int>(this->_internal_id().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "e8.LightMapProto.id");
-    target = stream->WriteStringMaybeAliased(
-        1, this->_internal_id(), target);
+  // int64 id = 1;
+  if (this->id() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(1, this->_internal_id(), target);
   }
 
   // .e8.TextureProto radiosity = 2;
@@ -305,22 +228,6 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(
         2, _Internal::radiosity(this), target, stream);
-  }
-
-  // .e8.TextureProto direct_radiosity = 3;
-  if (this->has_direct_radiosity()) {
-    target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(
-        3, _Internal::direct_radiosity(this), target, stream);
-  }
-
-  // .e8.TextureProto indirect_radiosity = 4;
-  if (this->has_indirect_radiosity()) {
-    target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(
-        4, _Internal::indirect_radiosity(this), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -339,13 +246,6 @@ size_t LightMapProto::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // string id = 1;
-  if (this->id().size() > 0) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-        this->_internal_id());
-  }
-
   // .e8.TextureProto radiosity = 2;
   if (this->has_radiosity()) {
     total_size += 1 +
@@ -353,18 +253,11 @@ size_t LightMapProto::ByteSizeLong() const {
         *radiosity_);
   }
 
-  // .e8.TextureProto direct_radiosity = 3;
-  if (this->has_direct_radiosity()) {
+  // int64 id = 1;
+  if (this->id() != 0) {
     total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-        *direct_radiosity_);
-  }
-
-  // .e8.TextureProto indirect_radiosity = 4;
-  if (this->has_indirect_radiosity()) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-        *indirect_radiosity_);
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int64Size(
+        this->_internal_id());
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -398,17 +291,11 @@ void LightMapProto::MergeFrom(const LightMapProto& from) {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.id().size() > 0) {
-    _internal_set_id(from._internal_id());
-  }
   if (from.has_radiosity()) {
     _internal_mutable_radiosity()->::e8::TextureProto::MergeFrom(from._internal_radiosity());
   }
-  if (from.has_direct_radiosity()) {
-    _internal_mutable_direct_radiosity()->::e8::TextureProto::MergeFrom(from._internal_direct_radiosity());
-  }
-  if (from.has_indirect_radiosity()) {
-    _internal_mutable_indirect_radiosity()->::e8::TextureProto::MergeFrom(from._internal_indirect_radiosity());
+  if (from.id() != 0) {
+    _internal_set_id(from._internal_id());
   }
 }
 
@@ -433,10 +320,9 @@ bool LightMapProto::IsInitialized() const {
 void LightMapProto::InternalSwap(LightMapProto* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
-  id_.Swap(&other->id_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(LightMapProto, indirect_radiosity_)
-      + sizeof(LightMapProto::indirect_radiosity_)
+      PROTOBUF_FIELD_OFFSET(LightMapProto, id_)
+      + sizeof(LightMapProto::id_)
       - PROTOBUF_FIELD_OFFSET(LightMapProto, radiosity_)>(
           reinterpret_cast<char*>(&radiosity_),
           reinterpret_cast<char*>(&other->radiosity_));

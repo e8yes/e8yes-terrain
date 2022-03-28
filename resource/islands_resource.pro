@@ -24,6 +24,7 @@ SOURCES += \
     buffer_vertex.cc \
     common.cc \
     geometry.cc \
+    light_map.cc \
     material.cc \
     proto/geometry.pb.cc \
     proto/light_map.pb.cc \
@@ -33,6 +34,7 @@ SOURCES += \
     proto/table.pb.cc \
     proto/texture.pb.cc \
     ram_geometry.cc \
+    ram_light_map.cc \
     ram_material.cc \
     table.cc
 
@@ -44,6 +46,7 @@ HEADERS += \
     buffer_vertex.h \
     common.h \
     geometry.h \
+    light_map.h \
     material.h \
     proto/geometry.pb.h \
     proto/light_map.pb.h \
@@ -53,6 +56,7 @@ HEADERS += \
     proto/table.pb.h \
     proto/texture.pb.h \
     ram_geometry.h \
+    ram_light_map.h \
     ram_material.h \
     table.h
 

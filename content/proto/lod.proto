@@ -40,8 +40,11 @@ message SceneEntityResources {
         // Light map reference.
         int64 light_map_id = 4;
 
+        // Indirect light map reference.
+        int64 indirect_light_map_id = 5;
+
         // Physical shape reference.
-        int64 physical_shape_id = 5;
+        int64 physical_shape_id = 6;
     }
 
     // A list of LOD references stored in decreasing level of detail.

@@ -15,35 +15,28 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RESOURCE_MATERIAL_H
-#define ISLANDS_RESOURCE_MATERIAL_H
-
-#include <string>
-#include <vulkan/vulkan.h>
+#ifndef ISLANDS_RESOURCE_LIGHT_MAP_H
+#define ISLANDS_RESOURCE_LIGHT_MAP_H
 
 #include "common/device.h"
 #include "resource/buffer_image.h"
 #include "resource/common.h"
-#include "resource/proto/material.pb.h"
+#include "resource/proto/light_map.pb.h"
 #include "resource/proto/table.pb.h"
 
 namespace e8 {
 
-// It uniquely identifies a material design.
-using MaterialId = Uuid;
-
-// A descriptive human readable name for a material.
-using MaterialName = std::string;
+// It uniquely identifies a light map.
+using LightMapId = Uuid;
 
 /**
- * @brief The Material struct It defines the appearance of the surface of entities that use this
- * material.
+ * @brief The LightMap struct It stores pre-computed radiosity for static lights and surfaces.
  */
-struct Material {
-    Material();
-    Material(Material const &) = delete;
-    Material(Material &&) = default;
-    ~Material();
+struct LightMap {
+    LightMap();
+    LightMap(LightMap const &) = delete;
+    LightMap(LightMap &&) = default;
+    ~LightMap();
 
     /**
      * @brief FromDisk Recovers data from disk. If the data isn't available, this function will
@@ -51,42 +44,33 @@ struct Material {
      * recovers the material from data on disk to Vulkan buffer memory associated with the Vulkan
      * context.
      */
-    void FromDisk(MaterialId const &id, ResourceTable const &table, VulkanContext *context);
+    void FromDisk(LightMapId const &id, ResourceTable const &table, VulkanContext *context);
 
     /**
-     * @brief ToDisk It saves the material data to disk and populates the material resource's
+     * @brief ToDisk It saves the light map data to disk and populates the light map resource's
      * metadata to the specified resource table.
      *
-     * @param temporary Indicates if the material resource is only temporary. This allows the
+     * @param temporary Indicates if the light map resource is only temporary. This allows the
      * resource table to conduct cleanup operations properly.
      */
     void ToDisk(bool temporary, ResourceTable *table);
 
-    // ID of this material design.
-    MaterialId id;
+    // ID of this light map.
+    LightMapId id;
 
-    // A descriptive human readable name of this material.
-    MaterialName name;
-
-    // The albedo map.
-    StagingImageBuffer albedo;
-
-    // The normal map.
-    StagingImageBuffer normal;
-
-    // The roughness map.
-    StagingImageBuffer roughness;
+    // It stores the radiosity map contributed from some or all light bounces.
+    StagingImageBuffer radiosity;
 };
 
 /**
- * @brief SaveMaterialProto Saves the specified material proto to disk and populates the material
+ * @brief SaveLightMapProto Saves the specified light map proto to disk and populates the light map
  * resource's metadata to the specified resource table.
  *
- * @param temporary Indicates if the material resource is only temporary. This allows the
+ * @param temporary Indicates if the light map resource is only temporary. This allows the
  * resource table to conduct cleanup operations properly.
  */
-void SaveMaterialProto(MaterialProto const &material_proto, bool temporary, ResourceTable *table);
+void SaveLightMapProto(LightMapProto const &light_map_proto, bool temporary, ResourceTable *table);
 
 } // namespace e8
 
-#endif // ISLANDS_RESOURCE_MATERIAL_H
+#endif // ISLANDS_RESOURCE_LIGHT_MAP_H

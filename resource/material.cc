@@ -15,9 +15,7 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <algorithm>
-#include <boost/log/trivial.hpp>
-#include <cstdint>
+#include <cassert>
 #include <filesystem>
 #include <fstream>
 #include <string>
@@ -75,17 +73,29 @@ void Material::FromDisk(MaterialId const &id, ResourceTable const &table, Vulkan
     roughness.CreateFromTextureProto(proto.roughness(), context);
 }
 
+void Material::ToDisk(bool temporary, ResourceTable *table) {
+    MaterialProto proto;
+
+    proto.set_id(id);
+    proto.set_name(name);
+    *proto.mutable_albedo() = albedo.ToProto();
+    *proto.mutable_normal() = normal.ToProto();
+    *proto.mutable_roughness() = roughness.ToProto();
+
+    SaveMaterialProto(proto, temporary, table);
+}
+
 void SaveMaterialProto(MaterialProto const &material_proto, bool temporary, ResourceTable *table) {
     assert(material_proto.id() != kNullUuid);
 
-    // Writes out the geometry.
+    // Writes out the material.
     std::filesystem::path file_path = MaterialFilePath(table->current_base_path(), material_proto);
     std::fstream proto_file(file_path, std::ios::out | std::ios::trunc | std::ios::binary);
     assert(proto_file.is_open());
     assert(material_proto.SerializeToOstream(&proto_file));
     proto_file.close();
 
-    // Writes out the metadata for this geometry resource.
+    // Writes out the metadata for this material resource.
     ResourceTable::Metadata metadata;
     metadata.set_file_name(MaterialFileName(material_proto));
     metadata.set_resource_size(MaterialSize(material_proto));

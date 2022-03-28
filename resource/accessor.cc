@@ -23,11 +23,13 @@
 #include "common/device.h"
 #include "resource/accessor.h"
 #include "resource/geometry.h"
+#include "resource/light_map.h"
 #include "resource/material.h"
 #include "resource/proto/geometry.pb.h"
 #include "resource/proto/material.pb.h"
 #include "resource/proto/table.pb.h"
 #include "resource/ram_geometry.h"
+#include "resource/ram_light_map.h"
 #include "resource/ram_material.h"
 #include "resource/table.h"
 
@@ -51,6 +53,7 @@ ResourceAccessor::ResourceAccessor(std::filesystem::path const &base_path, bool 
 
     geometry_ram_transfer_ = std::make_unique<GeometryRamTransfer>(&device->geometry_ram_usage);
     material_ram_transfer_ = std::make_unique<MaterialRamTransfer>(&device->image_ram_usage);
+    light_map_ram_transfer_ = std::make_unique<LightMapRamTransfer>(&device->image_ram_usage);
 }
 
 ResourceAccessor::~ResourceAccessor() {
@@ -86,6 +89,14 @@ std::shared_ptr<Material> ResourceAccessor::LoadMaterial(MaterialId const &id) {
 
 void ResourceAccessor::RemoveMaterial(MaterialId const &id) {
     transient_table_->mutable_materials()->erase(id);
+}
+
+std::shared_ptr<LightMap> ResourceAccessor::LoadLightMap(LightMapId const &id) {
+    return light_map_ram_transfer_->Load(id, *transient_table_, device_);
+}
+
+void ResourceAccessor::RemoveLightMap(LightMapId const &id) {
+    transient_table_->mutable_light_maps()->erase(id);
 }
 
 bool ResourceAccessor::Commit() {

@@ -22,19 +22,13 @@ package e8;
 import "texture.proto";
 
 /**
- * @brief the LightMapProto message It stores the pre-computed radiosity for static lights and
+ * @brief the IndrectLightMapProto message It stores pre-computed radiosity for static lights and
  * surfaces.
  */
 message LightMapProto {
     // ID of this light map.
-    string id = 1;
+    int64 id = 1;
 
-    // Optional. It stores the full radiosity map.
+    // It stores the radiosity map contributed from some or all light bounces.
     TextureProto radiosity = 2;
-
-    // Optional. It stores only the radiosity map contributed from only the direct light bounce.
-    TextureProto direct_radiosity = 3;
-
-    // It stores the radiosity map contributed from only the indirect light bounces.
-    TextureProto indirect_radiosity = 4;
 }

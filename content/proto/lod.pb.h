@@ -186,7 +186,8 @@ class SceneEntityResources_Lod PROTOBUF_FINAL :
     kGeometryIdFieldNumber = 2,
     kMaterialIdFieldNumber = 3,
     kLightMapIdFieldNumber = 4,
-    kPhysicalShapeIdFieldNumber = 5,
+    kIndirectLightMapIdFieldNumber = 5,
+    kPhysicalShapeIdFieldNumber = 6,
     kApplyAfterDistanceFieldNumber = 1,
   };
   // int64 geometry_id = 2;
@@ -216,7 +217,16 @@ class SceneEntityResources_Lod PROTOBUF_FINAL :
   void _internal_set_light_map_id(::PROTOBUF_NAMESPACE_ID::int64 value);
   public:
 
-  // int64 physical_shape_id = 5;
+  // int64 indirect_light_map_id = 5;
+  void clear_indirect_light_map_id();
+  ::PROTOBUF_NAMESPACE_ID::int64 indirect_light_map_id() const;
+  void set_indirect_light_map_id(::PROTOBUF_NAMESPACE_ID::int64 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int64 _internal_indirect_light_map_id() const;
+  void _internal_set_indirect_light_map_id(::PROTOBUF_NAMESPACE_ID::int64 value);
+  public:
+
+  // int64 physical_shape_id = 6;
   void clear_physical_shape_id();
   ::PROTOBUF_NAMESPACE_ID::int64 physical_shape_id() const;
   void set_physical_shape_id(::PROTOBUF_NAMESPACE_ID::int64 value);
@@ -244,6 +254,7 @@ class SceneEntityResources_Lod PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::int64 geometry_id_;
   ::PROTOBUF_NAMESPACE_ID::int64 material_id_;
   ::PROTOBUF_NAMESPACE_ID::int64 light_map_id_;
+  ::PROTOBUF_NAMESPACE_ID::int64 indirect_light_map_id_;
   ::PROTOBUF_NAMESPACE_ID::int64 physical_shape_id_;
   float apply_after_distance_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -488,7 +499,27 @@ inline void SceneEntityResources_Lod::set_light_map_id(::PROTOBUF_NAMESPACE_ID::
   // @@protoc_insertion_point(field_set:e8.SceneEntityResources.Lod.light_map_id)
 }
 
-// int64 physical_shape_id = 5;
+// int64 indirect_light_map_id = 5;
+inline void SceneEntityResources_Lod::clear_indirect_light_map_id() {
+  indirect_light_map_id_ = PROTOBUF_LONGLONG(0);
+}
+inline ::PROTOBUF_NAMESPACE_ID::int64 SceneEntityResources_Lod::_internal_indirect_light_map_id() const {
+  return indirect_light_map_id_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int64 SceneEntityResources_Lod::indirect_light_map_id() const {
+  // @@protoc_insertion_point(field_get:e8.SceneEntityResources.Lod.indirect_light_map_id)
+  return _internal_indirect_light_map_id();
+}
+inline void SceneEntityResources_Lod::_internal_set_indirect_light_map_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
+  
+  indirect_light_map_id_ = value;
+}
+inline void SceneEntityResources_Lod::set_indirect_light_map_id(::PROTOBUF_NAMESPACE_ID::int64 value) {
+  _internal_set_indirect_light_map_id(value);
+  // @@protoc_insertion_point(field_set:e8.SceneEntityResources.Lod.indirect_light_map_id)
+}
+
+// int64 physical_shape_id = 6;
 inline void SceneEntityResources_Lod::clear_physical_shape_id() {
   physical_shape_id_ = PROTOBUF_LONGLONG(0);
 }
