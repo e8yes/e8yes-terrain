@@ -29,8 +29,11 @@ message TextureProto {
     enum Encoding {
         INVALID = 0;
 
+        // Raw byte array, basically unencoded. Note, this isn't the BMP encoding.
+        BITMAP = 1;
+
         // Portable Network Graphics encoding (using lossless compression).
-        PNG = 1;
+        PNG = 2;
     }
 
     // The encoding used for the image data.

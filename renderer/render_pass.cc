@@ -128,7 +128,7 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
         vkCmdBindIndexBuffer(cmds, gpu_geometry.index_buffer->buffer, /*offset=*/0,
                              gpu_geometry.index_element_type);
 
-        vkCmdDrawIndexed(cmds, instance.geometry->index_count,
+        vkCmdDrawIndexed(cmds, instance.geometry->indices.index_count,
                          /*instanceCount=*/1, /*firstIndex=*/0, /*vertexOffset=*/0,
                          /*firstInstance=*/0);
     }

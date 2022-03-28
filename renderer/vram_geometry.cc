@@ -27,6 +27,8 @@
 #include "common/device.h"
 #include "content/proto/camera.pb.h"
 #include "renderer/vram_geometry.h"
+#include "resource/buffer_index.h"
+#include "resource/buffer_vertex.h"
 #include "resource/geometry.h"
 
 namespace e8 {
@@ -47,7 +49,7 @@ void UploadVertexBuffer(Geometry const *geometry, uint64_t old_buffer_size,
     }
 
     VkBufferCopy region{};
-    region.size = geometry->VertexBufferSize();
+    region.size = geometry->vertices.BufferSize();
 
     vkCmdCopyBuffer(cmds, geometry->vertices.buffer, vertex_buffer_object->buffer,
                     /*regionCount=*/1, &region);
@@ -66,7 +68,7 @@ void UploadIndexBuffer(Geometry const *geometry, uint64_t old_buffer_size, uint6
     }
 
     VkBufferCopy region{};
-    region.size = geometry->IndexBufferSize();
+    region.size = geometry->indices.BufferSize();
 
     vkCmdCopyBuffer(cmds, geometry->indices.buffer, index_buffer_object->buffer, /*regionCount=*/1,
                     &region);
@@ -147,7 +149,7 @@ void GeometryVramTransfer::GeometryVramTransferImpl::Upload(Geometry const *geom
         geometry,
         /*override_old_upload=*/geometry->rigidity == GeometryProto::DEFORMABLE ||
             geometry->rigidity == GeometryProto::TEARABLE,
-        /*object_size_fn=*/[](Geometry const *geo) { return geo->VertexBufferSize(); },
+        /*object_size_fn=*/[](Geometry const *geo) { return geo->vertices.BufferSize(); },
         /*upload_fn=*/
         [this, cmds](Geometry const *geometry, uint64_t old_buffer_size, uint64_t new_buffer_size,
                      GeometryVramTransfer::BufferUploadResult *vertex_buffer_object) {
@@ -157,7 +159,7 @@ void GeometryVramTransfer::GeometryVramTransferImpl::Upload(Geometry const *geom
 
     index_cache.Upload(
         geometry, /*override_old_upload=*/geometry->rigidity == GeometryProto::TEARABLE,
-        /*object_size_fn=*/[](Geometry const *geo) { return geo->IndexBufferSize(); },
+        /*object_size_fn=*/[](Geometry const *geo) { return geo->indices.BufferSize(); },
         /*upload_fn=*/
         [this, cmds](Geometry const *geometry, uint64_t old_buffer_size, uint64_t new_buffer_size,
                      GeometryVramTransfer::BufferUploadResult *vertex_buffer_object) {
@@ -237,7 +239,7 @@ GeometryVramTransfer::GpuGeometry GeometryVramTransfer::Find(Geometry const *geo
     assert(result.vertex_buffer != nullptr);
     assert(result.index_buffer != nullptr);
 
-    result.index_element_type = geometry->IndexElementType();
+    result.index_element_type = geometry->indices.IndexElementType();
 
     return result;
 }

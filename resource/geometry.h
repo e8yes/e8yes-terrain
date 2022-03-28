@@ -19,15 +19,13 @@
 #define ISLANDS_CONTENT_GEOMETRY_H
 
 #include <string>
-#include <vector>
-#include <vulkan/vulkan.h>
 
 #include "common/device.h"
-#include "common/tensor.h"
+#include "resource/buffer_index.h"
+#include "resource/buffer_vertex.h"
 #include "resource/common.h"
 #include "resource/proto/geometry.pb.h"
 #include "resource/proto/table.pb.h"
-#include "third_party/vma/vk_mem_alloc.h"
 
 namespace e8 {
 
@@ -38,90 +36,10 @@ using GeometryId = Uuid;
 using GeometryName = std::string;
 
 /**
- * @brief The PrimitiveVertex struct It defines the geometric attributes of a primitive's
- * vertex.
- */
-struct PrimitiveVertex {
-    /**
-     * @brief PrimitiveVertex Constructs a vertex with all attributes set to zero.
-     */
-    PrimitiveVertex();
-
-    /**
-     * @brief PrimitiveVertex Constructs a vertex from proto message.
-     */
-    PrimitiveVertex(PrimitiveVertexProto const &proto);
-
-    ~PrimitiveVertex();
-
-    /**
-     * @brief ToProto Exports vertex attribute data as protobuf object.
-     */
-    PrimitiveVertexProto ToProto() const;
-
-    // Defines the vertex's 3D position.
-    vec3 position;
-
-    // Defines the 3D normal vector for the vertex position.
-    vec3 normal;
-
-    // Defines the normalized 2D coordinates of a texture image to make it wrap around the surface
-    // surrounding this vertex.
-    vec2 tex_coord;
-};
-
-/**
  * @brief The Geometry struct Models an object's geometry as triangle mesh. This object isn't thread
  * safe.
  */
 struct Geometry {
-    /**
-     * @brief The VulkanBuffer struct Wraps on a Vulkan buffer with a simply memory management
-     * layer. The Vulkan buffer is used for storing the geometry's vertex and index data.
-     */
-    struct VulkanBuffer {
-        VulkanBuffer();
-        VulkanBuffer(VulkanBuffer const &) = delete;
-        VulkanBuffer(VulkanBuffer &&);
-        ~VulkanBuffer();
-
-        VulkanBuffer &operator=(VulkanBuffer &&other);
-
-        /**
-         * @brief Allocate Used internally by the Geometry object for Vulkan buffer allocation.
-         */
-        void Allocate(unsigned size, VulkanContext *context);
-
-        /**
-         * @brief Free Used internally by the Geometry object for Vulkan buffer de-allocation.
-         */
-        void Free();
-
-        /**
-         * @brief BeginAccess Obtains a pointer to the buffer region accessible by caller's process.
-         */
-        void *BeginAccess() const;
-
-        /**
-         * @brief EndAccess This must be called when the access to the buffer region is finished.
-         */
-        void EndAccess() const;
-
-        /**
-         * @brief Valid Indicates if the buffer is valid.
-         */
-        bool Valid() const;
-
-        // The allocated buffer object.
-        VkBuffer buffer;
-
-        // Information about the buffer allocation.
-        VmaAllocation allocation;
-
-        // Contextual Vulkan handles.
-        VulkanContext *context;
-    };
-
     /**
      * @brief Geometry Constructs an empty geometry with a uniquely allocated ID.
      */
@@ -149,46 +67,18 @@ struct Geometry {
      */
     void ToDisk(bool temporary, ResourceTable *table) const;
 
-    /**
-     * @brief IndexElementType The integer type each index element uses in the upload.
-     */
-    VkIndexType IndexElementType() const;
-
-    /**
-     * @brief IndexElementSize Returns the size of each index element, in byte.
-     */
-    unsigned IndexElementSize() const;
-
-    /**
-     * @brief VertexBufferSize Returns the size of the vertex buffer, in byte.
-     */
-    uint64_t VertexBufferSize() const;
-
-    /**
-     * @brief IndexBufferSize Returns the size of the index buffer, in byte.
-     */
-    uint64_t IndexBufferSize() const;
-
     // ID of this geometry.
     GeometryId id;
 
     // The type of rigidity to be expected for this geometry.
     GeometryProto::RigidityType rigidity;
 
-    // A host-only vertex buffer. It's not guaranteed to be unique. The buffer physically contains a
-    // list of vertices defining the geometry of this geometry.
-    VulkanBuffer vertices;
+    // A valid host-only vertex buffer.
+    StagingVertexBuffer vertices;
 
-    // The number of vertex there are in this geometry.
-    unsigned vertex_count;
-
-    // A valid host-only index buffer. It's not guaranteed to be unique. Every 3 integers in the
-    // list define a triangle primitive. The integer references a vertex from the vertex list. The
-    // size of the index element is indicated by the field index_element_type below.
-    VulkanBuffer indices;
-
-    // The number of index there are in this geometry.
-    unsigned index_count;
+    // A valid host-only index buffer. Every 3 integers in the list define a triangle primitive. The
+    // integer references a vertex from the vertex list.
+    StagingIndexBuffer indices;
 };
 
 /**

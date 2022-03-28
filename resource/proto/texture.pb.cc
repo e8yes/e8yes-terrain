@@ -60,12 +60,12 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_texture_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\rtexture.proto\022\002e8\"\267\001\n\014TextureProto\022+\n\010"
+  "\n\rtexture.proto\022\002e8\"\303\001\n\014TextureProto\022+\n\010"
   "encoding\030\001 \001(\0162\031.e8.TextureProto.Encodin"
   "g\022\r\n\005width\030\002 \001(\005\022\016\n\006height\030\003 \001(\005\022\025\n\rchan"
   "nel_count\030\004 \001(\005\022\024\n\014channel_size\030\005 \001(\005\022\014\n"
-  "\004data\030\006 \001(\014\" \n\010Encoding\022\013\n\007INVALID\020\000\022\007\n\003"
-  "PNG\020\001b\006proto3"
+  "\004data\030\006 \001(\014\",\n\010Encoding\022\013\n\007INVALID\020\000\022\n\n\006"
+  "BITMAP\020\001\022\007\n\003PNG\020\002b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_texture_2eproto_deps[1] = {
 };
@@ -74,7 +74,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_tex
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_texture_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_texture_2eproto = {
-  false, false, descriptor_table_protodef_texture_2eproto, "texture.proto", 213,
+  false, false, descriptor_table_protodef_texture_2eproto, "texture.proto", 225,
   &descriptor_table_texture_2eproto_once, descriptor_table_texture_2eproto_sccs, descriptor_table_texture_2eproto_deps, 1, 0,
   schemas, file_default_instances, TableStruct_texture_2eproto::offsets,
   file_level_metadata_texture_2eproto, 1, file_level_enum_descriptors_texture_2eproto, file_level_service_descriptors_texture_2eproto,
@@ -91,6 +91,7 @@ bool TextureProto_Encoding_IsValid(int value) {
   switch (value) {
     case 0:
     case 1:
+    case 2:
       return true;
     default:
       return false;
@@ -99,6 +100,7 @@ bool TextureProto_Encoding_IsValid(int value) {
 
 #if (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
 constexpr TextureProto_Encoding TextureProto::INVALID;
+constexpr TextureProto_Encoding TextureProto::BITMAP;
 constexpr TextureProto_Encoding TextureProto::PNG;
 constexpr TextureProto_Encoding TextureProto::Encoding_MIN;
 constexpr TextureProto_Encoding TextureProto::Encoding_MAX;

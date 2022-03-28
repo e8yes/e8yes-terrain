@@ -67,7 +67,8 @@ namespace e8 {
 
 enum TextureProto_Encoding : int {
   TextureProto_Encoding_INVALID = 0,
-  TextureProto_Encoding_PNG = 1,
+  TextureProto_Encoding_BITMAP = 1,
+  TextureProto_Encoding_PNG = 2,
   TextureProto_Encoding_TextureProto_Encoding_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
   TextureProto_Encoding_TextureProto_Encoding_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
 };
@@ -205,6 +206,8 @@ class TextureProto PROTOBUF_FINAL :
   typedef TextureProto_Encoding Encoding;
   static constexpr Encoding INVALID =
     TextureProto_Encoding_INVALID;
+  static constexpr Encoding BITMAP =
+    TextureProto_Encoding_BITMAP;
   static constexpr Encoding PNG =
     TextureProto_Encoding_PNG;
   static inline bool Encoding_IsValid(int value) {
