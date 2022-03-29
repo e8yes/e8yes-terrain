@@ -628,9 +628,12 @@ static void Dump(const tinygltf::Model &model) {
             const tinygltf::Image &image = model.images[i];
             std::cout << Indent(1) << "name         : " << image.name << std::endl;
 
+            std::cout << Indent(2) << "uri       : " << image.uri << std::endl;
             std::cout << Indent(2) << "width     : " << image.width << std::endl;
             std::cout << Indent(2) << "height    : " << image.height << std::endl;
             std::cout << Indent(2) << "component : " << image.component << std::endl;
+            std::cout << Indent(2) << "bits      : " << image.bits << std::endl;
+            std::cout << Indent(2) << "size      : " << image.image.size() << std::endl;
             DumpExtensions(image.extensions, 1);
             std::cout << PrintValue("extras", image.extras, 2) << std::endl;
 
@@ -795,6 +798,7 @@ int main(int argc, char **argv) {
     std::string input_filename(argv[1]);
     std::string ext = GetFilePathExtension(input_filename);
 
+    gltf_ctx.SetPreserveImageChannels(true);
     gltf_ctx.SetStoreOriginalJSONForExtrasAndExtensions(
         store_original_json_for_extras_and_extensions);
 
