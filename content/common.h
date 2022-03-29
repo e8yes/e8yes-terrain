@@ -24,8 +24,13 @@
 #include "content/proto/bbox.pb.h"
 #include "content/proto/transform.pb.h"
 #include "resource/common.h"
+#include "resource/proto/geometry.pb.h"
+#include "resource/proto/texture.pb.h"
 
 namespace e8 {
+
+// Uniquely identifies a procedural object.
+using ProceduralObjectId = Uuid;
 
 /**
  * @brief ToProto Converts an AABB bounding box to a protobuf object.
@@ -42,8 +47,34 @@ aabb ToAabb(AABB const &proto);
  */
 mat44 ToHomogeneousTransform(SrtTransform const &srt_transform);
 
-// Uniquely identifies a procedural object.
-using ProceduralObjectId = Uuid;
+/**
+ * @brief BoundingBoxOf Computes a bounding box that contains the specified geometry.
+ */
+aabb BoundingBoxOf(GeometryProto const &geometry);
+
+/**
+ * @brief OneByOneAlbedoTexture Creates an albedo texture with exactly one pixel carrying the
+ * specified albedo value.
+ */
+TextureProto OneByOneAlbedoTexture(vec3 const &albedo);
+
+/**
+ * @brief OneByOneNormalTexture Creates a normal texture with exactly one pixel carrying a tangent
+ * space normal vector pointing up towards the z axis.
+ */
+TextureProto OneByOneNormalTexture();
+
+/**
+ * @brief OneByOneRoughnessTexture Creates an roughness texture with exactly one pixel carrying the
+ * specified roughness value.
+ */
+TextureProto OneByOneRoughnessTexture(float roughness);
+
+/**
+ * @brief OneByOneMetallicTexture Creates an metallic texture with exactly one pixel carrying the
+ * specified metallic value.
+ */
+TextureProto OneByOneMetallicTexture(float metallic);
 
 } // namespace e8
 

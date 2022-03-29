@@ -16,6 +16,7 @@
  */
 
 #include <cassert>
+#include <cstring>
 #include <google/protobuf/repeated_field.h>
 #include <mutex>
 #include <string>
@@ -23,6 +24,7 @@
 #include "common/tensor.h"
 #include "resource/common.h"
 #include "resource/proto/primitive.pb.h"
+#include "third_party/stb_image/stb_image_write.h"
 #include "third_party/uuid/uuid4.h"
 
 namespace e8 {
@@ -31,6 +33,12 @@ namespace {
 std::mutex gUuidGenMutex;
 bool gUuidInitialized = false;
 UUID4_STATE_T gUuidGenState;
+
+void CopyEncodedImageFn(void *context, void *data, int size) {
+    auto texture_proto = static_cast<TextureProto *>(context);
+    texture_proto->mutable_data()->resize(size);
+    memcpy(texture_proto->mutable_data()->data(), data, size);
+}
 
 } // namespace
 
@@ -107,6 +115,22 @@ mat44 ToMat44(google::protobuf::RepeatedField<float> const &proto) {
         }
     }
     return m;
+}
+
+void EncodeTextureData(void const *bitmap, TextureProto *texture_proto) {
+    switch (texture_proto->encoding()) {
+    case TextureProto::PNG: {
+        stbi_write_png_to_func(CopyEncodedImageFn, /*context=*/texture_proto,
+                               texture_proto->width(), texture_proto->height(),
+                               texture_proto->channel_count(), bitmap,
+                               texture_proto->width() * texture_proto->channel_count() *
+                                   texture_proto->channel_size());
+        break;
+    }
+    default: {
+        assert(false);
+    }
+    }
 }
 
 } // namespace e8

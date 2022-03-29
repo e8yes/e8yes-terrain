@@ -20,6 +20,8 @@ SOURCES += \
     camera.cc \
     common.cc \
     loader_gltf.cc \
+    loader_gltf_geometry.cc \
+    loader_gltf_material.cc \
     procedural_basic.cc \
     procedural_object.cc \
     proto/bbox.pb.cc \
@@ -41,6 +43,8 @@ HEADERS += \
     camera.h \
     common.h \
     loader_gltf.h \
+    loader_gltf_geometry.h \
+    loader_gltf_material.h \
     procedural_basic.h \
     procedural_object.h \
     proto/bbox.pb.h \

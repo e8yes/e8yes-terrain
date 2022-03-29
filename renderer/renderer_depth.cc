@@ -85,7 +85,7 @@ void DepthRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor)
             scene->SceneEntityStructure()->QueryEntities(QueryAllSceneEntities);
         std::vector<DrawableInstance> drawables =
             ToDrawables(scene_entities, /*viewer_location=*/ToVec3(scene->camera.position()),
-                        resource_accessor);
+                        /*load_material=*/false, /*load_light_map=*/false, resource_accessor);
         PerspectiveProjection camera_projection(scene->camera);
 
         PipelineOutputInterface *depth_map_output = pimpl_->depth_map_pipeline.Run(

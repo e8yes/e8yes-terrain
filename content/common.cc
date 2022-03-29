@@ -23,6 +23,8 @@
 #include "content/proto/bbox.pb.h"
 #include "content/proto/transform.pb.h"
 #include "resource/common.h"
+#include "resource/proto/geometry.pb.h"
+#include "resource/proto/texture.pb.h"
 
 namespace e8 {
 
@@ -68,6 +70,74 @@ mat44 ToHomogeneousTransform(SrtTransform const &srt_transform) {
     }
 
     return translation * rot_z * rot_y * rot_x * scaling;
+}
+
+aabb BoundingBoxOf(GeometryProto const &geometry) {
+    aabb bounding_box;
+    for (auto const &vertex : geometry.vertices()) {
+        bounding_box = bounding_box + ToVec3(vertex.position());
+    }
+    return bounding_box;
+}
+
+TextureProto OneByOneAlbedoTexture(vec3 const &albedo) {
+    TextureProto texture_proto;
+    texture_proto.set_encoding(TextureProto::PNG);
+    texture_proto.set_width(1);
+    texture_proto.set_height(1);
+    texture_proto.set_channel_count(3);
+    texture_proto.set_channel_size(1);
+
+    vec<3, uint8_t> pixel{
+        static_cast<uint8_t>(albedo(0) * 255.0f),
+        static_cast<uint8_t>(albedo(1) * 255.0f),
+        static_cast<uint8_t>(albedo(2) * 255.0f),
+    };
+    EncodeTextureData(&pixel, &texture_proto);
+
+    return texture_proto;
+}
+
+TextureProto OneByOneNormalTexture() {
+    TextureProto texture_proto;
+    texture_proto.set_encoding(TextureProto::PNG);
+    texture_proto.set_width(1);
+    texture_proto.set_height(1);
+    texture_proto.set_channel_count(3);
+    texture_proto.set_channel_size(1);
+
+    vec<3, uint8_t> pixel{0, 0, 255};
+    EncodeTextureData(&pixel, &texture_proto);
+
+    return texture_proto;
+}
+
+TextureProto OneByOneRoughnessTexture(float roughness) {
+    TextureProto texture_proto;
+    texture_proto.set_encoding(TextureProto::PNG);
+    texture_proto.set_width(1);
+    texture_proto.set_height(1);
+    texture_proto.set_channel_count(1);
+    texture_proto.set_channel_size(1);
+
+    vec<1, uint8_t> pixel{static_cast<uint8_t>(roughness * 255.0f)};
+    EncodeTextureData(&pixel, &texture_proto);
+
+    return texture_proto;
+}
+
+TextureProto OneByOneMetallicTexture(float metallic) {
+    TextureProto texture_proto;
+    texture_proto.set_encoding(TextureProto::PNG);
+    texture_proto.set_width(1);
+    texture_proto.set_height(1);
+    texture_proto.set_channel_count(1);
+    texture_proto.set_channel_size(1);
+
+    vec<1, uint8_t> pixel{static_cast<uint8_t>(metallic * 255.0f)};
+    EncodeTextureData(&pixel, &texture_proto);
+
+    return texture_proto;
 }
 
 } // namespace e8

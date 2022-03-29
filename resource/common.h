@@ -23,6 +23,7 @@
 
 #include "common/tensor.h"
 #include "resource/proto/primitive.pb.h"
+#include "resource/proto/texture.pb.h"
 
 namespace e8 {
 
@@ -70,6 +71,15 @@ google::protobuf::RepeatedField<float> ToProto(mat44 const &m);
  * exactly 16 elements. If not, it will fail.
  */
 mat44 ToMat44(google::protobuf::RepeatedField<float> const &proto);
+
+/**
+ * @brief EncodeTextureData Encodes the bitmap into the texture protobuf object's data field.
+ *
+ * @param bitmap Points to the memory region that stores the bitmap.
+ * @param texture_proto In order for the bitmap to be correctly encoded, this protobuf object must
+ * have everything except the data field correctly specified.
+ */
+void EncodeTextureData(void const *bitmap, TextureProto *texture_proto);
 
 } // namespace e8
 

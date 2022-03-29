@@ -24,9 +24,9 @@
 #include "common/device.h"
 #include "resource/buffer.h"
 #include "resource/buffer_image.h"
+#include "resource/common.h"
 #include "resource/proto/texture.pb.h"
 #include "third_party/stb_image/stb_image.h"
-#include "third_party/stb_image/stb_image_write.h"
 
 namespace e8 {
 namespace {
@@ -81,28 +81,6 @@ void *LoadTexture(TextureProto const &texture_proto) {
     return decoded;
 }
 
-void SaveTextureFunction(void *context, void *data, int size) {
-    auto texture_proto = static_cast<TextureProto *>(context);
-    texture_proto->mutable_data()->resize(size);
-    memcpy(texture_proto->mutable_data()->data(), data, size);
-}
-
-void SaveTexture(void const *source_buffer, TextureProto *texture_proto) {
-    switch (texture_proto->encoding()) {
-    case TextureProto::PNG: {
-        stbi_write_png_to_func(SaveTextureFunction, /*context=*/texture_proto,
-                               texture_proto->width(), texture_proto->height(),
-                               texture_proto->channel_count(), source_buffer,
-                               texture_proto->width() * texture_proto->channel_count() *
-                                   texture_proto->channel_size());
-        break;
-    }
-    default: {
-        assert(false);
-    }
-    }
-}
-
 } // namespace
 
 StagingImageBuffer::StagingImageBuffer() : width(0), height(0), channel_count(0), channel_size(0) {}
@@ -145,7 +123,7 @@ TextureProto StagingImageBuffer::ToProto() const {
     proto.set_channel_size(channel_size);
 
     void const *source_buffer = this->BeginAccess();
-    SaveTexture(source_buffer, &proto);
+    EncodeTextureData(source_buffer, &proto);
     this->EndAccess();
 
     return proto;

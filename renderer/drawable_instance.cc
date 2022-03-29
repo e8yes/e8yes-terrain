@@ -24,6 +24,8 @@
 #include "resource/accessor.h"
 #include "resource/common.h"
 #include "resource/geometry.h"
+#include "resource/light_map.h"
+#include "resource/material.h"
 
 namespace e8 {
 namespace {
@@ -45,7 +47,8 @@ SceneEntityResources::Lod const *SelectResourceLod(SceneEntity const &scene_enti
 } // namespace
 
 std::vector<DrawableInstance> ToDrawables(std::vector<SceneEntity const *> const &scene_entities,
-                                          vec3 const &viewer_location,
+                                          vec3 const &viewer_location, bool load_material,
+                                          bool load_light_map,
                                           ResourceAccessor *resource_accessor) {
     std::vector<DrawableInstance> instances;
 
@@ -55,11 +58,22 @@ std::vector<DrawableInstance> ToDrawables(std::vector<SceneEntity const *> const
             continue;
         }
 
-        std::shared_ptr<Geometry> geometry = resource_accessor->LoadGeometry(lod->geometry_id());
-
         DrawableInstance drawable;
-        drawable.geometry = geometry.get();
         drawable.transform = &scene_entity->transform;
+
+        drawable.geometry = resource_accessor->LoadGeometry(lod->geometry_id()).get();
+
+        if (load_material && lod->material_id() != kNullUuid) {
+            drawable.material = resource_accessor->LoadMaterial(lod->material_id()).get();
+        } else {
+            drawable.material = nullptr;
+        }
+
+        if (load_light_map && lod->light_map_id() != kNullUuid) {
+            drawable.light_map = resource_accessor->LoadLightMap(lod->light_map_id()).get();
+        } else {
+            drawable.light_map = nullptr;
+        }
 
         instances.push_back(drawable);
     }

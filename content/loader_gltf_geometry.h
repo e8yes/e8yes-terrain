@@ -15,27 +15,26 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RESOURCE_LOADER_GLTF_H
-#define ISLANDS_RESOURCE_LOADER_GLTF_H
+#ifndef ISLANDS_CONTENT_LOADER_GLTF_GEOMETRY_H
+#define ISLANDS_CONTENT_LOADER_GLTF_GEOMETRY_H
 
+#include <optional>
 #include <string>
-#include <vector>
 
-#include "content/scene_object.h"
-#include "resource/accessor.h"
+#include "resource/proto/geometry.pb.h"
+#include "third_party/tiny_gltf/tiny_gltf.h"
 
 namespace e8 {
 
 /**
- * @brief LoadFromGltf Loads scene objects from a glTF file.
- *
- * @param gltf_file_path The file to be loaded.
- * @param resource_accessor Where glTF resources will be imported.
- * @return A list of root objects specified in the glTF file.
+ * @brief LoadGeometry Converts a glTF primitive to a geometry protobuf object. In order for the
+ * conversion be successful, the primitive must contains these vertex attributes: position and at
+ * least one set of texture coordinate. Otherwise, this function returns a nullopt. Besides, the
+ * primitive must be modeled as a triangle mesh.
  */
-std::vector<SceneObject> LoadFromGltf(std::string const &gltf_file_path,
-                                      ResourceAccessor *resource_accessor);
+std::optional<GeometryProto> LoadGeometry(tinygltf::Primitive const &primitive,
+                                          std::string const &name, tinygltf::Model const &model);
 
 } // namespace e8
 
-#endif // ISLANDS_RESOURCE_LOADER_GLTF_H
+#endif // ISLANDS_CONTENT_LOADER_GLTF_GEOMETRY_H

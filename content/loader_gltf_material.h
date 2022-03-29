@@ -15,27 +15,19 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RESOURCE_LOADER_GLTF_H
-#define ISLANDS_RESOURCE_LOADER_GLTF_H
+#ifndef ISLANDS_CONTENT_LOADER_GLTF_MATERIAL_H
+#define ISLANDS_CONTENT_LOADER_GLTF_MATERIAL_H
 
-#include <string>
-#include <vector>
-
-#include "content/scene_object.h"
-#include "resource/accessor.h"
+#include "resource/proto/material.pb.h"
+#include "third_party/tiny_gltf/tiny_gltf.h"
 
 namespace e8 {
 
 /**
- * @brief LoadFromGltf Loads scene objects from a glTF file.
- *
- * @param gltf_file_path The file to be loaded.
- * @param resource_accessor Where glTF resources will be imported.
- * @return A list of root objects specified in the glTF file.
+ * @brief LoadMaterial Converts a glTF material to a material protobuf object.
  */
-std::vector<SceneObject> LoadFromGltf(std::string const &gltf_file_path,
-                                      ResourceAccessor *resource_accessor);
+MaterialProto LoadMaterial(tinygltf::Material const &material, tinygltf::Model const &model);
 
 } // namespace e8
 
-#endif // ISLANDS_RESOURCE_LOADER_GLTF_H
+#endif // ISLANDS_CONTENT_LOADER_GLTF_MATERIAL_H

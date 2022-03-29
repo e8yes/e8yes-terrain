@@ -24,6 +24,8 @@
 #include "content/scene_entity.h"
 #include "resource/accessor.h"
 #include "resource/geometry.h"
+#include "resource/light_map.h"
+#include "resource/material.h"
 
 namespace e8 {
 
@@ -35,17 +37,30 @@ struct DrawableInstance {
     // The geometry selected from a series of LODs.
     Geometry const *geometry;
 
+    // Optional. The material selected from a series of LODs.
+    Material const *material;
+
+    // Optional. The light map selected from a series of LODs.
+    LightMap const *light_map;
+
     // The homogeneous transformation to be applied to the geometry.
     mat44 const *transform;
 };
 
 /**
- * @brief ToDrawable Selects a suitable geometry and material LODs from each entity and creates a
- * drawable from the selection, if there is one.
+ * @brief ToDrawable Selects a suitable resource LODs from each entity and creates a
+ * drawable from the selection, if there is one. Scene entities that don't have a geometry reference
+ * are excluded from the result.
+ *
+ * @param scene_entities The scene entities to create drawables from.
+ * @param viewer_location Used for determining the resource LOD.
+ * @param load_material Whether to attach material resource to the drawables.
+ * @param load_light_map Whether to attach light map resource to the drawables.
+ * @return An array of drawables with applicable resources.
  */
 std::vector<DrawableInstance> ToDrawables(std::vector<SceneEntity const *> const &scene_entities,
-                                          vec3 const &viewer_location,
-                                          ResourceAccessor *resource_accessor);
+                                          vec3 const &viewer_location, bool load_material,
+                                          bool load_light_map, ResourceAccessor *resource_accessor);
 
 } // namespace e8
 

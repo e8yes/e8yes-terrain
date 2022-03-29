@@ -40,14 +40,6 @@ namespace {
 constexpr char const *kEntityName = "entity";
 float const kLodMinDistance = 0.0f;
 
-aabb BoundingBoxOf(GeometryProto const &geometry_proto) {
-    aabb bounding_box;
-    for (auto const &vertex : geometry_proto.vertices()) {
-        bounding_box = bounding_box + ToVec3(vertex.position());
-    }
-    return bounding_box;
-}
-
 GeometryProto PlaneGeometry(float width, float height, float cell_area, bool movable) {
     assert(width > 0);
     assert(height > 0);
