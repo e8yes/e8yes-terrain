@@ -70,6 +70,7 @@ void Material::FromDisk(MaterialId const &id, ResourceTable const &table, Vulkan
     // Creates texture maps on Vulkan memory regions.
     albedo.CreateFromTextureProto(proto.albedo(), context);
     normal.CreateFromTextureProto(proto.normal(), context);
+    metallic.CreateFromTextureProto(proto.metallic(), context);
     roughness.CreateFromTextureProto(proto.roughness(), context);
 }
 
@@ -80,6 +81,7 @@ void Material::ToDisk(bool temporary, ResourceTable *table) {
     proto.set_name(name);
     *proto.mutable_albedo() = albedo.ToProto();
     *proto.mutable_normal() = normal.ToProto();
+    *proto.mutable_metallic() = metallic.ToProto();
     *proto.mutable_roughness() = roughness.ToProto();
 
     SaveMaterialProto(proto, temporary, table);

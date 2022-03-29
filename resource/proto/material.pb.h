@@ -183,7 +183,8 @@ class MaterialProto PROTOBUF_FINAL :
     kNameFieldNumber = 2,
     kAlbedoFieldNumber = 3,
     kNormalFieldNumber = 4,
-    kRoughnessFieldNumber = 5,
+    kMetallicFieldNumber = 5,
+    kRoughnessFieldNumber = 6,
     kIdFieldNumber = 1,
   };
   // string name = 2;
@@ -247,7 +248,25 @@ class MaterialProto PROTOBUF_FINAL :
       ::e8::TextureProto* normal);
   ::e8::TextureProto* unsafe_arena_release_normal();
 
-  // .e8.TextureProto roughness = 5;
+  // .e8.TextureProto metallic = 5;
+  bool has_metallic() const;
+  private:
+  bool _internal_has_metallic() const;
+  public:
+  void clear_metallic();
+  const ::e8::TextureProto& metallic() const;
+  ::e8::TextureProto* release_metallic();
+  ::e8::TextureProto* mutable_metallic();
+  void set_allocated_metallic(::e8::TextureProto* metallic);
+  private:
+  const ::e8::TextureProto& _internal_metallic() const;
+  ::e8::TextureProto* _internal_mutable_metallic();
+  public:
+  void unsafe_arena_set_allocated_metallic(
+      ::e8::TextureProto* metallic);
+  ::e8::TextureProto* unsafe_arena_release_metallic();
+
+  // .e8.TextureProto roughness = 6;
   bool has_roughness() const;
   private:
   bool _internal_has_roughness() const;
@@ -284,6 +303,7 @@ class MaterialProto PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
   ::e8::TextureProto* albedo_;
   ::e8::TextureProto* normal_;
+  ::e8::TextureProto* metallic_;
   ::e8::TextureProto* roughness_;
   ::PROTOBUF_NAMESPACE_ID::int64 id_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -551,7 +571,82 @@ inline void MaterialProto::set_allocated_normal(::e8::TextureProto* normal) {
   // @@protoc_insertion_point(field_set_allocated:e8.MaterialProto.normal)
 }
 
-// .e8.TextureProto roughness = 5;
+// .e8.TextureProto metallic = 5;
+inline bool MaterialProto::_internal_has_metallic() const {
+  return this != internal_default_instance() && metallic_ != nullptr;
+}
+inline bool MaterialProto::has_metallic() const {
+  return _internal_has_metallic();
+}
+inline const ::e8::TextureProto& MaterialProto::_internal_metallic() const {
+  const ::e8::TextureProto* p = metallic_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::e8::TextureProto*>(
+      &::e8::_TextureProto_default_instance_);
+}
+inline const ::e8::TextureProto& MaterialProto::metallic() const {
+  // @@protoc_insertion_point(field_get:e8.MaterialProto.metallic)
+  return _internal_metallic();
+}
+inline void MaterialProto::unsafe_arena_set_allocated_metallic(
+    ::e8::TextureProto* metallic) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(metallic_);
+  }
+  metallic_ = metallic;
+  if (metallic) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.MaterialProto.metallic)
+}
+inline ::e8::TextureProto* MaterialProto::release_metallic() {
+  auto temp = unsafe_arena_release_metallic();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::e8::TextureProto* MaterialProto::unsafe_arena_release_metallic() {
+  // @@protoc_insertion_point(field_release:e8.MaterialProto.metallic)
+  
+  ::e8::TextureProto* temp = metallic_;
+  metallic_ = nullptr;
+  return temp;
+}
+inline ::e8::TextureProto* MaterialProto::_internal_mutable_metallic() {
+  
+  if (metallic_ == nullptr) {
+    auto* p = CreateMaybeMessage<::e8::TextureProto>(GetArena());
+    metallic_ = p;
+  }
+  return metallic_;
+}
+inline ::e8::TextureProto* MaterialProto::mutable_metallic() {
+  // @@protoc_insertion_point(field_mutable:e8.MaterialProto.metallic)
+  return _internal_mutable_metallic();
+}
+inline void MaterialProto::set_allocated_metallic(::e8::TextureProto* metallic) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(metallic_);
+  }
+  if (metallic) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(metallic)->GetArena();
+    if (message_arena != submessage_arena) {
+      metallic = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, metallic, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  metallic_ = metallic;
+  // @@protoc_insertion_point(field_set_allocated:e8.MaterialProto.metallic)
+}
+
+// .e8.TextureProto roughness = 6;
 inline bool MaterialProto::_internal_has_roughness() const {
   return this != internal_default_instance() && roughness_ != nullptr;
 }

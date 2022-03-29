@@ -50,6 +50,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_material_2eproto::offsets[] PR
   PROTOBUF_FIELD_OFFSET(::e8::MaterialProto, name_),
   PROTOBUF_FIELD_OFFSET(::e8::MaterialProto, albedo_),
   PROTOBUF_FIELD_OFFSET(::e8::MaterialProto, normal_),
+  PROTOBUF_FIELD_OFFSET(::e8::MaterialProto, metallic_),
   PROTOBUF_FIELD_OFFSET(::e8::MaterialProto, roughness_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -61,11 +62,12 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_material_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\016material.proto\022\002e8\032\rtexture.proto\"\222\001\n\r"
+  "\n\016material.proto\022\002e8\032\rtexture.proto\"\266\001\n\r"
   "MaterialProto\022\n\n\002id\030\001 \001(\003\022\014\n\004name\030\002 \001(\t\022"
   " \n\006albedo\030\003 \001(\0132\020.e8.TextureProto\022 \n\006nor"
-  "mal\030\004 \001(\0132\020.e8.TextureProto\022#\n\troughness"
-  "\030\005 \001(\0132\020.e8.TextureProtob\006proto3"
+  "mal\030\004 \001(\0132\020.e8.TextureProto\022\"\n\010metallic\030"
+  "\005 \001(\0132\020.e8.TextureProto\022#\n\troughness\030\006 \001"
+  "(\0132\020.e8.TextureProtob\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_material_2eproto_deps[1] = {
   &::descriptor_table_texture_2eproto,
@@ -75,7 +77,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_mat
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_material_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_material_2eproto = {
-  false, false, descriptor_table_protodef_material_2eproto, "material.proto", 192,
+  false, false, descriptor_table_protodef_material_2eproto, "material.proto", 228,
   &descriptor_table_material_2eproto_once, descriptor_table_material_2eproto_sccs, descriptor_table_material_2eproto_deps, 1, 1,
   schemas, file_default_instances, TableStruct_material_2eproto::offsets,
   file_level_metadata_material_2eproto, 1, file_level_enum_descriptors_material_2eproto, file_level_service_descriptors_material_2eproto,
@@ -92,6 +94,8 @@ void MaterialProto::InitAsDefaultInstance() {
       ::e8::TextureProto::internal_default_instance());
   ::e8::_MaterialProto_default_instance_._instance.get_mutable()->normal_ = const_cast< ::e8::TextureProto*>(
       ::e8::TextureProto::internal_default_instance());
+  ::e8::_MaterialProto_default_instance_._instance.get_mutable()->metallic_ = const_cast< ::e8::TextureProto*>(
+      ::e8::TextureProto::internal_default_instance());
   ::e8::_MaterialProto_default_instance_._instance.get_mutable()->roughness_ = const_cast< ::e8::TextureProto*>(
       ::e8::TextureProto::internal_default_instance());
 }
@@ -99,6 +103,7 @@ class MaterialProto::_Internal {
  public:
   static const ::e8::TextureProto& albedo(const MaterialProto* msg);
   static const ::e8::TextureProto& normal(const MaterialProto* msg);
+  static const ::e8::TextureProto& metallic(const MaterialProto* msg);
   static const ::e8::TextureProto& roughness(const MaterialProto* msg);
 };
 
@@ -109,6 +114,10 @@ MaterialProto::_Internal::albedo(const MaterialProto* msg) {
 const ::e8::TextureProto&
 MaterialProto::_Internal::normal(const MaterialProto* msg) {
   return *msg->normal_;
+}
+const ::e8::TextureProto&
+MaterialProto::_Internal::metallic(const MaterialProto* msg) {
+  return *msg->metallic_;
 }
 const ::e8::TextureProto&
 MaterialProto::_Internal::roughness(const MaterialProto* msg) {
@@ -125,6 +134,12 @@ void MaterialProto::clear_normal() {
     delete normal_;
   }
   normal_ = nullptr;
+}
+void MaterialProto::clear_metallic() {
+  if (GetArena() == nullptr && metallic_ != nullptr) {
+    delete metallic_;
+  }
+  metallic_ = nullptr;
 }
 void MaterialProto::clear_roughness() {
   if (GetArena() == nullptr && roughness_ != nullptr) {
@@ -156,6 +171,11 @@ MaterialProto::MaterialProto(const MaterialProto& from)
   } else {
     normal_ = nullptr;
   }
+  if (from._internal_has_metallic()) {
+    metallic_ = new ::e8::TextureProto(*from.metallic_);
+  } else {
+    metallic_ = nullptr;
+  }
   if (from._internal_has_roughness()) {
     roughness_ = new ::e8::TextureProto(*from.roughness_);
   } else {
@@ -184,6 +204,7 @@ void MaterialProto::SharedDtor() {
   name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete albedo_;
   if (this != internal_default_instance()) delete normal_;
+  if (this != internal_default_instance()) delete metallic_;
   if (this != internal_default_instance()) delete roughness_;
 }
 
@@ -217,6 +238,10 @@ void MaterialProto::Clear() {
     delete normal_;
   }
   normal_ = nullptr;
+  if (GetArena() == nullptr && metallic_ != nullptr) {
+    delete metallic_;
+  }
+  metallic_ = nullptr;
   if (GetArena() == nullptr && roughness_ != nullptr) {
     delete roughness_;
   }
@@ -263,9 +288,16 @@ const char* MaterialProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // .e8.TextureProto roughness = 5;
+      // .e8.TextureProto metallic = 5;
       case 5:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
+          ptr = ctx->ParseMessage(_internal_mutable_metallic(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .e8.TextureProto roughness = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
           ptr = ctx->ParseMessage(_internal_mutable_roughness(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
@@ -330,12 +362,20 @@ failure:
         4, _Internal::normal(this), target, stream);
   }
 
-  // .e8.TextureProto roughness = 5;
+  // .e8.TextureProto metallic = 5;
+  if (this->has_metallic()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        5, _Internal::metallic(this), target, stream);
+  }
+
+  // .e8.TextureProto roughness = 6;
   if (this->has_roughness()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(
-        5, _Internal::roughness(this), target, stream);
+        6, _Internal::roughness(this), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -375,7 +415,14 @@ size_t MaterialProto::ByteSizeLong() const {
         *normal_);
   }
 
-  // .e8.TextureProto roughness = 5;
+  // .e8.TextureProto metallic = 5;
+  if (this->has_metallic()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *metallic_);
+  }
+
+  // .e8.TextureProto roughness = 6;
   if (this->has_roughness()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
@@ -428,6 +475,9 @@ void MaterialProto::MergeFrom(const MaterialProto& from) {
   }
   if (from.has_normal()) {
     _internal_mutable_normal()->::e8::TextureProto::MergeFrom(from._internal_normal());
+  }
+  if (from.has_metallic()) {
+    _internal_mutable_metallic()->::e8::TextureProto::MergeFrom(from._internal_metallic());
   }
   if (from.has_roughness()) {
     _internal_mutable_roughness()->::e8::TextureProto::MergeFrom(from._internal_roughness());

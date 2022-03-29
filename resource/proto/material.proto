@@ -38,6 +38,9 @@ message MaterialProto {
     // The normal map.
     TextureProto normal = 4;
 
+    // The metallic map.
+    TextureProto metallic = 5;
+
     // The roughness map.
-    TextureProto roughness = 5;
+    TextureProto roughness = 6;
 }

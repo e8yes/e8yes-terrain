@@ -74,6 +74,9 @@ struct Material {
     // The normal map.
     StagingImageBuffer normal;
 
+    // The metallic map.
+    StagingImageBuffer metallic;
+
     // The roughness map.
     StagingImageBuffer roughness;
 };
