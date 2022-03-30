@@ -31,11 +31,14 @@ enum RendererType {
     // Depth renderer.
     RT_DEPTH = 2;
 
+    // Light inputs renderer.
+    RT_LIGHT_INPUTS = 3;
+
     // Radiance renderer.
-    RT_RADIANCE = 3;
+    RT_RADIANCE = 4;
 
     // Radiosity renderer.
-    RT_RADIOSITY = 4;
+    RT_RADIOSITY = 5;
 }
 
 /**
@@ -52,6 +55,26 @@ message DepthRendererParameters {
     // using the raw NDC value. When it is set to one, the value is corrected to display the true
     // depth.
     float alpha = 1;
+}
+/**
+ * @brief The LightInputsRendererParameters message Parameters for the light inputs renderer.
+ */
+message LightInputsRendererParameters {
+    /*
+     * @brief the InputType enum All types of light inputs.
+     */
+    enum InputType {
+        INVALID = 0;
+
+        // Normal vector.
+        NORMAL = 1;
+
+        // Roughness factor.
+        ROUGHNESS = 2;
+    }
+
+    // The input selected for visualization.
+    InputType input_to_visualize = 1;
 }
 
 /**
@@ -76,6 +99,7 @@ message RendererConfiguration {
     // Current parameters for each type of renderer.
     SolidColorRendererParameters solid_color_renderer_params = 2;
     DepthRendererParameters depth_renderer_params = 3;
-    RadianceRendererParameters radiance_renderer_params = 4;
-    RadiosityRendererParameters radiosity_renderer_params = 5;
+    LightInputsRendererParameters light_inputs_renderer_params = 4;
+    RadianceRendererParameters radiance_renderer_params = 5;
+    RadiosityRendererParameters radiosity_renderer_params = 6;
 }

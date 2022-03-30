@@ -48,7 +48,7 @@ struct TableStruct_renderer_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[5]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[6]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -59,6 +59,9 @@ namespace e8 {
 class DepthRendererParameters;
 class DepthRendererParametersDefaultTypeInternal;
 extern DepthRendererParametersDefaultTypeInternal _DepthRendererParameters_default_instance_;
+class LightInputsRendererParameters;
+class LightInputsRendererParametersDefaultTypeInternal;
+extern LightInputsRendererParametersDefaultTypeInternal _LightInputsRendererParameters_default_instance_;
 class RadianceRendererParameters;
 class RadianceRendererParametersDefaultTypeInternal;
 extern RadianceRendererParametersDefaultTypeInternal _RadianceRendererParameters_default_instance_;
@@ -74,6 +77,7 @@ extern SolidColorRendererParametersDefaultTypeInternal _SolidColorRendererParame
 }  // namespace e8
 PROTOBUF_NAMESPACE_OPEN
 template<> ::e8::DepthRendererParameters* Arena::CreateMaybeMessage<::e8::DepthRendererParameters>(Arena*);
+template<> ::e8::LightInputsRendererParameters* Arena::CreateMaybeMessage<::e8::LightInputsRendererParameters>(Arena*);
 template<> ::e8::RadianceRendererParameters* Arena::CreateMaybeMessage<::e8::RadianceRendererParameters>(Arena*);
 template<> ::e8::RadiosityRendererParameters* Arena::CreateMaybeMessage<::e8::RadiosityRendererParameters>(Arena*);
 template<> ::e8::RendererConfiguration* Arena::CreateMaybeMessage<::e8::RendererConfiguration>(Arena*);
@@ -81,12 +85,39 @@ template<> ::e8::SolidColorRendererParameters* Arena::CreateMaybeMessage<::e8::S
 PROTOBUF_NAMESPACE_CLOSE
 namespace e8 {
 
+enum LightInputsRendererParameters_InputType : int {
+  LightInputsRendererParameters_InputType_INVALID = 0,
+  LightInputsRendererParameters_InputType_NORMAL = 1,
+  LightInputsRendererParameters_InputType_ROUGHNESS = 2,
+  LightInputsRendererParameters_InputType_LightInputsRendererParameters_InputType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
+  LightInputsRendererParameters_InputType_LightInputsRendererParameters_InputType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
+};
+bool LightInputsRendererParameters_InputType_IsValid(int value);
+constexpr LightInputsRendererParameters_InputType LightInputsRendererParameters_InputType_InputType_MIN = LightInputsRendererParameters_InputType_INVALID;
+constexpr LightInputsRendererParameters_InputType LightInputsRendererParameters_InputType_InputType_MAX = LightInputsRendererParameters_InputType_ROUGHNESS;
+constexpr int LightInputsRendererParameters_InputType_InputType_ARRAYSIZE = LightInputsRendererParameters_InputType_InputType_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* LightInputsRendererParameters_InputType_descriptor();
+template<typename T>
+inline const std::string& LightInputsRendererParameters_InputType_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, LightInputsRendererParameters_InputType>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function LightInputsRendererParameters_InputType_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    LightInputsRendererParameters_InputType_descriptor(), enum_t_value);
+}
+inline bool LightInputsRendererParameters_InputType_Parse(
+    const std::string& name, LightInputsRendererParameters_InputType* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<LightInputsRendererParameters_InputType>(
+    LightInputsRendererParameters_InputType_descriptor(), name, value);
+}
 enum RendererType : int {
   RT_INVALID = 0,
   RT_SOLID_COLOR = 1,
   RT_DEPTH = 2,
-  RT_RADIANCE = 3,
-  RT_RADIOSITY = 4,
+  RT_LIGHT_INPUTS = 3,
+  RT_RADIANCE = 4,
+  RT_RADIOSITY = 5,
   RendererType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
   RendererType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
 };
@@ -372,6 +403,175 @@ class DepthRendererParameters PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
+class LightInputsRendererParameters PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:e8.LightInputsRendererParameters) */ {
+ public:
+  inline LightInputsRendererParameters() : LightInputsRendererParameters(nullptr) {};
+  virtual ~LightInputsRendererParameters();
+
+  LightInputsRendererParameters(const LightInputsRendererParameters& from);
+  LightInputsRendererParameters(LightInputsRendererParameters&& from) noexcept
+    : LightInputsRendererParameters() {
+    *this = ::std::move(from);
+  }
+
+  inline LightInputsRendererParameters& operator=(const LightInputsRendererParameters& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline LightInputsRendererParameters& operator=(LightInputsRendererParameters&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const LightInputsRendererParameters& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const LightInputsRendererParameters* internal_default_instance() {
+    return reinterpret_cast<const LightInputsRendererParameters*>(
+               &_LightInputsRendererParameters_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  friend void swap(LightInputsRendererParameters& a, LightInputsRendererParameters& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(LightInputsRendererParameters* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(LightInputsRendererParameters* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline LightInputsRendererParameters* New() const final {
+    return CreateMaybeMessage<LightInputsRendererParameters>(nullptr);
+  }
+
+  LightInputsRendererParameters* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<LightInputsRendererParameters>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const LightInputsRendererParameters& from);
+  void MergeFrom(const LightInputsRendererParameters& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(LightInputsRendererParameters* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "e8.LightInputsRendererParameters";
+  }
+  protected:
+  explicit LightInputsRendererParameters(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_renderer_2eproto);
+    return ::descriptor_table_renderer_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  typedef LightInputsRendererParameters_InputType InputType;
+  static constexpr InputType INVALID =
+    LightInputsRendererParameters_InputType_INVALID;
+  static constexpr InputType NORMAL =
+    LightInputsRendererParameters_InputType_NORMAL;
+  static constexpr InputType ROUGHNESS =
+    LightInputsRendererParameters_InputType_ROUGHNESS;
+  static inline bool InputType_IsValid(int value) {
+    return LightInputsRendererParameters_InputType_IsValid(value);
+  }
+  static constexpr InputType InputType_MIN =
+    LightInputsRendererParameters_InputType_InputType_MIN;
+  static constexpr InputType InputType_MAX =
+    LightInputsRendererParameters_InputType_InputType_MAX;
+  static constexpr int InputType_ARRAYSIZE =
+    LightInputsRendererParameters_InputType_InputType_ARRAYSIZE;
+  static inline const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor*
+  InputType_descriptor() {
+    return LightInputsRendererParameters_InputType_descriptor();
+  }
+  template<typename T>
+  static inline const std::string& InputType_Name(T enum_t_value) {
+    static_assert(::std::is_same<T, InputType>::value ||
+      ::std::is_integral<T>::value,
+      "Incorrect type passed to function InputType_Name.");
+    return LightInputsRendererParameters_InputType_Name(enum_t_value);
+  }
+  static inline bool InputType_Parse(const std::string& name,
+      InputType* value) {
+    return LightInputsRendererParameters_InputType_Parse(name, value);
+  }
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kInputToVisualizeFieldNumber = 1,
+  };
+  // .e8.LightInputsRendererParameters.InputType input_to_visualize = 1;
+  void clear_input_to_visualize();
+  ::e8::LightInputsRendererParameters_InputType input_to_visualize() const;
+  void set_input_to_visualize(::e8::LightInputsRendererParameters_InputType value);
+  private:
+  ::e8::LightInputsRendererParameters_InputType _internal_input_to_visualize() const;
+  void _internal_set_input_to_visualize(::e8::LightInputsRendererParameters_InputType value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:e8.LightInputsRendererParameters)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  int input_to_visualize_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_renderer_2eproto;
+};
+// -------------------------------------------------------------------
+
 class RadianceRendererParameters PROTOBUF_FINAL :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:e8.RadianceRendererParameters) */ {
  public:
@@ -414,7 +614,7 @@ class RadianceRendererParameters PROTOBUF_FINAL :
                &_RadianceRendererParameters_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    3;
 
   friend void swap(RadianceRendererParameters& a, RadianceRendererParameters& b) {
     a.Swap(&b);
@@ -538,7 +738,7 @@ class RadiosityRendererParameters PROTOBUF_FINAL :
                &_RadiosityRendererParameters_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   friend void swap(RadiosityRendererParameters& a, RadiosityRendererParameters& b) {
     a.Swap(&b);
@@ -662,7 +862,7 @@ class RendererConfiguration PROTOBUF_FINAL :
                &_RendererConfiguration_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   friend void swap(RendererConfiguration& a, RendererConfiguration& b) {
     a.Swap(&b);
@@ -735,8 +935,9 @@ class RendererConfiguration PROTOBUF_FINAL :
   enum : int {
     kSolidColorRendererParamsFieldNumber = 2,
     kDepthRendererParamsFieldNumber = 3,
-    kRadianceRendererParamsFieldNumber = 4,
-    kRadiosityRendererParamsFieldNumber = 5,
+    kLightInputsRendererParamsFieldNumber = 4,
+    kRadianceRendererParamsFieldNumber = 5,
+    kRadiosityRendererParamsFieldNumber = 6,
     kInUseRendererTypeFieldNumber = 1,
   };
   // .e8.SolidColorRendererParameters solid_color_renderer_params = 2;
@@ -775,7 +976,25 @@ class RendererConfiguration PROTOBUF_FINAL :
       ::e8::DepthRendererParameters* depth_renderer_params);
   ::e8::DepthRendererParameters* unsafe_arena_release_depth_renderer_params();
 
-  // .e8.RadianceRendererParameters radiance_renderer_params = 4;
+  // .e8.LightInputsRendererParameters light_inputs_renderer_params = 4;
+  bool has_light_inputs_renderer_params() const;
+  private:
+  bool _internal_has_light_inputs_renderer_params() const;
+  public:
+  void clear_light_inputs_renderer_params();
+  const ::e8::LightInputsRendererParameters& light_inputs_renderer_params() const;
+  ::e8::LightInputsRendererParameters* release_light_inputs_renderer_params();
+  ::e8::LightInputsRendererParameters* mutable_light_inputs_renderer_params();
+  void set_allocated_light_inputs_renderer_params(::e8::LightInputsRendererParameters* light_inputs_renderer_params);
+  private:
+  const ::e8::LightInputsRendererParameters& _internal_light_inputs_renderer_params() const;
+  ::e8::LightInputsRendererParameters* _internal_mutable_light_inputs_renderer_params();
+  public:
+  void unsafe_arena_set_allocated_light_inputs_renderer_params(
+      ::e8::LightInputsRendererParameters* light_inputs_renderer_params);
+  ::e8::LightInputsRendererParameters* unsafe_arena_release_light_inputs_renderer_params();
+
+  // .e8.RadianceRendererParameters radiance_renderer_params = 5;
   bool has_radiance_renderer_params() const;
   private:
   bool _internal_has_radiance_renderer_params() const;
@@ -793,7 +1012,7 @@ class RendererConfiguration PROTOBUF_FINAL :
       ::e8::RadianceRendererParameters* radiance_renderer_params);
   ::e8::RadianceRendererParameters* unsafe_arena_release_radiance_renderer_params();
 
-  // .e8.RadiosityRendererParameters radiosity_renderer_params = 5;
+  // .e8.RadiosityRendererParameters radiosity_renderer_params = 6;
   bool has_radiosity_renderer_params() const;
   private:
   bool _internal_has_radiosity_renderer_params() const;
@@ -829,6 +1048,7 @@ class RendererConfiguration PROTOBUF_FINAL :
   typedef void DestructorSkippable_;
   ::e8::SolidColorRendererParameters* solid_color_renderer_params_;
   ::e8::DepthRendererParameters* depth_renderer_params_;
+  ::e8::LightInputsRendererParameters* light_inputs_renderer_params_;
   ::e8::RadianceRendererParameters* radiance_renderer_params_;
   ::e8::RadiosityRendererParameters* radiosity_renderer_params_;
   int in_use_renderer_type_;
@@ -868,6 +1088,30 @@ inline void DepthRendererParameters::_internal_set_alpha(float value) {
 inline void DepthRendererParameters::set_alpha(float value) {
   _internal_set_alpha(value);
   // @@protoc_insertion_point(field_set:e8.DepthRendererParameters.alpha)
+}
+
+// -------------------------------------------------------------------
+
+// LightInputsRendererParameters
+
+// .e8.LightInputsRendererParameters.InputType input_to_visualize = 1;
+inline void LightInputsRendererParameters::clear_input_to_visualize() {
+  input_to_visualize_ = 0;
+}
+inline ::e8::LightInputsRendererParameters_InputType LightInputsRendererParameters::_internal_input_to_visualize() const {
+  return static_cast< ::e8::LightInputsRendererParameters_InputType >(input_to_visualize_);
+}
+inline ::e8::LightInputsRendererParameters_InputType LightInputsRendererParameters::input_to_visualize() const {
+  // @@protoc_insertion_point(field_get:e8.LightInputsRendererParameters.input_to_visualize)
+  return _internal_input_to_visualize();
+}
+inline void LightInputsRendererParameters::_internal_set_input_to_visualize(::e8::LightInputsRendererParameters_InputType value) {
+  
+  input_to_visualize_ = value;
+}
+inline void LightInputsRendererParameters::set_input_to_visualize(::e8::LightInputsRendererParameters_InputType value) {
+  _internal_set_input_to_visualize(value);
+  // @@protoc_insertion_point(field_set:e8.LightInputsRendererParameters.input_to_visualize)
 }
 
 // -------------------------------------------------------------------
@@ -1064,7 +1308,88 @@ inline void RendererConfiguration::set_allocated_depth_renderer_params(::e8::Dep
   // @@protoc_insertion_point(field_set_allocated:e8.RendererConfiguration.depth_renderer_params)
 }
 
-// .e8.RadianceRendererParameters radiance_renderer_params = 4;
+// .e8.LightInputsRendererParameters light_inputs_renderer_params = 4;
+inline bool RendererConfiguration::_internal_has_light_inputs_renderer_params() const {
+  return this != internal_default_instance() && light_inputs_renderer_params_ != nullptr;
+}
+inline bool RendererConfiguration::has_light_inputs_renderer_params() const {
+  return _internal_has_light_inputs_renderer_params();
+}
+inline void RendererConfiguration::clear_light_inputs_renderer_params() {
+  if (GetArena() == nullptr && light_inputs_renderer_params_ != nullptr) {
+    delete light_inputs_renderer_params_;
+  }
+  light_inputs_renderer_params_ = nullptr;
+}
+inline const ::e8::LightInputsRendererParameters& RendererConfiguration::_internal_light_inputs_renderer_params() const {
+  const ::e8::LightInputsRendererParameters* p = light_inputs_renderer_params_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::e8::LightInputsRendererParameters*>(
+      &::e8::_LightInputsRendererParameters_default_instance_);
+}
+inline const ::e8::LightInputsRendererParameters& RendererConfiguration::light_inputs_renderer_params() const {
+  // @@protoc_insertion_point(field_get:e8.RendererConfiguration.light_inputs_renderer_params)
+  return _internal_light_inputs_renderer_params();
+}
+inline void RendererConfiguration::unsafe_arena_set_allocated_light_inputs_renderer_params(
+    ::e8::LightInputsRendererParameters* light_inputs_renderer_params) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(light_inputs_renderer_params_);
+  }
+  light_inputs_renderer_params_ = light_inputs_renderer_params;
+  if (light_inputs_renderer_params) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.RendererConfiguration.light_inputs_renderer_params)
+}
+inline ::e8::LightInputsRendererParameters* RendererConfiguration::release_light_inputs_renderer_params() {
+  auto temp = unsafe_arena_release_light_inputs_renderer_params();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::e8::LightInputsRendererParameters* RendererConfiguration::unsafe_arena_release_light_inputs_renderer_params() {
+  // @@protoc_insertion_point(field_release:e8.RendererConfiguration.light_inputs_renderer_params)
+  
+  ::e8::LightInputsRendererParameters* temp = light_inputs_renderer_params_;
+  light_inputs_renderer_params_ = nullptr;
+  return temp;
+}
+inline ::e8::LightInputsRendererParameters* RendererConfiguration::_internal_mutable_light_inputs_renderer_params() {
+  
+  if (light_inputs_renderer_params_ == nullptr) {
+    auto* p = CreateMaybeMessage<::e8::LightInputsRendererParameters>(GetArena());
+    light_inputs_renderer_params_ = p;
+  }
+  return light_inputs_renderer_params_;
+}
+inline ::e8::LightInputsRendererParameters* RendererConfiguration::mutable_light_inputs_renderer_params() {
+  // @@protoc_insertion_point(field_mutable:e8.RendererConfiguration.light_inputs_renderer_params)
+  return _internal_mutable_light_inputs_renderer_params();
+}
+inline void RendererConfiguration::set_allocated_light_inputs_renderer_params(::e8::LightInputsRendererParameters* light_inputs_renderer_params) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete light_inputs_renderer_params_;
+  }
+  if (light_inputs_renderer_params) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(light_inputs_renderer_params);
+    if (message_arena != submessage_arena) {
+      light_inputs_renderer_params = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, light_inputs_renderer_params, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  light_inputs_renderer_params_ = light_inputs_renderer_params;
+  // @@protoc_insertion_point(field_set_allocated:e8.RendererConfiguration.light_inputs_renderer_params)
+}
+
+// .e8.RadianceRendererParameters radiance_renderer_params = 5;
 inline bool RendererConfiguration::_internal_has_radiance_renderer_params() const {
   return this != internal_default_instance() && radiance_renderer_params_ != nullptr;
 }
@@ -1145,7 +1470,7 @@ inline void RendererConfiguration::set_allocated_radiance_renderer_params(::e8::
   // @@protoc_insertion_point(field_set_allocated:e8.RendererConfiguration.radiance_renderer_params)
 }
 
-// .e8.RadiosityRendererParameters radiosity_renderer_params = 5;
+// .e8.RadiosityRendererParameters radiosity_renderer_params = 6;
 inline bool RendererConfiguration::_internal_has_radiosity_renderer_params() const {
   return this != internal_default_instance() && radiosity_renderer_params_ != nullptr;
 }
@@ -1237,6 +1562,8 @@ inline void RendererConfiguration::set_allocated_radiosity_renderer_params(::e8:
 
 // -------------------------------------------------------------------
 
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 
@@ -1244,6 +1571,11 @@ inline void RendererConfiguration::set_allocated_radiosity_renderer_params(::e8:
 
 PROTOBUF_NAMESPACE_OPEN
 
+template <> struct is_proto_enum< ::e8::LightInputsRendererParameters_InputType> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::e8::LightInputsRendererParameters_InputType>() {
+  return ::e8::LightInputsRendererParameters_InputType_descriptor();
+}
 template <> struct is_proto_enum< ::e8::RendererType> : ::std::true_type {};
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::e8::RendererType>() {

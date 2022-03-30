@@ -196,6 +196,8 @@ std::unique_ptr<RendererConfiguration> DefaultRendererConfiguration() {
     auto config = std::make_unique<RendererConfiguration>();
     config->set_in_use_renderer_type(RendererType::RT_SOLID_COLOR);
     config->mutable_depth_renderer_params()->set_alpha(1.0f);
+    config->mutable_light_inputs_renderer_params()->set_input_to_visualize(
+        LightInputsRendererParameters::NORMAL);
     return config;
 }
 
