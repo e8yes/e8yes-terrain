@@ -76,7 +76,7 @@ class ResourceAccessor {
      * @brief LoadGeometry Loads an existing geometry pointed by the specifed ID. If the load fails,
      * this function will also fail.
      */
-    std::shared_ptr<Geometry> LoadGeometry(GeometryId const &id);
+    Geometry *LoadGeometry(GeometryId const &id);
 
     /**
      * @brief RemoveGeometry Removes the geometry pointed to by the ID. If such geometry doesn't
@@ -97,7 +97,7 @@ class ResourceAccessor {
      * @brief LoadMaterial Loads an existing material pointed by the specifed ID. If the load fails,
      * this function will also fail.
      */
-    std::shared_ptr<Material> LoadMaterial(MaterialId const &id);
+    Material *LoadMaterial(MaterialId const &id);
 
     /**
      * @brief RemoveGeometry Removes the material pointed to by the ID. If such material doesn't
@@ -109,7 +109,7 @@ class ResourceAccessor {
      * @brief LoadLightMap Loads an existing light map pointed by the specifed ID. If the load
      * fails, this function will also fail.
      */
-    std::shared_ptr<LightMap> LoadLightMap(LightMapId const &id);
+    LightMap *LoadLightMap(LightMapId const &id);
 
     /**
      * @brief RemoveLightMap Removes the light map pointed to by the ID. If such light map doesn't

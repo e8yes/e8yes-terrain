@@ -28,7 +28,7 @@ namespace e8 {
 StagingBuffer::StagingBuffer()
     : buffer(VK_NULL_HANDLE), allocation(VK_NULL_HANDLE), context(nullptr) {}
 
-StagingBuffer::StagingBuffer(StagingBuffer &&other) { *this = std::move(other); }
+StagingBuffer::StagingBuffer(StagingBuffer &&other) : StagingBuffer() { *this = std::move(other); }
 
 StagingBuffer::~StagingBuffer() { this->Free(); }
 

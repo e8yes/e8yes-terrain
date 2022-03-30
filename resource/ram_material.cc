@@ -16,7 +16,6 @@
  */
 
 #include <boost/log/trivial.hpp>
-#include <memory>
 
 #include "common/cache.h"
 #include "common/device.h"
@@ -32,11 +31,9 @@ uint64_t ResourceSize(MaterialId const &material_id, ResourceTable const &table)
 }
 
 void LoadMaterial(MaterialId const &material_id, ResourceTable const &table, VulkanContext *context,
-                  std::shared_ptr<Material> *material) {
+                  Material *material) {
     BOOST_LOG_TRIVIAL(info) << "LoadMaterial(): ID=[" << material_id << "].";
-
-    *material = std::make_shared<Material>();
-    (*material)->FromDisk(material_id, table, context);
+    material->FromDisk(material_id, table, context);
 }
 
 } // namespace
@@ -45,16 +42,14 @@ MaterialRamTransfer::MaterialRamTransfer(MemoryUsageTracker *tracker) : cache_(t
 
 MaterialRamTransfer::~MaterialRamTransfer() {}
 
-std::shared_ptr<Material> MaterialRamTransfer::Load(MaterialId const &id,
-                                                    ResourceTable const &resource_table,
-                                                    VulkanContext *context) {
-    std::shared_ptr<Material> *upload_result = cache_.Upload(
+Material *MaterialRamTransfer::Load(MaterialId const &id, ResourceTable const &resource_table,
+                                    VulkanContext *context) {
+    Material *upload_result = cache_.Upload(
         id, /*override_old_upload=*/false, /*object_size_fn=*/
         [&resource_table](MaterialId id) { return ResourceSize(id, resource_table); },
         /*upload_fn=*/
         [context, &resource_table](MaterialId id, uint64_t /*old_object_size*/,
-                                   uint64_t /*new_object_size*/,
-                                   std::shared_ptr<Material> *material) {
+                                   uint64_t /*new_object_size*/, Material *material) {
             LoadMaterial(id, resource_table, context, material);
         });
 
@@ -62,7 +57,7 @@ std::shared_ptr<Material> MaterialRamTransfer::Load(MaterialId const &id,
         return nullptr;
     }
 
-    return *upload_result;
+    return upload_result;
 }
 
 } // namespace e8

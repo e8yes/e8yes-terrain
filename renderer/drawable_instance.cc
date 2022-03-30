@@ -15,7 +15,6 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <memory>
 #include <vector>
 
 #include "common/tensor.h"
@@ -61,16 +60,16 @@ std::vector<DrawableInstance> ToDrawables(std::vector<SceneEntity const *> const
         DrawableInstance drawable;
         drawable.transform = &scene_entity->transform;
 
-        drawable.geometry = resource_accessor->LoadGeometry(lod->geometry_id()).get();
+        drawable.geometry = resource_accessor->LoadGeometry(lod->geometry_id());
 
         if (load_material && lod->material_id() != kNullUuid) {
-            drawable.material = resource_accessor->LoadMaterial(lod->material_id()).get();
+            drawable.material = resource_accessor->LoadMaterial(lod->material_id());
         } else {
             drawable.material = nullptr;
         }
 
         if (load_light_map && lod->light_map_id() != kNullUuid) {
-            drawable.light_map = resource_accessor->LoadLightMap(lod->light_map_id()).get();
+            drawable.light_map = resource_accessor->LoadLightMap(lod->light_map_id());
         } else {
             drawable.light_map = nullptr;
         }

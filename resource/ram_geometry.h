@@ -18,8 +18,6 @@
 #ifndef ISLANDS_RESOURCE_RAM_GEOMETRY_H
 #define ISLANDS_RESOURCE_RAM_GEOMETRY_H
 
-#include <memory>
-
 #include "common/cache.h"
 #include "common/device.h"
 #include "resource/geometry.h"
@@ -43,11 +41,11 @@ class GeometryRamTransfer {
      * @brief Load Loads a geometry pointed to by its ID and metadata in the resource table from
      * disk if it hasn't been in the cache.
      */
-    std::shared_ptr<Geometry> Load(GeometryId const &id, ResourceTable const &resource_table,
-                                   VulkanContext *context);
+    Geometry *Load(GeometryId const &id, ResourceTable const &resource_table,
+                   VulkanContext *context);
 
   private:
-    DeviceCache<GeometryId, std::shared_ptr<Geometry>> cache_;
+    DeviceCache<GeometryId, Geometry> cache_;
 };
 
 } // namespace e8

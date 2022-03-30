@@ -34,11 +34,13 @@ std::chrono::nanoseconds const kUploadTimeout = std::chrono::seconds(10);
 VramTransfer::GpuBuffer::GpuBuffer()
     : buffer(VK_NULL_HANDLE), allocation(VK_NULL_HANDLE), context(nullptr) {}
 
-VramTransfer::GpuBuffer::GpuBuffer(GpuBuffer &&other) { *this = std::move(other); }
+VramTransfer::GpuBuffer::GpuBuffer(GpuBuffer &&other) : GpuBuffer() { *this = std::move(other); }
 
 VramTransfer::GpuBuffer::~GpuBuffer() { this->Free(); }
 
 VramTransfer::GpuBuffer &VramTransfer::GpuBuffer::operator=(GpuBuffer &&other) {
+    this->Free();
+
     buffer = other.buffer;
     allocation = other.allocation;
     context = other.context;
@@ -80,11 +82,15 @@ bool VramTransfer::GpuBuffer::Valid() const { return buffer != VK_NULL_HANDLE; }
 VramTransfer::GpuTexture::GpuTexture()
     : image(VK_NULL_HANDLE), allocation(VK_NULL_HANDLE), view(VK_NULL_HANDLE), context(nullptr) {}
 
-VramTransfer::GpuTexture::GpuTexture(GpuTexture &&other) { *this = std::move(other); }
+VramTransfer::GpuTexture::GpuTexture(GpuTexture &&other) : GpuTexture() {
+    *this = std::move(other);
+}
 
 VramTransfer::GpuTexture::~GpuTexture() { this->Free(); }
 
 VramTransfer::GpuTexture &VramTransfer::GpuTexture::operator=(VramTransfer::GpuTexture &&other) {
+    this->Free();
+
     image = other.image;
     allocation = other.allocation;
     view = other.view;

@@ -18,8 +18,6 @@
 #ifndef ISLANDS_RESOURCE_RAM_MATERIAL_H
 #define ISLANDS_RESOURCE_RAM_MATERIAL_H
 
-#include <memory>
-
 #include "common/cache.h"
 #include "common/device.h"
 #include "resource/material.h"
@@ -43,11 +41,11 @@ class MaterialRamTransfer {
      * @brief Load Loads a material from disk, pointed to by its ID and its metadata in the resource
      * table, if it hasn't been in the cache.
      */
-    std::shared_ptr<Material> Load(MaterialId const &id, ResourceTable const &resource_table,
-                                   VulkanContext *context);
+    Material *Load(MaterialId const &id, ResourceTable const &resource_table,
+                   VulkanContext *context);
 
   private:
-    DeviceCache<MaterialId, std::shared_ptr<Material>> cache_;
+    DeviceCache<MaterialId, Material> cache_;
 };
 
 } // namespace e8

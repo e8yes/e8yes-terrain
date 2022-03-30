@@ -71,7 +71,7 @@ void ResourceAccessor::AddGeometry(GeometryProto const &proto, bool temporary) {
     SaveGeometryProto(proto, temporary, transient_table_.get());
 }
 
-std::shared_ptr<Geometry> ResourceAccessor::LoadGeometry(GeometryId const &id) {
+Geometry *ResourceAccessor::LoadGeometry(GeometryId const &id) {
     return geometry_ram_transfer_->Load(id, *transient_table_, device_);
 }
 
@@ -83,7 +83,7 @@ void ResourceAccessor::AddMaterial(MaterialProto const &proto, bool temporary) {
     SaveMaterialProto(proto, temporary, transient_table_.get());
 }
 
-std::shared_ptr<Material> ResourceAccessor::LoadMaterial(MaterialId const &id) {
+Material *ResourceAccessor::LoadMaterial(MaterialId const &id) {
     return material_ram_transfer_->Load(id, *transient_table_, device_);
 }
 
@@ -91,7 +91,7 @@ void ResourceAccessor::RemoveMaterial(MaterialId const &id) {
     transient_table_->mutable_materials()->erase(id);
 }
 
-std::shared_ptr<LightMap> ResourceAccessor::LoadLightMap(LightMapId const &id) {
+LightMap *ResourceAccessor::LoadLightMap(LightMapId const &id) {
     return light_map_ram_transfer_->Load(id, *transient_table_, device_);
 }
 

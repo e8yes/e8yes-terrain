@@ -18,8 +18,6 @@
 #ifndef ISLANDS_RESOURCE_RAM_LIGHT_MAP_H
 #define ISLANDS_RESOURCE_RAM_LIGHT_MAP_H
 
-#include <memory>
-
 #include "common/cache.h"
 #include "common/device.h"
 #include "resource/light_map.h"
@@ -43,11 +41,11 @@ class LightMapRamTransfer {
      * @brief Load Loads a light map from disk, pointed to by its ID and its metadata in the
      * resource table, if it hasn't been in the cache.
      */
-    std::shared_ptr<LightMap> Load(LightMapId const &id, ResourceTable const &resource_table,
-                                   VulkanContext *context);
+    LightMap *Load(LightMapId const &id, ResourceTable const &resource_table,
+                   VulkanContext *context);
 
   private:
-    DeviceCache<LightMapId, std::shared_ptr<LightMap>> cache_;
+    DeviceCache<LightMapId, LightMap> cache_;
 };
 
 } // namespace e8
