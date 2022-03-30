@@ -23,7 +23,7 @@
 
 #include "common/device.h"
 #include "resource/buffer.h"
-#include "resource/buffer_image.h"
+#include "resource/buffer_texture.h"
 #include "resource/common.h"
 #include "resource/proto/texture.pb.h"
 #include "third_party/stb_image/stb_image.h"
@@ -83,11 +83,11 @@ void *LoadTexture(TextureProto const &texture_proto) {
 
 } // namespace
 
-StagingImageBuffer::StagingImageBuffer() : width(0), height(0), channel_count(0), channel_size(0) {}
+StagingTextureBuffer::StagingTextureBuffer() : width(0), height(0), channel_count(0), channel_size(0) {}
 
-StagingImageBuffer::~StagingImageBuffer() {}
+StagingTextureBuffer::~StagingTextureBuffer() {}
 
-void StagingImageBuffer::CreateFromTextureProto(TextureProto const &texture_proto,
+void StagingTextureBuffer::CreateFromTextureProto(TextureProto const &texture_proto,
                                                 VulkanContext *context) {
     void *decoded = LoadTexture(texture_proto);
     if (decoded == nullptr) {
@@ -109,7 +109,7 @@ void StagingImageBuffer::CreateFromTextureProto(TextureProto const &texture_prot
     stbi_image_free(decoded);
 }
 
-TextureProto StagingImageBuffer::ToProto() const {
+TextureProto StagingTextureBuffer::ToProto() const {
     TextureProto proto;
 
     if (!this->Valid()) {
@@ -129,7 +129,8 @@ TextureProto StagingImageBuffer::ToProto() const {
     return proto;
 }
 
-unsigned StagingImageBuffer::ImageSize() const {
+unsigned StagingTextureBuffer::ImageSize() const {
+    // TODO: Update this code after adding GPU encoding support.
     return width * height * channel_count * channel_size;
 }
 

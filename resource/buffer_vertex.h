@@ -88,7 +88,7 @@ class StagingVertexBuffer : public StagingBuffer {
     google::protobuf::RepeatedPtrField<PrimitiveVertexProto> ToProto() const;
 
     /**
-     * @brief BufferSize The size of this vertex buffer, in byte.
+     * @brief BufferSize The size of this vertex buffer, in bytes.
      */
     unsigned BufferSize() const;
 

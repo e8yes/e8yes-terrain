@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RESOURCE_BUFFER_IMAGE_H
-#define ISLANDS_RESOURCE_BUFFER_IMAGE_H
+#ifndef ISLANDS_RESOURCE_BUFFER_TEXTURE_H
+#define ISLANDS_RESOURCE_BUFFER_TEXTURE_H
 
 #include "common/device.h"
 #include "resource/buffer.h"
@@ -25,17 +25,17 @@
 namespace e8 {
 
 /**
- * @brief The StagingImageBuffer class Wraps on a host-only Vulkan image buffer with a simply data
- * conversion layer. The Vulkan image buffer is typically used for storing a texture image.
+ * @brief The StagingTextureBuffer class Wraps on a host-only Vulkan image buffer with a simply data
+ * conversion layer. The Vulkan texture buffer is typically used for storing a texture image.
  */
-class StagingImageBuffer : public StagingBuffer {
+class StagingTextureBuffer : public StagingBuffer {
   public:
-    StagingImageBuffer();
-    StagingImageBuffer(StagingImageBuffer const &) = delete;
-    StagingImageBuffer(StagingImageBuffer &&) = default;
-    ~StagingImageBuffer();
+    StagingTextureBuffer();
+    StagingTextureBuffer(StagingTextureBuffer const &) = delete;
+    StagingTextureBuffer(StagingTextureBuffer &&) = default;
+    ~StagingTextureBuffer();
 
-    StagingImageBuffer &operator=(StagingImageBuffer &&) = default;
+    StagingTextureBuffer &operator=(StagingTextureBuffer &&) = default;
 
     /**
      * @brief CreateFromTextureProto Allocates memory for holding the texture and copies texture
@@ -53,7 +53,7 @@ class StagingImageBuffer : public StagingBuffer {
     TextureProto ToProto() const;
 
     /**
-     * @brief ImageSize The size of the image, in byte.
+     * @brief ImageSize The size of the image, in bytes.
      */
     unsigned ImageSize() const;
 
@@ -76,4 +76,4 @@ class StagingImageBuffer : public StagingBuffer {
 
 } // namespace e8
 
-#endif // ISLANDS_RESOURCE_BUFFER_IMAGE_H
+#endif // ISLANDS_RESOURCE_BUFFER_TEXTURE_H

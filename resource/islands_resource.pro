@@ -19,8 +19,8 @@ INCLUDEPATH += ../
 SOURCES += \
     accessor.cc \
     buffer.cc \
-    buffer_image.cc \
     buffer_index.cc \
+    buffer_texture.cc \
     buffer_vertex.cc \
     common.cc \
     geometry.cc \
@@ -41,8 +41,8 @@ SOURCES += \
 HEADERS += \
     accessor.h \
     buffer.h \
-    buffer_image.h \
     buffer_index.h \
+    buffer_texture.h \
     buffer_vertex.h \
     common.h \
     geometry.h \

@@ -19,7 +19,7 @@
 #define ISLANDS_RESOURCE_LIGHT_MAP_H
 
 #include "common/device.h"
-#include "resource/buffer_image.h"
+#include "resource/buffer_texture.h"
 #include "resource/common.h"
 #include "resource/proto/light_map.pb.h"
 #include "resource/proto/table.pb.h"
@@ -59,7 +59,7 @@ struct LightMap {
     LightMapId id;
 
     // It stores the radiosity map contributed from some or all light bounces.
-    StagingImageBuffer radiosity;
+    StagingTextureBuffer radiosity;
 };
 
 /**

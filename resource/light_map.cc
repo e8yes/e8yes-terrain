@@ -21,7 +21,7 @@
 #include <string>
 
 #include "common/device.h"
-#include "resource/buffer_image.h"
+#include "resource/buffer_texture.h"
 #include "resource/common.h"
 #include "resource/light_map.h"
 #include "resource/proto/light_map.pb.h"

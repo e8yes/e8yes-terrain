@@ -22,7 +22,7 @@
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
-#include "resource/buffer_image.h"
+#include "resource/buffer_texture.h"
 #include "resource/common.h"
 #include "resource/proto/material.pb.h"
 #include "resource/proto/table.pb.h"
@@ -69,16 +69,16 @@ struct Material {
     MaterialName name;
 
     // The albedo map.
-    StagingImageBuffer albedo;
+    StagingTextureBuffer albedo;
 
     // The normal map.
-    StagingImageBuffer normal;
+    StagingTextureBuffer normal;
 
     // The metallic map.
-    StagingImageBuffer metallic;
+    StagingTextureBuffer metallic;
 
     // The roughness map.
-    StagingImageBuffer roughness;
+    StagingTextureBuffer roughness;
 };
 
 /**

@@ -24,7 +24,7 @@
 #include "common/device.h"
 #include "renderer/vram.h"
 #include "renderer/vram_texture.h"
-#include "resource/buffer_image.h"
+#include "resource/buffer_texture.h"
 
 namespace e8 {
 namespace {
@@ -65,7 +65,7 @@ VkFormat SuitableFourChannelsImageFormat(unsigned channel_size) {
     }
 }
 
-VkFormat SuitableImageFormat(StagingImageBuffer const *staging_buffer) {
+VkFormat SuitableImageFormat(StagingTextureBuffer const *staging_buffer) {
     // TODO: handles GPU encodings.
 
     switch (staging_buffer->channel_count) {
@@ -84,7 +84,7 @@ VkFormat SuitableImageFormat(StagingImageBuffer const *staging_buffer) {
     }
 }
 
-void UploadStagingTexture(StagingImageBuffer const *staging_buffer, VulkanContext *context,
+void UploadStagingTexture(StagingTextureBuffer const *staging_buffer, VulkanContext *context,
                           VramTransfer::GpuTexture *gpu_image, VkCommandBuffer cmds) {
     assert(staging_buffer->Valid());
     assert(staging_buffer->context == context);
@@ -154,15 +154,15 @@ void UploadStagingTexture(StagingImageBuffer const *staging_buffer, VulkanContex
                          /*pImageMemoryBarriers=*/&to_shader_readable);
 }
 
-void UploadTexture(StagingImageBuffer const *texture,
-                   DeviceCache<StagingImageBuffer const *, VramTransfer::GpuTexture> *texture_cache,
+void UploadTexture(StagingTextureBuffer const *texture,
+                   DeviceCache<StagingTextureBuffer const *, VramTransfer::GpuTexture> *texture_cache,
                    VulkanContext *context, VkCommandBuffer cmds) {
     texture_cache->Upload(
         texture, /*override_old_upload=*/false,
         /*object_size_fn=*/
-        [](StagingImageBuffer const *staging_buffer) { return staging_buffer->ImageSize(); },
+        [](StagingTextureBuffer const *staging_buffer) { return staging_buffer->ImageSize(); },
         /*upload_fn=*/
-        [context, cmds](StagingImageBuffer const *staging_buffer, uint64_t /*old_object_size*/,
+        [context, cmds](StagingTextureBuffer const *staging_buffer, uint64_t /*old_object_size*/,
                         uint64_t /*new_object_size*/, VramTransfer::GpuTexture *gpu_image) {
             UploadStagingTexture(staging_buffer, context, gpu_image, cmds);
         });
@@ -177,7 +177,7 @@ TextureVramTransfer::~TextureVramTransfer() {}
 
 void TextureVramTransfer::Prepare() { texture_cache_.Reset(); }
 
-void TextureVramTransfer::Upload(std::vector<StagingImageBuffer const *> const &textures) {
+void TextureVramTransfer::Upload(std::vector<StagingTextureBuffer const *> const &textures) {
     VkCommandBuffer cmds = VramTransfer::BeginUpload();
 
     for (auto texture : textures) {
@@ -187,7 +187,7 @@ void TextureVramTransfer::Upload(std::vector<StagingImageBuffer const *> const &
     VramTransfer::EndUpload(cmds);
 }
 
-VramTransfer::GpuTexture *TextureVramTransfer::Find(StagingImageBuffer const *texture) {
+VramTransfer::GpuTexture *TextureVramTransfer::Find(StagingTextureBuffer const *texture) {
     return texture_cache_.Find(texture);
 }
 

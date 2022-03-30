@@ -56,12 +56,12 @@ class StagingIndexBuffer : public StagingBuffer {
     google::protobuf::RepeatedPtrField<PrimitiveIndicesProto> ToProto() const;
 
     /**
-     * @brief IndexElementType
+     * @brief IndexElementType The type of index element used for the vertex referencing.
      */
     VkIndexType IndexElementType() const;
 
     /**
-     * @brief BufferSize
+     * @brief BufferSize he size of this index buffer, in bytes.
      */
     unsigned BufferSize() const;
 

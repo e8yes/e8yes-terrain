@@ -23,7 +23,7 @@
 #include "common/cache.h"
 #include "common/device.h"
 #include "renderer/vram.h"
-#include "resource/buffer_image.h"
+#include "resource/buffer_texture.h"
 
 namespace e8 {
 
@@ -48,16 +48,16 @@ class TextureVramTransfer : public VramTransfer {
      *
      * @param images The images to be uploaded.
      */
-    void Upload(std::vector<StagingImageBuffer const *> const &textures);
+    void Upload(std::vector<StagingTextureBuffer const *> const &textures);
 
     /**
      * @brief Find Returns the uploaded image. If the specified image has not been uploaded prior to
      * this call, this function will fail.
      */
-    GpuTexture *Find(StagingImageBuffer const *texture);
+    GpuTexture *Find(StagingTextureBuffer const *texture);
 
   private:
-    DeviceCache<StagingImageBuffer const *, GpuTexture> texture_cache_;
+    DeviceCache<StagingTextureBuffer const *, GpuTexture> texture_cache_;
 };
 
 } // namespace e8
