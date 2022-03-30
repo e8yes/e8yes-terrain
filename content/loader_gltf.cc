@@ -93,8 +93,9 @@ std::optional<SceneEntity> LoadSceneEntity(tinygltf::Primitive const &primitive,
     }
     resource_accessor->AddGeometry(*geometry_proto, /*temporary=*/false);
 
+    MaterialProto material_proto;
     if (primitive.material >= 0) {
-        MaterialProto material_proto = LoadMaterial(model.materials[primitive.material], model);
+        material_proto = LoadMaterial(model.materials[primitive.material], model);
         resource_accessor->AddMaterial(material_proto, /*temporary=*/false);
     }
 
@@ -105,6 +106,7 @@ std::optional<SceneEntity> LoadSceneEntity(tinygltf::Primitive const &primitive,
     SceneEntityResources::Lod *lod = scene_entity.resources.add_lods();
     lod->set_apply_after_distance(0.0f);
     lod->set_geometry_id(geometry_proto->id());
+    lod->set_material_id(material_proto.id());
 
     SceneEntitySetTransform(transform, &scene_entity);
 
