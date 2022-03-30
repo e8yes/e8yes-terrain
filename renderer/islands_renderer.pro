@@ -32,7 +32,9 @@ SOURCES += \
     renderer.cc \
     renderer_depth.cc \
     renderer_solid_color.cc \
-    vram_geometry.cc
+    vram.cc \
+    vram_geometry.cc \
+    vram_texture.cc
 
 HEADERS += \
     drawable_instance.h \
@@ -50,7 +52,9 @@ HEADERS += \
     renderer.h \
     renderer_depth.h \
     renderer_solid_color.h \
-    vram_geometry.h
+    vram.h \
+    vram_geometry.h \
+    vram_texture.h
 
 # Default rules for deployment.
 unix {

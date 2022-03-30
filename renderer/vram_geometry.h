@@ -18,13 +18,12 @@
 #ifndef ISLANDS_RENDERER_VRAM_GEOMETRY_H
 #define ISLANDS_RENDERER_VRAM_GEOMETRY_H
 
-#include <memory>
 #include <vector>
 #include <vulkan/vulkan.h>
 
+#include "common/cache.h"
 #include "common/device.h"
-#include "renderer/pipeline_output.h"
-#include "renderer/projection.h"
+#include "renderer/vram.h"
 #include "resource/geometry.h"
 
 namespace e8 {
@@ -33,7 +32,7 @@ namespace e8 {
  * @brief The GeometryVramTransfer class It encapsulates an efficient and scalable geometry data
  * transfer from host machine to GPU device via caching. This class isn't thread-safe.
  */
-class GeometryVramTransfer {
+class GeometryVramTransfer : public VramTransfer {
   public:
     /**
      * @brief GeometryVramTransfer Constructs a VRAM transferer.
@@ -44,36 +43,6 @@ class GeometryVramTransfer {
      */
     GeometryVramTransfer(VulkanContext *context);
     ~GeometryVramTransfer();
-
-    /**
-     * @brief The BufferUploadResult struct Contains information of an allocated buffer object.
-     */
-    struct BufferUploadResult {
-        BufferUploadResult();
-        BufferUploadResult(BufferUploadResult const &) = delete;
-        BufferUploadResult(BufferUploadResult &&) = default;
-        ~BufferUploadResult();
-
-        void Allocate(VkBufferUsageFlags usage, unsigned size, VulkanContext *context);
-        void Free();
-
-        /**
-         * @brief Valid Indicates if the buffer is valid.
-         */
-        bool Valid() const;
-
-        // The allocated buffer object.
-        VkBuffer buffer;
-
-        // Information about the buffer allocation.
-        VmaAllocation allocation;
-
-        // The size of the memory region of the buffer object.
-        unsigned size;
-
-        // Contextual Vulkan handles.
-        VulkanContext *context;
-    };
 
     /**
      * @brief The GpuGeometry struct Represents a geometry living on the video memory.
@@ -88,10 +57,10 @@ class GeometryVramTransfer {
         bool Valid() const;
 
         // A valid vertex buffer allocation if not null.
-        BufferUploadResult *vertex_buffer;
+        GpuBuffer *vertex_buffer;
 
         // A valid index buffer allocation if not null.
-        BufferUploadResult *index_buffer;
+        GpuBuffer *index_buffer;
 
         // The integer type each index element uses in the upload.
         VkIndexType index_element_type;
@@ -105,9 +74,10 @@ class GeometryVramTransfer {
 
     /**
      * @brief Upload Transfers the vertex and index data of the specified geometry list to the GPU
-     * device when they has not been there. However, a mutable geometry will always be transferred
-     * regardless of its cache status. A geometry is mutable if its rigidity type is deformable or
-     * tearable. This function blocks until the uploads, if there are any, are complete.
+     * device for those that have not been there. However, a mutable geometry will always be
+     * transferred regardless of its cache status. A geometry is mutable if its rigidity type is
+     * deformable or tearable. This function blocks until the uploads, if there are any, are
+     * complete.
      *
      * @param geometries The geometries to be uploaded.
      */
@@ -120,8 +90,8 @@ class GeometryVramTransfer {
     GpuGeometry Find(Geometry const *geometry);
 
   private:
-    struct GeometryVramTransferImpl;
-    std::unique_ptr<GeometryVramTransferImpl> pimpl_;
+    DeviceCache<Geometry const *, GpuBuffer> vertex_cache_;
+    DeviceCache<Geometry const *, GpuBuffer> index_cache_;
 };
 
 } // namespace e8
