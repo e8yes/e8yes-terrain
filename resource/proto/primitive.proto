@@ -30,9 +30,12 @@ message PrimitiveVertexProto {
     // Defines the 3D normal vector for the vertex position. This array has exactly 3 elements.
     repeated float normal = 2;
 
+    // Defines the 3D tangent vector for the vertex position. This array has exactly 3 elements.
+    repeated float tangent = 3;
+
     // Defines the normalized 2D coordinates of a texture image to make it wrap around the surface
     // surrounding this vertex. This array has exactly 2 elements.
-    repeated float texcoord = 3;
+    repeated float texcoord = 4;
 }
 
 /**

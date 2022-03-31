@@ -95,7 +95,7 @@ google::protobuf::RepeatedField<float> Vec2Element(unsigned char const *attribut
 }
 
 bool HasRequiredVertexAttributes(tinygltf::Primitive const &primitive) {
-    std::vector<std::string> required_attributes{"POSITION", "NORMAL", "TEXCOORD_0"};
+    std::vector<std::string> required_attributes{"POSITION", "NORMAL", "TANGENT", "TEXCOORD_0"};
 
     for (auto const &required_attribute : required_attributes) {
         auto it = primitive.attributes.find(required_attribute);
@@ -197,6 +197,23 @@ std::optional<GeometryProto> LoadGeometry(tinygltf::Primitive const &primitive,
     for (unsigned i = 0; i < normal_count; i++) {
         *geometry_proto.mutable_vertices(i)->mutable_normal() =
             Vec3Element(normal_data.data(), normal_stride, i);
+    }
+
+    // Loads vertex tangent vectors.
+    unsigned tangent_stride;
+    unsigned tangent_count;
+    std::vector<unsigned char> tangent_data =
+        GetVertexBuffer(primitive.attributes.at("TANGENT"), model, &tangent_stride, &tangent_count);
+    if (tangent_count != position_count) {
+        BOOST_LOG_TRIVIAL(warning) << "LoadGeometry(): primitive=[" << name
+                                   << "attribute=[TANGENT] has a different count=[" << tangent_count
+                                   << "] than POSITION=[" << position_count << "].";
+        return std::nullopt;
+    }
+
+    for (unsigned i = 0; i < tangent_count; i++) {
+        *geometry_proto.mutable_vertices(i)->mutable_tangent() =
+            Vec3Element(tangent_data.data(), tangent_stride, i);
     }
 
     // Loads vertex texture coordinates.

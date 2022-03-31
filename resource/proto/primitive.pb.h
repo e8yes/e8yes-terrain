@@ -185,7 +185,8 @@ class PrimitiveVertexProto PROTOBUF_FINAL :
   enum : int {
     kPositionFieldNumber = 1,
     kNormalFieldNumber = 2,
-    kTexcoordFieldNumber = 3,
+    kTangentFieldNumber = 3,
+    kTexcoordFieldNumber = 4,
   };
   // repeated float position = 1;
   int position_size() const;
@@ -231,7 +232,29 @@ class PrimitiveVertexProto PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
       mutable_normal();
 
-  // repeated float texcoord = 3;
+  // repeated float tangent = 3;
+  int tangent_size() const;
+  private:
+  int _internal_tangent_size() const;
+  public:
+  void clear_tangent();
+  private:
+  float _internal_tangent(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      _internal_tangent() const;
+  void _internal_add_tangent(float value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      _internal_mutable_tangent();
+  public:
+  float tangent(int index) const;
+  void set_tangent(int index, float value);
+  void add_tangent(float value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      tangent() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      mutable_tangent();
+
+  // repeated float texcoord = 4;
   int texcoord_size() const;
   private:
   int _internal_texcoord_size() const;
@@ -264,6 +287,8 @@ class PrimitiveVertexProto PROTOBUF_FINAL :
   mutable std::atomic<int> _position_cached_byte_size_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > normal_;
   mutable std::atomic<int> _normal_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > tangent_;
+  mutable std::atomic<int> _tangent_cached_byte_size_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > texcoord_;
   mutable std::atomic<int> _texcoord_cached_byte_size_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -525,7 +550,54 @@ PrimitiveVertexProto::mutable_normal() {
   return _internal_mutable_normal();
 }
 
-// repeated float texcoord = 3;
+// repeated float tangent = 3;
+inline int PrimitiveVertexProto::_internal_tangent_size() const {
+  return tangent_.size();
+}
+inline int PrimitiveVertexProto::tangent_size() const {
+  return _internal_tangent_size();
+}
+inline void PrimitiveVertexProto::clear_tangent() {
+  tangent_.Clear();
+}
+inline float PrimitiveVertexProto::_internal_tangent(int index) const {
+  return tangent_.Get(index);
+}
+inline float PrimitiveVertexProto::tangent(int index) const {
+  // @@protoc_insertion_point(field_get:e8.PrimitiveVertexProto.tangent)
+  return _internal_tangent(index);
+}
+inline void PrimitiveVertexProto::set_tangent(int index, float value) {
+  tangent_.Set(index, value);
+  // @@protoc_insertion_point(field_set:e8.PrimitiveVertexProto.tangent)
+}
+inline void PrimitiveVertexProto::_internal_add_tangent(float value) {
+  tangent_.Add(value);
+}
+inline void PrimitiveVertexProto::add_tangent(float value) {
+  _internal_add_tangent(value);
+  // @@protoc_insertion_point(field_add:e8.PrimitiveVertexProto.tangent)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+PrimitiveVertexProto::_internal_tangent() const {
+  return tangent_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+PrimitiveVertexProto::tangent() const {
+  // @@protoc_insertion_point(field_list:e8.PrimitiveVertexProto.tangent)
+  return _internal_tangent();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+PrimitiveVertexProto::_internal_mutable_tangent() {
+  return &tangent_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+PrimitiveVertexProto::mutable_tangent() {
+  // @@protoc_insertion_point(field_mutable_list:e8.PrimitiveVertexProto.tangent)
+  return _internal_mutable_tangent();
+}
+
+// repeated float texcoord = 4;
 inline int PrimitiveVertexProto::_internal_texcoord_size() const {
   return texcoord_.size();
 }
