@@ -582,6 +582,25 @@ std::unique_ptr<ImageSampler> CreateReadBackSampler(VulkanContext *context) {
     return info;
 }
 
+std::unique_ptr<ImageSampler> CreateTextureSampler(VulkanContext *context) {
+    VkSamplerCreateInfo sampler_info{};
+    sampler_info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    sampler_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    sampler_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    sampler_info.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    sampler_info.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+    sampler_info.compareOp = VK_COMPARE_OP_ALWAYS;
+    sampler_info.magFilter = VK_FILTER_LINEAR;
+    sampler_info.minFilter = VK_FILTER_LINEAR;
+    sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+
+    auto info = std::make_unique<ImageSampler>(context);
+    assert(VK_SUCCESS ==
+           vkCreateSampler(context->device, &sampler_info, /*pAllocator=*/nullptr, &info->sampler));
+
+    return info;
+}
+
 DescriptorSets::DescriptorSets(VulkanContext *context) : context(context) {}
 
 DescriptorSets::~DescriptorSets() {
@@ -631,13 +650,13 @@ void WriteUniformBufferDescriptor(void *data, UniformBuffer const &uniform_buffe
                            /*descriptorCopyCount=*/0, /*pDescriptorCopies=*/nullptr);
 }
 
-void WriteImageDescriptor(VkImageView image_view, VkImageLayout image_layout,
-                          ImageSampler const &image_sampler, VkDescriptorSet descriptor_set,
-                          unsigned binding, VulkanContext *context) {
+void WriteImageDescriptor(VkImageView image_view, ImageSampler const &image_sampler,
+                          VkDescriptorSet descriptor_set, unsigned binding,
+                          VulkanContext *context) {
     VkDescriptorImageInfo image_info{};
     image_info.sampler = image_sampler.sampler;
     image_info.imageView = image_view;
-    image_info.imageLayout = image_layout;
+    image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
     VkWriteDescriptorSet write_descriptor{};
     write_descriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

@@ -34,6 +34,7 @@ constexpr char const *kVertexShaderFilePathDepthMap = "./depth.vert.spv";
 constexpr char const *kVertexShaderFilePathLightInputs = "./light_inputs.vert.spv";
 constexpr char const *kVertexShaderFilePathPostProcessor = "./post_processor.vert.spv";
 constexpr char const *kFragmentShaderFilePathDepthMapVisualizer = "./depth_visualizer.frag.spv";
+constexpr char const *kFragmentShaderFilePathLightInputs = "./light_inputs.frag.spv";
 constexpr char const *kFragmentShaderFilePathPostProcessorEmpty = "./post_processor.frag.spv";
 
 /**
@@ -448,12 +449,20 @@ struct ImageSampler {
 
 /**
  * @brief CreateReadBackSampler Creates an image sampler for the purpose of simply reading back
- * image pixels (no sampling at at).
+ * image pixels (no sampling at all).
  *
  * @param context Contextual Vulkan handles.
- * @return A valid unique pointer to the UniformBuffer structure.
+ * @return A valid unique pointer to the ImageSampler structure.
  */
 std::unique_ptr<ImageSampler> CreateReadBackSampler(VulkanContext *context);
+
+/**
+ * @brief CreateTextureSampler Creates a high quality image sampler for sampling texture images.
+ *
+ * @param context Contextual Vulkan handles.
+ * @return A valid unique pointer to the ImageSampler structure.
+ */
+std::unique_ptr<ImageSampler> CreateTextureSampler(VulkanContext *context);
 
 /**
  * @brief The DescriptorSets struct It contains descriptor set instances of the descriptor set
@@ -510,16 +519,16 @@ void WriteUniformBufferDescriptor(void *data, UniformBuffer const &uniform_buffe
  * @brief WriteImageDescriptor Writes image data (from the device) to the specified combined
  * image-sampler descriptor. The write is synchronous.
  *
- * @param image_view View of the image data.
- * @param image_layout Layout of the image.
+ * @param image_view View of the image data. Note, since image descriptors are always used for image
+ * accessing from a shader, the layout of the image is assumed to be
+ * VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL.
  * @param image_sampler The sampler used for accessing the image content.
  * @param descriptor_set The set the descriptor lives in.
  * @param binding Binding of the descriptor in the set.
  * @param context Contextual Vulkan handles.
  */
-void WriteImageDescriptor(VkImageView image_view, VkImageLayout image_layout,
-                          ImageSampler const &image_sampler, VkDescriptorSet descriptor_set,
-                          unsigned binding, VulkanContext *context);
+void WriteImageDescriptor(VkImageView image_view, ImageSampler const &image_sampler,
+                          VkDescriptorSet descriptor_set, unsigned binding, VulkanContext *context);
 
 } // namespace e8
 
