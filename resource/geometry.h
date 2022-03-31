@@ -67,6 +67,11 @@ struct Geometry {
      */
     void ToDisk(bool temporary, ResourceTable *table) const;
 
+    /**
+     * @brief Valid Checks if the vertex buffer and index buffer are both valid.
+     */
+    bool Valid() const;
+
     // ID of this geometry.
     GeometryId id;
 

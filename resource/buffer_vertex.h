@@ -55,6 +55,9 @@ struct PrimitiveVertex {
     // Defines the 3D normal vector for the vertex position.
     vec3 normal;
 
+    // Defines the 3D tangent vector for the vertex position.
+    vec3 tangent;
+
     // Defines the normalized 2D coordinates of a texture image to make it wrap around the surface
     // surrounding this vertex.
     vec2 tex_coord;

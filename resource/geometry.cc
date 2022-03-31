@@ -83,6 +83,8 @@ void Geometry::ToDisk(bool temporary, ResourceTable *table) const {
     SaveGeometryProto(proto, temporary, table);
 }
 
+bool Geometry::Valid() const { return vertices.Valid() && indices.Valid(); }
+
 void SaveGeometryProto(GeometryProto const &geometry_proto, bool temporary, ResourceTable *table) {
     assert(geometry_proto.id() != kNullUuid);
 
