@@ -23,13 +23,14 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
-#include "common/tensor.h"
 #include "common/device.h"
+#include "common/tensor.h"
 #include "renderer/drawable_instance.h"
 #include "renderer/pipeline_output.h"
 #include "renderer/projection.h"
 #include "renderer/render_pass.h"
 #include "renderer/vram_geometry.h"
+#include "renderer/vram_texture.h"
 
 namespace e8 {
 
@@ -59,7 +60,8 @@ class DepthMapPipeline {
      */
     PipelineOutputInterface *Run(std::vector<DrawableInstance> const &drawables,
                                  ProjectionInterface const &projection,
-                                 GpuBarrier const &prerequisites, GeometryVramTransfer *geo_vram);
+                                 GpuBarrier const &prerequisites, GeometryVramTransfer *geo_vram,
+                                 TextureVramTransfer *tex_vram);
 
   private:
     class DepthMapPipelineImpl;

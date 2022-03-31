@@ -18,6 +18,7 @@
 #include <cassert>
 #include <functional>
 #include <memory>
+#include <unordered_set>
 #include <vector>
 #include <vulkan/vulkan.h>
 
@@ -27,9 +28,120 @@
 #include "renderer/pipeline_output.h"
 #include "renderer/render_pass.h"
 #include "renderer/vram_geometry.h"
+#include "renderer/vram_texture.h"
+#include "resource/buffer_texture.h"
 #include "resource/geometry.h"
 
 namespace e8 {
+namespace {
+
+std::unordered_set<DrawableInstance const *>
+UploadResources(std::vector<DrawableInstance> const &drawables,
+                RenderPassConfiguratorInterface const &configurator, GeometryVramTransfer *geo_vram,
+                TextureVramTransfer *tex_vram) {
+    std::unordered_set<DrawableInstance const *> excluded;
+
+    std::vector<Geometry const *> geometries;
+    std::vector<StagingTextureBuffer const *> textures;
+
+    for (auto const &drawable : drawables) {
+        if (!configurator.IncludeDrawable(drawable)) {
+            excluded.insert(&drawable);
+            continue;
+        }
+
+        if (!drawable.geometry->Valid()) {
+            excluded.insert(&drawable);
+            continue;
+        }
+
+        RenderPassConfiguratorInterface::DrawableTextures staging_textures =
+            configurator.TexturesOf(drawable);
+        if (!staging_textures.Valid()) {
+            excluded.insert(&drawable);
+            continue;
+        }
+
+        geometries.push_back(drawable.geometry);
+        staging_textures.ToVector(&textures);
+    }
+
+    geo_vram->Upload(geometries);
+    tex_vram->Upload(textures);
+
+    return excluded;
+}
+
+} // namespace
+
+RenderPassConfiguratorInterface::DrawableTextures::DrawableTextures() {
+    for (unsigned i = 0; i < kTextureTypeCount; ++i) {
+        staging_textures[i] = nullptr;
+    }
+}
+
+RenderPassConfiguratorInterface::DrawableTextures::~DrawableTextures() {}
+
+bool RenderPassConfiguratorInterface::DrawableTextures::Valid() const {
+    for (unsigned i = 0; i < kTextureTypeCount; ++i) {
+        if (staging_textures[i] != nullptr && !staging_textures[i]->Valid()) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void RenderPassConfiguratorInterface::DrawableTextures::ToVector(
+    std::vector<StagingTextureBuffer const *> *textures) const {
+    assert(this->Valid());
+
+    for (unsigned i = 0; i < kTextureTypeCount; ++i) {
+        if (staging_textures[i] != nullptr) {
+            textures->push_back(staging_textures[i]);
+        }
+    }
+}
+
+RenderPassConfiguratorInterface::DrawableGpuTextures::DrawableGpuTextures(
+    DrawableTextures const &staging, TextureVramTransfer *tex_vram) {
+    assert(staging.Valid());
+
+    for (unsigned i = 0; i < kTextureTypeCount; ++i) {
+        if (staging.staging_textures[i] != nullptr) {
+            gpu_textures[i] = tex_vram->Find(staging.staging_textures[i]);
+        } else {
+            gpu_textures[i] = nullptr;
+        }
+    }
+}
+
+RenderPassConfiguratorInterface::DrawableGpuTextures::~DrawableGpuTextures() {}
+
+bool RenderPassConfiguratorInterface::DrawableGpuTextures::Valid() const {
+    for (unsigned i = 0; i < kTextureTypeCount; ++i) {
+        if (gpu_textures[i] != nullptr && !gpu_textures[i]->Valid()) {
+            return false;
+        }
+    }
+    return true;
+}
+
+RenderPassConfiguratorInterface::RenderPassConfiguratorInterface() {}
+
+RenderPassConfiguratorInterface::~RenderPassConfiguratorInterface() {}
+
+bool RenderPassConfiguratorInterface::IncludeDrawable(DrawableInstance const & /*drawable*/) const {
+    return true;
+}
+
+RenderPassConfiguratorInterface::DrawableTextures
+RenderPassConfiguratorInterface::TexturesOf(DrawableInstance const & /*drawable*/) const {
+    return DrawableTextures();
+}
+
+void RenderPassConfiguratorInterface::SetUniformsFor(DrawableInstance const & /*drawable*/,
+                                                     DrawableGpuTextures const & /*textures*/,
+                                                     VkCommandBuffer /*cmds*/) const {}
 
 VkCommandBuffer StartRenderPass(RenderPass const &render_pass, FrameBuffer const &frame_buffer,
                                 VulkanContext *context) {
@@ -99,27 +211,36 @@ std::unique_ptr<GpuBarrier> FinishRenderPass(VkCommandBuffer cmds, GpuBarrier co
 }
 
 void RenderDrawables(std::vector<DrawableInstance> const &drawables,
-                     GraphicsPipeline const &pipeline, ShaderUniformLayout const &uniform_layout,
-                     SetDrawableUniformsFn const &set_uniforms_fn, GeometryVramTransfer *geo_vram,
+                     GraphicsPipeline const &pipeline,
+                     RenderPassConfiguratorInterface const &configurator,
+                     GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram,
                      VkCommandBuffer cmds) {
-    //
-    std::vector<Geometry const *> geometries(drawables.size());
-    for (unsigned i = 0; i < drawables.size(); ++i) {
-        geometries[i] = drawables[i].geometry;
-    }
+    std::unordered_set<DrawableInstance const *> excluded =
+        UploadResources(drawables, configurator, geo_vram, tex_vram);
 
-    geo_vram->Upload(geometries);
-
-    //
+    // Sends drawable instances through the graphics pipeline.
     vkCmdBindPipeline(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline);
-
     for (auto const &instance : drawables) {
+        if (excluded.find(&instance) != excluded.end()) {
+            continue;
+        }
+
+        // Fetches GPU geometry data.
         GeometryVramTransfer::GpuGeometry gpu_geometry = geo_vram->Find(instance.geometry);
         if (!gpu_geometry.Valid()) {
             continue;
         }
 
-        set_uniforms_fn(instance, uniform_layout, cmds);
+        // Fetches GPU texture data.
+        RenderPassConfiguratorInterface::DrawableTextures staging_textures =
+            configurator.TexturesOf(instance);
+        RenderPassConfiguratorInterface::DrawableGpuTextures textures(staging_textures, tex_vram);
+        if (!textures.Valid()) {
+            continue;
+        }
+
+        // Prepares for the draw call.
+        configurator.SetUniformsFor(instance, textures, cmds);
 
         VkDeviceSize offset = 0;
         vkCmdBindVertexBuffers(cmds, /*firstBinding=*/0, /*bindingCount=*/1,
@@ -128,6 +249,7 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
         vkCmdBindIndexBuffer(cmds, gpu_geometry.index_buffer->buffer, /*offset=*/0,
                              gpu_geometry.index_element_type);
 
+        // Draw call.
         vkCmdDrawIndexed(cmds, instance.geometry->indices.index_count,
                          /*instanceCount=*/1, /*firstIndex=*/0, /*vertexOffset=*/0,
                          /*firstInstance=*/0);

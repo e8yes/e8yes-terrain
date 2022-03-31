@@ -115,9 +115,8 @@ DepthMapVisualizerPipeline::Run(float alpha, std::optional<PerspectiveProjection
                                /*size=*/sizeof(PushConstants), &push_constants);
 
             // Sets the depth map input.
-            WriteImageDescriptor(
-                depth_map.DepthAttachment()->view, depth_map.DepthAttachment()->desc.finalLayout,
-                *pimpl_->depth_map_sampler, per_pass, /*binding=*/0, pimpl_->context);
+            WriteImageDescriptor(depth_map.DepthAttachment()->view, *pimpl_->depth_map_sampler,
+                                 per_pass, /*binding=*/0, pimpl_->context);
 
             vkCmdBindDescriptorSets(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
                                     /*firstSet=*/1,

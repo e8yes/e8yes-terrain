@@ -32,6 +32,7 @@
 #include "renderer/projection.h"
 #include "renderer/render_pass.h"
 #include "renderer/vram_geometry.h"
+#include "renderer/vram_texture.h"
 
 namespace e8 {
 namespace {
@@ -51,13 +52,46 @@ VkPushConstantRange PushConstantLayout() {
 }
 
 std::vector<VkVertexInputAttributeDescription> VertexShaderInputAttributes() {
-    VkVertexInputAttributeDescription position_attribute;
+    VkVertexInputAttributeDescription position_attribute{};
     position_attribute.binding = 0;
     position_attribute.location = 0;
     position_attribute.format = VK_FORMAT_R32G32B32_SFLOAT;
     position_attribute.offset = offsetof(PrimitiveVertex, position);
 
     return std::vector<VkVertexInputAttributeDescription>{position_attribute};
+}
+
+class RenderPassConfigurator : public RenderPassConfiguratorInterface {
+  public:
+    RenderPassConfigurator(ProjectionInterface const &projection,
+                           ShaderUniformLayout const &uniform_layout);
+    ~RenderPassConfigurator();
+
+    void SetUniformsFor(DrawableInstance const &drawable, DrawableGpuTextures const &textures,
+                        VkCommandBuffer cmds) const override;
+
+  private:
+    ProjectionInterface const &projection_;
+    ShaderUniformLayout const &uniform_layout_;
+};
+
+RenderPassConfigurator::RenderPassConfigurator(ProjectionInterface const &projection,
+                                               ShaderUniformLayout const &uniform_layout)
+    : projection_(projection), uniform_layout_(uniform_layout) {}
+
+RenderPassConfigurator::~RenderPassConfigurator() {}
+
+void RenderPassConfigurator::SetUniformsFor(DrawableInstance const &drawable,
+                                            DrawableGpuTextures const & /*textures*/,
+                                            VkCommandBuffer cmds) const {
+    mat44 model_view_proj =
+        projection_.ProjectiveTransform() * projection_.ViewTransform() * (*drawable.transform);
+    PushConstants push_constants(model_view_proj);
+
+    vkCmdPushConstants(cmds, uniform_layout_.layout,
+                       /*stageFlags=*/VK_SHADER_STAGE_VERTEX_BIT,
+                       /*offset=*/0,
+                       /*size=*/sizeof(PushConstants), &push_constants);
 }
 
 } // namespace
@@ -120,24 +154,14 @@ DepthMapPipeline::~DepthMapPipeline() {}
 PipelineOutputInterface *DepthMapPipeline::Run(std::vector<DrawableInstance> const &drawables,
                                                ProjectionInterface const &projection,
                                                GpuBarrier const &prerequisites,
-                                               GeometryVramTransfer *geo_vram) {
+                                               GeometryVramTransfer *geo_vram,
+                                               TextureVramTransfer *tex_vram) {
     VkCommandBuffer cmds = StartRenderPass(pimpl_->output->GetRenderPass(),
                                            *pimpl_->output->GetFrameBuffer(), pimpl_->context);
 
-    RenderDrawables(
-        drawables, pimpl_->GetGraphicsPipeline(), pimpl_->GetUniformLayout(),
-        [&projection](DrawableInstance const &drawable, ShaderUniformLayout const &uniform_layout,
-                      VkCommandBuffer cmds) {
-            mat44 model_view_proj = projection.ProjectiveTransform() * projection.ViewTransform() *
-                                    (*drawable.transform);
-            PushConstants push_constants(model_view_proj);
-
-            vkCmdPushConstants(cmds, uniform_layout.layout,
-                               /*stageFlags=*/VK_SHADER_STAGE_VERTEX_BIT,
-                               /*offset=*/0,
-                               /*size=*/sizeof(PushConstants), &push_constants);
-        },
-        geo_vram, cmds);
+    RenderPassConfigurator configurator(projection, pimpl_->GetUniformLayout());
+    RenderDrawables(drawables, pimpl_->GetGraphicsPipeline(), configurator, geo_vram, tex_vram,
+                    cmds);
 
     pimpl_->output->barrier =
         FinishRenderPass(cmds, prerequisites, pimpl_->output->AcquireFence(), pimpl_->context);
