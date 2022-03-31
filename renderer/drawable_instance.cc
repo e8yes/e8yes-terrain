@@ -45,9 +45,15 @@ SceneEntityResources::Lod const *SelectResourceLod(SceneEntity const &scene_enti
 
 } // namespace
 
+ResourceLoadingOption::ResourceLoadingOption()
+    : load_geometry(false), load_material(false), load_light_map(false),
+      load_indirect_light_map(false) {}
+
+ResourceLoadingOption::~ResourceLoadingOption() {}
+
 std::vector<DrawableInstance> ToDrawables(std::vector<SceneEntity const *> const &scene_entities,
-                                          vec3 const &viewer_location, bool load_material,
-                                          bool load_light_map,
+                                          vec3 const &viewer_location,
+                                          ResourceLoadingOption const &option,
                                           ResourceAccessor *resource_accessor) {
     std::vector<DrawableInstance> instances;
 
@@ -60,18 +66,29 @@ std::vector<DrawableInstance> ToDrawables(std::vector<SceneEntity const *> const
         DrawableInstance drawable;
         drawable.transform = &scene_entity->transform;
 
-        drawable.geometry = resource_accessor->LoadGeometry(lod->geometry_id());
+        if (option.load_geometry && lod->geometry_id() != kNullUuid) {
+            drawable.geometry = resource_accessor->LoadGeometry(lod->geometry_id());
+        } else {
+            drawable.geometry = nullptr;
+        }
 
-        if (load_material && lod->material_id() != kNullUuid) {
+        if (option.load_material && lod->material_id() != kNullUuid) {
             drawable.material = resource_accessor->LoadMaterial(lod->material_id());
         } else {
             drawable.material = nullptr;
         }
 
-        if (load_light_map && lod->light_map_id() != kNullUuid) {
+        if (option.load_light_map && lod->light_map_id() != kNullUuid) {
             drawable.light_map = resource_accessor->LoadLightMap(lod->light_map_id());
         } else {
             drawable.light_map = nullptr;
+        }
+
+        if (option.load_indirect_light_map && lod->indirect_light_map_id() != kNullUuid) {
+            drawable.indirect_light_map =
+                resource_accessor->LoadLightMap(lod->indirect_light_map_id());
+        } else {
+            drawable.indirect_light_map = nullptr;
         }
 
         instances.push_back(drawable);

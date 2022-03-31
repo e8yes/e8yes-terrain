@@ -43,24 +43,51 @@ struct DrawableInstance {
     // Optional. The light map selected from a series of LODs.
     LightMap const *light_map;
 
+    // Optional. The indirect light map selected from a series of LODs.
+    LightMap const *indirect_light_map;
+
     // The homogeneous transformation to be applied to the geometry.
     mat44 const *transform;
 };
 
 /**
- * @brief ToDrawable Selects a suitable resource LODs from each entity and creates a
+ * @brief The ResourceLoadingOption struct Options to supply to the ToDrawables() call.
+ */
+struct ResourceLoadingOption {
+    /**
+     * @brief ResourceLoadingOption All fields are default to false.
+     */
+    ResourceLoadingOption();
+    ~ResourceLoadingOption();
+
+    // Whether to attach geometry resource to the drawables.
+    bool load_geometry;
+
+    // Whether to attach material resource to the drawables.
+    bool load_material;
+
+    // Whether to attach light map resource to the drawables.
+    bool load_light_map;
+
+    // Whether to attach indirect light map resource to the drawables.
+    bool load_indirect_light_map;
+};
+
+/**
+ * @brief ToDrawables Selects a suitable resource LODs from each entity and creates a
  * drawable from the selection, if there is one. Scene entities that don't have a geometry reference
  * are excluded from the result.
  *
  * @param scene_entities The scene entities to create drawables from.
  * @param viewer_location Used for determining the resource LOD.
- * @param load_material Whether to attach material resource to the drawables.
- * @param load_light_map Whether to attach light map resource to the drawables.
+ * @param option Options to specify which resource to load.
+ * @param resource_accessor Proxy to getting the actual resource data.
  * @return An array of drawables with applicable resources.
  */
 std::vector<DrawableInstance> ToDrawables(std::vector<SceneEntity const *> const &scene_entities,
-                                          vec3 const &viewer_location, bool load_material,
-                                          bool load_light_map, ResourceAccessor *resource_accessor);
+                                          vec3 const &viewer_location,
+                                          ResourceLoadingOption const &option,
+                                          ResourceAccessor *resource_accessor);
 
 } // namespace e8
 

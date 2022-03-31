@@ -36,6 +36,7 @@
 #include "renderer/renderer.h"
 #include "renderer/renderer_depth.h"
 #include "renderer/vram_geometry.h"
+#include "renderer/vram_texture.h"
 #include "resource/accessor.h"
 
 namespace e8 {
@@ -52,6 +53,7 @@ class DepthRenderer::DepthRendererImpl {
     DepthMapVisualizerPipeline depth_map_visualizer_pipeline;
 
     GeometryVramTransfer geo_vram;
+    TextureVramTransfer tex_vram;
     RendererConfiguration config;
 };
 
@@ -60,7 +62,7 @@ DepthRenderer::DepthRendererImpl::DepthRendererImpl(VulkanContext *context)
                        context->swap_chain_image_extent.height, context),
       final_output(/*with_depth_buffer=*/false, context),
       depth_map_pipeline(&depth_map_output, context),
-      depth_map_visualizer_pipeline(&final_output, context), geo_vram(context) {}
+      depth_map_visualizer_pipeline(&final_output, context), geo_vram(context), tex_vram(context) {}
 
 DepthRenderer::DepthRendererImpl::~DepthRendererImpl() {}
 
@@ -81,16 +83,20 @@ void DepthRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor)
     {
         Scene::ReadAccess read_access = scene->GainReadAccess();
 
+        PerspectiveProjection camera_projection(scene->camera);
         std::vector<SceneEntity const *> scene_entities =
             scene->SceneEntityStructure()->QueryEntities(QueryAllSceneEntities);
+
+        ResourceLoadingOption option;
+        option.load_geometry = true;
+
         std::vector<DrawableInstance> drawables =
             ToDrawables(scene_entities, /*viewer_location=*/ToVec3(scene->camera.position()),
-                        /*load_material=*/false, /*load_light_map=*/false, resource_accessor);
-        PerspectiveProjection camera_projection(scene->camera);
+                        option, resource_accessor);
 
         PipelineOutputInterface *depth_map_output = pimpl_->depth_map_pipeline.Run(
             drawables, camera_projection, frame_context.acquire_swap_chain_image_barrier,
-            &pimpl_->geo_vram);
+            &pimpl_->geo_vram, &pimpl_->tex_vram);
 
         final_output = pimpl_->depth_map_visualizer_pipeline.Run(
             pimpl_->config.depth_renderer_params().alpha(), camera_projection, *depth_map_output);
