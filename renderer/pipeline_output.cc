@@ -204,4 +204,56 @@ FrameBufferAttachment const *DepthMapPipelineOutput::DepthAttachment() const {
     return pimpl_->depth_attachment_.get();
 }
 
+struct LightInputsPipelineOutput::LightInputsPipelineOutputImpl {
+    LightInputsPipelineOutputImpl(unsigned width, unsigned height, VulkanContext *context);
+    ~LightInputsPipelineOutputImpl();
+
+    std::unique_ptr<FrameBufferAttachment> color_attachment_;
+    std::unique_ptr<FrameBufferAttachment> depth_attachment_;
+    std::unique_ptr<RenderPass> render_pass_;
+    std::unique_ptr<FrameBuffer> frame_buffer_;
+
+    VulkanContext *context;
+};
+
+LightInputsPipelineOutput::LightInputsPipelineOutputImpl::LightInputsPipelineOutputImpl(
+    unsigned width, unsigned height, VulkanContext *context) {
+    color_attachment_ =
+        CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R8G8B8A8_SRGB, context);
+    depth_attachment_ = CreateDepthAttachment(width, height, /*samplable=*/true, context);
+    render_pass_ = CreateRenderPass(
+        /*color_attachments=*/std::vector<VkAttachmentDescription>{color_attachment_->desc},
+        depth_attachment_->desc, context);
+    frame_buffer_ =
+        CreateFrameBuffer(*render_pass_, width, height,
+                          /*color_attachments=*/std::vector<VkImageView>{color_attachment_->view},
+                          depth_attachment_->view, context);
+}
+
+LightInputsPipelineOutput::LightInputsPipelineOutputImpl::~LightInputsPipelineOutputImpl() {}
+
+LightInputsPipelineOutput::LightInputsPipelineOutput(unsigned width, unsigned height,
+                                                     VulkanContext *context)
+    : PipelineOutputInterface(context),
+      pimpl_(std::make_unique<LightInputsPipelineOutputImpl>(width, height, context)) {
+    this->width = width;
+    this->height = height;
+}
+
+LightInputsPipelineOutput::~LightInputsPipelineOutput() {}
+
+FrameBuffer *LightInputsPipelineOutput::GetFrameBuffer() const {
+    return pimpl_->frame_buffer_.get();
+}
+
+RenderPass const &LightInputsPipelineOutput::GetRenderPass() const { return *pimpl_->render_pass_; }
+
+FrameBufferAttachment const *LightInputsPipelineOutput::ColorAttachment() const {
+    return pimpl_->color_attachment_.get();
+}
+
+FrameBufferAttachment const *LightInputsPipelineOutput::DepthAttachment() const {
+    return pimpl_->depth_attachment_.get();
+}
+
 } // namespace e8

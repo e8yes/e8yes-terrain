@@ -183,6 +183,33 @@ class DepthMapPipelineOutput : public PipelineOutputInterface {
     std::unique_ptr<DepthMapPipelineOutputImpl> pimpl_;
 };
 
+/**
+ * @brief The LightInputsPipelineOutput class For storing a 32-bit RGBA color output containing the
+ * geometry data as well as a 32-bit depth output.
+ */
+class LightInputsPipelineOutput : public PipelineOutputInterface {
+  public:
+    /**
+     * @brief LightInputsPipelineOutput Constructs a light inputs map output with the specified
+     * dimension.
+     *
+     * @param width The width of the light inputs map output.
+     * @param height The height of the light inputs map output.
+     * @param context Contextual Vulkan handles.
+     */
+    LightInputsPipelineOutput(unsigned width, unsigned height, VulkanContext *context);
+    ~LightInputsPipelineOutput();
+
+    FrameBuffer *GetFrameBuffer() const override;
+    RenderPass const &GetRenderPass() const override;
+    FrameBufferAttachment const *ColorAttachment() const override;
+    FrameBufferAttachment const *DepthAttachment() const override;
+
+  private:
+    struct LightInputsPipelineOutputImpl;
+    std::unique_ptr<LightInputsPipelineOutputImpl> pimpl_;
+};
+
 } // namespace e8
 
 #endif // ISLANDS_RENDERER_PIPELINE_OUTPUT_H

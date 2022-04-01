@@ -55,7 +55,8 @@ class DepthMapPipeline {
      * @param drawables An array of drawables to be rendered onto the depth map.
      * @param projection Defines how drawables should be projected to the depth map.
      * @param prerequisites Dependent tasks.
-     * @param geo_vram The geometry VRAM transferrer.
+     * @param geo_vram The geometry VRAM transferer.
+     * @param tex_vram The texture VRAM transferer.
      * @return The output object set from the constructor, with a barrier assigned.
      */
     PipelineOutputInterface *Run(std::vector<DrawableInstance> const &drawables,

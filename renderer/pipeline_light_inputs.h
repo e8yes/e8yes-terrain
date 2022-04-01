@@ -15,9 +15,10 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_PIPELINE_GEOMETRY_MAP_H
-#define ISLANDS_RENDERER_PIPELINE_GEOMETRY_MAP_H
+#ifndef ISLANDS_RENDERER_PIPELINE_LIGHT_INPUTS_H
+#define ISLANDS_RENDERER_PIPELINE_LIGHT_INPUTS_H
 
+#include <memory>
 #include <vector>
 
 #include "common/device.h"
@@ -25,38 +26,48 @@
 #include "renderer/pipeline_output.h"
 #include "renderer/projection.h"
 #include "renderer/vram_geometry.h"
+#include "renderer/vram_texture.h"
 
 namespace e8 {
 
 /**
- * @brief The LightInputsPipeline class
+ * @brief The LightInputsPipeline class A graphics pipeline for generating a map of geometry
+ * information. These information are essential for lighting computation. They are: normal vector,
+ * roughness factor and depth.
  */
 class LightInputsPipeline {
   public:
     /**
-     * @brief LightInputsPipeline
-     * @param output
-     * @param context
+     * @brief LightInputsPipeline Constructs a graphics pipeline for generate light inputs.
+     *
+     * @param output An object for storing the rendered geometry and depth data.
+     * @param context Contextual Vulkan handles.
      */
     LightInputsPipeline(PipelineOutputInterface *output, VulkanContext *context);
     ~LightInputsPipeline();
 
     /**
-     * @brief Run
+     * @brief Run Runs the light inputs graphics pipeline. The pipeline can only be run when the
+     * previous run was finished (indicated by the output's barrier).
      *
-     * @param drawables
-     * @param projection
-     * @param barrier
-     * @param geo_vram
-     * @return
+     * @param drawables An array of drawables to be rendered onto the light inputs map.
+     * @param projection Defines how drawables should be projected to the light inputs map..
+     * @param prerequisites Dependent tasks.
+     * @param geo_vram The geometry VRAM transferer.
+     * @param tex_vram The texture VRAM transferer.
+     * @return The output object set from the constructor, with a barrier assigned.
      */
     PipelineOutputInterface *Run(std::vector<DrawableInstance> const &drawables,
-                                 ProjectionInterface const &projection, GpuBarrier const &barrier,
-                                 GeometryVramTransfer *geo_vram);
+                                 ProjectionInterface const &projection,
+                                 GpuBarrier const &prerequisites, GeometryVramTransfer *geo_vram,
+                                 TextureVramTransfer *tex_vram);
 
   private:
+    class LightInputsPipelineImpl;
+
+    std::unique_ptr<LightInputsPipelineImpl> pimpl_;
 };
 
 } // namespace e8
 
-#endif // ISLANDS_RENDERER_PIPELINE_GEOMETRY_MAP_H
+#endif // ISLANDS_RENDERER_PIPELINE_LIGHT_INPUTS_H
