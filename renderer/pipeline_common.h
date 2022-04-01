@@ -258,6 +258,21 @@ std::vector<std::unique_ptr<FrameBufferAttachment>>
 CreateColorAttachmentsForSwapChain(VulkanContext *context);
 
 /**
+ * @brief CreateColorAttachment Creates a color attachment and allocates an image for storing color
+ * pixels. The color attachment is default to be samplable by a shader. This function will always
+ * return a valid FrameBufferAttachment structure. Any failure occurs during color image/image view
+ * allocation will make it fail.
+ *
+ * @param width The width, in pixels, of the color buffer.
+ * @param height The height, in pixels, of the color buffer.
+ * @param format The color pixel's format.
+ * @param context Contextual Vulkan handles.
+ * @return A valid unique pointer to the FrameBufferAttachment structure.
+ */
+std::unique_ptr<FrameBufferAttachment>
+CreateColorAttachment(unsigned width, unsigned height, VkFormat format, VulkanContext *context);
+
+/**
  * @brief CreateDepthAttachment Creates a depth attachment and allocates an image for depth
  * buffering. This function will always return a valid FrameBufferAttachment structure. Any failure
  * occurs during depth image/image view allocation will make it fail.
