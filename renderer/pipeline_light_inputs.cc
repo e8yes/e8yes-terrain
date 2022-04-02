@@ -82,10 +82,10 @@ std::vector<VkDescriptorSetLayoutBinding> NormalRoughnessMapBinding() {
     normal_map_binding.descriptorCount = 1;
 
     VkDescriptorSetLayoutBinding roughness_map_binding{};
-    normal_map_binding.binding = 1;
-    normal_map_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-    normal_map_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    normal_map_binding.descriptorCount = 1;
+    roughness_map_binding.binding = 1;
+    roughness_map_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    roughness_map_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    roughness_map_binding.descriptorCount = 1;
 
     return std::vector<VkDescriptorSetLayoutBinding>{normal_map_binding, roughness_map_binding};
 }
@@ -126,7 +126,7 @@ RenderPassConfigurator::RenderPassConfigurator(ProjectionInterface const &projec
 RenderPassConfigurator::~RenderPassConfigurator() {}
 
 bool RenderPassConfigurator::IncludeDrawable(DrawableInstance const &drawable) const {
-    return drawable.material;
+    return drawable.material != nullptr;
 }
 
 RenderPassConfigurator::DrawableTextures
@@ -162,7 +162,7 @@ void RenderPassConfigurator::SetUniformsFor(DrawableInstance const &drawable,
                          /*binding=*/1, context_);
 
     vkCmdBindDescriptorSets(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout_.layout,
-                            /*firstSet=*/0,
+                            /*firstSet=*/2,
                             /*descriptorSetCount=*/1, &descriptor_sets_.drawable,
                             /*dynamicOffsetCount=*/0,
                             /*pDynamicOffsets=*/nullptr);
@@ -172,11 +172,11 @@ void RenderPassConfigurator::SetUniformsFor(DrawableInstance const &drawable,
 
 class LightInputsPipeline::LightInputsPipelineImpl {
   public:
-    LightInputsPipelineImpl(PipelineOutputInterface *output, VulkanContext *context);
+    LightInputsPipelineImpl(LightInputsPipelineOutput *output, VulkanContext *context);
     ~LightInputsPipelineImpl();
 
   public:
-    PipelineOutputInterface *output;
+    LightInputsPipelineOutput *output;
     VulkanContext *context;
 
   public:
@@ -193,7 +193,7 @@ class LightInputsPipeline::LightInputsPipelineImpl {
 };
 
 LightInputsPipeline::LightInputsPipelineImpl::LightInputsPipelineImpl(
-    PipelineOutputInterface *output, VulkanContext *context)
+    LightInputsPipelineOutput *output, VulkanContext *context)
     : output(output), context(context) {
     uniform_layout = CreateShaderUniformLayout(
         PushConstantLayout(), /*per_frame_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
@@ -218,16 +218,16 @@ LightInputsPipeline::LightInputsPipelineImpl::LightInputsPipelineImpl(
 
 LightInputsPipeline::LightInputsPipelineImpl::~LightInputsPipelineImpl() {}
 
-LightInputsPipeline::LightInputsPipeline(PipelineOutputInterface *output, VulkanContext *context)
+LightInputsPipeline::LightInputsPipeline(LightInputsPipelineOutput *output, VulkanContext *context)
     : pimpl_(std::make_unique<LightInputsPipelineImpl>(output, context)) {}
 
 LightInputsPipeline::~LightInputsPipeline() {}
 
-PipelineOutputInterface *LightInputsPipeline::Run(std::vector<DrawableInstance> const &drawables,
-                                                  ProjectionInterface const &projection,
-                                                  GpuBarrier const &prerequisites,
-                                                  GeometryVramTransfer *geo_vram,
-                                                  TextureVramTransfer *tex_vram) {
+LightInputsPipelineOutput *LightInputsPipeline::Run(std::vector<DrawableInstance> const &drawables,
+                                                    ProjectionInterface const &projection,
+                                                    GpuBarrier const &prerequisites,
+                                                    GeometryVramTransfer *geo_vram,
+                                                    TextureVramTransfer *tex_vram) {
     VkCommandBuffer cmds = StartRenderPass(pimpl_->output->GetRenderPass(),
                                            *pimpl_->output->GetFrameBuffer(), pimpl_->context);
 

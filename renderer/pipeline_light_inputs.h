@@ -43,7 +43,7 @@ class LightInputsPipeline {
      * @param output An object for storing the rendered geometry and depth data.
      * @param context Contextual Vulkan handles.
      */
-    LightInputsPipeline(PipelineOutputInterface *output, VulkanContext *context);
+    LightInputsPipeline(LightInputsPipelineOutput *output, VulkanContext *context);
     ~LightInputsPipeline();
 
     /**
@@ -57,10 +57,10 @@ class LightInputsPipeline {
      * @param tex_vram The texture VRAM transferer.
      * @return The output object set from the constructor, with a barrier assigned.
      */
-    PipelineOutputInterface *Run(std::vector<DrawableInstance> const &drawables,
-                                 ProjectionInterface const &projection,
-                                 GpuBarrier const &prerequisites, GeometryVramTransfer *geo_vram,
-                                 TextureVramTransfer *tex_vram);
+    LightInputsPipelineOutput *Run(std::vector<DrawableInstance> const &drawables,
+                                   ProjectionInterface const &projection,
+                                   GpuBarrier const &prerequisites, GeometryVramTransfer *geo_vram,
+                                   TextureVramTransfer *tex_vram);
 
   private:
     class LightInputsPipelineImpl;
