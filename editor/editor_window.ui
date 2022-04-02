@@ -905,6 +905,13 @@
                  </widget>
                 </item>
                 <item>
+                 <widget class="QRadioButton" name="light_inputs_rend_radial">
+                  <property name="text">
+                   <string>Light Inputs</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <widget class="QRadioButton" name="radiance_rend_radial">
                   <property name="text">
                    <string>Radiance</string>

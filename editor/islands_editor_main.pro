@@ -56,6 +56,7 @@ HEADERS += \
 
 FORMS += \
     display/renderer_depth_parameters.ui \
+    display/renderer_light_inputs_parameters.ui \
     display/renderer_radiance_parameters.ui \
     display/renderer_radiosity_parameters.ui \
     display/renderer_solid_color_parameters.ui \

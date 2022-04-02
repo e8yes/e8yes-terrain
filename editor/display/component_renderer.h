@@ -25,6 +25,7 @@
 #include "editor/basic/component_modification_monitor.h"
 #include "editor/basic/context.h"
 #include "ui_renderer_depth_parameters.h"
+#include "ui_renderer_light_inputs_parameters.h"
 #include "ui_renderer_radiance_parameters.h"
 #include "ui_renderer_radiosity_parameters.h"
 #include "ui_renderer_solid_color_parameters.h"
@@ -32,13 +33,13 @@
 namespace e8 {
 namespace display_internal {
 
-class SolidColorRendererParameters : public QWidget {
+class SolidColorRendererWidget : public QWidget {
     Q_OBJECT
 
   public:
-    SolidColorRendererParameters(ModificationMonitorComponent *modification_monitor_comp,
-                                 EditorContext *context);
-    ~SolidColorRendererParameters();
+    SolidColorRendererWidget(ModificationMonitorComponent *modification_monitor_comp,
+                             EditorContext *context);
+    ~SolidColorRendererWidget();
 
   private:
     Ui::SolidColorRendererParameters ui_;
@@ -47,19 +48,37 @@ class SolidColorRendererParameters : public QWidget {
     EditorContext *context_;
 };
 
-class DepthRendererParameters : public QWidget {
+class DepthRendererWidget : public QWidget {
     Q_OBJECT
 
   public:
-    DepthRendererParameters(ModificationMonitorComponent *modification_monitor_comp,
-                            EditorContext *context);
-    ~DepthRendererParameters();
+    DepthRendererWidget(ModificationMonitorComponent *modification_monitor_comp,
+                        EditorContext *context);
+    ~DepthRendererWidget();
 
   public slots:
     void OnChangeAlpha();
 
   private:
     Ui::DepthRendererParameters ui_;
+
+    ModificationMonitorComponent *modification_monitor_comp_;
+    EditorContext *context_;
+};
+
+class LightInputsRendererWidget : public QWidget {
+    Q_OBJECT
+
+  public:
+    LightInputsRendererWidget(ModificationMonitorComponent *modification_monitor_comp,
+                              EditorContext *context);
+    ~LightInputsRendererWidget();
+
+  public slots:
+    void OnChangeInputType();
+
+  private:
+    Ui::LightInputsRendererParameters ui_;
 
     ModificationMonitorComponent *modification_monitor_comp_;
     EditorContext *context_;
@@ -112,6 +131,7 @@ class RendererComponent : public QObject {
     void OnChangeProject();
     void OnClickSolidColorRenderer();
     void OnClickDepthRenderer();
+    void OnClickLightInputsRenderer();
     void OnClickRadianceRenderer();
     void OnClickRadiosityRenderer();
     void OnUpdateRendererPerformanceStatistics();

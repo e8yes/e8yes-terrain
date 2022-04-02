@@ -45,8 +45,8 @@ namespace e8 {
 namespace {
 
 void DisplayRendererType(RendererConfiguration const &config, QRadioButton *solid_color_rend,
-                         QRadioButton *depth_rend, QRadioButton *radiance_rend,
-                         QRadioButton *radiosity_rend) {
+                         QRadioButton *depth_rend, QRadioButton *light_inputs_rend,
+                         QRadioButton *radiance_rend, QRadioButton *radiosity_rend) {
     switch (config.in_use_renderer_type()) {
     case RendererType::RT_SOLID_COLOR: {
         solid_color_rend->setChecked(true);
@@ -54,6 +54,10 @@ void DisplayRendererType(RendererConfiguration const &config, QRadioButton *soli
     }
     case RendererType::RT_DEPTH: {
         depth_rend->setChecked(true);
+        break;
+    }
+    case RendererType::RT_LIGHT_INPUTS: {
+        light_inputs_rend->setChecked(true);
         break;
     }
     case RendererType::RT_RADIANCE: {
@@ -80,12 +84,17 @@ void DisplayRendererParameters(RendererConfiguration const &config,
     switch (config.in_use_renderer_type()) {
     case RendererType::RT_SOLID_COLOR: {
         renderer_params_widget =
-            new display_internal::SolidColorRendererParameters(modification_monitor_comp, context);
+            new display_internal::SolidColorRendererWidget(modification_monitor_comp, context);
         break;
     }
     case RendererType::RT_DEPTH: {
         renderer_params_widget =
-            new display_internal::DepthRendererParameters(modification_monitor_comp, context);
+            new display_internal::DepthRendererWidget(modification_monitor_comp, context);
+        break;
+    }
+    case RendererType::RT_LIGHT_INPUTS: {
+        renderer_params_widget =
+            new display_internal::LightInputsRendererWidget(modification_monitor_comp, context);
         break;
     }
     case RendererType::RT_RADIANCE: {
@@ -127,38 +136,77 @@ void DisplayPerformanceStats(std::vector<RendererInterface::StagePerformance> co
 
 namespace display_internal {
 
-SolidColorRendererParameters::SolidColorRendererParameters(
+SolidColorRendererWidget::SolidColorRendererWidget(
     ModificationMonitorComponent *modification_monitor_comp, EditorContext *context)
     : modification_monitor_comp_(modification_monitor_comp), context_(context) {
     ui_.setupUi(this);
 }
 
-SolidColorRendererParameters::~SolidColorRendererParameters() {}
+SolidColorRendererWidget::~SolidColorRendererWidget() {}
 
-DepthRendererParameters::DepthRendererParameters(
-    ModificationMonitorComponent *modification_monitor_comp, EditorContext *context)
+DepthRendererWidget::DepthRendererWidget(ModificationMonitorComponent *modification_monitor_comp,
+                                         EditorContext *context)
     : modification_monitor_comp_(modification_monitor_comp), context_(context) {
     ui_.setupUi(this);
     QObject::connect(ui_.alpha_slider, &QSlider::valueChanged, this,
-                     &DepthRendererParameters::OnChangeAlpha);
+                     &DepthRendererWidget::OnChangeAlpha);
 
     RendererConfiguration *config = context_->game->GetGameData().renderer_config;
     float alpha = config->depth_renderer_params().alpha();
     ui_.alpha_slider->setValue(alpha * ui_.alpha_slider->maximum());
 }
 
-DepthRendererParameters::~DepthRendererParameters() {}
+DepthRendererWidget::~DepthRendererWidget() {}
 
-void DepthRendererParameters::OnChangeAlpha() {
-    if (context_->game == nullptr) {
-        BOOST_LOG_TRIVIAL(error)
-            << "DepthRendererParameters::OnChangeAlpha(): Invoked with an empty project.";
-        return;
-    }
-
+void DepthRendererWidget::OnChangeAlpha() {
     RendererConfiguration *config = context_->game->GetGameData().renderer_config;
     float alpha = static_cast<float>(ui_.alpha_slider->value()) / ui_.alpha_slider->maximum();
     config->mutable_depth_renderer_params()->set_alpha(alpha);
+
+    modification_monitor_comp_->OnModifyProject();
+}
+
+LightInputsRendererWidget::LightInputsRendererWidget(
+    ModificationMonitorComponent *modification_monitor_comp, EditorContext *context)
+    : modification_monitor_comp_(modification_monitor_comp), context_(context) {
+    ui_.setupUi(this);
+
+    QObject::connect(ui_.normal_vector_radio, &QRadioButton::clicked, this,
+                     &LightInputsRendererWidget::OnChangeInputType);
+    QObject::connect(ui_.roughness_factor_radio, &QRadioButton::clicked, this,
+                     &LightInputsRendererWidget::OnChangeInputType);
+
+    RendererConfiguration *config = context_->game->GetGameData().renderer_config;
+
+    switch (config->light_inputs_renderer_params().input_to_visualize()) {
+    case LightInputsRendererParameters::NORMAL: {
+        ui_.normal_vector_radio->setChecked(true);
+        break;
+    }
+    case LightInputsRendererParameters::ROUGHNESS: {
+        ui_.roughness_factor_radio->setChecked(true);
+        break;
+    }
+    default: {
+        assert(false);
+    }
+    }
+}
+
+LightInputsRendererWidget::~LightInputsRendererWidget() {}
+
+void LightInputsRendererWidget::OnChangeInputType() {
+    RendererConfiguration *config = context_->game->GetGameData().renderer_config;
+
+    if (ui_.normal_vector_radio->isChecked()) {
+        config->mutable_light_inputs_renderer_params()->set_input_to_visualize(
+            LightInputsRendererParameters::NORMAL);
+    } else if (ui_.roughness_factor_radio->isChecked()) {
+        config->mutable_light_inputs_renderer_params()->set_input_to_visualize(
+            LightInputsRendererParameters::ROUGHNESS);
+    } else {
+        assert(false);
+    }
 
     modification_monitor_comp_->OnModifyProject();
 }
@@ -191,6 +239,8 @@ RendererComponent::RendererComponent(ModificationMonitorComponent *modification_
                      &RendererComponent::OnClickSolidColorRenderer);
     QObject::connect(context->ui->depth_rend_radial, &QRadioButton::clicked, this,
                      &RendererComponent::OnClickDepthRenderer);
+    QObject::connect(context->ui->light_inputs_rend_radial, &QRadioButton::clicked, this,
+                     &RendererComponent::OnClickLightInputsRenderer);
     QObject::connect(context->ui->radiance_rend_radial, &QRadioButton::clicked, this,
                      &RendererComponent::OnClickRadianceRenderer);
     QObject::connect(context->ui->radiosity_rend_radial, &QRadioButton::clicked, this,
@@ -217,19 +267,13 @@ void RendererComponent::OnChangeProject() {
 
     RendererConfiguration *config = context_->game->GetGameData().renderer_config;
     DisplayRendererType(*config, context_->ui->solid_color_rend_radial,
-                        context_->ui->depth_rend_radial, context_->ui->radiance_rend_radial,
-                        context_->ui->radiosity_rend_radial);
+                        context_->ui->depth_rend_radial, context_->ui->light_inputs_rend_radial,
+                        context_->ui->radiance_rend_radial, context_->ui->radiosity_rend_radial);
     DisplayRendererParameters(*config, modification_monitor_comp_, context_,
                               context_->ui->display_param_group);
 }
 
 void RendererComponent::OnClickSolidColorRenderer() {
-    if (context_->game == nullptr) {
-        BOOST_LOG_TRIVIAL(error)
-            << "RendererComponent::OnClickSolidColorRenderer(): Invoked with an empty project.";
-        return;
-    }
-
     RendererConfiguration *config = context_->game->GetGameData().renderer_config;
     config->set_in_use_renderer_type(RendererType::RT_SOLID_COLOR);
 
@@ -240,12 +284,6 @@ void RendererComponent::OnClickSolidColorRenderer() {
 }
 
 void RendererComponent::OnClickDepthRenderer() {
-    if (context_->game == nullptr) {
-        BOOST_LOG_TRIVIAL(error)
-            << "RendererComponent::OnClickDepthRenderer(): Invoked with an empty project.";
-        return;
-    }
-
     RendererConfiguration *config = context_->game->GetGameData().renderer_config;
     config->set_in_use_renderer_type(RendererType::RT_DEPTH);
 
@@ -255,13 +293,17 @@ void RendererComponent::OnClickDepthRenderer() {
     modification_monitor_comp_->OnModifyProject();
 }
 
-void RendererComponent::OnClickRadianceRenderer() {
-    if (context_->game == nullptr) {
-        BOOST_LOG_TRIVIAL(error)
-            << "RendererComponent::OnClickRadianceRenderer(): Invoked with an empty project.";
-        return;
-    }
+void RendererComponent::OnClickLightInputsRenderer() {
+    RendererConfiguration *config = context_->game->GetGameData().renderer_config;
+    config->set_in_use_renderer_type(RendererType::RT_LIGHT_INPUTS);
 
+    DisplayRendererParameters(*config, modification_monitor_comp_, context_,
+                              context_->ui->display_param_group);
+
+    modification_monitor_comp_->OnModifyProject();
+}
+
+void RendererComponent::OnClickRadianceRenderer() {
     RendererConfiguration *config = context_->game->GetGameData().renderer_config;
     config->set_in_use_renderer_type(RendererType::RT_RADIANCE);
 
@@ -272,12 +314,6 @@ void RendererComponent::OnClickRadianceRenderer() {
 }
 
 void RendererComponent::OnClickRadiosityRenderer() {
-    if (context_->game == nullptr) {
-        BOOST_LOG_TRIVIAL(error)
-            << "RendererComponent::OnClickRadiosityRenderer(): Invoked with an empty project.";
-        return;
-    }
-
     RendererConfiguration *config = context_->game->GetGameData().renderer_config;
     config->set_in_use_renderer_type(RendererType::RT_RADIOSITY);
 
@@ -288,12 +324,6 @@ void RendererComponent::OnClickRadiosityRenderer() {
 }
 
 void RendererComponent::OnUpdateRendererPerformanceStatistics() {
-    if (context_->game == nullptr) {
-        BOOST_LOG_TRIVIAL(error) << "RendererComponent::OnUpdateRendererPerformanceStatistics(): "
-                                    "Invoked with an empty project.";
-        return;
-    }
-
     RendererInterface *renderer = context_->game->GetGameData().renderer;
     std::vector<RendererInterface::StagePerformance> performance = renderer->GetPerformanceStats();
 
