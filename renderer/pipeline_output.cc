@@ -161,49 +161,6 @@ void SwapChainPipelineOutput::SetSwapChainImageIndex(unsigned swap_chain_image_i
     pimpl_->swap_chain_image_index = swap_chain_image_index;
 }
 
-struct DepthMapPipelineOutput::DepthMapPipelineOutputImpl {
-    DepthMapPipelineOutputImpl(unsigned width, unsigned height, VulkanContext *context);
-    ~DepthMapPipelineOutputImpl();
-
-    std::unique_ptr<FrameBufferAttachment> depth_attachment_;
-    std::unique_ptr<RenderPass> render_pass_;
-    std::unique_ptr<FrameBuffer> frame_buffer_;
-
-    VulkanContext *context;
-};
-
-DepthMapPipelineOutput::DepthMapPipelineOutputImpl::DepthMapPipelineOutputImpl(
-    unsigned width, unsigned height, VulkanContext *context) {
-    depth_attachment_ = CreateDepthAttachment(width, height, /*samplable=*/true, context);
-    render_pass_ = CreateRenderPass(/*color_attachments=*/std::vector<VkAttachmentDescription>(),
-                                    depth_attachment_->desc, context);
-    frame_buffer_ = CreateFrameBuffer(*render_pass_, width, height,
-                                      /*color_attachments=*/std::vector<VkImageView>(),
-                                      depth_attachment_->view, context);
-}
-
-DepthMapPipelineOutput::DepthMapPipelineOutputImpl::~DepthMapPipelineOutputImpl() {}
-
-DepthMapPipelineOutput::DepthMapPipelineOutput(unsigned width, unsigned height,
-                                               VulkanContext *context)
-    : PipelineOutputInterface(context),
-      pimpl_(std::make_unique<DepthMapPipelineOutputImpl>(width, height, context)) {
-    this->width = width;
-    this->height = height;
-}
-
-DepthMapPipelineOutput::~DepthMapPipelineOutput() {}
-
-FrameBuffer *DepthMapPipelineOutput::GetFrameBuffer() const { return pimpl_->frame_buffer_.get(); }
-
-RenderPass const &DepthMapPipelineOutput::GetRenderPass() const { return *pimpl_->render_pass_; }
-
-FrameBufferAttachment const *DepthMapPipelineOutput::ColorAttachment() const { return nullptr; }
-
-FrameBufferAttachment const *DepthMapPipelineOutput::DepthAttachment() const {
-    return pimpl_->depth_attachment_.get();
-}
-
 struct LightInputsPipelineOutput::LightInputsPipelineOutputImpl {
     LightInputsPipelineOutputImpl(unsigned width, unsigned height, VulkanContext *context);
     ~LightInputsPipelineOutputImpl();

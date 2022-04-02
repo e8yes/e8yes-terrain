@@ -97,7 +97,7 @@ DepthMapVisualizerPipeline::~DepthMapVisualizerPipeline() {}
 
 PipelineOutputInterface *
 DepthMapVisualizerPipeline::Run(float alpha, std::optional<PerspectiveProjection> projection,
-                                PipelineOutputInterface const &depth_map) {
+                                DepthMapPipelineOutput const &depth_map) {
     return pimpl_->post_processor_pipeline->Run(
         *depth_map.barrier, /*set_uniforms_fn=*/
         [this, alpha, projection, &depth_map](ShaderUniformLayout const &uniform_layout,

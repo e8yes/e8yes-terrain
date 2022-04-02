@@ -22,7 +22,7 @@
 #include <optional>
 
 #include "common/device.h"
-#include "renderer/pipeline_output.h"
+#include "renderer/pipeline_depth_map.h"
 #include "renderer/projection.h"
 
 namespace e8 {
@@ -56,7 +56,7 @@ class DepthMapVisualizerPipeline {
      * @return The output object set from the constructor, with a barrier assigned.
      */
     PipelineOutputInterface *Run(float alpha, std::optional<PerspectiveProjection> projection,
-                                 PipelineOutputInterface const &depth_map);
+                                 DepthMapPipelineOutput const &depth_map);
 
   private:
     struct DepthMapVisualizerPipelineImpl;

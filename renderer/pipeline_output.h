@@ -97,13 +97,13 @@ class PipelineOutputInterface {
     virtual FrameBufferAttachment const *DepthAttachment() const = 0;
 
     /**
-     * @brief RequireFence
+     * @brief RequireFence Returns an unsignaled fence of this output.
      */
     VkFence AcquireFence();
 
     /**
-     * @brief Fulfill
-     * @param timeout
+     * @brief Fulfill Waits until either the output is fulfilled or gets timed out. If the wait is
+     * timed out, this function will fail.
      */
     void Fulfill(std::chrono::nanoseconds const &timeout);
 
@@ -118,10 +118,10 @@ class PipelineOutputInterface {
     // output can be read or used again.
     std::unique_ptr<GpuBarrier> barrier;
 
-    //
+    // A CPU fence which gets signaled when the output is fulfilled.
     VkFence fence;
 
-    //
+    // Contextual Vulkan handles.
     VulkanContext *context;
 };
 
@@ -155,32 +155,6 @@ class SwapChainPipelineOutput : public PipelineOutputInterface {
   private:
     struct SwapChainPipelineOutputImpl;
     std::unique_ptr<SwapChainPipelineOutputImpl> pimpl_;
-};
-
-/**
- * @brief The DepthMapPipelineOutput class For storing, depth-only rendering output. The depth
- * values are stored in 32-bit floats.
- */
-class DepthMapPipelineOutput : public PipelineOutputInterface {
-  public:
-    /**
-     * @brief DepthMapPipelineOutput Constructs a depth map output with the specified dimension.
-     *
-     * @param width The width of the depth map output.
-     * @param height The height of the depth map output.
-     * @param context Contextual Vulkan handles.
-     */
-    DepthMapPipelineOutput(unsigned width, unsigned height, VulkanContext *context);
-    ~DepthMapPipelineOutput();
-
-    FrameBuffer *GetFrameBuffer() const override;
-    RenderPass const &GetRenderPass() const override;
-    FrameBufferAttachment const *ColorAttachment() const override;
-    FrameBufferAttachment const *DepthAttachment() const override;
-
-  private:
-    struct DepthMapPipelineOutputImpl;
-    std::unique_ptr<DepthMapPipelineOutputImpl> pimpl_;
 };
 
 /**

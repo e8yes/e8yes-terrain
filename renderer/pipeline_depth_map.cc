@@ -96,16 +96,59 @@ void RenderPassConfigurator::SetUniformsFor(DrawableInstance const &drawable,
 
 } // namespace
 
+struct DepthMapPipelineOutput::DepthMapPipelineOutputImpl {
+    DepthMapPipelineOutputImpl(unsigned width, unsigned height, VulkanContext *context);
+    ~DepthMapPipelineOutputImpl();
+
+    std::unique_ptr<FrameBufferAttachment> depth_attachment_;
+    std::unique_ptr<RenderPass> render_pass_;
+    std::unique_ptr<FrameBuffer> frame_buffer_;
+
+    VulkanContext *context;
+};
+
+DepthMapPipelineOutput::DepthMapPipelineOutputImpl::DepthMapPipelineOutputImpl(
+    unsigned width, unsigned height, VulkanContext *context) {
+    depth_attachment_ = CreateDepthAttachment(width, height, /*samplable=*/true, context);
+    render_pass_ = CreateRenderPass(/*color_attachments=*/std::vector<VkAttachmentDescription>(),
+                                    depth_attachment_->desc, context);
+    frame_buffer_ = CreateFrameBuffer(*render_pass_, width, height,
+                                      /*color_attachments=*/std::vector<VkImageView>(),
+                                      depth_attachment_->view, context);
+}
+
+DepthMapPipelineOutput::DepthMapPipelineOutputImpl::~DepthMapPipelineOutputImpl() {}
+
+DepthMapPipelineOutput::DepthMapPipelineOutput(unsigned width, unsigned height,
+                                               VulkanContext *context)
+    : PipelineOutputInterface(context),
+      pimpl_(std::make_unique<DepthMapPipelineOutputImpl>(width, height, context)) {
+    this->width = width;
+    this->height = height;
+}
+
+DepthMapPipelineOutput::~DepthMapPipelineOutput() {}
+
+FrameBuffer *DepthMapPipelineOutput::GetFrameBuffer() const { return pimpl_->frame_buffer_.get(); }
+
+RenderPass const &DepthMapPipelineOutput::GetRenderPass() const { return *pimpl_->render_pass_; }
+
+FrameBufferAttachment const *DepthMapPipelineOutput::ColorAttachment() const { return nullptr; }
+
+FrameBufferAttachment const *DepthMapPipelineOutput::DepthAttachment() const {
+    return pimpl_->depth_attachment_.get();
+}
+
 class DepthMapPipeline::DepthMapPipelineImpl {
   public:
-    DepthMapPipelineImpl(PipelineOutputInterface *output, VulkanContext *context);
+    DepthMapPipelineImpl(DepthMapPipelineOutput *output, VulkanContext *context);
     ~DepthMapPipelineImpl();
 
     ShaderUniformLayout const &GetUniformLayout() const;
     GraphicsPipeline const &GetGraphicsPipeline() const;
 
   public:
-    PipelineOutputInterface *output;
+    DepthMapPipelineOutput *output;
     VulkanContext *context;
 
   private:
@@ -117,7 +160,7 @@ class DepthMapPipeline::DepthMapPipelineImpl {
     std::unique_ptr<GraphicsPipeline> pipeline_;
 };
 
-DepthMapPipeline::DepthMapPipelineImpl::DepthMapPipelineImpl(PipelineOutputInterface *output,
+DepthMapPipeline::DepthMapPipelineImpl::DepthMapPipelineImpl(DepthMapPipelineOutput *output,
                                                              VulkanContext *context)
     : output(output), context(context) {
     uniform_layout_ = CreateShaderUniformLayout(
@@ -146,16 +189,16 @@ GraphicsPipeline const &DepthMapPipeline::DepthMapPipelineImpl::GetGraphicsPipel
     return *pipeline_;
 }
 
-DepthMapPipeline::DepthMapPipeline(PipelineOutputInterface *output, VulkanContext *context)
+DepthMapPipeline::DepthMapPipeline(DepthMapPipelineOutput *output, VulkanContext *context)
     : pimpl_(std::make_unique<DepthMapPipelineImpl>(output, context)) {}
 
 DepthMapPipeline::~DepthMapPipeline() {}
 
-PipelineOutputInterface *DepthMapPipeline::Run(std::vector<DrawableInstance> const &drawables,
-                                               ProjectionInterface const &projection,
-                                               GpuBarrier const &prerequisites,
-                                               GeometryVramTransfer *geo_vram,
-                                               TextureVramTransfer *tex_vram) {
+DepthMapPipelineOutput *DepthMapPipeline::Run(std::vector<DrawableInstance> const &drawables,
+                                              ProjectionInterface const &projection,
+                                              GpuBarrier const &prerequisites,
+                                              GeometryVramTransfer *geo_vram,
+                                              TextureVramTransfer *tex_vram) {
     VkCommandBuffer cmds = StartRenderPass(pimpl_->output->GetRenderPass(),
                                            *pimpl_->output->GetFrameBuffer(), pimpl_->context);
 

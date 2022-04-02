@@ -26,6 +26,7 @@
 #include "common/device.h"
 #include "common/tensor.h"
 #include "renderer/drawable_instance.h"
+#include "renderer/pipeline_common.h"
 #include "renderer/pipeline_output.h"
 #include "renderer/projection.h"
 #include "renderer/render_pass.h"
@@ -33,6 +34,32 @@
 #include "renderer/vram_texture.h"
 
 namespace e8 {
+
+/**
+ * @brief The DepthMapPipelineOutput class For storing, depth-only rendering output. The depth
+ * values are stored in 32-bit floats.
+ */
+class DepthMapPipelineOutput : public PipelineOutputInterface {
+  public:
+    /**
+     * @brief DepthMapPipelineOutput Constructs a depth map output with the specified dimension.
+     *
+     * @param width The width of the depth map output.
+     * @param height The height of the depth map output.
+     * @param context Contextual Vulkan handles.
+     */
+    DepthMapPipelineOutput(unsigned width, unsigned height, VulkanContext *context);
+    ~DepthMapPipelineOutput();
+
+    FrameBuffer *GetFrameBuffer() const override;
+    RenderPass const &GetRenderPass() const override;
+    FrameBufferAttachment const *ColorAttachment() const override;
+    FrameBufferAttachment const *DepthAttachment() const override;
+
+  private:
+    struct DepthMapPipelineOutputImpl;
+    std::unique_ptr<DepthMapPipelineOutputImpl> pimpl_;
+};
 
 /**
  * @brief The DepthMapPipeline class A graphics pipeline for rendering a depth map.
@@ -45,7 +72,7 @@ class DepthMapPipeline {
      * @param output An object for storing the rendered depth map.
      * @param context Contextual Vulkan handles.
      */
-    DepthMapPipeline(PipelineOutputInterface *output, VulkanContext *context);
+    DepthMapPipeline(DepthMapPipelineOutput *output, VulkanContext *context);
     ~DepthMapPipeline();
 
     /**
@@ -59,10 +86,10 @@ class DepthMapPipeline {
      * @param tex_vram The texture VRAM transferer.
      * @return The output object set from the constructor, with a barrier assigned.
      */
-    PipelineOutputInterface *Run(std::vector<DrawableInstance> const &drawables,
-                                 ProjectionInterface const &projection,
-                                 GpuBarrier const &prerequisites, GeometryVramTransfer *geo_vram,
-                                 TextureVramTransfer *tex_vram);
+    DepthMapPipelineOutput *Run(std::vector<DrawableInstance> const &drawables,
+                                ProjectionInterface const &projection,
+                                GpuBarrier const &prerequisites, GeometryVramTransfer *geo_vram,
+                                TextureVramTransfer *tex_vram);
 
   private:
     class DepthMapPipelineImpl;

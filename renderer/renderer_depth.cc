@@ -94,7 +94,7 @@ void DepthRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor)
             ToDrawables(scene_entities, /*viewer_location=*/ToVec3(scene->camera.position()),
                         option, resource_accessor);
 
-        PipelineOutputInterface *depth_map_output = pimpl_->depth_map_pipeline.Run(
+        DepthMapPipelineOutput *depth_map_output = pimpl_->depth_map_pipeline.Run(
             drawables, camera_projection, frame_context.acquire_swap_chain_image_barrier,
             &pimpl_->geo_vram, &pimpl_->tex_vram);
 
