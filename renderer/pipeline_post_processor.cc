@@ -99,8 +99,17 @@ PostProcessorPipeline::PostProcessorPipelineImpl::PostProcessorPipelineImpl(
                                /*cull_mode=*/VK_CULL_MODE_NONE,
                                /*enable_depth_test=*/false, output->width, output->height);
 
+    // Sets up the viewport dimension UBO descriptor.
     viewport_dimension_ubo = CreateUniformBuffer(/*size=*/sizeof(ViewportDimension), context);
 
+    ViewportDimension dimension;
+    dimension.viewport_width = output->width;
+    dimension.viewport_height = output->height;
+
+    WriteUniformBufferDescriptor(&dimension, *viewport_dimension_ubo, descriptor_sets->frame,
+                                 /*binding=*/0, context);
+
+    // Creates the post processing pipeline.
     pipeline =
         CreateGraphicsPipeline(output->GetRenderPass(), *shader_stages, *this->uniform_layout,
                                *vertex_inputs, *fixed_stage_config, context);
@@ -127,14 +136,6 @@ PostProcessorPipeline::~PostProcessorPipeline() {}
 PipelineOutputInterface *
 PostProcessorPipeline::Run(GpuBarrier const &barrier,
                            SetPostProcessorUniformsExFn const &set_uniforms_fn) {
-    ViewportDimension dimension;
-    dimension.viewport_width = pimpl_->output->width;
-    dimension.viewport_height = pimpl_->output->height;
-
-    WriteUniformBufferDescriptor(&dimension, *pimpl_->viewport_dimension_ubo,
-                                 pimpl_->descriptor_sets->frame,
-                                 /*binding=*/0, pimpl_->context);
-
     VkCommandBuffer cmds = StartRenderPass(pimpl_->output->GetRenderPass(),
                                            *pimpl_->output->GetFrameBuffer(), pimpl_->context);
 

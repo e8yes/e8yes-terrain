@@ -73,12 +73,13 @@ struct DepthMapVisualizerPipeline::DepthMapVisualizerPipelineImpl {
     VulkanContext *context;
 
     std::unique_ptr<ImageSampler> depth_map_sampler;
+    PipelineOutputInterface const *current_depth_map_input;
     std::unique_ptr<PostProcessorPipeline> post_processor_pipeline;
 };
 
 DepthMapVisualizerPipeline::DepthMapVisualizerPipelineImpl::DepthMapVisualizerPipelineImpl(
     PipelineOutputInterface *visualizer_output, VulkanContext *context)
-    : context(context) {
+    : context(context), current_depth_map_input(nullptr) {
     depth_map_sampler = CreateReadBackSampler(context);
 
     post_processor_pipeline = std::make_unique<PostProcessorPipeline>(
@@ -115,8 +116,12 @@ DepthMapVisualizerPipeline::Run(float alpha, std::optional<PerspectiveProjection
                                /*size=*/sizeof(PushConstants), &push_constants);
 
             // Sets the depth map input.
-            WriteImageDescriptor(depth_map.DepthAttachment()->view, *pimpl_->depth_map_sampler,
-                                 per_pass, /*binding=*/0, pimpl_->context);
+            if (&depth_map != pimpl_->current_depth_map_input) {
+                WriteImageDescriptor(depth_map.DepthAttachment()->view, *pimpl_->depth_map_sampler,
+                                     per_pass, /*binding=*/0, pimpl_->context);
+
+                pimpl_->current_depth_map_input = &depth_map;
+            }
 
             vkCmdBindDescriptorSets(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
                                     /*firstSet=*/1,
