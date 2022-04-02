@@ -74,18 +74,18 @@ GeometryProto PlaneGeometry(float width, float height, float cell_area, bool mov
         }
     }
 
-    // Generates triangle faces.
+    // Generates triangle faces in counter-clockwise winding order.
     for (unsigned j = 0; j < num_height_steps - 1; ++j) {
         for (unsigned i = 0; i < num_width_steps - 1; ++i) {
             PrimitiveIndicesProto *top_left = geometry_proto.add_primitives();
             top_left->add_indices((i + 0) + (j + 0) * num_width_steps);
-            top_left->add_indices((i + 1) + (j + 0) * num_width_steps);
             top_left->add_indices((i + 0) + (j + 1) * num_width_steps);
+            top_left->add_indices((i + 1) + (j + 0) * num_width_steps);
 
             PrimitiveIndicesProto *bottom_right = geometry_proto.add_primitives();
             bottom_right->add_indices((i + 1) + (j + 1) * num_width_steps);
-            bottom_right->add_indices((i + 0) + (j + 1) * num_width_steps);
             bottom_right->add_indices((i + 1) + (j + 0) * num_width_steps);
+            bottom_right->add_indices((i + 0) + (j + 1) * num_width_steps);
         }
     }
 

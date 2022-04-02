@@ -245,7 +245,8 @@ std::unique_ptr<FixedStageConfig> CreateFixedStageConfig(VkPolygonMode polygon_m
     info->rasterizer.polygonMode = polygon_mode;
     info->rasterizer.lineWidth = 1.0f;
     info->rasterizer.cullMode = cull_mode;
-    info->rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+    info->rasterizer.frontFace =
+        VK_FRONT_FACE_CLOCKWISE; // Counter-clockwise in viewspace, but clockwise after project.
     info->rasterizer.depthBiasEnable = VK_FALSE;
     info->rasterizer.depthBiasConstantFactor = 0.0f;
     info->rasterizer.depthBiasClamp = 0.0f;
@@ -679,13 +680,13 @@ std::unique_ptr<DescriptorSets> CreateDescriptorSets(ShaderUniformLayout const &
 void WriteUniformBufferDescriptor(void *data, UniformBuffer const &uniform_buffer,
                                   VkDescriptorSet descriptor_set, unsigned binding,
                                   VulkanContext *context) {
-    //
+    // Updates the host buffer.
     void *staging_buffer;
     vmaMapMemory(context->allocator, uniform_buffer.allocation, &staging_buffer);
     memcpy(staging_buffer, data, uniform_buffer.size);
     vmaUnmapMemory(context->allocator, uniform_buffer.allocation);
 
-    //
+    // Writes the updated buffer to the descriptor.
     VkDescriptorBufferInfo buffer_info{};
     buffer_info.buffer = uniform_buffer.buffer;
     buffer_info.offset = 0;
