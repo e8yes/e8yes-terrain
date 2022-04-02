@@ -31,6 +31,7 @@
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/renderer.h"
 #include "renderer/renderer_depth.h"
+#include "renderer/renderer_light_inputs.h"
 #include "renderer/renderer_solid_color.h"
 
 namespace e8 {
@@ -153,6 +154,9 @@ std::unique_ptr<RendererInterface> CreateRenderer(RendererType type, VulkanConte
     }
     case RendererType::RT_DEPTH: {
         return std::make_unique<DepthRenderer>(context);
+    }
+    case RendererType::RT_LIGHT_INPUTS: {
+        return std::make_unique<LightInputsRenderer>(context);
     }
     case RendererType::RT_RADIANCE: {
         assert(false);

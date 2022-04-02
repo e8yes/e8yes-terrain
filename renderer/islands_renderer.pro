@@ -22,6 +22,7 @@ SOURCES += \
     pipeline_depth_map.cc \
     pipeline_depth_map_visualizer.cc \
     pipeline_light_inputs.cc \
+    pipeline_light_inputs_visualizer.cc \
     pipeline_output.cc \
     pipeline_post_processor.cc \
     pipeline_solid_color.cc \
@@ -31,6 +32,7 @@ SOURCES += \
     render_pass.cc \
     renderer.cc \
     renderer_depth.cc \
+    renderer_light_inputs.cc \
     renderer_solid_color.cc \
     vram.cc \
     vram_geometry.cc \
@@ -42,6 +44,7 @@ HEADERS += \
     pipeline_depth_map.h \
     pipeline_depth_map_visualizer.h \
     pipeline_light_inputs.h \
+    pipeline_light_inputs_visualizer.h \
     pipeline_output.h \
     pipeline_post_processor.h \
     pipeline_solid_color.h \
@@ -51,6 +54,7 @@ HEADERS += \
     render_pass.h \
     renderer.h \
     renderer_depth.h \
+    renderer_light_inputs.h \
     renderer_solid_color.h \
     vram.h \
     vram_geometry.h \
