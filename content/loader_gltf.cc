@@ -50,23 +50,25 @@ mat44 NodeTransform(tinygltf::Node const &node) {
         mat44 transform = mat44_identity();
 
         if (!node.scale.empty()) {
-            transform = transform * mat44_scale(vec3{static_cast<float>(node.scale[0]),
-                                                     static_cast<float>(node.scale[1]),
-                                                     static_cast<float>(node.scale[2])});
+            transform = mat44_scale(vec3{static_cast<float>(node.scale[0]),
+                                         static_cast<float>(node.scale[1]),
+                                         static_cast<float>(node.scale[2])}) *
+                        transform;
         }
 
         if (!node.rotation.empty()) {
-            transform =
-                transform *
-                mat44_rotate(node.rotation[3], /*axis=*/vec3{static_cast<float>(node.rotation[0]),
-                                                             static_cast<float>(node.rotation[1]),
-                                                             static_cast<float>(node.rotation[2])});
+            transform = mat44_rotate(node.rotation[3],
+                                     /*axis=*/vec3{static_cast<float>(node.rotation[0]),
+                                                   static_cast<float>(node.rotation[1]),
+                                                   static_cast<float>(node.rotation[2])}) *
+                        transform;
         }
 
         if (!node.translation.empty()) {
-            transform = transform * mat44_translate(vec3{static_cast<float>(node.translation[0]),
-                                                         static_cast<float>(node.translation[1]),
-                                                         static_cast<float>(node.translation[2])});
+            transform = mat44_translate(vec3{static_cast<float>(node.translation[0]),
+                                             static_cast<float>(node.translation[1]),
+                                             static_cast<float>(node.translation[2])}) *
+                        transform;
         }
 
         return transform;
