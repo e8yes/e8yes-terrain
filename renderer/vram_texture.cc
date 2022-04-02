@@ -84,8 +84,8 @@ VkFormat SuitableImageFormat(StagingTextureBuffer const *staging_buffer) {
     }
 }
 
-void UploadStagingTexture(StagingTextureBuffer const *staging_buffer, VulkanContext *context,
-                          VramTransfer::GpuTexture *gpu_image, VkCommandBuffer cmds) {
+void UploadStagingTextureToVram(StagingTextureBuffer const *staging_buffer, VulkanContext *context,
+                                VramTransfer::GpuTexture *gpu_image, VkCommandBuffer cmds) {
     assert(staging_buffer->Valid());
     assert(staging_buffer->context == context);
 
@@ -154,9 +154,10 @@ void UploadStagingTexture(StagingTextureBuffer const *staging_buffer, VulkanCont
                          /*pImageMemoryBarriers=*/&to_shader_readable);
 }
 
-void UploadTexture(StagingTextureBuffer const *texture,
-                   DeviceCache<StagingTextureBuffer const *, VramTransfer::GpuTexture> *texture_cache,
-                   VulkanContext *context, VkCommandBuffer cmds) {
+void UploadTexture(
+    StagingTextureBuffer const *texture,
+    DeviceCache<StagingTextureBuffer const *, VramTransfer::GpuTexture> *texture_cache,
+    VulkanContext *context, VkCommandBuffer cmds) {
     texture_cache->Upload(
         texture, /*override_old_upload=*/false,
         /*object_size_fn=*/
@@ -164,7 +165,7 @@ void UploadTexture(StagingTextureBuffer const *texture,
         /*upload_fn=*/
         [context, cmds](StagingTextureBuffer const *staging_buffer, uint64_t /*old_object_size*/,
                         uint64_t /*new_object_size*/, VramTransfer::GpuTexture *gpu_image) {
-            UploadStagingTexture(staging_buffer, context, gpu_image, cmds);
+            UploadStagingTextureToVram(staging_buffer, context, gpu_image, cmds);
         });
 }
 
