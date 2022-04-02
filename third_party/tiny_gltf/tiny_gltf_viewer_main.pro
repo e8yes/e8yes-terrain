@@ -12,10 +12,12 @@ QMAKE_LFLAGS_RELEASE += -O3 -flto -march=native
 INCLUDEPATH += ../../
 
 SOURCES += \
-    dump_main.cc
+    trackball.cc \
+    viewer_main.cc
 
 HEADERS += \
     tiny_gltf.h \
+    trackball.h \
     stb_image.h \
     stb_image_write.h
 
@@ -32,3 +34,8 @@ else:unix: LIBS += -L$$OUT_PWD/../stb_image/ -lstb_image
 
 INCLUDEPATH += $$PWD/../stb_image
 DEPENDPATH += $$PWD/../stb_image
+
+LIBS += -lglfw
+LIBS += -lGLEW
+LIBS += -lGLU
+LIBS += -lGL

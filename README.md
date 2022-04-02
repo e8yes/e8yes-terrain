@@ -19,5 +19,8 @@ Installation command ```apt install -y libsdl2-dev```
 ### Vulkan Driver & SDK
 Installation guide https://vulkan.lunarg.com/doc/view/latest/linux/getting_started_ubuntu.html
 
+## GLEW & GLFW
+Installation command ```apt install -y libglew-dev libglfw3-dev```
+
 ### Shaderc
 Git repository & download page https://github.com/google/shaderc
