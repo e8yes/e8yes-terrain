@@ -186,7 +186,8 @@ class PrimitiveVertexProto PROTOBUF_FINAL :
     kPositionFieldNumber = 1,
     kNormalFieldNumber = 2,
     kTangentFieldNumber = 3,
-    kTexcoordFieldNumber = 4,
+    kTexcoordFieldNumber = 5,
+    kBitangentSignFieldNumber = 4,
   };
   // repeated float position = 1;
   int position_size() const;
@@ -254,7 +255,7 @@ class PrimitiveVertexProto PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
       mutable_tangent();
 
-  // repeated float texcoord = 4;
+  // repeated float texcoord = 5;
   int texcoord_size() const;
   private:
   int _internal_texcoord_size() const;
@@ -276,6 +277,15 @@ class PrimitiveVertexProto PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
       mutable_texcoord();
 
+  // float bitangent_sign = 4;
+  void clear_bitangent_sign();
+  float bitangent_sign() const;
+  void set_bitangent_sign(float value);
+  private:
+  float _internal_bitangent_sign() const;
+  void _internal_set_bitangent_sign(float value);
+  public:
+
   // @@protoc_insertion_point(class_scope:e8.PrimitiveVertexProto)
  private:
   class _Internal;
@@ -291,6 +301,7 @@ class PrimitiveVertexProto PROTOBUF_FINAL :
   mutable std::atomic<int> _tangent_cached_byte_size_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > texcoord_;
   mutable std::atomic<int> _texcoord_cached_byte_size_;
+  float bitangent_sign_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_primitive_2eproto;
 };
@@ -597,7 +608,27 @@ PrimitiveVertexProto::mutable_tangent() {
   return _internal_mutable_tangent();
 }
 
-// repeated float texcoord = 4;
+// float bitangent_sign = 4;
+inline void PrimitiveVertexProto::clear_bitangent_sign() {
+  bitangent_sign_ = 0;
+}
+inline float PrimitiveVertexProto::_internal_bitangent_sign() const {
+  return bitangent_sign_;
+}
+inline float PrimitiveVertexProto::bitangent_sign() const {
+  // @@protoc_insertion_point(field_get:e8.PrimitiveVertexProto.bitangent_sign)
+  return _internal_bitangent_sign();
+}
+inline void PrimitiveVertexProto::_internal_set_bitangent_sign(float value) {
+  
+  bitangent_sign_ = value;
+}
+inline void PrimitiveVertexProto::set_bitangent_sign(float value) {
+  _internal_set_bitangent_sign(value);
+  // @@protoc_insertion_point(field_set:e8.PrimitiveVertexProto.bitangent_sign)
+}
+
+// repeated float texcoord = 5;
 inline int PrimitiveVertexProto::_internal_texcoord_size() const {
   return texcoord_.size();
 }

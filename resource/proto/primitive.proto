@@ -33,9 +33,12 @@ message PrimitiveVertexProto {
     // Defines the 3D tangent vector for the vertex position. This array has exactly 3 elements.
     repeated float tangent = 3;
 
+    // Defines the sign of the bitangent vector for the vertex position.
+    float bitangent_sign = 4;
+
     // Defines the normalized 2D coordinates of a texture image to make it wrap around the surface
     // surrounding this vertex. This array has exactly 2 elements.
-    repeated float texcoord = 4;
+    repeated float texcoord = 5;
 }
 
 /**

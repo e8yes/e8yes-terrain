@@ -45,6 +45,31 @@ unsigned IndexElement(unsigned char const *index_buffer_data, unsigned stride, u
     }
 }
 
+google::protobuf::RepeatedField<float> Vec4Element(unsigned char const *attribute_buffer_data,
+                                                   unsigned stride, unsigned i) {
+    google::protobuf::RepeatedField<float> v;
+    v.Resize(4, /*value=*/0);
+
+    switch (stride) {
+    case 4 * 4:
+        for (unsigned j = 0; j < 4; ++j) {
+            v.Set(j, reinterpret_cast<float const *>(attribute_buffer_data)[4 * i + j]);
+        }
+        break;
+    case 8 * 4:
+        for (unsigned j = 0; j < 4; ++j) {
+            v.Set(j, static_cast<float>(
+                         reinterpret_cast<double const *>(attribute_buffer_data)[4 * i + j]));
+        }
+        break;
+    default:
+        BOOST_LOG_TRIVIAL(warning) << "Vec4Element(): Unknown stride=[" << stride << "].";
+        break;
+    }
+
+    return v;
+}
+
 google::protobuf::RepeatedField<float> Vec3Element(unsigned char const *attribute_buffer_data,
                                                    unsigned stride, unsigned i) {
     google::protobuf::RepeatedField<float> v;
@@ -212,8 +237,15 @@ std::optional<GeometryProto> LoadGeometry(tinygltf::Primitive const &primitive,
     }
 
     for (unsigned i = 0; i < tangent_count; i++) {
-        *geometry_proto.mutable_vertices(i)->mutable_tangent() =
-            Vec3Element(tangent_data.data(), tangent_stride, i);
+        google::protobuf::RepeatedField<float> v4 =
+            Vec4Element(tangent_data.data(), tangent_stride, i);
+
+        geometry_proto.mutable_vertices(i)->mutable_tangent()->Resize(/*new_size=*/3, /*value=*/0);
+        geometry_proto.mutable_vertices(i)->set_tangent(0, v4[0]);
+        geometry_proto.mutable_vertices(i)->set_tangent(1, v4[1]);
+        geometry_proto.mutable_vertices(i)->set_tangent(2, v4[2]);
+
+        geometry_proto.mutable_vertices(i)->set_bitangent_sign(v4[3]);
     }
 
     // Loads vertex texture coordinates.

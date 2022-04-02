@@ -65,6 +65,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_primitive_2eproto::offsets[] P
   PROTOBUF_FIELD_OFFSET(::e8::PrimitiveVertexProto, position_),
   PROTOBUF_FIELD_OFFSET(::e8::PrimitiveVertexProto, normal_),
   PROTOBUF_FIELD_OFFSET(::e8::PrimitiveVertexProto, tangent_),
+  PROTOBUF_FIELD_OFFSET(::e8::PrimitiveVertexProto, bitangent_sign_),
   PROTOBUF_FIELD_OFFSET(::e8::PrimitiveVertexProto, texcoord_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::e8::PrimitiveIndicesProto, _internal_metadata_),
@@ -75,7 +76,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_primitive_2eproto::offsets[] P
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::e8::PrimitiveVertexProto)},
-  { 9, -1, sizeof(::e8::PrimitiveIndicesProto)},
+  { 10, -1, sizeof(::e8::PrimitiveIndicesProto)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -84,11 +85,11 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_primitive_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\017primitive.proto\022\002e8\"[\n\024PrimitiveVertex"
+  "\n\017primitive.proto\022\002e8\"s\n\024PrimitiveVertex"
   "Proto\022\020\n\010position\030\001 \003(\002\022\016\n\006normal\030\002 \003(\002\022"
-  "\017\n\007tangent\030\003 \003(\002\022\020\n\010texcoord\030\004 \003(\002\"(\n\025Pr"
-  "imitiveIndicesProto\022\017\n\007indices\030\001 \003(\005b\006pr"
-  "oto3"
+  "\017\n\007tangent\030\003 \003(\002\022\026\n\016bitangent_sign\030\004 \001(\002"
+  "\022\020\n\010texcoord\030\005 \003(\002\"(\n\025PrimitiveIndicesPr"
+  "oto\022\017\n\007indices\030\001 \003(\005b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_primitive_2eproto_deps[1] = {
 };
@@ -98,7 +99,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_pri
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_primitive_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_primitive_2eproto = {
-  false, false, descriptor_table_protodef_primitive_2eproto, "primitive.proto", 164,
+  false, false, descriptor_table_protodef_primitive_2eproto, "primitive.proto", 188,
   &descriptor_table_primitive_2eproto_once, descriptor_table_primitive_2eproto_sccs, descriptor_table_primitive_2eproto_deps, 2, 0,
   schemas, file_default_instances, TableStruct_primitive_2eproto::offsets,
   file_level_metadata_primitive_2eproto, 2, file_level_enum_descriptors_primitive_2eproto, file_level_service_descriptors_primitive_2eproto,
@@ -133,10 +134,12 @@ PrimitiveVertexProto::PrimitiveVertexProto(const PrimitiveVertexProto& from)
       tangent_(from.tangent_),
       texcoord_(from.texcoord_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  bitangent_sign_ = from.bitangent_sign_;
   // @@protoc_insertion_point(copy_constructor:e8.PrimitiveVertexProto)
 }
 
 void PrimitiveVertexProto::SharedCtor() {
+  bitangent_sign_ = 0;
 }
 
 PrimitiveVertexProto::~PrimitiveVertexProto() {
@@ -174,6 +177,7 @@ void PrimitiveVertexProto::Clear() {
   normal_.Clear();
   tangent_.Clear();
   texcoord_.Clear();
+  bitangent_sign_ = 0;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -215,12 +219,19 @@ const char* PrimitiveVertexProto::_InternalParse(const char* ptr, ::PROTOBUF_NAM
           ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
-      // repeated float texcoord = 4;
+      // float bitangent_sign = 4;
       case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 37)) {
+          bitangent_sign_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // repeated float texcoord = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedFloatParser(_internal_mutable_texcoord(), ptr, ctx);
           CHK_(ptr);
-        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 37) {
+        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 45) {
           _internal_add_texcoord(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr));
           ptr += sizeof(float);
         } else goto handle_unusual;
@@ -268,9 +279,15 @@ failure:
     target = stream->WriteFixedPacked(3, _internal_tangent(), target);
   }
 
-  // repeated float texcoord = 4;
+  // float bitangent_sign = 4;
+  if (!(this->bitangent_sign() <= 0 && this->bitangent_sign() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(4, this->_internal_bitangent_sign(), target);
+  }
+
+  // repeated float texcoord = 5;
   if (this->_internal_texcoord_size() > 0) {
-    target = stream->WriteFixedPacked(4, _internal_texcoord(), target);
+    target = stream->WriteFixedPacked(5, _internal_texcoord(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -334,7 +351,7 @@ size_t PrimitiveVertexProto::ByteSizeLong() const {
     total_size += data_size;
   }
 
-  // repeated float texcoord = 4;
+  // repeated float texcoord = 5;
   {
     unsigned int count = static_cast<unsigned int>(this->_internal_texcoord_size());
     size_t data_size = 4UL * count;
@@ -347,6 +364,11 @@ size_t PrimitiveVertexProto::ByteSizeLong() const {
     _texcoord_cached_byte_size_.store(cached_size,
                                     std::memory_order_relaxed);
     total_size += data_size;
+  }
+
+  // float bitangent_sign = 4;
+  if (!(this->bitangent_sign() <= 0 && this->bitangent_sign() >= 0)) {
+    total_size += 1 + 4;
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -384,6 +406,9 @@ void PrimitiveVertexProto::MergeFrom(const PrimitiveVertexProto& from) {
   normal_.MergeFrom(from.normal_);
   tangent_.MergeFrom(from.tangent_);
   texcoord_.MergeFrom(from.texcoord_);
+  if (!(from.bitangent_sign() <= 0 && from.bitangent_sign() >= 0)) {
+    _internal_set_bitangent_sign(from._internal_bitangent_sign());
+  }
 }
 
 void PrimitiveVertexProto::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
@@ -411,6 +436,7 @@ void PrimitiveVertexProto::InternalSwap(PrimitiveVertexProto* other) {
   normal_.InternalSwap(&other->normal_);
   tangent_.InternalSwap(&other->tangent_);
   texcoord_.InternalSwap(&other->texcoord_);
+  swap(bitangent_sign_, other->bitangent_sign_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata PrimitiveVertexProto::GetMetadata() const {

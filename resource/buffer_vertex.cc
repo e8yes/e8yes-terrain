@@ -30,7 +30,8 @@ PrimitiveVertex::PrimitiveVertex() {}
 
 PrimitiveVertex::PrimitiveVertex(PrimitiveVertexProto const &proto)
     : position(ToVec3(proto.position())), normal(ToVec3(proto.normal())),
-      tangent(ToVec3(proto.tangent())), tex_coord(ToVec2(proto.texcoord())) {}
+      tangent(ToVec3(proto.tangent())), bitangent_sign(proto.bitangent_sign()),
+      tex_coord(ToVec2(proto.texcoord())) {}
 
 PrimitiveVertex::~PrimitiveVertex() {}
 
@@ -39,6 +40,7 @@ PrimitiveVertexProto PrimitiveVertex::ToProto() const {
     *proto.mutable_position() = e8::ToProto(position);
     *proto.mutable_normal() = e8::ToProto(normal);
     *proto.mutable_tangent() = e8::ToProto(tangent);
+    proto.set_bitangent_sign(bitangent_sign);
     *proto.mutable_texcoord() = e8::ToProto(tex_coord);
     return proto;
 }

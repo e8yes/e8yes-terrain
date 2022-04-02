@@ -61,6 +61,17 @@ google::protobuf::RepeatedField<float> ToProto(vec3 const &v);
 vec3 ToVec3(google::protobuf::RepeatedField<float> const &proto);
 
 /**
+ * @brief ToProto Converts a 4D vector to a protobuf array.
+ */
+google::protobuf::RepeatedField<float> ToProto(vec4 const &v);
+
+/**
+ * @brief ToVec4 Converts a protobuf array back to a 4D vector. It will check if the array has
+ * exactly 4 elements. If not, it will fail.
+ */
+vec4 ToVec4(google::protobuf::RepeatedField<float> const &proto);
+
+/**
  * @brief ToProto Converts a 4 by 4 matrix to a protobuf array. The data is stored in column-major
  * order.
  */

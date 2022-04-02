@@ -94,6 +94,25 @@ vec3 ToVec3(google::protobuf::RepeatedField<float> const &proto) {
     return v;
 }
 
+google::protobuf::RepeatedField<float> ToProto(vec4 const &v) {
+    google::protobuf::RepeatedField<float> proto;
+    proto.Resize(/*new_size=*/4, /*value=*/0);
+    for (unsigned i = 0; i < 4; ++i) {
+        proto[i] = v(i);
+    }
+    return proto;
+}
+
+vec4 ToVec4(google::protobuf::RepeatedField<float> const &proto) {
+    assert(proto.size() == 4);
+
+    vec4 v;
+    for (unsigned i = 0; i < 4; ++i) {
+        v(i) = proto[i];
+    }
+    return v;
+}
+
 google::protobuf::RepeatedField<float> ToProto(mat44 const &m) {
     google::protobuf::RepeatedField<float> proto;
     proto.Resize(/*new_size=*/4 * 4, /*value=*/0);
