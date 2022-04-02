@@ -80,18 +80,19 @@ aabb BoundingBoxOf(GeometryProto const &geometry) {
     return bounding_box;
 }
 
-TextureProto OneByOneAlbedoTexture(vec3 const &albedo) {
+TextureProto OneByOneAlbedoTexture(vec4 const &albedo) {
     TextureProto texture_proto;
     texture_proto.set_encoding(TextureProto::PNG);
     texture_proto.set_width(1);
     texture_proto.set_height(1);
-    texture_proto.set_channel_count(3);
+    texture_proto.set_channel_count(4);
     texture_proto.set_channel_size(1);
 
-    vec<3, uint8_t> pixel{
+    vec<4, uint8_t> pixel{
         static_cast<uint8_t>(albedo(0) * 255.0f),
         static_cast<uint8_t>(albedo(1) * 255.0f),
         static_cast<uint8_t>(albedo(2) * 255.0f),
+        static_cast<uint8_t>(albedo(3) * 255.0f),
     };
     EncodeTextureData(&pixel, &texture_proto);
 
@@ -103,10 +104,10 @@ TextureProto OneByOneNormalTexture() {
     texture_proto.set_encoding(TextureProto::PNG);
     texture_proto.set_width(1);
     texture_proto.set_height(1);
-    texture_proto.set_channel_count(3);
+    texture_proto.set_channel_count(4);
     texture_proto.set_channel_size(1);
 
-    vec<3, uint8_t> pixel{0, 0, 255};
+    vec<3, uint8_t> pixel{0, 0, 255, 255};
     EncodeTextureData(&pixel, &texture_proto);
 
     return texture_proto;

@@ -56,7 +56,7 @@ aabb BoundingBoxOf(GeometryProto const &geometry);
  * @brief OneByOneAlbedoTexture Creates an albedo texture with exactly one pixel carrying the
  * specified albedo value.
  */
-TextureProto OneByOneAlbedoTexture(vec3 const &albedo);
+TextureProto OneByOneAlbedoTexture(vec4 const &albedo);
 
 /**
  * @brief OneByOneNormalTexture Creates a normal texture with exactly one pixel carrying a tangent

@@ -71,7 +71,6 @@ void MetallicRoughnessToTextureProto(unsigned texture_index, tinygltf::Model con
     assert(texture.source >= 0);
     tinygltf::Image const &combined_image = model.images[texture.source];
     assert(combined_image.bits == 8);
-    assert(combined_image.component == 3);
 
     std::vector<uint8_t> metallic_bitmap;
     std::vector<uint8_t> roughness_bitmap;
@@ -102,9 +101,10 @@ MaterialProto LoadMaterial(tinygltf::Material const &material, tinygltf::Model c
 
     if (material.pbrMetallicRoughness.baseColorTexture.index < 0) {
         *material_proto.mutable_albedo() = OneByOneAlbedoTexture(
-            vec3{static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[0]),
+            vec4{static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[0]),
                  static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[1]),
-                 static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[2])});
+                 static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[2]),
+                 static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[3])});
     } else {
         *material_proto.mutable_albedo() =
             ToTextureProto(material.pbrMetallicRoughness.baseColorTexture.index, model);

@@ -173,7 +173,6 @@ std::optional<SceneObject> LoadSceneObject(tinygltf::Node const &node, tinygltf:
 std::vector<SceneObject> LoadFromGltf(std::string const &gltf_file_path,
                                       ResourceAccessor *resource_accessor) {
     tinygltf::TinyGLTF loader;
-    loader.SetPreserveImageChannels(true);
 
     bool successful = false;
     std::string err;
