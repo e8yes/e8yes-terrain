@@ -11,7 +11,7 @@ layout (push_constant) uniform PerPassConstants {
 	int input_to_visualize;
 } ppc;
 
-layout(set = 1, binding = 0) uniform sampler2D geometry_map;
+layout(set = 1, binding = 0) uniform sampler2D light_inputs;
 
 layout (location = 0) out vec4 out_frag_color;
 
@@ -25,11 +25,11 @@ void main() {
 
     if (ppc.input_to_visualize == 1) {
         // Visualizes the normal vector.
-        vec3 normal = texture(geometry_map, screen_tex_coord).xyz;
+        vec3 normal = texture(light_inputs, screen_tex_coord).xyz;
         out_frag_color = vec4(normal, 1.0);
     } else {
         // Visualizes the roughness factor.
-        float roughness = texture(geometry_map, screen_tex_coord).w;
+        float roughness = texture(light_inputs, screen_tex_coord).w;
         out_frag_color = vec4(roughness, roughness, roughness, 1.0);
     }
 }

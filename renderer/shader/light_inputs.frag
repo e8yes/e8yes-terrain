@@ -27,5 +27,6 @@ void main() {
 
 	float roughness = texture(roughness_map, in_tex_coord).x;
 
-	out_geometry = vec4(normal.x, normal.y, normal.z, roughness);
+	vec3 normal_color = 0.5f*(normal + 1.0f);
+	out_geometry = vec4(normal_color.x, normal_color.y, normal_color.z, roughness);
 }
