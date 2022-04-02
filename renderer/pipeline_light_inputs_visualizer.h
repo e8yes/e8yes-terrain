@@ -22,7 +22,7 @@
 #include <optional>
 
 #include "common/device.h"
-#include "renderer/pipeline_output.h"
+#include "renderer/pipeline_light_inputs.h"
 #include "renderer/proto/renderer.pb.h"
 
 namespace e8 {

@@ -23,12 +23,40 @@
 
 #include "common/device.h"
 #include "renderer/drawable_instance.h"
+#include "renderer/pipeline_common.h"
 #include "renderer/pipeline_output.h"
 #include "renderer/projection.h"
 #include "renderer/vram_geometry.h"
 #include "renderer/vram_texture.h"
 
 namespace e8 {
+
+/**
+ * @brief The LightInputsPipelineOutput class For storing a 32-bit RGBA color output containing the
+ * geometry data as well as a 32-bit depth output.
+ */
+class LightInputsPipelineOutput : public PipelineOutputInterface {
+  public:
+    /**
+     * @brief LightInputsPipelineOutput Constructs a light inputs map output with the specified
+     * dimension.
+     *
+     * @param width The width of the light inputs map output.
+     * @param height The height of the light inputs map output.
+     * @param context Contextual Vulkan handles.
+     */
+    LightInputsPipelineOutput(unsigned width, unsigned height, VulkanContext *context);
+    ~LightInputsPipelineOutput();
+
+    FrameBuffer *GetFrameBuffer() const override;
+    RenderPass const &GetRenderPass() const override;
+    FrameBufferAttachment const *ColorAttachment() const override;
+    FrameBufferAttachment const *DepthAttachment() const override;
+
+  private:
+    struct LightInputsPipelineOutputImpl;
+    std::unique_ptr<LightInputsPipelineOutputImpl> pimpl_;
+};
 
 /**
  * @brief The LightInputsPipeline class A graphics pipeline for generating a map of geometry
