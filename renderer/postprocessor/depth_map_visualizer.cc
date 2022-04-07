@@ -78,7 +78,7 @@ struct DepthMapVisualizerPipeline::DepthMapVisualizerPipelineImpl {
     DescriptorSetAllocator *desc_set_allocator;
 
     std::unique_ptr<ImageSampler> depth_map_sampler;
-    PipelineOutputInterface const *current_depth_map_input;
+    DepthMapPipelineOutput const *current_depth_map_input;
     std::unique_ptr<PostProcessorPipeline> post_processor_pipeline;
 };
 

@@ -67,12 +67,14 @@ struct LightInputsVisualizerPipeline::LightInputsVisualizerPipelineImpl {
     DescriptorSetAllocator *desc_set_allocator;
     std::unique_ptr<ImageSampler> light_inputs_sampler;
     std::unique_ptr<PostProcessorPipeline> post_processor_pipeline;
+
+    LightInputsPipelineOutput const *current_light_inputs;
 };
 
 LightInputsVisualizerPipeline::LightInputsVisualizerPipelineImpl::LightInputsVisualizerPipelineImpl(
     PipelineOutputInterface *visualizer_output, DescriptorSetAllocator *desc_set_allocator,
     VulkanContext *context)
-    : context(context), desc_set_allocator(desc_set_allocator) {
+    : context(context), desc_set_allocator(desc_set_allocator), current_light_inputs(nullptr) {
     light_inputs_sampler = CreateReadBackSampler(context);
 
     post_processor_pipeline = std::make_unique<PostProcessorPipeline>(
@@ -108,10 +110,13 @@ LightInputsVisualizerPipeline::Run(LightInputsRendererParameters::InputType inpu
                                /*offset=*/0,
                                /*size=*/sizeof(PushConstants), &push_constants);
 
-            // Sets the depth map input.
-            WriteImageDescriptor(light_inputs.ColorAttachment()->view,
-                                 *pimpl_->light_inputs_sampler, input_images_desc_set,
-                                 /*binding=*/0, pimpl_->context);
+            if (&light_inputs != pimpl_->current_light_inputs) {
+                // Sets the depth map input.
+                WriteImageDescriptor(light_inputs.ColorAttachment()->view,
+                                     *pimpl_->light_inputs_sampler, input_images_desc_set,
+                                     /*binding=*/0, pimpl_->context);
+                pimpl_->current_light_inputs = &light_inputs;
+            }
 
             vkCmdBindDescriptorSets(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
                                     /*firstSet=*/DescriptorSetType::DST_PER_PASS,
