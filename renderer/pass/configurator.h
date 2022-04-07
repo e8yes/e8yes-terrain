@@ -18,6 +18,9 @@
 #ifndef ISLANDS_RENDERER_CONFIGURATOR_H
 #define ISLANDS_RENDERER_CONFIGURATOR_H
 
+#include <cstdint>
+#include <vector>
+
 #include "renderer/query/drawable_instance.h"
 #include "renderer/transfer/texture_group.h"
 
@@ -38,14 +41,14 @@ class RenderPassConfiguratorInterface {
     virtual bool IncludeDrawable(DrawableInstance const &drawable) const;
 
     /**
+     * @brief PushConstantOf A byte array containing push constant data of the specified drawable.
+     */
+    virtual std::vector<uint8_t> PushConstantOf(DrawableInstance const &drawable) const;
+
+    /**
      * @brief TexturesOf Textures of the specified drawable needed by the render pass.
      */
     virtual TextureSelector TexturesOf(DrawableInstance const &drawable) const;
-
-    /**
-     * @brief SetUniformsFor Sets the uniform variables for drawing the specified drawable.
-     */
-    virtual void PushConstant(DrawableInstance const &drawable, VkCommandBuffer cmds) const;
 };
 
 } // namespace e8

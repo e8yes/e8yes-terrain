@@ -17,6 +17,7 @@
 
 #include <array>
 #include <cassert>
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <unordered_set>
@@ -206,7 +207,12 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
                                     /*pDynamicOffsets=*/nullptr);
         }
 
-        configurator.PushConstant(instance, cmds);
+        std::vector<uint8_t> push_constant = configurator.PushConstantOf(instance);
+        if (uniform_layout.push_constant_range.has_value() && !push_constant.empty()) {
+            vkCmdPushConstants(cmds, uniform_layout.layout,
+                               /*stageFlags=*/uniform_layout.push_constant_range->stageFlags,
+                               /*offset=*/0, push_constant.size(), push_constant.data());
+        }
 
         VkDeviceSize offset = 0;
         vkCmdBindVertexBuffers(cmds, /*firstBinding=*/0, /*bindingCount=*/1,

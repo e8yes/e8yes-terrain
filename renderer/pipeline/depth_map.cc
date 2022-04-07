@@ -17,6 +17,7 @@
 
 #include <cassert>
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -47,16 +48,13 @@
 namespace e8 {
 namespace {
 
-struct PushConstants {
-    PushConstants(mat44 const &model_view_proj_trans)
-        : model_view_proj_trans(model_view_proj_trans) {}
-
+struct PushConstant {
     mat44 model_view_proj_trans;
 };
 
 VkPushConstantRange PushConstantLayout() {
     VkPushConstantRange push_constant{};
-    push_constant.size = sizeof(PushConstants);
+    push_constant.size = sizeof(PushConstant);
     push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
     return push_constant;
 }
@@ -73,33 +71,29 @@ std::vector<VkVertexInputAttributeDescription> VertexShaderInputAttributes() {
 
 class RenderPassConfigurator : public RenderPassConfiguratorInterface {
   public:
-    RenderPassConfigurator(ProjectionInterface const &projection,
-                           ShaderUniformLayout const &uniform_layout);
+    RenderPassConfigurator(ProjectionInterface const &projection);
     ~RenderPassConfigurator();
 
-    void PushConstant(DrawableInstance const &drawable, VkCommandBuffer cmds) const override;
+    std::vector<uint8_t> PushConstantOf(DrawableInstance const &drawable) const override;
 
   private:
     ProjectionInterface const &projection_;
-    ShaderUniformLayout const &uniform_layout_;
 };
 
-RenderPassConfigurator::RenderPassConfigurator(ProjectionInterface const &projection,
-                                               ShaderUniformLayout const &uniform_layout)
-    : projection_(projection), uniform_layout_(uniform_layout) {}
+RenderPassConfigurator::RenderPassConfigurator(ProjectionInterface const &projection)
+    : projection_(projection) {}
 
 RenderPassConfigurator::~RenderPassConfigurator() {}
 
-void RenderPassConfigurator::PushConstant(DrawableInstance const &drawable,
-                                          VkCommandBuffer cmds) const {
-    mat44 model_view_proj =
-        projection_.ProjectiveTransform() * projection_.ViewTransform() * (*drawable.transform);
-    PushConstants push_constants(model_view_proj);
+std::vector<uint8_t>
+RenderPassConfigurator::PushConstantOf(DrawableInstance const &drawable) const {
+    std::vector<uint8_t> bytes(sizeof(PushConstant));
 
-    vkCmdPushConstants(cmds, uniform_layout_.layout,
-                       /*stageFlags=*/VK_SHADER_STAGE_VERTEX_BIT,
-                       /*offset=*/0,
-                       /*size=*/sizeof(PushConstants), &push_constants);
+    PushConstant *push_constant = reinterpret_cast<PushConstant *>(bytes.data());
+    push_constant->model_view_proj_trans =
+        projection_.ProjectiveTransform() * projection_.ViewTransform() * (*drawable.transform);
+
+    return bytes;
 }
 
 } // namespace
@@ -211,7 +205,7 @@ DepthMapPipelineOutput *DepthMapPipeline::Run(std::vector<DrawableInstance> cons
     VkCommandBuffer cmds = StartRenderPass(pimpl_->output->GetRenderPass(),
                                            *pimpl_->output->GetFrameBuffer(), pimpl_->context);
 
-    RenderPassConfigurator configurator(projection, pimpl_->GetUniformLayout());
+    RenderPassConfigurator configurator(projection);
     RenderDrawables(drawables, pimpl_->GetGraphicsPipeline(), pimpl_->GetUniformLayout(),
                     configurator, tex_desc_set_cache, geo_vram, tex_vram, cmds);
 

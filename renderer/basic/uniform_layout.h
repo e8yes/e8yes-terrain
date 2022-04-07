@@ -42,6 +42,9 @@ struct ShaderUniformLayout {
     ShaderUniformLayout(ShaderUniformLayout const &) = delete;
     ShaderUniformLayout(ShaderUniformLayout &&) = delete;
 
+    // Push constant setup.
+    std::optional<VkPushConstantRange> push_constant_range;
+
     // descriptor set layout designed for low mutation frequency (changes every frame) uniform data.
     VkDescriptorSetLayout per_frame_desc_set;
 

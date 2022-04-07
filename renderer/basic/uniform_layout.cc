@@ -53,6 +53,7 @@ CreateShaderUniformLayout(std::optional<VkPushConstantRange> const &push_constan
     layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 
     // Sets push constant layout.
+    info->push_constant_range = push_constant;
     if (push_constant.has_value()) {
         layout_info.pPushConstantRanges = &push_constant.value();
         layout_info.pushConstantRangeCount = 1;

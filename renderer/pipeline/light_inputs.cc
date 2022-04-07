@@ -17,6 +17,7 @@
 
 #include <cassert>
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <vector>
 #include <vulkan/vulkan.h>
@@ -106,29 +107,38 @@ std::vector<VkDescriptorSetLayoutBinding> NormalRoughnessMapBinding() {
 class RenderPassConfigurator : public RenderPassConfiguratorInterface {
   public:
     RenderPassConfigurator(ProjectionInterface const &projection,
-                           ShaderUniformLayout const &uniform_layout,
                            ImageSampler const &texture_sampler);
     ~RenderPassConfigurator();
 
     bool IncludeDrawable(DrawableInstance const &drawable) const override;
+    std::vector<uint8_t> PushConstantOf(DrawableInstance const &drawable) const override;
     TextureSelector TexturesOf(DrawableInstance const &drawable) const override;
-    void PushConstant(DrawableInstance const &drawable, VkCommandBuffer cmds) const override;
 
   private:
     ProjectionInterface const &projection_;
-    ShaderUniformLayout const &uniform_layout_;
     ImageSampler const &texture_sampler_;
 };
 
 RenderPassConfigurator::RenderPassConfigurator(ProjectionInterface const &projection,
-                                               ShaderUniformLayout const &uniform_layout,
                                                ImageSampler const &texture_sampler)
-    : projection_(projection), uniform_layout_(uniform_layout), texture_sampler_(texture_sampler) {}
+    : projection_(projection), texture_sampler_(texture_sampler) {}
 
 RenderPassConfigurator::~RenderPassConfigurator() {}
 
 bool RenderPassConfigurator::IncludeDrawable(DrawableInstance const &drawable) const {
     return drawable.material != nullptr;
+}
+
+std::vector<uint8_t>
+RenderPassConfigurator::PushConstantOf(DrawableInstance const &drawable) const {
+    std::vector<uint8_t> bytes(sizeof(PushConstants));
+
+    PushConstants *push_constants = reinterpret_cast<PushConstants *>(bytes.data());
+    push_constants->view_model_trans = projection_.ViewTransform() * (*drawable.transform);
+    push_constants->proj_view_model_trans =
+        projection_.ProjectiveTransform() * push_constants->view_model_trans;
+
+    return bytes;
 }
 
 TextureSelector RenderPassConfigurator::TexturesOf(DrawableInstance const &drawable) const {
@@ -143,20 +153,6 @@ TextureSelector RenderPassConfigurator::TexturesOf(DrawableInstance const &drawa
     selector.bindings[TextureType::TT_ROUGHNESS] = 1;
 
     return selector;
-}
-
-void RenderPassConfigurator::PushConstant(DrawableInstance const &drawable,
-                                          VkCommandBuffer cmds) const {
-    // Vertex shader push constants.
-    PushConstants push_constants;
-    push_constants.view_model_trans = projection_.ViewTransform() * (*drawable.transform);
-    push_constants.proj_view_model_trans =
-        projection_.ProjectiveTransform() * push_constants.view_model_trans;
-
-    vkCmdPushConstants(cmds, uniform_layout_.layout,
-                       /*stageFlags=*/VK_SHADER_STAGE_VERTEX_BIT,
-                       /*offset=*/0,
-                       /*size=*/sizeof(PushConstants), &push_constants);
 }
 
 } // namespace
@@ -271,8 +267,7 @@ LightInputsPipelineOutput *LightInputsPipeline::Run(std::vector<DrawableInstance
     VkCommandBuffer cmds = StartRenderPass(pimpl_->output->GetRenderPass(),
                                            *pimpl_->output->GetFrameBuffer(), pimpl_->context);
 
-    RenderPassConfigurator configurator(projection, *pimpl_->uniform_layout,
-                                        *pimpl_->texture_sampler);
+    RenderPassConfigurator configurator(projection, *pimpl_->texture_sampler);
     RenderDrawables(drawables, *pimpl_->pipeline, *pimpl_->uniform_layout, configurator,
                     tex_desc_set_cache, geo_vram, tex_vram, cmds);
 

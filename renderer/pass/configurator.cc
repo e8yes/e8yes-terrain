@@ -15,6 +15,9 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cstdint>
+#include <vector>
+
 #include "renderer/pass/configurator.h"
 #include "renderer/query/drawable_instance.h"
 #include "renderer/transfer/texture_group.h"
@@ -30,12 +33,14 @@ bool RenderPassConfiguratorInterface::IncludeDrawable(DrawableInstance const & /
     return true;
 }
 
+std::vector<uint8_t>
+RenderPassConfiguratorInterface::PushConstantOf(DrawableInstance const & /*drawable*/) const {
+    return std::vector<uint8_t>();
+}
+
 TextureSelector
 RenderPassConfiguratorInterface::TexturesOf(DrawableInstance const & /*drawable*/) const {
     return TextureSelector(kNullUuid);
 }
-
-void RenderPassConfiguratorInterface::PushConstant(DrawableInstance const & /*drawable*/,
-                                                   VkCommandBuffer /*cmds*/) const {}
 
 } // namespace e8
