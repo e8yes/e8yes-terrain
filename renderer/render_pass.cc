@@ -23,13 +23,15 @@
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
+#include "renderer/descriptor_set.h"
 #include "renderer/drawable_instance.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/pipeline_output.h"
 #include "renderer/render_pass.h"
+#include "renderer/texture_group.h"
 #include "renderer/vram_geometry.h"
 #include "renderer/vram_texture.h"
-#include "resource/buffer_texture.h"
+#include "resource/common.h"
 #include "resource/geometry.h"
 
 namespace e8 {
@@ -55,15 +57,14 @@ UploadResources(std::vector<DrawableInstance> const &drawables,
             continue;
         }
 
-        RenderPassConfiguratorInterface::DrawableTextures staging_textures =
-            configurator.TexturesOf(drawable);
-        if (!staging_textures.Valid()) {
+        TextureSelector texture_selector = configurator.TexturesOf(drawable);
+        if (!texture_selector.Valid()) {
             excluded.insert(&drawable);
             continue;
         }
 
         geometries.push_back(drawable.geometry);
-        staging_textures.ToVector(&textures);
+        texture_selector.AppendTo(&textures);
     }
 
     geo_vram->Upload(geometries);
@@ -74,58 +75,6 @@ UploadResources(std::vector<DrawableInstance> const &drawables,
 
 } // namespace
 
-RenderPassConfiguratorInterface::DrawableTextures::DrawableTextures() {
-    for (unsigned i = 0; i < kTextureTypeCount; ++i) {
-        staging_textures[i] = nullptr;
-    }
-}
-
-RenderPassConfiguratorInterface::DrawableTextures::~DrawableTextures() {}
-
-bool RenderPassConfiguratorInterface::DrawableTextures::Valid() const {
-    for (unsigned i = 0; i < kTextureTypeCount; ++i) {
-        if (staging_textures[i] != nullptr && !staging_textures[i]->Valid()) {
-            return false;
-        }
-    }
-    return true;
-}
-
-void RenderPassConfiguratorInterface::DrawableTextures::ToVector(
-    std::vector<StagingTextureBuffer const *> *textures) const {
-    assert(this->Valid());
-
-    for (unsigned i = 0; i < kTextureTypeCount; ++i) {
-        if (staging_textures[i] != nullptr) {
-            textures->push_back(staging_textures[i]);
-        }
-    }
-}
-
-RenderPassConfiguratorInterface::DrawableGpuTextures::DrawableGpuTextures(
-    DrawableTextures const &staging, TextureVramTransfer *tex_vram) {
-    assert(staging.Valid());
-
-    for (unsigned i = 0; i < kTextureTypeCount; ++i) {
-        if (staging.staging_textures[i] != nullptr) {
-            gpu_textures[i] = tex_vram->Find(staging.staging_textures[i]);
-        } else {
-            gpu_textures[i] = nullptr;
-        }
-    }
-}
-
-RenderPassConfiguratorInterface::DrawableGpuTextures::~DrawableGpuTextures() {}
-
-bool RenderPassConfiguratorInterface::DrawableGpuTextures::Valid() const {
-    for (unsigned i = 0; i < kTextureTypeCount; ++i) {
-        if (gpu_textures[i] != nullptr && !gpu_textures[i]->Valid()) {
-            return false;
-        }
-    }
-    return true;
-}
-
 RenderPassConfiguratorInterface::RenderPassConfiguratorInterface() {}
 
 RenderPassConfiguratorInterface::~RenderPassConfiguratorInterface() {}
@@ -134,14 +83,13 @@ bool RenderPassConfiguratorInterface::IncludeDrawable(DrawableInstance const & /
     return true;
 }
 
-RenderPassConfiguratorInterface::DrawableTextures
+TextureSelector
 RenderPassConfiguratorInterface::TexturesOf(DrawableInstance const & /*drawable*/) const {
-    return DrawableTextures();
+    return TextureSelector(kNullUuid);
 }
 
-void RenderPassConfiguratorInterface::SetUniformsFor(DrawableInstance const & /*drawable*/,
-                                                     DrawableGpuTextures const & /*textures*/,
-                                                     VkCommandBuffer /*cmds*/) const {}
+void RenderPassConfiguratorInterface::PushConstant(DrawableInstance const & /*drawable*/,
+                                                   VkCommandBuffer /*cmds*/) const {}
 
 VkCommandBuffer StartRenderPass(RenderPass const &render_pass, FrameBuffer const &frame_buffer,
                                 VulkanContext *context) {
@@ -211,10 +159,10 @@ std::unique_ptr<GpuBarrier> FinishRenderPass(VkCommandBuffer cmds, GpuBarrier co
 }
 
 void RenderDrawables(std::vector<DrawableInstance> const &drawables,
-                     GraphicsPipeline const &pipeline,
+                     GraphicsPipeline const &pipeline, ShaderUniformLayout const &uniform_layout,
                      RenderPassConfiguratorInterface const &configurator,
-                     GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram,
-                     VkCommandBuffer cmds) {
+                     TextureDescriptorSetCache *tex_desc_set_cache, GeometryVramTransfer *geo_vram,
+                     TextureVramTransfer *tex_vram, VkCommandBuffer cmds) {
     std::unordered_set<DrawableInstance const *> excluded =
         UploadResources(drawables, configurator, geo_vram, tex_vram);
 
@@ -232,15 +180,30 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
         }
 
         // Fetches GPU texture data.
-        RenderPassConfiguratorInterface::DrawableTextures staging_textures =
-            configurator.TexturesOf(instance);
-        RenderPassConfiguratorInterface::DrawableGpuTextures textures(staging_textures, tex_vram);
-        if (!textures.Valid()) {
+        TextureSelector texture_selector = configurator.TexturesOf(instance);
+
+        TextureGroup texture_group;
+        texture_group.id = texture_selector.id;
+        texture_group.layout = uniform_layout.per_drawable_desc_set;
+        texture_group.sampler = texture_selector.sampler;
+        texture_group.textures = tex_vram->Find(texture_selector.textures);
+        texture_group.bindings = texture_selector.bindings;
+
+        if (!texture_group.Valid()) {
             continue;
         }
 
         // Prepares for the draw call.
-        configurator.SetUniformsFor(instance, textures, cmds);
+        if (texture_group.id != kNullUuid) {
+            DescriptorSet *desc_set = tex_desc_set_cache->DescriptorSetFor(texture_group);
+            vkCmdBindDescriptorSets(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
+                                    /*firstSet=*/DescriptorSetType::DST_PER_DRAWABLE,
+                                    /*descriptorSetCount=*/1, &desc_set->descriptor_set,
+                                    /*dynamicOffsetCount=*/0,
+                                    /*pDynamicOffsets=*/nullptr);
+        }
+
+        configurator.PushConstant(instance, cmds);
 
         VkDeviceSize offset = 0;
         vkCmdBindVertexBuffers(cmds, /*firstBinding=*/0, /*bindingCount=*/1,

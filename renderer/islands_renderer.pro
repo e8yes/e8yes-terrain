@@ -17,6 +17,8 @@ QMAKE_LFLAGS_RELEASE += -O3 -flto -march=native
 INCLUDEPATH += ../
 
 SOURCES += \
+    descriptor_set.cc \
+    descriptor_set_texture.cc \
     drawable_instance.cc \
     pipeline_common.cc \
     pipeline_depth_map.cc \
@@ -34,11 +36,14 @@ SOURCES += \
     renderer_depth.cc \
     renderer_light_inputs.cc \
     renderer_solid_color.cc \
+    texture_group.cc \
     vram.cc \
     vram_geometry.cc \
     vram_texture.cc
 
 HEADERS += \
+    descriptor_set.h \
+    descriptor_set_texture.h \
     drawable_instance.h \
     pipeline_common.h \
     pipeline_depth_map.h \
@@ -56,6 +61,7 @@ HEADERS += \
     renderer_depth.h \
     renderer_light_inputs.h \
     renderer_solid_color.h \
+    texture_group.h \
     vram.h \
     vram_geometry.h \
     vram_texture.h

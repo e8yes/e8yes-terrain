@@ -18,13 +18,13 @@
 #include <cassert>
 #include <cstddef>
 #include <memory>
-#include <optional>
 #include <utility>
 #include <vector>
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "common/tensor.h"
+#include "renderer/descriptor_set_texture.h"
 #include "renderer/drawable_instance.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/pipeline_depth_map.h"
@@ -67,8 +67,7 @@ class RenderPassConfigurator : public RenderPassConfiguratorInterface {
                            ShaderUniformLayout const &uniform_layout);
     ~RenderPassConfigurator();
 
-    void SetUniformsFor(DrawableInstance const &drawable, DrawableGpuTextures const &textures,
-                        VkCommandBuffer cmds) const override;
+    void PushConstant(DrawableInstance const &drawable, VkCommandBuffer cmds) const override;
 
   private:
     ProjectionInterface const &projection_;
@@ -81,9 +80,8 @@ RenderPassConfigurator::RenderPassConfigurator(ProjectionInterface const &projec
 
 RenderPassConfigurator::~RenderPassConfigurator() {}
 
-void RenderPassConfigurator::SetUniformsFor(DrawableInstance const &drawable,
-                                            DrawableGpuTextures const & /*textures*/,
-                                            VkCommandBuffer cmds) const {
+void RenderPassConfigurator::PushConstant(DrawableInstance const &drawable,
+                                          VkCommandBuffer cmds) const {
     mat44 model_view_proj =
         projection_.ProjectiveTransform() * projection_.ViewTransform() * (*drawable.transform);
     PushConstants push_constants(model_view_proj);
@@ -197,14 +195,15 @@ DepthMapPipeline::~DepthMapPipeline() {}
 DepthMapPipelineOutput *DepthMapPipeline::Run(std::vector<DrawableInstance> const &drawables,
                                               ProjectionInterface const &projection,
                                               GpuBarrier const &prerequisites,
+                                              TextureDescriptorSetCache *tex_desc_set_cache,
                                               GeometryVramTransfer *geo_vram,
                                               TextureVramTransfer *tex_vram) {
     VkCommandBuffer cmds = StartRenderPass(pimpl_->output->GetRenderPass(),
                                            *pimpl_->output->GetFrameBuffer(), pimpl_->context);
 
     RenderPassConfigurator configurator(projection, pimpl_->GetUniformLayout());
-    RenderDrawables(drawables, pimpl_->GetGraphicsPipeline(), configurator, geo_vram, tex_vram,
-                    cmds);
+    RenderDrawables(drawables, pimpl_->GetGraphicsPipeline(), pimpl_->GetUniformLayout(),
+                    configurator, tex_desc_set_cache, geo_vram, tex_vram, cmds);
 
     pimpl_->output->barrier =
         FinishRenderPass(cmds, prerequisites, pimpl_->output->AcquireFence(), pimpl_->context);

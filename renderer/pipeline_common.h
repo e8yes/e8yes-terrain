@@ -482,42 +482,6 @@ std::unique_ptr<ImageSampler> CreateReadBackSampler(VulkanContext *context);
 std::unique_ptr<ImageSampler> CreateTextureSampler(VulkanContext *context);
 
 /**
- * @brief The DescriptorSets struct It contains descriptor set instances of the descriptor set
- * layouts specified in a ShaderUniformLayout. It will clean up the descriptor set resource by the
- * end of its lifecycle.
- */
-struct DescriptorSets {
-    /**
-     * @brief DescriptorSets Should be created only by calling CreateDescriptorSets().
-     */
-    DescriptorSets(VulkanContext *context);
-    ~DescriptorSets();
-
-    // Per-drawable descriptor set instance.
-    VkDescriptorSet drawable;
-
-    // Per-pass descriptor set instance.
-    VkDescriptorSet pass;
-
-    // Per-frame descriptor set instance.
-    VkDescriptorSet frame;
-
-    // Contextual Vulkan handles.
-    VulkanContext *context;
-};
-
-/**
- * @brief CreateDescriptorSets Creates descriptor set instances of the descriptor set layouts
- * specified in the shader uniform layout.
- *
- * @param uniform_layout Contains the descriptor set layouts.
- * @param context Contextual Vulkan handles.
- * @return A valid unique pointer to the DescriptorSets structure.
- */
-std::unique_ptr<DescriptorSets> CreateDescriptorSets(ShaderUniformLayout const &uniform_layout,
-                                                     VulkanContext *context);
-
-/**
  * @brief WriteUniformBufferDescriptor Writes data (from the host) to the specified uniform buffer
  * descriptor. The write is synchronous.
  *

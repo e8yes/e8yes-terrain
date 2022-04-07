@@ -17,9 +17,11 @@
 
 #include <memory>
 #include <optional>
+#include <vector>
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
+#include "renderer/descriptor_set.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/pipeline_light_inputs_visualizer.h"
 #include "renderer/pipeline_output.h"
@@ -55,31 +57,35 @@ std::vector<VkDescriptorSetLayoutBinding> LightInputsBinding() {
 
 struct LightInputsVisualizerPipeline::LightInputsVisualizerPipelineImpl {
     LightInputsVisualizerPipelineImpl(PipelineOutputInterface *visualizer_output,
+                                      DescriptorSetAllocator *desc_set_allocator,
                                       VulkanContext *context);
     ~LightInputsVisualizerPipelineImpl();
 
     VulkanContext *context;
-
+    DescriptorSetAllocator *desc_set_allocator;
     std::unique_ptr<ImageSampler> light_inputs_sampler;
     std::unique_ptr<PostProcessorPipeline> post_processor_pipeline;
 };
 
 LightInputsVisualizerPipeline::LightInputsVisualizerPipelineImpl::LightInputsVisualizerPipelineImpl(
-    PipelineOutputInterface *visualizer_output, VulkanContext *context)
-    : context(context) {
+    PipelineOutputInterface *visualizer_output, DescriptorSetAllocator *desc_set_allocator,
+    VulkanContext *context)
+    : context(context), desc_set_allocator(desc_set_allocator) {
     light_inputs_sampler = CreateReadBackSampler(context);
 
     post_processor_pipeline = std::make_unique<PostProcessorPipeline>(
         kFragmentShaderFilePathLightInputsVisualizer, PushConstantRange(), LightInputsBinding(),
-        visualizer_output, context);
+        visualizer_output, desc_set_allocator, context);
 }
 
 LightInputsVisualizerPipeline::LightInputsVisualizerPipelineImpl::
     ~LightInputsVisualizerPipelineImpl() {}
 
 LightInputsVisualizerPipeline::LightInputsVisualizerPipeline(
-    PipelineOutputInterface *visualizer_output, VulkanContext *context)
-    : pimpl_(std::make_unique<LightInputsVisualizerPipelineImpl>(visualizer_output, context)) {}
+    PipelineOutputInterface *visualizer_output, DescriptorSetAllocator *desc_set_allocator,
+    VulkanContext *context)
+    : pimpl_(std::make_unique<LightInputsVisualizerPipelineImpl>(visualizer_output,
+                                                                 desc_set_allocator, context)) {}
 
 LightInputsVisualizerPipeline::~LightInputsVisualizerPipeline() {}
 
@@ -89,7 +95,8 @@ LightInputsVisualizerPipeline::Run(LightInputsRendererParameters::InputType inpu
     return pimpl_->post_processor_pipeline->Run(
         *light_inputs.barrier, /*set_uniforms_fn=*/
         [this, input_to_visualize, &light_inputs](ShaderUniformLayout const &uniform_layout,
-                                                  VkDescriptorSet per_pass, VkCommandBuffer cmds) {
+                                                  DescriptorSet const &input_images_desc_set,
+                                                  VkCommandBuffer cmds) {
             // Sets projection and visualizer parameters.
             PushConstants push_constants;
             push_constants.input_to_visualize = input_to_visualize;
@@ -100,13 +107,13 @@ LightInputsVisualizerPipeline::Run(LightInputsRendererParameters::InputType inpu
                                /*size=*/sizeof(PushConstants), &push_constants);
 
             // Sets the depth map input.
-            WriteImageDescriptor(light_inputs.ColorAttachment()->view,
-                                 *pimpl_->light_inputs_sampler, per_pass, /*binding=*/0,
-                                 pimpl_->context);
+            WriteImageDescriptor(
+                light_inputs.ColorAttachment()->view, *pimpl_->light_inputs_sampler,
+                input_images_desc_set.descriptor_set, /*binding=*/0, pimpl_->context);
 
             vkCmdBindDescriptorSets(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
-                                    /*firstSet=*/1,
-                                    /*descriptorSetCount=*/1, &per_pass,
+                                    /*firstSet=*/DescriptorSetType::DST_PER_PASS,
+                                    /*descriptorSetCount=*/1, &input_images_desc_set.descriptor_set,
                                     /*dynamicOffsetCount=*/0,
                                     /*pDynamicOffsets=*/nullptr);
         });

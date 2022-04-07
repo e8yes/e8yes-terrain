@@ -19,9 +19,9 @@
 #define ISLANDS_RENDERER_PIPELINE_LIGHT_INPUTS_VISUALIZER_H
 
 #include <memory>
-#include <optional>
 
 #include "common/device.h"
+#include "renderer/descriptor_set.h"
 #include "renderer/pipeline_light_inputs.h"
 #include "renderer/proto/renderer.pb.h"
 
@@ -41,6 +41,7 @@ class LightInputsVisualizerPipeline {
      * @param context Contextual Vulkan handles.
      */
     LightInputsVisualizerPipeline(PipelineOutputInterface *visualizer_output,
+                                  DescriptorSetAllocator *desc_set_allocator,
                                   VulkanContext *context);
 
     ~LightInputsVisualizerPipeline();

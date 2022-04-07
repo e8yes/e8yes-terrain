@@ -25,9 +25,12 @@
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
+#include "renderer/descriptor_set.h"
+#include "renderer/descriptor_set_texture.h"
 #include "renderer/drawable_instance.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/pipeline_output.h"
+#include "renderer/texture_group.h"
 #include "renderer/vram_geometry.h"
 #include "renderer/vram_texture.h"
 #include "resource/buffer_texture.h"
@@ -61,70 +64,10 @@ std::unique_ptr<GpuBarrier> FinishRenderPass(VkCommandBuffer cmds, GpuBarrier co
 
 /**
  * @brief The RenderPassConfiguratorInterface class For configuring what resources go in a render
- * pass and setting up the uniform variables for each drawable.
+ * pass and what shader uniform setup to apply to each drawable.
  */
 class RenderPassConfiguratorInterface {
   public:
-    /**
-     * @brief The DrawableTextureType enum All texture types that wraps on a geometry.
-     */
-    enum DrawableTextureType {
-        ALBEDO,
-        NORMAL,
-        METALLIC,
-        ROUGHNESS,
-        LIGHT_MAP,
-        INDIRECT_LIGHT_MAP,
-    };
-
-    // The total number of textures types.
-    static unsigned const kTextureTypeCount = INDIRECT_LIGHT_MAP + 1;
-
-    /**
-     * @brief The DrawableTextures struct Represents staging texture resources associated with a
-     * drawable.
-     */
-    struct DrawableTextures {
-        DrawableTextures();
-        ~DrawableTextures();
-
-        /**
-         * @brief Valid Checks if all non-null textures are valid.
-         */
-        bool Valid() const;
-
-        /**
-         * @brief ToVector Exports non-null textures to the vector.
-         */
-        void ToVector(std::vector<StagingTextureBuffer const *> *textures) const;
-
-        // Non-null slots are textures required by an associated drawable.
-        std::array<StagingTextureBuffer const *, kTextureTypeCount> staging_textures;
-    };
-
-    /**
-     * @brief The DrawableGpuTextures struct Represents uploaded texture resources associated with a
-     * drawable.
-     */
-    struct DrawableGpuTextures {
-        /**
-         * @brief DrawableGpuTextures Constructs upon the staging texture configuration.
-         *
-         * @param staging The staging texture configuration.
-         * @param tex_vram The cache which holds the uploaded version of the staging textures.
-         */
-        DrawableGpuTextures(DrawableTextures const &staging, TextureVramTransfer *tex_vram);
-        ~DrawableGpuTextures();
-
-        /**
-         * @brief Valid Checks if all non-null textures are valid.
-         */
-        bool Valid() const;
-
-        // Non-null slots are uploaded textures required by an associated drawable.
-        std::array<VramTransfer::GpuTexture const *, kTextureTypeCount> gpu_textures;
-    };
-
     RenderPassConfiguratorInterface();
     virtual ~RenderPassConfiguratorInterface();
 
@@ -136,13 +79,12 @@ class RenderPassConfiguratorInterface {
     /**
      * @brief TexturesOf Textures of the specified drawable needed by the render pass.
      */
-    virtual DrawableTextures TexturesOf(DrawableInstance const &drawable) const;
+    virtual TextureSelector TexturesOf(DrawableInstance const &drawable) const;
 
     /**
      * @brief SetUniformsFor Sets the uniform variables for drawing the specified drawable.
      */
-    virtual void SetUniformsFor(DrawableInstance const &drawable,
-                                DrawableGpuTextures const &textures, VkCommandBuffer cmds) const;
+    virtual void PushConstant(DrawableInstance const &drawable, VkCommandBuffer cmds) const;
 };
 
 /**
@@ -152,15 +94,16 @@ class RenderPassConfiguratorInterface {
  * @param drawables The array of drawables to be rendered.
  * @param pipeline The graphics pipeline to use for the rendering.
  * @param configurator Specifies how to set up the rendering.
+ * @param tex_desc_set_cache The texture descriptor set cache.
  * @param geo_vram The geometry VRAM transferer.
  * @param tex_vram The texture VRAM transferer.
  * @param cmds The command buffer to which draw commands will be added.
  */
 void RenderDrawables(std::vector<DrawableInstance> const &drawables,
-                     GraphicsPipeline const &pipeline,
+                     GraphicsPipeline const &pipeline, ShaderUniformLayout const &uniform_layout,
                      RenderPassConfiguratorInterface const &configurator,
-                     GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram,
-                     VkCommandBuffer cmds);
+                     TextureDescriptorSetCache *tex_desc_set_cache, GeometryVramTransfer *geo_vram,
+                     TextureVramTransfer *tex_vram, VkCommandBuffer cmds);
 
 // Represents a function which sets the value of uniform variables for post processing.
 using SetPostProcessorUniformsFn =

@@ -15,6 +15,7 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <array>
 #include <cassert>
 #include <cstdint>
 #include <vector>
@@ -22,6 +23,7 @@
 
 #include "common/cache.h"
 #include "common/device.h"
+#include "renderer/texture_group.h"
 #include "renderer/vram.h"
 #include "renderer/vram_texture.h"
 #include "resource/buffer_texture.h"
@@ -182,14 +184,26 @@ void TextureVramTransfer::Upload(std::vector<StagingTextureBuffer const *> const
     VkCommandBuffer cmds = VramTransfer::BeginUpload();
 
     for (auto texture : textures) {
+        assert(texture != nullptr);
         UploadTexture(texture, &texture_cache_, context_, cmds);
     }
 
     VramTransfer::EndUpload(cmds);
 }
 
-VramTransfer::GpuTexture *TextureVramTransfer::Find(StagingTextureBuffer const *texture) {
-    return texture_cache_.Find(texture);
+std::array<VramTransfer::GpuTexture *, TEXTURE_TYPE_COUNT> TextureVramTransfer::Find(
+    std::array<StagingTextureBuffer const *, TEXTURE_TYPE_COUNT> const &textures) {
+    std::array<VramTransfer::GpuTexture *, TEXTURE_TYPE_COUNT> result;
+
+    for (unsigned i = 0; i < TEXTURE_TYPE_COUNT; ++i) {
+        if (textures[i] != nullptr) {
+            result[i] = texture_cache_.Find(textures[i]);
+        } else {
+            result[i] = nullptr;
+        }
+    }
+
+    return result;
 }
 
 } // namespace e8

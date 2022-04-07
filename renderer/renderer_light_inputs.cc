@@ -24,15 +24,15 @@
 #include "content/common.h"
 #include "content/scene.h"
 #include "content/scene_entity.h"
+#include "renderer/descriptor_set.h"
+#include "renderer/descriptor_set_texture.h"
 #include "renderer/drawable_instance.h"
-#include "renderer/pipeline_common.h"
 #include "renderer/pipeline_light_inputs.h"
 #include "renderer/pipeline_light_inputs_visualizer.h"
 #include "renderer/pipeline_output.h"
 #include "renderer/projection.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/query_fn.h"
-#include "renderer/render_pass.h"
 #include "renderer/renderer.h"
 #include "renderer/renderer_light_inputs.h"
 #include "renderer/vram_geometry.h"
@@ -49,21 +49,24 @@ class LightInputsRenderer::LightInputsRendererImpl {
     LightInputsPipelineOutput light_inputs_output;
     SwapChainPipelineOutput final_output;
 
+    DescriptorSetAllocator desc_set_alloc;
+    TextureDescriptorSetCache tex_desc_set_cache;
+    GeometryVramTransfer geo_vram;
+    TextureVramTransfer tex_vram;
+
     LightInputsPipeline light_inputs_pipeline;
     LightInputsVisualizerPipeline light_inputs_visualizer_pipeline;
 
-    GeometryVramTransfer geo_vram;
-    TextureVramTransfer tex_vram;
     RendererConfiguration config;
 };
 
 LightInputsRenderer::LightInputsRendererImpl::LightInputsRendererImpl(VulkanContext *context)
     : light_inputs_output(context->swap_chain_image_extent.width,
                           context->swap_chain_image_extent.height, context),
-      final_output(/*with_depth_buffer=*/false, context),
+      final_output(/*with_depth_buffer=*/false, context), desc_set_alloc(context),
+      tex_desc_set_cache(&desc_set_alloc), geo_vram(context), tex_vram(context),
       light_inputs_pipeline(&light_inputs_output, context),
-      light_inputs_visualizer_pipeline(&final_output, context), geo_vram(context),
-      tex_vram(context) {}
+      light_inputs_visualizer_pipeline(&final_output, &desc_set_alloc, context) {}
 
 LightInputsRenderer::LightInputsRendererImpl::~LightInputsRendererImpl() {}
 
@@ -98,7 +101,7 @@ void LightInputsRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_acc
 
         LightInputsPipelineOutput *light_inputs = pimpl_->light_inputs_pipeline.Run(
             drawables, camera_projection, frame_context.acquire_swap_chain_image_barrier,
-            &pimpl_->geo_vram, &pimpl_->tex_vram);
+            &pimpl_->tex_desc_set_cache, &pimpl_->geo_vram, &pimpl_->tex_vram);
 
         final_output = pimpl_->light_inputs_visualizer_pipeline.Run(
             pimpl_->config.light_inputs_renderer_params().input_to_visualize(), *light_inputs);

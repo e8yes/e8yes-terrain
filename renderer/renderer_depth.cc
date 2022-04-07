@@ -24,15 +24,15 @@
 #include "content/common.h"
 #include "content/scene.h"
 #include "content/scene_entity.h"
+#include "renderer/descriptor_set.h"
+#include "renderer/descriptor_set_texture.h"
 #include "renderer/drawable_instance.h"
-#include "renderer/pipeline_common.h"
 #include "renderer/pipeline_depth_map.h"
 #include "renderer/pipeline_depth_map_visualizer.h"
 #include "renderer/pipeline_output.h"
 #include "renderer/projection.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/query_fn.h"
-#include "renderer/render_pass.h"
 #include "renderer/renderer.h"
 #include "renderer/renderer_depth.h"
 #include "renderer/vram_geometry.h"
@@ -49,20 +49,24 @@ class DepthRenderer::DepthRendererImpl {
     DepthMapPipelineOutput depth_map_output;
     SwapChainPipelineOutput final_output;
 
+    DescriptorSetAllocator desc_set_alloc;
+    TextureDescriptorSetCache tex_desc_set_cache;
+    GeometryVramTransfer geo_vram;
+    TextureVramTransfer tex_vram;
+
     DepthMapPipeline depth_map_pipeline;
     DepthMapVisualizerPipeline depth_map_visualizer_pipeline;
 
-    GeometryVramTransfer geo_vram;
-    TextureVramTransfer tex_vram;
     RendererConfiguration config;
 };
 
 DepthRenderer::DepthRendererImpl::DepthRendererImpl(VulkanContext *context)
     : depth_map_output(context->swap_chain_image_extent.width,
                        context->swap_chain_image_extent.height, context),
-      final_output(/*with_depth_buffer=*/false, context),
+      final_output(/*with_depth_buffer=*/false, context), desc_set_alloc(context),
+      tex_desc_set_cache(&desc_set_alloc), geo_vram(context), tex_vram(context),
       depth_map_pipeline(&depth_map_output, context),
-      depth_map_visualizer_pipeline(&final_output, context), geo_vram(context), tex_vram(context) {}
+      depth_map_visualizer_pipeline(&final_output, &desc_set_alloc, context) {}
 
 DepthRenderer::DepthRendererImpl::~DepthRendererImpl() {}
 
@@ -96,7 +100,7 @@ void DepthRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor)
 
         DepthMapPipelineOutput *depth_map_output = pimpl_->depth_map_pipeline.Run(
             drawables, camera_projection, frame_context.acquire_swap_chain_image_barrier,
-            &pimpl_->geo_vram, &pimpl_->tex_vram);
+            &pimpl_->tex_desc_set_cache, &pimpl_->geo_vram, &pimpl_->tex_vram);
 
         final_output = pimpl_->depth_map_visualizer_pipeline.Run(
             pimpl_->config.depth_renderer_params().alpha(), camera_projection, *depth_map_output);

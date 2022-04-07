@@ -19,17 +19,14 @@
 #define ISLANDS_RENDERER_PIPELINE_DEPTH_MAP_H
 
 #include <memory>
-#include <optional>
 #include <vector>
-#include <vulkan/vulkan.h>
 
 #include "common/device.h"
-#include "common/tensor.h"
+#include "renderer/descriptor_set_texture.h"
 #include "renderer/drawable_instance.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/pipeline_output.h"
 #include "renderer/projection.h"
-#include "renderer/render_pass.h"
 #include "renderer/vram_geometry.h"
 #include "renderer/vram_texture.h"
 
@@ -82,14 +79,16 @@ class DepthMapPipeline {
      * @param drawables An array of drawables to be rendered onto the depth map.
      * @param projection Defines how drawables should be projected to the depth map.
      * @param prerequisites Dependent tasks.
+     * @param tex_desc_set_cache
      * @param geo_vram The geometry VRAM transferer.
      * @param tex_vram The texture VRAM transferer.
      * @return The output object set from the constructor, with a barrier assigned.
      */
     DepthMapPipelineOutput *Run(std::vector<DrawableInstance> const &drawables,
                                 ProjectionInterface const &projection,
-                                GpuBarrier const &prerequisites, GeometryVramTransfer *geo_vram,
-                                TextureVramTransfer *tex_vram);
+                                GpuBarrier const &prerequisites,
+                                TextureDescriptorSetCache *tex_desc_set_cache,
+                                GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram);
 
   private:
     class DepthMapPipelineImpl;

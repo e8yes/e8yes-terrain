@@ -16,17 +16,20 @@
  */
 
 #include <cassert>
+#include <cstddef>
 #include <memory>
 #include <vector>
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
+#include "renderer/descriptor_set_texture.h"
 #include "renderer/drawable_instance.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/pipeline_light_inputs.h"
 #include "renderer/pipeline_output.h"
 #include "renderer/projection.h"
 #include "renderer/render_pass.h"
+#include "renderer/texture_group.h"
 #include "renderer/vram_geometry.h"
 #include "renderer/vram_texture.h"
 
@@ -94,34 +97,23 @@ class RenderPassConfigurator : public RenderPassConfiguratorInterface {
   public:
     RenderPassConfigurator(ProjectionInterface const &projection,
                            ShaderUniformLayout const &uniform_layout,
-                           DescriptorSets const &descriptor_sets,
-                           ImageSampler const &normal_map_sampler,
-                           ImageSampler const &roughness_map_sampler, VulkanContext *context);
+                           ImageSampler const &texture_sampler);
     ~RenderPassConfigurator();
 
     bool IncludeDrawable(DrawableInstance const &drawable) const override;
-    DrawableTextures TexturesOf(DrawableInstance const &drawable) const override;
-    void SetUniformsFor(DrawableInstance const &drawable, DrawableGpuTextures const &textures,
-                        VkCommandBuffer cmds) const override;
+    TextureSelector TexturesOf(DrawableInstance const &drawable) const override;
+    void PushConstant(DrawableInstance const &drawable, VkCommandBuffer cmds) const override;
 
   private:
     ProjectionInterface const &projection_;
     ShaderUniformLayout const &uniform_layout_;
-    DescriptorSets const &descriptor_sets_;
-    ImageSampler const &normal_map_sampler_;
-    ImageSampler const &roughness_map_sampler_;
-    VulkanContext *context_;
+    ImageSampler const &texture_sampler_;
 };
 
 RenderPassConfigurator::RenderPassConfigurator(ProjectionInterface const &projection,
                                                ShaderUniformLayout const &uniform_layout,
-                                               DescriptorSets const &descriptor_sets,
-                                               ImageSampler const &normal_map_sampler,
-                                               ImageSampler const &roughness_map_sampler,
-                                               VulkanContext *context)
-    : projection_(projection), uniform_layout_(uniform_layout), descriptor_sets_(descriptor_sets),
-      normal_map_sampler_(normal_map_sampler), roughness_map_sampler_(roughness_map_sampler),
-      context_(context) {}
+                                               ImageSampler const &texture_sampler)
+    : projection_(projection), uniform_layout_(uniform_layout), texture_sampler_(texture_sampler) {}
 
 RenderPassConfigurator::~RenderPassConfigurator() {}
 
@@ -129,19 +121,22 @@ bool RenderPassConfigurator::IncludeDrawable(DrawableInstance const &drawable) c
     return drawable.material != nullptr;
 }
 
-RenderPassConfigurator::DrawableTextures
-RenderPassConfigurator::TexturesOf(DrawableInstance const &drawable) const {
-    RenderPassConfigurator::DrawableTextures textures;
+TextureSelector RenderPassConfigurator::TexturesOf(DrawableInstance const &drawable) const {
+    TextureSelector selector(drawable.material->id);
 
-    textures.staging_textures[NORMAL] = &drawable.material->normal;
-    textures.staging_textures[ROUGHNESS] = &drawable.material->roughness;
+    selector.sampler = &texture_sampler_;
 
-    return textures;
+    selector.textures[TextureType::TT_NORMAL] = &drawable.material->normal;
+    selector.bindings[TextureType::TT_NORMAL] = 0;
+
+    selector.textures[TextureType::TT_ROUGHNESS] = &drawable.material->roughness;
+    selector.bindings[TextureType::TT_ROUGHNESS] = 1;
+
+    return selector;
 }
 
-void RenderPassConfigurator::SetUniformsFor(DrawableInstance const &drawable,
-                                            DrawableGpuTextures const &textures,
-                                            VkCommandBuffer cmds) const {
+void RenderPassConfigurator::PushConstant(DrawableInstance const &drawable,
+                                          VkCommandBuffer cmds) const {
     // Vertex shader push constants.
     PushConstants push_constants;
     push_constants.view_model_trans = projection_.ViewTransform() * (*drawable.transform);
@@ -152,20 +147,6 @@ void RenderPassConfigurator::SetUniformsFor(DrawableInstance const &drawable,
                        /*stageFlags=*/VK_SHADER_STAGE_VERTEX_BIT,
                        /*offset=*/0,
                        /*size=*/sizeof(PushConstants), &push_constants);
-
-    // Fragment shader texture map descriptors.
-    WriteImageDescriptor(textures.gpu_textures[NORMAL]->view, normal_map_sampler_,
-                         descriptor_sets_.drawable,
-                         /*binding=*/0, context_);
-    WriteImageDescriptor(textures.gpu_textures[ROUGHNESS]->view, roughness_map_sampler_,
-                         descriptor_sets_.drawable,
-                         /*binding=*/1, context_);
-
-    vkCmdBindDescriptorSets(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout_.layout,
-                            /*firstSet=*/2,
-                            /*descriptorSetCount=*/1, &descriptor_sets_.drawable,
-                            /*dynamicOffsetCount=*/0,
-                            /*pDynamicOffsets=*/nullptr);
 }
 
 } // namespace
@@ -234,14 +215,12 @@ class LightInputsPipeline::LightInputsPipelineImpl {
   public:
     std::unique_ptr<ShaderStages> shader_stages;
     std::unique_ptr<ShaderUniformLayout> uniform_layout;
-    std::unique_ptr<DescriptorSets> descriptor_sets;
     std::unique_ptr<VertexInputInfo> vertex_inputs;
     std::unique_ptr<FixedStageConfig> fixed_stage_config;
 
     std::unique_ptr<GraphicsPipeline> pipeline;
 
-    std::unique_ptr<ImageSampler> normal_map_sampler;
-    std::unique_ptr<ImageSampler> roughness_map_sampler;
+    std::unique_ptr<ImageSampler> texture_sampler;
 };
 
 LightInputsPipeline::LightInputsPipelineImpl::LightInputsPipelineImpl(
@@ -251,7 +230,6 @@ LightInputsPipeline::LightInputsPipelineImpl::LightInputsPipelineImpl(
         PushConstantLayout(), /*per_frame_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
         /*per_pass_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
         /*per_drawable_desc_set=*/NormalRoughnessMapBinding(), context);
-    descriptor_sets = CreateDescriptorSets(*uniform_layout, context);
     shader_stages = CreateShaderStages(
         /*vertex_shader_file_path=*/kVertexShaderFilePathLightInputs,
         /*fragment_shader_file_path=*/kFragmentShaderFilePathLightInputs, context);
@@ -264,8 +242,7 @@ LightInputsPipeline::LightInputsPipelineImpl::LightInputsPipelineImpl(
     pipeline = CreateGraphicsPipeline(output->GetRenderPass(), *shader_stages, *uniform_layout,
                                       *vertex_inputs, *fixed_stage_config, context);
 
-    normal_map_sampler = CreateTextureSampler(context);
-    roughness_map_sampler = CreateTextureSampler(context);
+    texture_sampler = CreateTextureSampler(context);
 }
 
 LightInputsPipeline::LightInputsPipelineImpl::~LightInputsPipelineImpl() {}
@@ -278,15 +255,16 @@ LightInputsPipeline::~LightInputsPipeline() {}
 LightInputsPipelineOutput *LightInputsPipeline::Run(std::vector<DrawableInstance> const &drawables,
                                                     ProjectionInterface const &projection,
                                                     GpuBarrier const &prerequisites,
+                                                    TextureDescriptorSetCache *tex_desc_set_cache,
                                                     GeometryVramTransfer *geo_vram,
                                                     TextureVramTransfer *tex_vram) {
     VkCommandBuffer cmds = StartRenderPass(pimpl_->output->GetRenderPass(),
                                            *pimpl_->output->GetFrameBuffer(), pimpl_->context);
 
     RenderPassConfigurator configurator(projection, *pimpl_->uniform_layout,
-                                        *pimpl_->descriptor_sets, *pimpl_->normal_map_sampler,
-                                        *pimpl_->roughness_map_sampler, pimpl_->context);
-    RenderDrawables(drawables, *pimpl_->pipeline, configurator, geo_vram, tex_vram, cmds);
+                                        *pimpl_->texture_sampler);
+    RenderDrawables(drawables, *pimpl_->pipeline, *pimpl_->uniform_layout, configurator,
+                    tex_desc_set_cache, geo_vram, tex_vram, cmds);
 
     pimpl_->output->barrier =
         FinishRenderPass(cmds, prerequisites, pimpl_->output->AcquireFence(), pimpl_->context);

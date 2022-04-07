@@ -22,6 +22,7 @@
 #include <optional>
 
 #include "common/device.h"
+#include "renderer/descriptor_set.h"
 #include "renderer/pipeline_depth_map.h"
 #include "renderer/projection.h"
 
@@ -38,9 +39,11 @@ class DepthMapVisualizerPipeline {
      * visualizing a rendered depth map.
      *
      * @param visualizer_output An object for storing the depth map image in grayscale.
+     * @param desc_set_allocator
      * @param context Contextual Vulkan handles.
      */
-    DepthMapVisualizerPipeline(PipelineOutputInterface *visualizer_output, VulkanContext *context);
+    DepthMapVisualizerPipeline(PipelineOutputInterface *visualizer_output,
+                               DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
 
     ~DepthMapVisualizerPipeline();
 

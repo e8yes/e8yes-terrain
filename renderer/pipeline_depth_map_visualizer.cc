@@ -18,9 +18,11 @@
 #include <cassert>
 #include <memory>
 #include <optional>
+#include <vector>
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
+#include "renderer/descriptor_set.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/pipeline_depth_map_visualizer.h"
 #include "renderer/pipeline_output.h"
@@ -67,10 +69,12 @@ std::vector<VkDescriptorSetLayoutBinding> DepthMapBinding() {
 
 struct DepthMapVisualizerPipeline::DepthMapVisualizerPipelineImpl {
     DepthMapVisualizerPipelineImpl(PipelineOutputInterface *visualizer_output,
+                                   DescriptorSetAllocator *desc_set_allocator,
                                    VulkanContext *context);
     ~DepthMapVisualizerPipelineImpl();
 
     VulkanContext *context;
+    DescriptorSetAllocator *desc_set_allocator;
 
     std::unique_ptr<ImageSampler> depth_map_sampler;
     PipelineOutputInterface const *current_depth_map_input;
@@ -78,20 +82,23 @@ struct DepthMapVisualizerPipeline::DepthMapVisualizerPipelineImpl {
 };
 
 DepthMapVisualizerPipeline::DepthMapVisualizerPipelineImpl::DepthMapVisualizerPipelineImpl(
-    PipelineOutputInterface *visualizer_output, VulkanContext *context)
-    : context(context), current_depth_map_input(nullptr) {
+    PipelineOutputInterface *visualizer_output, DescriptorSetAllocator *desc_set_allocator,
+    VulkanContext *context)
+    : context(context), desc_set_allocator(desc_set_allocator), current_depth_map_input(nullptr) {
     depth_map_sampler = CreateReadBackSampler(context);
 
     post_processor_pipeline = std::make_unique<PostProcessorPipeline>(
         kFragmentShaderFilePathDepthMapVisualizer, PushConstantRange(), DepthMapBinding(),
-        visualizer_output, context);
+        visualizer_output, desc_set_allocator, context);
 }
 
 DepthMapVisualizerPipeline::DepthMapVisualizerPipelineImpl::~DepthMapVisualizerPipelineImpl() {}
 
 DepthMapVisualizerPipeline::DepthMapVisualizerPipeline(PipelineOutputInterface *visualizer_output,
+                                                       DescriptorSetAllocator *desc_set_allocator,
                                                        VulkanContext *context)
-    : pimpl_(std::make_unique<DepthMapVisualizerPipelineImpl>(visualizer_output, context)) {}
+    : pimpl_(std::make_unique<DepthMapVisualizerPipelineImpl>(visualizer_output, desc_set_allocator,
+                                                              context)) {}
 
 DepthMapVisualizerPipeline::~DepthMapVisualizerPipeline() {}
 
@@ -101,7 +108,8 @@ DepthMapVisualizerPipeline::Run(float alpha, std::optional<PerspectiveProjection
     return pimpl_->post_processor_pipeline->Run(
         *depth_map.barrier, /*set_uniforms_fn=*/
         [this, alpha, projection, &depth_map](ShaderUniformLayout const &uniform_layout,
-                                              VkDescriptorSet per_pass, VkCommandBuffer cmds) {
+                                              DescriptorSet const &input_images_desc_set,
+                                              VkCommandBuffer cmds) {
             // Sets projection and visualizer parameters.
             PushConstants push_constants;
             push_constants.alpha = alpha;
@@ -118,14 +126,15 @@ DepthMapVisualizerPipeline::Run(float alpha, std::optional<PerspectiveProjection
             // Sets the depth map input.
             if (&depth_map != pimpl_->current_depth_map_input) {
                 WriteImageDescriptor(depth_map.DepthAttachment()->view, *pimpl_->depth_map_sampler,
-                                     per_pass, /*binding=*/0, pimpl_->context);
+                                     input_images_desc_set.descriptor_set, /*binding=*/0,
+                                     pimpl_->context);
 
                 pimpl_->current_depth_map_input = &depth_map;
             }
 
             vkCmdBindDescriptorSets(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
                                     /*firstSet=*/1,
-                                    /*descriptorSetCount=*/1, &per_pass,
+                                    /*descriptorSetCount=*/1, &input_images_desc_set.descriptor_set,
                                     /*dynamicOffsetCount=*/0,
                                     /*pDynamicOffsets=*/nullptr);
         });

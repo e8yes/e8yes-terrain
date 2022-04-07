@@ -22,6 +22,7 @@
 #include <string>
 
 #include "common/device.h"
+#include "renderer/descriptor_set.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/pipeline_output.h"
 #include "renderer/render_pass.h"
@@ -36,8 +37,9 @@ namespace e8 {
 class PostProcessorPipeline {
   public:
     //
-    using SetPostProcessorUniformsExFn = std::function<void(
-        ShaderUniformLayout const &uniform_layout, VkDescriptorSet per_pass, VkCommandBuffer cmds)>;
+    using SetPostProcessorUniformsExFn =
+        std::function<void(ShaderUniformLayout const &uniform_layout,
+                           DescriptorSet const &image_inputs_desc_set, VkCommandBuffer cmds)>;
 
     /**
      * @brief PostProcessorPipeline Constructs a custom post processor.
@@ -46,21 +48,25 @@ class PostProcessorPipeline {
      * @param push_constant
      * @param per_pass_desc_set
      * @param output To receive output from the post processor.
+     * @param desc_set_allocator
      * @param context Contextual Vulkan handles.
      */
     PostProcessorPipeline(std::string const &fragment_shader,
                           std::optional<VkPushConstantRange> const &push_constant,
                           std::vector<VkDescriptorSetLayoutBinding> const &per_pass_desc_set,
-                          PipelineOutputInterface *output, VulkanContext *context);
+                          PipelineOutputInterface *output,
+                          DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
 
     /**
      * @brief PostProcessorPipeline Constructs an empty post processor. It loads the empty post
      * processor shader and outputs the UV coordinate as color.
      *
      * @param output To receive output from the post processor.
+     * @param desc_set_allocator
      * @param context Contextual Vulkan handles.
      */
-    PostProcessorPipeline(PipelineOutputInterface *output, VulkanContext *context);
+    PostProcessorPipeline(PipelineOutputInterface *output,
+                          DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
 
     ~PostProcessorPipeline();
 

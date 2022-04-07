@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "common/device.h"
+#include "renderer/descriptor_set_texture.h"
 #include "renderer/drawable_instance.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/pipeline_output.h"
@@ -81,14 +82,16 @@ class LightInputsPipeline {
      * @param drawables An array of drawables to be rendered onto the light inputs map.
      * @param projection Defines how drawables should be projected to the light inputs map..
      * @param prerequisites Dependent tasks.
+     * @param tex_desc_set_cache
      * @param geo_vram The geometry VRAM transferer.
      * @param tex_vram The texture VRAM transferer.
      * @return The output object set from the constructor, with a barrier assigned.
      */
     LightInputsPipelineOutput *Run(std::vector<DrawableInstance> const &drawables,
                                    ProjectionInterface const &projection,
-                                   GpuBarrier const &prerequisites, GeometryVramTransfer *geo_vram,
-                                   TextureVramTransfer *tex_vram);
+                                   GpuBarrier const &prerequisites,
+                                   TextureDescriptorSetCache *tex_desc_set_cache,
+                                   GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram);
 
   private:
     class LightInputsPipelineImpl;

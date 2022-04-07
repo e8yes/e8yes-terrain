@@ -18,10 +18,12 @@
 #ifndef ISLANDS_RENDERER_VRAM_IMAGE_H
 #define ISLANDS_RENDERER_VRAM_IMAGE_H
 
+#include <array>
 #include <vector>
 
 #include "common/cache.h"
 #include "common/device.h"
+#include "renderer/texture_group.h"
 #include "renderer/vram.h"
 #include "resource/buffer_texture.h"
 
@@ -51,10 +53,11 @@ class TextureVramTransfer : public VramTransfer {
     void Upload(std::vector<StagingTextureBuffer const *> const &textures);
 
     /**
-     * @brief Find Returns the uploaded image. If the specified image has not been uploaded prior to
-     * this call, this function will fail.
+     * @brief Find Returns the uploaded textures. If the specified textures has not been uploaded
+     * prior to this call, this function will fail.
      */
-    GpuTexture *Find(StagingTextureBuffer const *texture);
+    std::array<VramTransfer::GpuTexture *, TEXTURE_TYPE_COUNT>
+    Find(std::array<StagingTextureBuffer const *, TEXTURE_TYPE_COUNT> const &textures);
 
   private:
     DeviceCache<StagingTextureBuffer const *, GpuTexture> texture_cache_;

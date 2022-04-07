@@ -67,7 +67,6 @@ struct VulkanContext {
     std::vector<VkImage> swap_chain_images;
     std::vector<VkImageView> swap_chain_image_views;
     VkCommandPool command_pool;
-    VkDescriptorPool descriptor_pool;
     VmaAllocator allocator;
     MemoryUsageTracker geometry_ram_usage;
     MemoryUsageTracker image_ram_usage;

@@ -23,6 +23,7 @@
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
+#include "renderer/descriptor_set.h"
 #include "renderer/pipeline_common.h"
 #include "renderer/pipeline_output.h"
 #include "renderer/pipeline_post_processor.h"
@@ -49,13 +50,13 @@ VkDescriptorSetLayoutBinding PostProcessorViewportBinding() {
 
 std::unique_ptr<ShaderUniformLayout>
 UniformLayout(std::optional<VkPushConstantRange> const &push_constant,
-              std::vector<VkDescriptorSetLayoutBinding> const &per_pass_desc_set,
+              std::vector<VkDescriptorSetLayoutBinding> const &input_images_layouts,
               VulkanContext *context) {
     return CreateShaderUniformLayout(
         push_constant,
         /*per_frame_desc_set=*/
         std::vector<VkDescriptorSetLayoutBinding>{PostProcessorViewportBinding()},
-        /*per_pass_desc_set=*/per_pass_desc_set,
+        /*per_pass_desc_set=*/input_images_layouts,
         /*per_drawable_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(), context);
 }
 
@@ -64,8 +65,9 @@ UniformLayout(std::optional<VkPushConstantRange> const &push_constant,
 struct PostProcessorPipeline::PostProcessorPipelineImpl {
     PostProcessorPipelineImpl(std::string const &fragment_shader,
                               std::optional<VkPushConstantRange> const &push_constant,
-                              std::vector<VkDescriptorSetLayoutBinding> const &per_pass_desc_set,
-                              PipelineOutputInterface *output, VulkanContext *context);
+                              std::vector<VkDescriptorSetLayoutBinding> const &input_images_layouts,
+                              PipelineOutputInterface *output,
+                              DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
     ~PostProcessorPipelineImpl();
 
     PipelineOutputInterface *output;
@@ -73,31 +75,38 @@ struct PostProcessorPipeline::PostProcessorPipelineImpl {
 
     std::unique_ptr<ShaderStages> shader_stages;
     std::unique_ptr<ShaderUniformLayout> uniform_layout;
-    std::unique_ptr<DescriptorSets> descriptor_sets;
     std::unique_ptr<VertexInputInfo> vertex_inputs;
     std::unique_ptr<FixedStageConfig> fixed_stage_config;
 
-    std::unique_ptr<UniformBuffer> viewport_dimension_ubo;
-
     std::unique_ptr<GraphicsPipeline> pipeline;
+
+    std::unique_ptr<DescriptorSet> viewport_dimension_desc_set;
+    std::unique_ptr<DescriptorSet> input_images_desc_set;
+    std::unique_ptr<UniformBuffer> viewport_dimension_ubo;
 };
 
 PostProcessorPipeline::PostProcessorPipelineImpl::PostProcessorPipelineImpl(
     std::string const &fragment_shader, std::optional<VkPushConstantRange> const &push_constant,
-    std::vector<VkDescriptorSetLayoutBinding> const &per_pass_desc_set,
-    PipelineOutputInterface *output, VulkanContext *context)
+    std::vector<VkDescriptorSetLayoutBinding> const &input_images_layouts,
+    PipelineOutputInterface *output, DescriptorSetAllocator *desc_set_allocator,
+    VulkanContext *context)
     : output(output), context(context) {
     shader_stages =
         CreateShaderStages(/*vertex_shader_file_path=*/kVertexShaderFilePathPostProcessor,
                            /*fragment_shader_file_path=*/fragment_shader, context);
-    uniform_layout = UniformLayout(push_constant, per_pass_desc_set, context);
-    descriptor_sets = CreateDescriptorSets(*uniform_layout, context);
+    uniform_layout = UniformLayout(push_constant, input_images_layouts, context);
     vertex_inputs = CreateVertexInputState(
         /*input_attributes=*/std::vector<VkVertexInputAttributeDescription>());
     fixed_stage_config =
         CreateFixedStageConfig(/*polygon_mode=*/VK_POLYGON_MODE_FILL,
                                /*cull_mode=*/VK_CULL_MODE_NONE,
                                /*enable_depth_test=*/false, output->width, output->height);
+
+    // Allocate descriptor sets.
+    viewport_dimension_desc_set = desc_set_allocator->Allocate(DescriptorType::DT_UNIFORM_BUFFER,
+                                                               uniform_layout->per_frame_desc_set);
+    input_images_desc_set = desc_set_allocator->Allocate(DescriptorType::DT_COMBINED_IMAGE_SAMPLER,
+                                                         uniform_layout->per_pass_desc_set);
 
     // Sets up the viewport dimension UBO descriptor.
     viewport_dimension_ubo = CreateUniformBuffer(/*size=*/sizeof(ViewportDimension), context);
@@ -106,7 +115,8 @@ PostProcessorPipeline::PostProcessorPipelineImpl::PostProcessorPipelineImpl(
     dimension.viewport_width = output->width;
     dimension.viewport_height = output->height;
 
-    WriteUniformBufferDescriptor(&dimension, *viewport_dimension_ubo, descriptor_sets->frame,
+    WriteUniformBufferDescriptor(&dimension, *viewport_dimension_ubo,
+                                 viewport_dimension_desc_set->descriptor_set,
                                  /*binding=*/0, context);
 
     // Creates the post processing pipeline.
@@ -120,16 +130,19 @@ PostProcessorPipeline::PostProcessorPipelineImpl::~PostProcessorPipelineImpl() {
 PostProcessorPipeline::PostProcessorPipeline(
     std::string const &fragment_shader, std::optional<VkPushConstantRange> const &push_constant,
     std::vector<VkDescriptorSetLayoutBinding> const &per_pass_desc_set,
-    PipelineOutputInterface *output, VulkanContext *context)
-    : pimpl_(std::make_unique<PostProcessorPipelineImpl>(fragment_shader, push_constant,
-                                                         per_pass_desc_set, output, context)) {}
+    PipelineOutputInterface *output, DescriptorSetAllocator *desc_set_allocator,
+    VulkanContext *context)
+    : pimpl_(std::make_unique<PostProcessorPipelineImpl>(
+          fragment_shader, push_constant, per_pass_desc_set, output, desc_set_allocator, context)) {
+}
 
 PostProcessorPipeline::PostProcessorPipeline(PipelineOutputInterface *output,
+                                             DescriptorSetAllocator *desc_set_allocator,
                                              VulkanContext *context)
     : PostProcessorPipeline(kFragmentShaderFilePathPostProcessorEmpty,
                             /*push_constant=*/std::nullopt,
                             /*per_pass_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
-                            output, context) {}
+                            output, desc_set_allocator, context) {}
 
 PostProcessorPipeline::~PostProcessorPipeline() {}
 
@@ -142,14 +155,15 @@ PostProcessorPipeline::Run(GpuBarrier const &barrier,
     PostProcess(
         *pimpl_->pipeline, *pimpl_->uniform_layout,
         [this, set_uniforms_fn](ShaderUniformLayout const &uniform_layout, VkCommandBuffer cmds) {
-            vkCmdBindDescriptorSets(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                                    pimpl_->uniform_layout->layout, /*firstSet=*/0,
-                                    /*descriptorSetCount=*/1, &pimpl_->descriptor_sets->frame,
-                                    /*dynamicOffsetCount=*/0,
-                                    /*pDynamicOffsets=*/nullptr);
+            vkCmdBindDescriptorSets(
+                cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, pimpl_->uniform_layout->layout,
+                /*firstSet=*/DescriptorSetType::DST_PER_FRAME,
+                /*descriptorSetCount=*/1, &pimpl_->viewport_dimension_desc_set->descriptor_set,
+                /*dynamicOffsetCount=*/0,
+                /*pDynamicOffsets=*/nullptr);
 
             if (set_uniforms_fn != nullptr) {
-                set_uniforms_fn(uniform_layout, pimpl_->descriptor_sets->pass, cmds);
+                set_uniforms_fn(uniform_layout, *pimpl_->input_images_desc_set, cmds);
             }
         },
         cmds);

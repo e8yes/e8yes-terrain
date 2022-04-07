@@ -59,20 +59,6 @@ VkShaderModule LoadShader(std::string const &file_name, VulkanContext *context) 
     return shader_module;
 }
 
-VkDescriptorSet CreateDescriptorSet(VkDescriptorSetLayout layout, VulkanContext *context) {
-    VkDescriptorSetAllocateInfo desc_set_alloc_info{};
-    desc_set_alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-    desc_set_alloc_info.descriptorPool = context->descriptor_pool;
-    desc_set_alloc_info.pSetLayouts = &layout;
-    desc_set_alloc_info.descriptorSetCount = 1;
-
-    VkDescriptorSet descriptor_set;
-    assert(VK_SUCCESS ==
-           vkAllocateDescriptorSets(context->device, &desc_set_alloc_info, &descriptor_set));
-
-    return descriptor_set;
-}
-
 } // namespace
 
 ShaderStages::ShaderStages(VulkanContext *context) : context_(context) {}
@@ -651,28 +637,6 @@ std::unique_ptr<ImageSampler> CreateTextureSampler(VulkanContext *context) {
     auto info = std::make_unique<ImageSampler>(context);
     assert(VK_SUCCESS ==
            vkCreateSampler(context->device, &sampler_info, /*pAllocator=*/nullptr, &info->sampler));
-
-    return info;
-}
-
-DescriptorSets::DescriptorSets(VulkanContext *context) : context(context) {}
-
-DescriptorSets::~DescriptorSets() {
-    vkFreeDescriptorSets(context->device, context->descriptor_pool,
-                         /*descriptorSetCount=*/1, &frame);
-    vkFreeDescriptorSets(context->device, context->descriptor_pool,
-                         /*descriptorSetCount=*/1, &pass);
-    vkFreeDescriptorSets(context->device, context->descriptor_pool,
-                         /*descriptorSetCount=*/1, &drawable);
-}
-
-std::unique_ptr<DescriptorSets> CreateDescriptorSets(ShaderUniformLayout const &uniform_layout,
-                                                     VulkanContext *context) {
-    auto info = std::make_unique<DescriptorSets>(context);
-
-    info->drawable = CreateDescriptorSet(uniform_layout.per_drawable_desc_set, context);
-    info->pass = CreateDescriptorSet(uniform_layout.per_pass_desc_set, context);
-    info->frame = CreateDescriptorSet(uniform_layout.per_frame_desc_set, context);
 
     return info;
 }
