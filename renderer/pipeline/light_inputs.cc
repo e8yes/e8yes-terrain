@@ -26,7 +26,7 @@
 #include "renderer/basic/projection.h"
 #include "renderer/output/pipeline_output.h"
 #include "renderer/pass/render_pass.h"
-#include "renderer/pipeline/pipeline_light_inputs.h"
+#include "renderer/pipeline/light_inputs.h"
 #include "renderer/query/drawable_instance.h"
 #include "renderer/transfer/descriptor_set_texture.h"
 #include "renderer/transfer/texture_group.h"

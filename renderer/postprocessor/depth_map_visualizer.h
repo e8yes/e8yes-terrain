@@ -15,15 +15,15 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PIPELINE_DEPTH_MAP_VISUALIZER_H
-#define PIPELINE_DEPTH_MAP_VISUALIZER_H
+#ifndef DEPTH_MAP_VISUALIZER_H
+#define DEPTH_MAP_VISUALIZER_H
 
 #include <memory>
 #include <optional>
 
 #include "common/device.h"
 #include "renderer/basic/projection.h"
-#include "renderer/pipeline/pipeline_depth_map.h"
+#include "renderer/pipeline/depth_map.h"
 #include "renderer/transfer/descriptor_set.h"
 
 namespace e8 {
@@ -68,4 +68,4 @@ class DepthMapVisualizerPipeline {
 
 } // namespace e8
 
-#endif // PIPELINE_DEPTH_MAP_VISUALIZER_H
+#endif // DEPTH_MAP_VISUALIZER_H

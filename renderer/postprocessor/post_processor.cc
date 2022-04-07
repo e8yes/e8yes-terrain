@@ -27,7 +27,7 @@
 #include "renderer/basic/pipeline_common.h"
 #include "renderer/output/pipeline_output.h"
 #include "renderer/pass/render_pass.h"
-#include "renderer/postprocessor/pipeline_post_processor.h"
+#include "renderer/postprocessor/post_processor.h"
 #include "renderer/transfer/descriptor_set.h"
 
 namespace e8 {

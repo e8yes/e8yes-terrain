@@ -23,9 +23,9 @@
 #include "common/device.h"
 #include "renderer/basic/pipeline_common.h"
 #include "renderer/output/pipeline_output.h"
-#include "renderer/pipeline/pipeline_light_inputs.h"
-#include "renderer/postprocessor/pipeline_light_inputs_visualizer.h"
-#include "renderer/postprocessor/pipeline_post_processor.h"
+#include "renderer/pipeline/light_inputs.h"
+#include "renderer/postprocessor/light_inputs_visualizer.h"
+#include "renderer/postprocessor/post_processor.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/transfer/descriptor_set.h"
 

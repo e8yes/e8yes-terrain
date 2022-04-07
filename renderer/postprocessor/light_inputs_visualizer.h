@@ -21,7 +21,7 @@
 #include <memory>
 
 #include "common/device.h"
-#include "renderer/pipeline/pipeline_light_inputs.h"
+#include "renderer/pipeline/light_inputs.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/transfer/descriptor_set.h"
 

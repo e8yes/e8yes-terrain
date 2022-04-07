@@ -21,12 +21,12 @@ SOURCES += \
     basic/projection.cc \
     output/pipeline_output.cc \
     pass/render_pass.cc \
-    pipeline/pipeline_depth_map.cc \
-    pipeline/pipeline_light_inputs.cc \
-    pipeline/pipeline_solid_color.cc \
-    postprocessor/pipeline_depth_map_visualizer.cc \
-    postprocessor/pipeline_light_inputs_visualizer.cc \
-    postprocessor/pipeline_post_processor.cc \
+    pipeline/depth_map.cc \
+    pipeline/light_inputs.cc \
+    pipeline/solid_color.cc \
+    postprocessor/depth_map_visualizer.cc \
+    postprocessor/light_inputs_visualizer.cc \
+    postprocessor/post_processor.cc \
     proto/renderer.pb.cc \
     query/drawable_instance.cc \
     query/query_fn.cc \
@@ -46,12 +46,12 @@ HEADERS += \
     basic/projection.h \
     output/pipeline_output.h \
     pass/render_pass.h \
-    pipeline/pipeline_depth_map.h \
-    pipeline/pipeline_light_inputs.h \
-    pipeline/pipeline_solid_color.h \
-    postprocessor/pipeline_depth_map_visualizer.h \
-    postprocessor/pipeline_light_inputs_visualizer.h \
-    postprocessor/pipeline_post_processor.h \
+    pipeline/depth_map.h \
+    pipeline/light_inputs.h \
+    pipeline/solid_color.h \
+    postprocessor/depth_map_visualizer.h \
+    postprocessor/light_inputs_visualizer.h \
+    postprocessor/post_processor.h \
     proto/renderer.pb.h \
     query/drawable_instance.h \
     query/query_fn.h \

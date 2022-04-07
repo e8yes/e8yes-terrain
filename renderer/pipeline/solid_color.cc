@@ -24,7 +24,7 @@
 #include "renderer/basic/pipeline_common.h"
 #include "renderer/output/pipeline_output.h"
 #include "renderer/pass/render_pass.h"
-#include "renderer/pipeline/pipeline_solid_color.h"
+#include "renderer/pipeline/solid_color.h"
 
 namespace e8 {
 

@@ -28,7 +28,7 @@
 #include "renderer/basic/projection.h"
 #include "renderer/output/pipeline_output.h"
 #include "renderer/pass/render_pass.h"
-#include "renderer/pipeline/pipeline_depth_map.h"
+#include "renderer/pipeline/depth_map.h"
 #include "renderer/query/drawable_instance.h"
 #include "renderer/transfer/descriptor_set_texture.h"
 #include "renderer/transfer/vram_geometry.h"
