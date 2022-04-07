@@ -17,57 +17,60 @@ QMAKE_LFLAGS_RELEASE += -O3 -flto -march=native
 INCLUDEPATH += ../
 
 SOURCES += \
-    descriptor_set.cc \
-    descriptor_set_texture.cc \
-    drawable_instance.cc \
-    pipeline_common.cc \
-    pipeline_depth_map.cc \
-    pipeline_depth_map_visualizer.cc \
-    pipeline_light_inputs.cc \
-    pipeline_light_inputs_visualizer.cc \
-    pipeline_output.cc \
-    pipeline_post_processor.cc \
-    pipeline_solid_color.cc \
-    projection.cc \
+    basic/pipeline_common.cc \
+    basic/projection.cc \
+    output/pipeline_output.cc \
+    pass/render_pass.cc \
+    pipeline/pipeline_depth_map.cc \
+    pipeline/pipeline_light_inputs.cc \
+    pipeline/pipeline_solid_color.cc \
+    postprocessor/pipeline_depth_map_visualizer.cc \
+    postprocessor/pipeline_light_inputs_visualizer.cc \
+    postprocessor/pipeline_post_processor.cc \
     proto/renderer.pb.cc \
-    query_fn.cc \
-    render_pass.cc \
+    query/drawable_instance.cc \
+    query/query_fn.cc \
     renderer.cc \
     renderer_depth.cc \
     renderer_light_inputs.cc \
     renderer_solid_color.cc \
-    texture_group.cc \
-    vram.cc \
-    vram_geometry.cc \
-    vram_texture.cc
+    transfer/descriptor_set.cc \
+    transfer/descriptor_set_texture.cc \
+    transfer/texture_group.cc \
+    transfer/vram.cc \
+    transfer/vram_geometry.cc \
+    transfer/vram_texture.cc
 
 HEADERS += \
-    descriptor_set.h \
-    descriptor_set_texture.h \
-    drawable_instance.h \
-    pipeline_common.h \
-    pipeline_depth_map.h \
-    pipeline_depth_map_visualizer.h \
-    pipeline_light_inputs.h \
-    pipeline_light_inputs_visualizer.h \
-    pipeline_output.h \
-    pipeline_post_processor.h \
-    pipeline_solid_color.h \
-    projection.h \
+    basic/pipeline_common.h \
+    basic/projection.h \
+    output/pipeline_output.h \
+    pass/render_pass.h \
+    pipeline/pipeline_depth_map.h \
+    pipeline/pipeline_light_inputs.h \
+    pipeline/pipeline_solid_color.h \
+    postprocessor/pipeline_depth_map_visualizer.h \
+    postprocessor/pipeline_light_inputs_visualizer.h \
+    postprocessor/pipeline_post_processor.h \
     proto/renderer.pb.h \
-    query_fn.h \
-    render_pass.h \
+    query/drawable_instance.h \
+    query/query_fn.h \
     renderer.h \
     renderer_depth.h \
     renderer_light_inputs.h \
     renderer_solid_color.h \
-    texture_group.h \
-    vram.h \
-    vram_geometry.h \
-    vram_texture.h
+    transfer/descriptor_set.h \
+    transfer/descriptor_set_texture.h \
+    transfer/texture_group.h \
+    transfer/vram.h \
+    transfer/vram_geometry.h \
+    transfer/vram_texture.h
 
 # Default rules for deployment.
 unix {
     target.path = /usr/lib
 }
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    proto/renderer.proto

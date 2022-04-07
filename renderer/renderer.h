@@ -27,7 +27,7 @@
 
 #include "common/device.h"
 #include "content/scene.h"
-#include "renderer/pipeline_output.h"
+#include "renderer/output/pipeline_output.h"
 #include "renderer/proto/renderer.pb.h"
 #include "resource/accessor.h"
 
