@@ -30,6 +30,7 @@ SOURCES += \
     basic/vertex_input.cc \
     output/pipeline_output.cc \
     output/promise.cc \
+    pass/configurator.cc \
     pass/rasterize.cc \
     pipeline/depth_map.cc \
     pipeline/light_inputs.cc \
@@ -65,6 +66,7 @@ HEADERS += \
     basic/vertex_input.h \
     output/pipeline_output.h \
     output/promise.h \
+    pass/configurator.h \
     pass/rasterize.h \
     pipeline/depth_map.h \
     pipeline/light_inputs.h \

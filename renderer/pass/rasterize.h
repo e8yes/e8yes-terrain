@@ -31,6 +31,7 @@
 #include "renderer/basic/uniform_layout.h"
 #include "renderer/output/pipeline_output.h"
 #include "renderer/output/promise.h"
+#include "renderer/pass/configurator.h"
 #include "renderer/query/drawable_instance.h"
 #include "renderer/transfer/descriptor_set.h"
 #include "renderer/transfer/descriptor_set_texture.h"
@@ -65,31 +66,6 @@ VkCommandBuffer StartRenderPass(RenderPass const &pass, FrameBuffer const &frame
  */
 std::unique_ptr<GpuPromise> FinishRenderPass(VkCommandBuffer cmds, GpuPromise const &prerequisites,
                                              VkFence fence, VulkanContext *context);
-
-/**
- * @brief The RenderPassConfiguratorInterface class For configuring what resources go in a render
- * pass and what shader uniform setup to apply to each drawable.
- */
-class RenderPassConfiguratorInterface {
-  public:
-    RenderPassConfiguratorInterface();
-    virtual ~RenderPassConfiguratorInterface();
-
-    /**
-     * @brief IncludeDrawable Whether to include the specified drawable to the render pass?
-     */
-    virtual bool IncludeDrawable(DrawableInstance const &drawable) const;
-
-    /**
-     * @brief TexturesOf Textures of the specified drawable needed by the render pass.
-     */
-    virtual TextureSelector TexturesOf(DrawableInstance const &drawable) const;
-
-    /**
-     * @brief SetUniformsFor Sets the uniform variables for drawing the specified drawable.
-     */
-    virtual void PushConstant(DrawableInstance const &drawable, VkCommandBuffer cmds) const;
-};
 
 /**
  * @brief RenderDrawables Renders an array of drawables with the specified graphics pipeline. Note,

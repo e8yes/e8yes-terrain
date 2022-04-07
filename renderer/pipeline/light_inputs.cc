@@ -34,6 +34,7 @@
 #include "renderer/basic/vertex_input.h"
 #include "renderer/output/pipeline_output.h"
 #include "renderer/output/promise.h"
+#include "renderer/pass/configurator.h"
 #include "renderer/pass/rasterize.h"
 #include "renderer/pipeline/light_inputs.h"
 #include "renderer/query/drawable_instance.h"

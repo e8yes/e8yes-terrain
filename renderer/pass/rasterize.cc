@@ -15,12 +15,29 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <array>
 #include <cassert>
 #include <functional>
 #include <memory>
 #include <unordered_set>
 #include <vector>
 #include <vulkan/vulkan.h>
+
+#include "common/device.h"
+#include "renderer/basic/frame_buffer.h"
+#include "renderer/basic/pipeline.h"
+#include "renderer/basic/render_pass.h"
+#include "renderer/basic/uniform_layout.h"
+#include "renderer/output/pipeline_output.h"
+#include "renderer/output/promise.h"
+#include "renderer/pass/configurator.h"
+#include "renderer/query/drawable_instance.h"
+#include "renderer/transfer/descriptor_set.h"
+#include "renderer/transfer/descriptor_set_texture.h"
+#include "renderer/transfer/texture_group.h"
+#include "renderer/transfer/vram_geometry.h"
+#include "renderer/transfer/vram_texture.h"
+#include "resource/buffer_texture.h"
 
 #include "common/device.h"
 #include "renderer/basic/frame_buffer.h"
@@ -76,22 +93,6 @@ UploadResources(std::vector<DrawableInstance> const &drawables,
 }
 
 } // namespace
-
-RenderPassConfiguratorInterface::RenderPassConfiguratorInterface() {}
-
-RenderPassConfiguratorInterface::~RenderPassConfiguratorInterface() {}
-
-bool RenderPassConfiguratorInterface::IncludeDrawable(DrawableInstance const & /*drawable*/) const {
-    return true;
-}
-
-TextureSelector
-RenderPassConfiguratorInterface::TexturesOf(DrawableInstance const & /*drawable*/) const {
-    return TextureSelector(kNullUuid);
-}
-
-void RenderPassConfiguratorInterface::PushConstant(DrawableInstance const & /*drawable*/,
-                                                   VkCommandBuffer /*cmds*/) const {}
 
 VkCommandBuffer StartRenderPass(RenderPass const &render_pass, FrameBuffer const &frame_buffer,
                                 VulkanContext *context) {
