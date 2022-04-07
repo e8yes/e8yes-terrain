@@ -25,6 +25,7 @@
 
 #include "common/device.h"
 #include "renderer/output/pipeline_output.h"
+#include "renderer/output/promise.h"
 #include "renderer/pass/rasterize.h"
 #include "renderer/postprocessor/post_processor.h"
 #include "renderer/transfer/descriptor_set.h"
@@ -146,7 +147,7 @@ PostProcessorPipeline::PostProcessorPipeline(PipelineOutputInterface *output,
 PostProcessorPipeline::~PostProcessorPipeline() {}
 
 PipelineOutputInterface *
-PostProcessorPipeline::Run(GpuBarrier const &barrier,
+PostProcessorPipeline::Run(GpuPromise const &barrier,
                            SetPostProcessorUniformsExFn const &set_uniforms_fn) {
     VkCommandBuffer cmds = StartRenderPass(pimpl_->output->GetRenderPass(),
                                            *pimpl_->output->GetFrameBuffer(), pimpl_->context);

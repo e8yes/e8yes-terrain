@@ -29,6 +29,7 @@ SOURCES += \
     basic/uniform_layout.cc \
     basic/vertex_input.cc \
     output/pipeline_output.cc \
+    output/promise.cc \
     pass/rasterize.cc \
     pipeline/depth_map.cc \
     pipeline/light_inputs.cc \
@@ -63,6 +64,7 @@ HEADERS += \
     basic/uniform_layout.h \
     basic/vertex_input.h \
     output/pipeline_output.h \
+    output/promise.h \
     pass/rasterize.h \
     pipeline/depth_map.h \
     pipeline/light_inputs.h \

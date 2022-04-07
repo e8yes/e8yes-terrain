@@ -33,6 +33,7 @@
 #include "renderer/basic/uniform_layout.h"
 #include "renderer/basic/vertex_input.h"
 #include "renderer/output/pipeline_output.h"
+#include "renderer/output/promise.h"
 #include "renderer/pass/rasterize.h"
 #include "renderer/pipeline/light_inputs.h"
 #include "renderer/query/drawable_instance.h"
@@ -262,7 +263,7 @@ LightInputsPipeline::~LightInputsPipeline() {}
 
 LightInputsPipelineOutput *LightInputsPipeline::Run(std::vector<DrawableInstance> const &drawables,
                                                     ProjectionInterface const &projection,
-                                                    GpuBarrier const &prerequisites,
+                                                    GpuPromise const &prerequisites,
                                                     TextureDescriptorSetCache *tex_desc_set_cache,
                                                     GeometryVramTransfer *geo_vram,
                                                     TextureVramTransfer *tex_vram) {

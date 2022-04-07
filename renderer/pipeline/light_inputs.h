@@ -24,6 +24,7 @@
 #include "common/device.h"
 #include "renderer/basic/projection.h"
 #include "renderer/output/pipeline_output.h"
+#include "renderer/output/promise.h"
 #include "renderer/query/drawable_instance.h"
 #include "renderer/transfer/descriptor_set_texture.h"
 #include "renderer/transfer/vram_geometry.h"
@@ -88,7 +89,7 @@ class LightInputsPipeline {
      */
     LightInputsPipelineOutput *Run(std::vector<DrawableInstance> const &drawables,
                                    ProjectionInterface const &projection,
-                                   GpuBarrier const &prerequisites,
+                                   GpuPromise const &prerequisites,
                                    TextureDescriptorSetCache *tex_desc_set_cache,
                                    GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram);
 

@@ -26,6 +26,7 @@
 #include "renderer/basic/frame_buffer.h"
 #include "renderer/basic/pipeline.h"
 #include "renderer/output/pipeline_output.h"
+#include "renderer/output/promise.h"
 #include "renderer/pass/rasterize.h"
 #include "renderer/query/drawable_instance.h"
 #include "renderer/transfer/descriptor_set.h"
@@ -127,7 +128,7 @@ VkCommandBuffer StartRenderPass(RenderPass const &render_pass, FrameBuffer const
     return cmds;
 }
 
-std::unique_ptr<GpuBarrier> FinishRenderPass(VkCommandBuffer cmds, GpuBarrier const &prerequisites,
+std::unique_ptr<GpuPromise> FinishRenderPass(VkCommandBuffer cmds, GpuPromise const &prerequisites,
                                              VkFence fence, VulkanContext *context) {
     // Finalizes the render pass and command buffers.
     vkCmdEndRenderPass(cmds);
@@ -156,7 +157,7 @@ std::unique_ptr<GpuBarrier> FinishRenderPass(VkCommandBuffer cmds, GpuBarrier co
 
     assert(VK_SUCCESS == vkQueueSubmit(context->graphics_queue, /*submitCount=*/1, &submit, fence));
 
-    return std::make_unique<GpuBarrier>(done_signal, cmds, context);
+    return std::make_unique<GpuPromise>(done_signal, cmds, context);
 }
 
 void RenderDrawables(std::vector<DrawableInstance> const &drawables,

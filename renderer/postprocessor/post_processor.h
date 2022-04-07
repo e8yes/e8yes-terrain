@@ -25,6 +25,7 @@
 #include "common/device.h"
 #include "renderer/basic/uniform_layout.h"
 #include "renderer/output/pipeline_output.h"
+#include "renderer/output/promise.h"
 #include "renderer/transfer/descriptor_set.h"
 
 namespace e8 {
@@ -79,7 +80,7 @@ class PostProcessorPipeline {
      * supplied, an empty function will be used.
      * @return The output object set from the constructor, with a barrier assigned.
      */
-    PipelineOutputInterface *Run(GpuBarrier const &barrier,
+    PipelineOutputInterface *Run(GpuPromise const &barrier,
                                  SetPostProcessorUniformsExFn const &set_uniforms_fn = nullptr);
 
   private:

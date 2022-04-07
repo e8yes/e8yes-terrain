@@ -28,6 +28,7 @@
 #include "common/device.h"
 #include "content/scene.h"
 #include "renderer/output/pipeline_output.h"
+#include "renderer/output/promise.h"
 #include "renderer/proto/renderer.pb.h"
 #include "resource/accessor.h"
 
@@ -117,7 +118,7 @@ class RendererInterface {
 
         // When the swap chain image indexed by the swap_chain_image_index becomes available, the
         // barrier will be signaled.
-        GpuBarrier acquire_swap_chain_image_barrier;
+        GpuPromise acquire_swap_chain_image_barrier;
 
         // The index of the swap chain image which will soon be available for presentation.
         unsigned swap_chain_image_index;

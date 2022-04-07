@@ -23,6 +23,7 @@
 #include "common/device.h"
 #include "common/tensor.h"
 #include "renderer/output/pipeline_output.h"
+#include "renderer/output/promise.h"
 
 namespace e8 {
 
@@ -50,7 +51,7 @@ class SolidColorPipeline {
      * @param prerequisites Dependent tasks.
      * @return The output object set from the constructor, with a barrier assigned.
      */
-    PipelineOutputInterface *Run(vec3 const &color, GpuBarrier const &prerequisites);
+    PipelineOutputInterface *Run(vec3 const &color, GpuPromise const &prerequisites);
 
   private:
     struct SolidColorPipelineImpl;

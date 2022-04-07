@@ -30,6 +30,7 @@
 #include "renderer/basic/render_pass.h"
 #include "renderer/basic/uniform_layout.h"
 #include "renderer/output/pipeline_output.h"
+#include "renderer/output/promise.h"
 #include "renderer/query/drawable_instance.h"
 #include "renderer/transfer/descriptor_set.h"
 #include "renderer/transfer/descriptor_set_texture.h"
@@ -62,7 +63,7 @@ VkCommandBuffer StartRenderPass(RenderPass const &pass, FrameBuffer const &frame
  * @param context Contextual Vulkan handles.
  * @return The task barrier for this render pass.
  */
-std::unique_ptr<GpuBarrier> FinishRenderPass(VkCommandBuffer cmds, GpuBarrier const &prerequisites,
+std::unique_ptr<GpuPromise> FinishRenderPass(VkCommandBuffer cmds, GpuPromise const &prerequisites,
                                              VkFence fence, VulkanContext *context);
 
 /**

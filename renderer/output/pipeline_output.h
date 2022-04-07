@@ -27,48 +27,9 @@
 #include "renderer/basic/attachment.h"
 #include "renderer/basic/frame_buffer.h"
 #include "renderer/basic/render_pass.h"
+#include "renderer/output/promise.h"
 
 namespace e8 {
-
-/**
- * @brief The GpuBarrier struct Stores a series of task semaphores. When later tasks are submitted
- * with waiting for this barrier, they will be blocked until all previous tasks merged in this
- * barrier are finished. It will clean up task semaphores and recycle task command buffers by the
- * end of its lifecycle.
- */
-struct GpuBarrier {
-    /**
-     * @brief GpuBarrier Constructs an empty barrier.
-     * @param context Contextual Vulkan handles.
-     */
-    explicit GpuBarrier(VulkanContext *context);
-
-    /**
-     * @brief GpuBarrier Constructs a barrier with one task.
-     * @param task_signal The task's semaphore which will be signaled by the moment of completion
-     * (when all the task_cmds finish running).
-     * @param task_cmds The commands the task consists of.
-     * @param context Contextual Vulkan handles.
-     */
-    GpuBarrier(VkSemaphore task_signal, VkCommandBuffer task_cmds, VulkanContext *context);
-    GpuBarrier(GpuBarrier const &) = delete;
-    GpuBarrier(GpuBarrier &&other);
-    ~GpuBarrier();
-
-    /**
-     * @brief Merge Merges tasks from another barrier.
-     */
-    void Merge(std::unique_ptr<GpuBarrier> &&other);
-
-    // Tasks' signal.
-    std::vector<VkSemaphore> tasks_signal;
-
-    // Tasks' commands.
-    std::vector<VkCommandBuffer> tasks_cmds;
-
-    // Contextual Vulkan handles.
-    VulkanContext *context_;
-};
 
 /**
  * @brief The PipelineOutputInterface class Represents the output of a graphics pipeline.
@@ -118,7 +79,7 @@ class PipelineOutputInterface {
 
     // Barrier of the rendering task. Semaphores in this barrier must all be signaled before the
     // output can be read or used again.
-    std::unique_ptr<GpuBarrier> barrier;
+    std::unique_ptr<GpuPromise> barrier;
 
     // A CPU fence which gets signaled when the output is fulfilled.
     VkFence fence;

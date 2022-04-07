@@ -23,6 +23,7 @@
 #include "common/tensor.h"
 #include "renderer/basic/frame_buffer.h"
 #include "renderer/output/pipeline_output.h"
+#include "renderer/output/promise.h"
 #include "renderer/pass/rasterize.h"
 #include "renderer/pipeline/solid_color.h"
 
@@ -48,7 +49,7 @@ SolidColorPipeline::SolidColorPipeline(PipelineOutputInterface *output, VulkanCo
 SolidColorPipeline::~SolidColorPipeline() {}
 
 PipelineOutputInterface *SolidColorPipeline::Run(vec3 const &color,
-                                                 GpuBarrier const &prerequisites) {
+                                                 GpuPromise const &prerequisites) {
     FrameBuffer *frame_buffer = pimpl_->output->GetFrameBuffer();
 
     frame_buffer->clear_values[0].color.float32[0] = color(0);

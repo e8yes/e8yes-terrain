@@ -27,45 +27,9 @@
 #include "renderer/basic/frame_buffer.h"
 #include "renderer/basic/render_pass.h"
 #include "renderer/output/pipeline_output.h"
+#include "renderer/output/promise.h"
 
 namespace e8 {
-
-GpuBarrier::GpuBarrier(VulkanContext *context) : context_(context) {}
-
-GpuBarrier::GpuBarrier(VkSemaphore task_signal, VkCommandBuffer task_cmds, VulkanContext *context)
-    : tasks_signal{task_signal}, tasks_cmds{task_cmds}, context_(context) {}
-
-GpuBarrier::GpuBarrier(GpuBarrier &&other) {
-    tasks_signal = other.tasks_signal;
-    tasks_cmds = other.tasks_cmds;
-    context_ = other.context_;
-
-    other.tasks_signal.clear();
-    other.tasks_cmds.clear();
-}
-
-GpuBarrier::~GpuBarrier() {
-    for (auto task_signal : tasks_signal) {
-        vkDestroySemaphore(context_->device, task_signal, /*pAllocator=*/nullptr);
-    }
-
-    if (!tasks_cmds.empty()) {
-        vkFreeCommandBuffers(context_->device, context_->command_pool, tasks_cmds.size(),
-                             tasks_cmds.data());
-    }
-}
-
-void GpuBarrier::Merge(std::unique_ptr<GpuBarrier> &&other) {
-    for (auto signal : other->tasks_signal) {
-        tasks_signal.push_back(signal);
-    }
-    other->tasks_signal.clear();
-
-    for (auto cmds : other->tasks_cmds) {
-        tasks_cmds.push_back(cmds);
-    }
-    other->tasks_cmds.clear();
-}
 
 PipelineOutputInterface::PipelineOutputInterface(VulkanContext *context)
     : width(0), height(0), context(context) {
