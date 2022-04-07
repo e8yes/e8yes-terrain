@@ -22,7 +22,6 @@
 #include <vector>
 
 #include "common/device.h"
-#include "renderer/basic/pipeline_common.h"
 #include "renderer/basic/projection.h"
 #include "renderer/output/pipeline_output.h"
 #include "renderer/query/drawable_instance.h"

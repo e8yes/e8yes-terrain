@@ -22,8 +22,11 @@
 #include <memory>
 #include <vulkan/vulkan.h>
 
+#include "basic/sampler.h"
+#include "basic/uniform_buffer.h"
 #include "common/device.h"
 #include "renderer/transfer/descriptor_set.h"
+#include "third_party/vma/vk_mem_alloc.h"
 
 namespace e8 {
 namespace {
@@ -232,6 +235,53 @@ DescriptorSetAllocator::~DescriptorSetAllocator() {}
 std::unique_ptr<DescriptorSet> DescriptorSetAllocator::Allocate(DescriptorType type,
                                                                 VkDescriptorSetLayout layout) {
     return pimpl_->type_to_pools[type].Allocate(layout);
+}
+
+void WriteUniformBufferDescriptor(void *data, UniformBuffer const &uniform_buffer,
+                                  DescriptorSet const &descriptor_set, unsigned binding,
+                                  VulkanContext *context) {
+    // Updates the host buffer.
+    void *staging_buffer;
+    vmaMapMemory(context->allocator, uniform_buffer.allocation, &staging_buffer);
+    memcpy(staging_buffer, data, uniform_buffer.size);
+    vmaUnmapMemory(context->allocator, uniform_buffer.allocation);
+
+    // Writes the updated buffer to the descriptor.
+    VkDescriptorBufferInfo buffer_info{};
+    buffer_info.buffer = uniform_buffer.buffer;
+    buffer_info.offset = 0;
+    buffer_info.range = uniform_buffer.size;
+
+    VkWriteDescriptorSet write_descriptor{};
+    write_descriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    write_descriptor.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    write_descriptor.dstSet = descriptor_set.descriptor_set;
+    write_descriptor.dstBinding = binding;
+    write_descriptor.descriptorCount = 1;
+    write_descriptor.pBufferInfo = &buffer_info;
+
+    vkUpdateDescriptorSets(context->device, /*descriptorWriteCount=*/1, &write_descriptor,
+                           /*descriptorCopyCount=*/0, /*pDescriptorCopies=*/nullptr);
+}
+
+void WriteImageDescriptor(VkImageView image_view, ImageSampler const &image_sampler,
+                          DescriptorSet const &descriptor_set, unsigned binding,
+                          VulkanContext *context) {
+    VkDescriptorImageInfo image_info{};
+    image_info.sampler = image_sampler.sampler;
+    image_info.imageView = image_view;
+    image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+    VkWriteDescriptorSet write_descriptor{};
+    write_descriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    write_descriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    write_descriptor.dstSet = descriptor_set.descriptor_set;
+    write_descriptor.dstBinding = binding;
+    write_descriptor.descriptorCount = 1;
+    write_descriptor.pImageInfo = &image_info;
+
+    vkUpdateDescriptorSets(context->device, /*descriptorWriteCount=*/1, &write_descriptor,
+                           /*descriptorCopyCount=*/0, /*pDescriptorCopies=*/nullptr);
 }
 
 } // namespace e8

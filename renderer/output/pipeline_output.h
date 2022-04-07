@@ -24,7 +24,9 @@
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
-#include "renderer/basic/pipeline_common.h"
+#include "renderer/basic/attachment.h"
+#include "renderer/basic/frame_buffer.h"
+#include "renderer/basic/render_pass.h"
 
 namespace e8 {
 

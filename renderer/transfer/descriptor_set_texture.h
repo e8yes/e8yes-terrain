@@ -21,7 +21,6 @@
 #include <array>
 #include <memory>
 
-#include "renderer/basic/pipeline_common.h"
 #include "renderer/transfer/descriptor_set.h"
 #include "renderer/transfer/texture_group.h"
 

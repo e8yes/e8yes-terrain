@@ -23,9 +23,10 @@
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
-#include "renderer/basic/pipeline_common.h"
+#include "renderer/basic/frame_buffer.h"
+#include "renderer/basic/pipeline.h"
 #include "renderer/output/pipeline_output.h"
-#include "renderer/pass/render_pass.h"
+#include "renderer/pass/rasterize.h"
 #include "renderer/query/drawable_instance.h"
 #include "renderer/transfer/descriptor_set.h"
 #include "renderer/transfer/texture_group.h"

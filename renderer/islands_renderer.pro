@@ -17,10 +17,19 @@ QMAKE_LFLAGS_RELEASE += -O3 -flto -march=native
 INCLUDEPATH += ../
 
 SOURCES += \
-    basic/pipeline_common.cc \
+    basic/attachment.cc \
+    basic/fixed_function.cc \
+    basic/frame_buffer.cc \
+    basic/pipeline.cc \
     basic/projection.cc \
+    basic/render_pass.cc \
+    basic/sampler.cc \
+    basic/shader.cc \
+    basic/uniform_buffer.cc \
+    basic/uniform_layout.cc \
+    basic/vertex_input.cc \
     output/pipeline_output.cc \
-    pass/render_pass.cc \
+    pass/rasterize.cc \
     pipeline/depth_map.cc \
     pipeline/light_inputs.cc \
     pipeline/solid_color.cc \
@@ -42,10 +51,19 @@ SOURCES += \
     transfer/vram_texture.cc
 
 HEADERS += \
-    basic/pipeline_common.h \
+    basic/attachment.h \
+    basic/fixed_function.h \
+    basic/frame_buffer.h \
+    basic/pipeline.h \
     basic/projection.h \
+    basic/render_pass.h \
+    basic/sampler.h \
+    basic/shader.h \
+    basic/uniform_buffer.h \
+    basic/uniform_layout.h \
+    basic/vertex_input.h \
     output/pipeline_output.h \
-    pass/render_pass.h \
+    pass/rasterize.h \
     pipeline/depth_map.h \
     pipeline/light_inputs.h \
     pipeline/solid_color.h \

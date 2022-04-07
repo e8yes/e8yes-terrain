@@ -22,7 +22,7 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
-#include "renderer/basic/pipeline_common.h"
+#include "renderer/basic/sampler.h"
 #include "renderer/transfer/vram.h"
 #include "resource/buffer_texture.h"
 #include "resource/common.h"

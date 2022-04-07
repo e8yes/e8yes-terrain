@@ -21,6 +21,8 @@
 #include <memory>
 #include <vulkan/vulkan.h>
 
+#include "basic/sampler.h"
+#include "basic/uniform_buffer.h"
 #include "common/device.h"
 
 namespace e8 {
@@ -92,6 +94,37 @@ class DescriptorSetAllocator {
     struct DescriptorSetAllocatorImpl;
     std::unique_ptr<DescriptorSetAllocatorImpl> pimpl_;
 };
+
+/**
+ * @brief WriteUniformBufferDescriptor Writes data (from the host) to the specified uniform buffer
+ * descriptor. The write is synchronous.
+ *
+ * @param data Pointer to the host data. The size of the data must be the same as the size of the
+ * uniform buffer.
+ * @param uniform_buffer The backing uniform buffer to associate with the descriptor.
+ * @param descriptor_set The set the descriptor lives in.
+ * @param binding Binding of the descriptor in the set.
+ * @param context Contextual Vulkan handles.
+ */
+void WriteUniformBufferDescriptor(void *data, UniformBuffer const &uniform_buffer,
+                                  DescriptorSet const &descriptor_set, unsigned binding,
+                                  VulkanContext *context);
+
+/**
+ * @brief WriteImageDescriptor Writes image data (from the device) to the specified combined
+ * image-sampler descriptor. The write is synchronous.
+ *
+ * @param image_view View of the image data. Note, since image descriptors are always used for image
+ * accessing from a shader, the layout of the image is assumed to be
+ * VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL.
+ * @param image_sampler The sampler used for accessing the image content.
+ * @param descriptor_set The set the descriptor lives in.
+ * @param binding Binding of the descriptor in the set.
+ * @param context Contextual Vulkan handles.
+ */
+void WriteImageDescriptor(VkImageView image_view, ImageSampler const &image_sampler,
+                          DescriptorSet const &descriptor_set, unsigned binding,
+                          VulkanContext *context);
 
 } // namespace e8
 

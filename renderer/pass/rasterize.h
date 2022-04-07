@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_RENDER_PASS_H
-#define ISLANDS_RENDERER_RENDER_PASS_H
+#ifndef ISLANDS_RENDERER_RASTERIZE_H
+#define ISLANDS_RENDERER_RASTERIZE_H
 
 #include <array>
 #include <functional>
@@ -25,7 +25,10 @@
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
-#include "renderer/basic/pipeline_common.h"
+#include "renderer/basic/frame_buffer.h"
+#include "renderer/basic/pipeline.h"
+#include "renderer/basic/render_pass.h"
+#include "renderer/basic/uniform_layout.h"
 #include "renderer/output/pipeline_output.h"
 #include "renderer/query/drawable_instance.h"
 #include "renderer/transfer/descriptor_set.h"
@@ -122,4 +125,4 @@ void PostProcess(GraphicsPipeline const &pipeline, ShaderUniformLayout const &un
 
 } // namespace e8
 
-#endif // ISLANDS_RENDERER_RENDER_PASS_H
+#endif // ISLANDS_RENDERER_RASTERIZE_H

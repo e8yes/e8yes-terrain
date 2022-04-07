@@ -21,7 +21,8 @@
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
-#include "renderer/basic/pipeline_common.h"
+#include "renderer/basic/shader.h"
+#include "renderer/basic/uniform_layout.h"
 #include "renderer/output/pipeline_output.h"
 #include "renderer/pipeline/light_inputs.h"
 #include "renderer/postprocessor/light_inputs_visualizer.h"
@@ -108,9 +109,9 @@ LightInputsVisualizerPipeline::Run(LightInputsRendererParameters::InputType inpu
                                /*size=*/sizeof(PushConstants), &push_constants);
 
             // Sets the depth map input.
-            WriteImageDescriptor(
-                light_inputs.ColorAttachment()->view, *pimpl_->light_inputs_sampler,
-                input_images_desc_set.descriptor_set, /*binding=*/0, pimpl_->context);
+            WriteImageDescriptor(light_inputs.ColorAttachment()->view,
+                                 *pimpl_->light_inputs_sampler, input_images_desc_set,
+                                 /*binding=*/0, pimpl_->context);
 
             vkCmdBindDescriptorSets(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
                                     /*firstSet=*/DescriptorSetType::DST_PER_PASS,

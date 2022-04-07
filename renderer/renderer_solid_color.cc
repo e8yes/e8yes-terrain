@@ -24,7 +24,7 @@
 #include "common/tensor.h"
 #include "content/scene.h"
 #include "renderer/output/pipeline_output.h"
-#include "renderer/pass/render_pass.h"
+#include "renderer/pass/rasterize.h"
 #include "renderer/pipeline/solid_color.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/renderer.h"

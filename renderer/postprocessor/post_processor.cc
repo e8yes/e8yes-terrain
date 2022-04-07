@@ -24,9 +24,8 @@
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
-#include "renderer/basic/pipeline_common.h"
 #include "renderer/output/pipeline_output.h"
-#include "renderer/pass/render_pass.h"
+#include "renderer/pass/rasterize.h"
 #include "renderer/postprocessor/post_processor.h"
 #include "renderer/transfer/descriptor_set.h"
 
@@ -116,8 +115,7 @@ PostProcessorPipeline::PostProcessorPipelineImpl::PostProcessorPipelineImpl(
     dimension.viewport_width = output->width;
     dimension.viewport_height = output->height;
 
-    WriteUniformBufferDescriptor(&dimension, *viewport_dimension_ubo,
-                                 viewport_dimension_desc_set->descriptor_set,
+    WriteUniformBufferDescriptor(&dimension, *viewport_dimension_ubo, *viewport_dimension_desc_set,
                                  /*binding=*/0, context);
 
     // Creates the post processing pipeline.

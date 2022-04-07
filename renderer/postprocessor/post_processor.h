@@ -23,7 +23,7 @@
 #include <string>
 
 #include "common/device.h"
-#include "renderer/basic/pipeline_common.h"
+#include "renderer/basic/uniform_layout.h"
 #include "renderer/output/pipeline_output.h"
 #include "renderer/transfer/descriptor_set.h"
 

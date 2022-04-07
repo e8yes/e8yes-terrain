@@ -21,9 +21,9 @@
 
 #include "common/device.h"
 #include "common/tensor.h"
-#include "renderer/basic/pipeline_common.h"
+#include "renderer/basic/frame_buffer.h"
 #include "renderer/output/pipeline_output.h"
-#include "renderer/pass/render_pass.h"
+#include "renderer/pass/rasterize.h"
 #include "renderer/pipeline/solid_color.h"
 
 namespace e8 {

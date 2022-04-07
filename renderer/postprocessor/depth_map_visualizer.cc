@@ -22,7 +22,8 @@
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
-#include "renderer/basic/pipeline_common.h"
+#include "renderer/basic/shader.h"
+#include "renderer/basic/uniform_layout.h"
 #include "renderer/output/pipeline_output.h"
 #include "renderer/postprocessor/depth_map_visualizer.h"
 #include "renderer/postprocessor/post_processor.h"
@@ -126,8 +127,7 @@ DepthMapVisualizerPipeline::Run(float alpha, std::optional<PerspectiveProjection
             // Sets the depth map input.
             if (&depth_map != pimpl_->current_depth_map_input) {
                 WriteImageDescriptor(depth_map.DepthAttachment()->view, *pimpl_->depth_map_sampler,
-                                     input_images_desc_set.descriptor_set, /*binding=*/0,
-                                     pimpl_->context);
+                                     input_images_desc_set, /*binding=*/0, pimpl_->context);
 
                 pimpl_->current_depth_map_input = &depth_map;
             }

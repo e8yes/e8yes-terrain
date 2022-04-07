@@ -22,7 +22,6 @@
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
-#include "renderer/basic/pipeline_common.h"
 #include "renderer/transfer/descriptor_set.h"
 #include "renderer/transfer/descriptor_set_texture.h"
 #include "resource/common.h"
@@ -40,9 +39,8 @@ void WriteDescriptorSet(TextureGroup const &texture_group, DescriptorSet *target
         }
         assert(texture_group.bindings[i] >= 0);
 
-        WriteImageDescriptor(texture_group.textures[i]->view, *texture_group.sampler,
-                             target->descriptor_set, texture_group.bindings[i],
-                             texture_group.textures[i]->context);
+        WriteImageDescriptor(texture_group.textures[i]->view, *texture_group.sampler, *target,
+                             texture_group.bindings[i], texture_group.textures[i]->context);
     }
 }
 
