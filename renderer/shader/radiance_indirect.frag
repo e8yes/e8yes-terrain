@@ -10,7 +10,6 @@ layout(set = 0, binding = 0) uniform PerFrameConstants {
 layout(set = 2, binding = 0) uniform sampler2D direct_radiance_map;
 layout(set = 2, binding = 1) uniform sampler2D indirect_radiance_map;
 
-layout (location = 0) in vec2 in_tex_coord;
 layout (location = 0) out vec4 out_radiance;
 
 void main() {

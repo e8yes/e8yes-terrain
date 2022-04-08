@@ -95,4 +95,6 @@ unix {
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
-    proto/renderer.proto
+    proto/renderer.proto \
+    shader/hdr_aces.frag \
+    shader/hdr_clamp.frag
