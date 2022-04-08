@@ -16,11 +16,10 @@ layout (push_constant) uniform PerLightConstants {
 	vec3 intensity;
 } plc;
 
-layout(set = 1, binding = 0) uniform sampler2D depth_map;
-layout(set = 1, binding = 1) uniform sampler2D geometry_map;
+layout(set = 1, binding = 0) uniform sampler2D normal_roughness_map;
+layout(set = 1, binding = 1) uniform sampler2D albedo_metallic_map;
 
-layout (location = 0) out vec3 out_unshoot_diffuse_radiance;
-layout (location = 1) out vec3 out_unshoot_specular_radiance;
+layout (location = 0) out vec4 out_radiance;
 
 float EvalDiffuseBrdf(vec3 n, vec3 i, vec3 o, float roughness) {
     float sigma2 = roughness * roughness;
@@ -95,10 +94,10 @@ void main() {
     vec2 screen_tex_coord = vec2(
         gl_FragCoord.x / pfc.viewport_width, gl_FragCoord.y / pfc.viewport_height);
 
-    vec4 geometry = texture(geometry_map, screen_tex_coord);
-
-    vec3 normal = vec3(geometry.x, geometry.y, geometry.z);
-    float roughness = geometry.z;
+    vec3 normal = texture(normal_roughness_map, screen_tex_coord).xyz;
+    float roughness = texture(normal_roughness_map, screen_tex_coord).w;
+    vec3 albedo = texture(albedo_metallic_map, screen_tex_coord).xyz;
+    float metallic = texture(albedo_metallic_map, screen_tex_coord).w;
 
     vec3 exitent_ray = vec3(0.0f, 0.0f, 1.0f);
 
@@ -106,6 +105,10 @@ void main() {
     float specular_brdf = EvalSpecularBrdf(normal, -plc.dir, exitent_ray, roughness);
     float cos_w = max(0.0f, dot(-plc.dir, exitent_ray));
 
-    out_unshoot_diffuse_radiance = plc.intensity * diffuse_brdf * cos_w;
-    out_unshoot_specular_radiance = plc.intensity * specular_brdf * cos_w;
+    float diffuse_term = diffuse_brdf * cos_w;
+    float specular_term = cos_w * specular_brdf;
+    float mix_term = (1 - metallic) * diffuse_term + metallic * specular_term;
+
+    vec3 radiance = plc.intensity * albedo * mix_term;
+    out_radiance = vec4(radiance, 1.0f);
 }
