@@ -115,9 +115,10 @@ FrameBuffer *SwapChainPipelineOutput::GetFrameBuffer() const {
 
 RenderPass const &SwapChainPipelineOutput::GetRenderPass() const { return *pimpl_->render_pass_; }
 
-FrameBufferAttachment const *SwapChainPipelineOutput::ColorAttachment() const {
+std::vector<FrameBufferAttachment const *> SwapChainPipelineOutput::ColorAttachments() const {
     assert(pimpl_->swap_chain_image_index >= 0);
-    return pimpl_->color_attachments_[pimpl_->swap_chain_image_index].get();
+    return std::vector<FrameBufferAttachment const *>{
+        pimpl_->color_attachments_[pimpl_->swap_chain_image_index].get()};
 }
 
 FrameBufferAttachment const *SwapChainPipelineOutput::DepthAttachment() const {

@@ -47,14 +47,20 @@ VkPushConstantRange PushConstantRange() {
 }
 
 std::vector<VkDescriptorSetLayoutBinding> LightInputsBinding() {
-    VkDescriptorSetLayoutBinding light_inputs_binding{};
+    VkDescriptorSetLayoutBinding normal_roughness_binding{};
+    normal_roughness_binding.binding = 0;
+    normal_roughness_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    normal_roughness_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    normal_roughness_binding.descriptorCount = 1;
 
-    light_inputs_binding.binding = 0;
-    light_inputs_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-    light_inputs_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    light_inputs_binding.descriptorCount = 1;
+    VkDescriptorSetLayoutBinding albedo_metallic_binding{};
+    albedo_metallic_binding.binding = 1;
+    albedo_metallic_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    albedo_metallic_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    albedo_metallic_binding.descriptorCount = 1;
 
-    return std::vector<VkDescriptorSetLayoutBinding>{light_inputs_binding};
+    return std::vector<VkDescriptorSetLayoutBinding>{normal_roughness_binding,
+                                                     albedo_metallic_binding};
 }
 
 struct LightInputsVisualizerPipeline::LightInputsVisualizerPipelineImpl {
@@ -97,7 +103,7 @@ PipelineOutputInterface *
 LightInputsVisualizerPipeline::Run(LightInputsRendererParameters::InputType input_to_visualize,
                                    LightInputsPipelineOutput const &light_inputs) {
     return pimpl_->post_processor_pipeline->Run(
-        *light_inputs.barrier, /*set_uniforms_fn=*/
+        *light_inputs.promise, /*set_uniforms_fn=*/
         [this, input_to_visualize, &light_inputs](ShaderUniformLayout const &uniform_layout,
                                                   DescriptorSet const &input_images_desc_set,
                                                   VkCommandBuffer cmds) {
@@ -111,10 +117,19 @@ LightInputsVisualizerPipeline::Run(LightInputsRendererParameters::InputType inpu
                                /*size=*/sizeof(PushConstants), &push_constants);
 
             if (&light_inputs != pimpl_->current_light_inputs) {
-                // Sets the depth map input.
-                WriteImageDescriptor(light_inputs.ColorAttachment()->view,
-                                     *pimpl_->light_inputs_sampler, input_images_desc_set,
-                                     /*binding=*/0, pimpl_->context);
+                // Sets the light inputs.
+                WriteImageDescriptor(
+                    light_inputs.ColorAttachments()[LightInputsPipelineOutput::NORMAL_ROUGHNESS]
+                        ->view,
+                    *pimpl_->light_inputs_sampler, input_images_desc_set,
+                    /*binding=*/0, pimpl_->context);
+
+                WriteImageDescriptor(
+                    light_inputs.ColorAttachments()[LightInputsPipelineOutput::ALBEDO_METALLIC]
+                        ->view,
+                    *pimpl_->light_inputs_sampler, input_images_desc_set,
+                    /*binding=*/1, pimpl_->context);
+
                 pimpl_->current_light_inputs = &light_inputs;
             }
 

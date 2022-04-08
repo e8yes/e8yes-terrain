@@ -40,9 +40,11 @@ CreateRenderPass(std::vector<VkAttachmentDescription> const &color_attachment_de
     VkSubpassDescription subpass{};
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 
+    unsigned color_attachment_count = color_attachment_descs.size();
+
     // Collects and sets attachment references.
     std::vector<VkAttachmentReference> color_attachment_refs;
-    for (unsigned i = 0; i < color_attachment_descs.size(); ++i) {
+    for (unsigned i = 0; i < color_attachment_count; ++i) {
         VkAttachmentReference color_attachment_ref{};
         color_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
         color_attachment_ref.attachment = i;
@@ -56,7 +58,8 @@ CreateRenderPass(std::vector<VkAttachmentDescription> const &color_attachment_de
 
     VkAttachmentReference depth_attachment_ref{};
     if (depth_attachment_desc.has_value()) {
-        depth_attachment_ref.attachment = color_attachment_descs.size();
+        unsigned depth_attachment = color_attachment_count;
+        depth_attachment_ref.attachment = depth_attachment;
         depth_attachment_ref.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
         subpass.pDepthStencilAttachment = &depth_attachment_ref;

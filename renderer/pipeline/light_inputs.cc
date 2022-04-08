@@ -88,20 +88,33 @@ std::vector<VkVertexInputAttributeDescription> VertexShaderInputAttributes() {
                                                           tangent_attribute, tex_coord_attribute};
 }
 
-std::vector<VkDescriptorSetLayoutBinding> NormalRoughnessMapBinding() {
+std::vector<VkDescriptorSetLayoutBinding> DescriptorSetBindings() {
+    VkDescriptorSetLayoutBinding albedo_map_binding{};
+    albedo_map_binding.binding = 0;
+    albedo_map_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    albedo_map_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    albedo_map_binding.descriptorCount = 1;
+
     VkDescriptorSetLayoutBinding normal_map_binding{};
-    normal_map_binding.binding = 0;
+    normal_map_binding.binding = 1;
     normal_map_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
     normal_map_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     normal_map_binding.descriptorCount = 1;
 
     VkDescriptorSetLayoutBinding roughness_map_binding{};
-    roughness_map_binding.binding = 1;
+    roughness_map_binding.binding = 2;
     roughness_map_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
     roughness_map_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     roughness_map_binding.descriptorCount = 1;
 
-    return std::vector<VkDescriptorSetLayoutBinding>{normal_map_binding, roughness_map_binding};
+    VkDescriptorSetLayoutBinding metallic_map_binding{};
+    metallic_map_binding.binding = 3;
+    metallic_map_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    metallic_map_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    metallic_map_binding.descriptorCount = 1;
+
+    return std::vector<VkDescriptorSetLayoutBinding>{albedo_map_binding, normal_map_binding,
+                                                     roughness_map_binding, metallic_map_binding};
 }
 
 class RenderPassConfigurator : public RenderPassConfiguratorInterface {
@@ -146,11 +159,17 @@ TextureSelector RenderPassConfigurator::TexturesOf(DrawableInstance const &drawa
 
     selector.sampler = &texture_sampler_;
 
+    selector.textures[TextureType::TT_ALBEDO] = &drawable.material->albedo;
+    selector.bindings[TextureType::TT_ALBEDO] = 0;
+
     selector.textures[TextureType::TT_NORMAL] = &drawable.material->normal;
-    selector.bindings[TextureType::TT_NORMAL] = 0;
+    selector.bindings[TextureType::TT_NORMAL] = 1;
 
     selector.textures[TextureType::TT_ROUGHNESS] = &drawable.material->roughness;
-    selector.bindings[TextureType::TT_ROUGHNESS] = 1;
+    selector.bindings[TextureType::TT_ROUGHNESS] = 2;
+
+    selector.textures[TextureType::TT_METALLIC] = &drawable.material->metallic;
+    selector.bindings[TextureType::TT_METALLIC] = 3;
 
     return selector;
 }
@@ -161,7 +180,8 @@ struct LightInputsPipelineOutput::LightInputsPipelineOutputImpl {
     LightInputsPipelineOutputImpl(unsigned width, unsigned height, VulkanContext *context);
     ~LightInputsPipelineOutputImpl();
 
-    std::unique_ptr<FrameBufferAttachment> color_attachment_;
+    std::unique_ptr<FrameBufferAttachment> normal_roughness_;
+    std::unique_ptr<FrameBufferAttachment> albedo_metallic_;
     std::unique_ptr<FrameBufferAttachment> depth_attachment_;
     std::unique_ptr<RenderPass> render_pass_;
     std::unique_ptr<FrameBuffer> frame_buffer_;
@@ -171,15 +191,19 @@ struct LightInputsPipelineOutput::LightInputsPipelineOutputImpl {
 
 LightInputsPipelineOutput::LightInputsPipelineOutputImpl::LightInputsPipelineOutputImpl(
     unsigned width, unsigned height, VulkanContext *context) {
-    color_attachment_ =
+    normal_roughness_ =
+        CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R8G8B8A8_SRGB, context);
+    albedo_metallic_ =
         CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R8G8B8A8_SRGB, context);
     depth_attachment_ = CreateDepthAttachment(width, height, /*samplable=*/true, context);
     render_pass_ = CreateRenderPass(
-        /*color_attachments=*/std::vector<VkAttachmentDescription>{color_attachment_->desc},
+        /*color_attachments=*/std::vector<VkAttachmentDescription>{normal_roughness_->desc,
+                                                                   albedo_metallic_->desc},
         depth_attachment_->desc, context);
     frame_buffer_ =
         CreateFrameBuffer(*render_pass_, width, height,
-                          /*color_attachments=*/std::vector<VkImageView>{color_attachment_->view},
+                          /*color_attachments=*/
+                          std::vector<VkImageView>{normal_roughness_->view, albedo_metallic_->view},
                           depth_attachment_->view, context);
 }
 
@@ -201,8 +225,9 @@ FrameBuffer *LightInputsPipelineOutput::GetFrameBuffer() const {
 
 RenderPass const &LightInputsPipelineOutput::GetRenderPass() const { return *pimpl_->render_pass_; }
 
-FrameBufferAttachment const *LightInputsPipelineOutput::ColorAttachment() const {
-    return pimpl_->color_attachment_.get();
+std::vector<FrameBufferAttachment const *> LightInputsPipelineOutput::ColorAttachments() const {
+    return std::vector<FrameBufferAttachment const *>{pimpl_->normal_roughness_.get(),
+                                                      pimpl_->albedo_metallic_.get()};
 }
 
 FrameBufferAttachment const *LightInputsPipelineOutput::DepthAttachment() const {
@@ -235,15 +260,15 @@ LightInputsPipeline::LightInputsPipelineImpl::LightInputsPipelineImpl(
     uniform_layout = CreateShaderUniformLayout(
         PushConstantLayout(), /*per_frame_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
         /*per_pass_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
-        /*per_drawable_desc_set=*/NormalRoughnessMapBinding(), context);
+        /*per_drawable_desc_set=*/DescriptorSetBindings(), context);
     shader_stages = CreateShaderStages(
         /*vertex_shader_file_path=*/kVertexShaderFilePathLightInputs,
         /*fragment_shader_file_path=*/kFragmentShaderFilePathLightInputs, context);
     vertex_inputs = CreateVertexInputState(VertexShaderInputAttributes());
-    fixed_stage_config =
-        CreateFixedStageConfig(/*polygon_mode=*/VK_POLYGON_MODE_FILL,
-                               /*cull_mode=*/VK_CULL_MODE_BACK_BIT,
-                               /*enable_depth_test=*/true, output->width, output->height);
+    fixed_stage_config = CreateFixedStageConfig(/*polygon_mode=*/VK_POLYGON_MODE_FILL,
+                                                /*cull_mode=*/VK_CULL_MODE_BACK_BIT,
+                                                /*enable_depth_test=*/true, output->width,
+                                                output->height, /*color_attachment_count=*/2);
 
     pipeline = CreateGraphicsPipeline(output->GetRenderPass(), *shader_stages, *uniform_layout,
                                       *vertex_inputs, *fixed_stage_config, context);
@@ -271,7 +296,7 @@ LightInputsPipelineOutput *LightInputsPipeline::Run(std::vector<DrawableInstance
     RenderDrawables(drawables, *pimpl_->pipeline, *pimpl_->uniform_layout, configurator,
                     tex_desc_set_cache, geo_vram, tex_vram, cmds);
 
-    pimpl_->output->barrier =
+    pimpl_->output->promise =
         FinishRenderPass(cmds, prerequisites, pimpl_->output->AcquireFence(), pimpl_->context);
 
     return pimpl_->output;

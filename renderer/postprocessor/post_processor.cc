@@ -98,10 +98,10 @@ PostProcessorPipeline::PostProcessorPipelineImpl::PostProcessorPipelineImpl(
     uniform_layout = UniformLayout(push_constant, input_images_layouts, context);
     vertex_inputs = CreateVertexInputState(
         /*input_attributes=*/std::vector<VkVertexInputAttributeDescription>());
-    fixed_stage_config =
-        CreateFixedStageConfig(/*polygon_mode=*/VK_POLYGON_MODE_FILL,
-                               /*cull_mode=*/VK_CULL_MODE_NONE,
-                               /*enable_depth_test=*/false, output->width, output->height);
+    fixed_stage_config = CreateFixedStageConfig(/*polygon_mode=*/VK_POLYGON_MODE_FILL,
+                                                /*cull_mode=*/VK_CULL_MODE_NONE,
+                                                /*enable_depth_test=*/false, output->width,
+                                                output->height, /*color_attachment_count=*/1);
 
     // Allocate descriptor sets.
     viewport_dimension_desc_set = desc_set_allocator->Allocate(DescriptorType::DT_UNIFORM_BUFFER,
@@ -168,7 +168,7 @@ PostProcessorPipeline::Run(GpuPromise const &barrier,
         },
         cmds);
 
-    pimpl_->output->barrier =
+    pimpl_->output->promise =
         FinishRenderPass(cmds, barrier, pimpl_->output->AcquireFence(), pimpl_->context);
 
     return pimpl_->output;

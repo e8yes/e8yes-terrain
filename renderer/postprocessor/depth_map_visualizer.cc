@@ -107,7 +107,7 @@ PipelineOutputInterface *
 DepthMapVisualizerPipeline::Run(float alpha, std::optional<PerspectiveProjection> projection,
                                 DepthMapPipelineOutput const &depth_map) {
     return pimpl_->post_processor_pipeline->Run(
-        *depth_map.barrier, /*set_uniforms_fn=*/
+        *depth_map.promise, /*set_uniforms_fn=*/
         [this, alpha, projection, &depth_map](ShaderUniformLayout const &uniform_layout,
                                               DescriptorSet const &input_images_desc_set,
                                               VkCommandBuffer cmds) {

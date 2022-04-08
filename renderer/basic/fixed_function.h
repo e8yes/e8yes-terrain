@@ -19,6 +19,7 @@
 #define ISLANDS_RENDERER_FIXED_FUNCTION_H
 
 #include <memory>
+#include <vector>
 #include <vulkan/vulkan.h>
 
 namespace e8 {
@@ -44,7 +45,7 @@ struct FixedStageConfig {
     VkPipelineColorBlendStateCreateInfo color_blending;
     VkPipelineViewportStateCreateInfo viewport_state;
 
-    VkPipelineColorBlendAttachmentState color_blending_attachment;
+    std::vector<VkPipelineColorBlendAttachmentState> color_blending_attachments;
     VkViewport viewport;
     VkRect2D scissor;
 };
@@ -58,13 +59,13 @@ struct FixedStageConfig {
  * @param enable_depth_test Specifies if a depth rejection should be employed.
  * @param render_target_width The width, in pixels, of the target rendering area.
  * @param render_target_height The height, in pixels, of the target rendering area.
+ * @param color_attachment_count The number of color attachments there are in the frame buffer.
  * @return A valid unique pointer to the FixedStageConfig structure.
  */
-std::unique_ptr<FixedStageConfig> CreateFixedStageConfig(VkPolygonMode polygon_mode,
-                                                         VkCullModeFlags cull_mode,
-                                                         bool enable_depth_test,
-                                                         unsigned render_target_width,
-                                                         unsigned render_target_height);
+std::unique_ptr<FixedStageConfig>
+CreateFixedStageConfig(VkPolygonMode polygon_mode, VkCullModeFlags cull_mode,
+                       bool enable_depth_test, unsigned render_target_width,
+                       unsigned render_target_height, unsigned color_attachment_count);
 
 } // namespace e8
 

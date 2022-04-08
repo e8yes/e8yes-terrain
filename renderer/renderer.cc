@@ -91,9 +91,9 @@ void RendererInterface::EndFrame(FrameContext const &frame_context,
     present_info.pSwapchains = &context->swap_chain;
     present_info.swapchainCount = 1;
     present_info.pImageIndices = &frame_context.swap_chain_image_index;
-    if (!final_ouput->barrier->tasks_signal.empty()) {
-        present_info.pWaitSemaphores = final_ouput->barrier->tasks_signal.data();
-        present_info.waitSemaphoreCount = final_ouput->barrier->tasks_signal.size();
+    if (!final_ouput->promise->tasks_signal.empty()) {
+        present_info.pWaitSemaphores = final_ouput->promise->tasks_signal.data();
+        present_info.waitSemaphoreCount = final_ouput->promise->tasks_signal.size();
     }
 
     assert(VK_SUCCESS == vkQueuePresentKHR(context->present_queue, &present_info));

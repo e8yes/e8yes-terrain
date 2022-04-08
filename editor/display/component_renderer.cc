@@ -171,20 +171,32 @@ LightInputsRendererWidget::LightInputsRendererWidget(
     : modification_monitor_comp_(modification_monitor_comp), context_(context) {
     ui_.setupUi(this);
 
+    QObject::connect(ui_.albedo_color_radio, &QRadioButton::clicked, this,
+                     &LightInputsRendererWidget::OnChangeInputType);
     QObject::connect(ui_.normal_vector_radio, &QRadioButton::clicked, this,
                      &LightInputsRendererWidget::OnChangeInputType);
     QObject::connect(ui_.roughness_factor_radio, &QRadioButton::clicked, this,
+                     &LightInputsRendererWidget::OnChangeInputType);
+    QObject::connect(ui_.metallic_factor_radio, &QRadioButton::clicked, this,
                      &LightInputsRendererWidget::OnChangeInputType);
 
     RendererConfiguration *config = context_->game->GetGameData().renderer_config;
 
     switch (config->light_inputs_renderer_params().input_to_visualize()) {
+    case LightInputsRendererParameters::ALBEDO: {
+        ui_.albedo_color_radio->setChecked(true);
+        break;
+    }
     case LightInputsRendererParameters::NORMAL: {
         ui_.normal_vector_radio->setChecked(true);
         break;
     }
     case LightInputsRendererParameters::ROUGHNESS: {
         ui_.roughness_factor_radio->setChecked(true);
+        break;
+    }
+    case LightInputsRendererParameters::METALLIC: {
+        ui_.metallic_factor_radio->setChecked(true);
         break;
     }
     default: {
@@ -198,12 +210,18 @@ LightInputsRendererWidget::~LightInputsRendererWidget() {}
 void LightInputsRendererWidget::OnChangeInputType() {
     RendererConfiguration *config = context_->game->GetGameData().renderer_config;
 
-    if (ui_.normal_vector_radio->isChecked()) {
+    if (ui_.albedo_color_radio->isChecked()) {
+        config->mutable_light_inputs_renderer_params()->set_input_to_visualize(
+            LightInputsRendererParameters::ALBEDO);
+    } else if (ui_.normal_vector_radio->isChecked()) {
         config->mutable_light_inputs_renderer_params()->set_input_to_visualize(
             LightInputsRendererParameters::NORMAL);
     } else if (ui_.roughness_factor_radio->isChecked()) {
         config->mutable_light_inputs_renderer_params()->set_input_to_visualize(
             LightInputsRendererParameters::ROUGHNESS);
+    } else if (ui_.metallic_factor_radio->isChecked()) {
+        config->mutable_light_inputs_renderer_params()->set_input_to_visualize(
+            LightInputsRendererParameters::METALLIC);
     } else {
         assert(false);
     }

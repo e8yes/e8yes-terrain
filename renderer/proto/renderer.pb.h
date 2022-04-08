@@ -87,14 +87,16 @@ namespace e8 {
 
 enum LightInputsRendererParameters_InputType : int {
   LightInputsRendererParameters_InputType_INVALID = 0,
-  LightInputsRendererParameters_InputType_NORMAL = 1,
-  LightInputsRendererParameters_InputType_ROUGHNESS = 2,
+  LightInputsRendererParameters_InputType_ALBEDO = 1,
+  LightInputsRendererParameters_InputType_NORMAL = 2,
+  LightInputsRendererParameters_InputType_ROUGHNESS = 3,
+  LightInputsRendererParameters_InputType_METALLIC = 4,
   LightInputsRendererParameters_InputType_LightInputsRendererParameters_InputType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
   LightInputsRendererParameters_InputType_LightInputsRendererParameters_InputType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
 };
 bool LightInputsRendererParameters_InputType_IsValid(int value);
 constexpr LightInputsRendererParameters_InputType LightInputsRendererParameters_InputType_InputType_MIN = LightInputsRendererParameters_InputType_INVALID;
-constexpr LightInputsRendererParameters_InputType LightInputsRendererParameters_InputType_InputType_MAX = LightInputsRendererParameters_InputType_ROUGHNESS;
+constexpr LightInputsRendererParameters_InputType LightInputsRendererParameters_InputType_InputType_MAX = LightInputsRendererParameters_InputType_METALLIC;
 constexpr int LightInputsRendererParameters_InputType_InputType_ARRAYSIZE = LightInputsRendererParameters_InputType_InputType_MAX + 1;
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* LightInputsRendererParameters_InputType_descriptor();
@@ -516,10 +518,14 @@ class LightInputsRendererParameters PROTOBUF_FINAL :
   typedef LightInputsRendererParameters_InputType InputType;
   static constexpr InputType INVALID =
     LightInputsRendererParameters_InputType_INVALID;
+  static constexpr InputType ALBEDO =
+    LightInputsRendererParameters_InputType_ALBEDO;
   static constexpr InputType NORMAL =
     LightInputsRendererParameters_InputType_NORMAL;
   static constexpr InputType ROUGHNESS =
     LightInputsRendererParameters_InputType_ROUGHNESS;
+  static constexpr InputType METALLIC =
+    LightInputsRendererParameters_InputType_METALLIC;
   static inline bool InputType_IsValid(int value) {
     return LightInputsRendererParameters_InputType_IsValid(value);
   }

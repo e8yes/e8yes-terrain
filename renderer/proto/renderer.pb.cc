@@ -199,26 +199,27 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 const char descriptor_table_protodef_renderer_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\016renderer.proto\022\002e8\"\036\n\034SolidColorRender"
   "erParameters\"(\n\027DepthRendererParameters\022"
-  "\r\n\005alpha\030\001 \001(\002\"\235\001\n\035LightInputsRendererPa"
+  "\r\n\005alpha\030\001 \001(\002\"\267\001\n\035LightInputsRendererPa"
   "rameters\022G\n\022input_to_visualize\030\001 \001(\0162+.e"
   "8.LightInputsRendererParameters.InputTyp"
-  "e\"3\n\tInputType\022\013\n\007INVALID\020\000\022\n\n\006NORMAL\020\001\022"
-  "\r\n\tROUGHNESS\020\002\"\034\n\032RadianceRendererParame"
-  "ters\"\035\n\033RadiosityRendererParameters\"\231\003\n\025"
-  "RendererConfiguration\022.\n\024in_use_renderer"
-  "_type\030\001 \001(\0162\020.e8.RendererType\022E\n\033solid_c"
-  "olor_renderer_params\030\002 \001(\0132 .e8.SolidCol"
-  "orRendererParameters\022:\n\025depth_renderer_p"
-  "arams\030\003 \001(\0132\033.e8.DepthRendererParameters"
-  "\022G\n\034light_inputs_renderer_params\030\004 \001(\0132!"
-  ".e8.LightInputsRendererParameters\022@\n\030rad"
-  "iance_renderer_params\030\005 \001(\0132\036.e8.Radianc"
-  "eRendererParameters\022B\n\031radiosity_rendere"
-  "r_params\030\006 \001(\0132\037.e8.RadiosityRendererPar"
-  "ameters*x\n\014RendererType\022\016\n\nRT_INVALID\020\000\022"
-  "\022\n\016RT_SOLID_COLOR\020\001\022\014\n\010RT_DEPTH\020\002\022\023\n\017RT_"
-  "LIGHT_INPUTS\020\003\022\017\n\013RT_RADIANCE\020\004\022\020\n\014RT_RA"
-  "DIOSITY\020\005b\006proto3"
+  "e\"M\n\tInputType\022\013\n\007INVALID\020\000\022\n\n\006ALBEDO\020\001\022"
+  "\n\n\006NORMAL\020\002\022\r\n\tROUGHNESS\020\003\022\014\n\010METALLIC\020\004"
+  "\"\034\n\032RadianceRendererParameters\"\035\n\033Radios"
+  "ityRendererParameters\"\231\003\n\025RendererConfig"
+  "uration\022.\n\024in_use_renderer_type\030\001 \001(\0162\020."
+  "e8.RendererType\022E\n\033solid_color_renderer_"
+  "params\030\002 \001(\0132 .e8.SolidColorRendererPara"
+  "meters\022:\n\025depth_renderer_params\030\003 \001(\0132\033."
+  "e8.DepthRendererParameters\022G\n\034light_inpu"
+  "ts_renderer_params\030\004 \001(\0132!.e8.LightInput"
+  "sRendererParameters\022@\n\030radiance_renderer"
+  "_params\030\005 \001(\0132\036.e8.RadianceRendererParam"
+  "eters\022B\n\031radiosity_renderer_params\030\006 \001(\013"
+  "2\037.e8.RadiosityRendererParameters*x\n\014Ren"
+  "dererType\022\016\n\nRT_INVALID\020\000\022\022\n\016RT_SOLID_CO"
+  "LOR\020\001\022\014\n\010RT_DEPTH\020\002\022\023\n\017RT_LIGHT_INPUTS\020\003"
+  "\022\017\n\013RT_RADIANCE\020\004\022\020\n\014RT_RADIOSITY\020\005b\006pro"
+  "to3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_renderer_2eproto_deps[1] = {
 };
@@ -232,7 +233,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_ren
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_renderer_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_renderer_2eproto = {
-  false, false, descriptor_table_protodef_renderer_2eproto, "renderer.proto", 857,
+  false, false, descriptor_table_protodef_renderer_2eproto, "renderer.proto", 883,
   &descriptor_table_renderer_2eproto_once, descriptor_table_renderer_2eproto_sccs, descriptor_table_renderer_2eproto_deps, 6, 0,
   schemas, file_default_instances, TableStruct_renderer_2eproto::offsets,
   file_level_metadata_renderer_2eproto, 6, file_level_enum_descriptors_renderer_2eproto, file_level_service_descriptors_renderer_2eproto,
@@ -250,6 +251,8 @@ bool LightInputsRendererParameters_InputType_IsValid(int value) {
     case 0:
     case 1:
     case 2:
+    case 3:
+    case 4:
       return true;
     default:
       return false;
@@ -258,8 +261,10 @@ bool LightInputsRendererParameters_InputType_IsValid(int value) {
 
 #if (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
 constexpr LightInputsRendererParameters_InputType LightInputsRendererParameters::INVALID;
+constexpr LightInputsRendererParameters_InputType LightInputsRendererParameters::ALBEDO;
 constexpr LightInputsRendererParameters_InputType LightInputsRendererParameters::NORMAL;
 constexpr LightInputsRendererParameters_InputType LightInputsRendererParameters::ROUGHNESS;
+constexpr LightInputsRendererParameters_InputType LightInputsRendererParameters::METALLIC;
 constexpr LightInputsRendererParameters_InputType LightInputsRendererParameters::InputType_MIN;
 constexpr LightInputsRendererParameters_InputType LightInputsRendererParameters::InputType_MAX;
 constexpr int LightInputsRendererParameters::InputType_ARRAYSIZE;

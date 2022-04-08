@@ -64,7 +64,7 @@ std::unique_ptr<FrameBuffer> CreateFrameBuffer(RenderPass const &render_pass, un
                                              /*pAllocator=*/nullptr, &info->buffer));
 
     // Set clear values defaults.
-    if (!color_attachments.empty()) {
+    for (unsigned i = 0; i < color_attachments.size(); ++i) {
         VkClearValue color_value{};
         info->clear_values.push_back(color_value);
     }

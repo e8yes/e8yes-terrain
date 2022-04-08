@@ -135,7 +135,9 @@ FrameBuffer *DepthMapPipelineOutput::GetFrameBuffer() const { return pimpl_->fra
 
 RenderPass const &DepthMapPipelineOutput::GetRenderPass() const { return *pimpl_->render_pass_; }
 
-FrameBufferAttachment const *DepthMapPipelineOutput::ColorAttachment() const { return nullptr; }
+std::vector<FrameBufferAttachment const *> DepthMapPipelineOutput::ColorAttachments() const {
+    return std::vector<FrameBufferAttachment const *>{};
+}
 
 FrameBufferAttachment const *DepthMapPipelineOutput::DepthAttachment() const {
     return pimpl_->depth_attachment_.get();
@@ -172,10 +174,10 @@ DepthMapPipeline::DepthMapPipelineImpl::DepthMapPipelineImpl(DepthMapPipelineOut
     shader_stages_ = CreateShaderStages(/*vertex_shader_file_path=*/kVertexShaderFilePathDepthMap,
                                         /*fragment_shader_file_path=*/std::nullopt, context);
     vertex_inputs_ = CreateVertexInputState(VertexShaderInputAttributes());
-    fixed_stage_config_ =
-        CreateFixedStageConfig(/*polygon_mode=*/VK_POLYGON_MODE_FILL,
-                               /*cull_mode=*/VK_CULL_MODE_BACK_BIT,
-                               /*enable_depth_test=*/true, output->width, output->height);
+    fixed_stage_config_ = CreateFixedStageConfig(/*polygon_mode=*/VK_POLYGON_MODE_FILL,
+                                                 /*cull_mode=*/VK_CULL_MODE_BACK_BIT,
+                                                 /*enable_depth_test=*/true, output->width,
+                                                 output->height, /*color_attachment_count=*/0);
 
     pipeline_ = CreateGraphicsPipeline(output->GetRenderPass(), *shader_stages_, *uniform_layout_,
                                        *vertex_inputs_, *fixed_stage_config_, context);
@@ -209,7 +211,7 @@ DepthMapPipelineOutput *DepthMapPipeline::Run(std::vector<DrawableInstance> cons
     RenderDrawables(drawables, pimpl_->GetGraphicsPipeline(), pimpl_->GetUniformLayout(),
                     configurator, tex_desc_set_cache, geo_vram, tex_vram, cmds);
 
-    pimpl_->output->barrier =
+    pimpl_->output->promise =
         FinishRenderPass(cmds, prerequisites, pimpl_->output->AcquireFence(), pimpl_->context);
 
     return pimpl_->output;

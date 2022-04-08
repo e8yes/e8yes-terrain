@@ -15,6 +15,13 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <widget class="QRadioButton" name="albedo_color_radio">
+     <property name="text">
+      <string>Albedo Color</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QRadioButton" name="normal_vector_radio">
      <property name="text">
       <string>Normal Vector</string>
@@ -25,6 +32,13 @@
     <widget class="QRadioButton" name="roughness_factor_radio">
      <property name="text">
       <string>Roughness Factor</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="metallic_factor_radio">
+     <property name="text">
+      <string>Metallic Factor</string>
      </property>
     </widget>
    </item>

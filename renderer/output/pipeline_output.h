@@ -52,7 +52,7 @@ class PipelineOutputInterface {
     /**
      * @brief ColorAttachment Returns the color attachment image, if there is any from the output.
      */
-    virtual FrameBufferAttachment const *ColorAttachment() const = 0;
+    virtual std::vector<FrameBufferAttachment const *> ColorAttachments() const = 0;
 
     /**
      * @brief DepthAttachment Returns the depth attachment image, if there is any from the output.
@@ -79,7 +79,7 @@ class PipelineOutputInterface {
 
     // Barrier of the rendering task. Semaphores in this barrier must all be signaled before the
     // output can be read or used again.
-    std::unique_ptr<GpuPromise> barrier;
+    std::unique_ptr<GpuPromise> promise;
 
     // A CPU fence which gets signaled when the output is fulfilled.
     VkFence fence;
@@ -105,7 +105,7 @@ class SwapChainPipelineOutput : public PipelineOutputInterface {
 
     FrameBuffer *GetFrameBuffer() const override;
     RenderPass const &GetRenderPass() const override;
-    FrameBufferAttachment const *ColorAttachment() const override;
+    std::vector<FrameBufferAttachment const *> ColorAttachments() const override;
     FrameBufferAttachment const *DepthAttachment() const override;
 
     /**

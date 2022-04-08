@@ -38,6 +38,11 @@ namespace e8 {
  */
 class LightInputsPipelineOutput : public PipelineOutputInterface {
   public:
+    enum ColorOutput {
+        NORMAL_ROUGHNESS,
+        ALBEDO_METALLIC,
+    };
+
     /**
      * @brief LightInputsPipelineOutput Constructs a light inputs map output with the specified
      * dimension.
@@ -51,7 +56,7 @@ class LightInputsPipelineOutput : public PipelineOutputInterface {
 
     FrameBuffer *GetFrameBuffer() const override;
     RenderPass const &GetRenderPass() const override;
-    FrameBufferAttachment const *ColorAttachment() const override;
+    std::vector<FrameBufferAttachment const *> ColorAttachments() const override;
     FrameBufferAttachment const *DepthAttachment() const override;
 
   private:

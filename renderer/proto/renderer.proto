@@ -66,11 +66,17 @@ message LightInputsRendererParameters {
     enum InputType {
         INVALID = 0;
 
+        // Albedo color.
+        ALBEDO = 1;
+
         // Normal vector.
-        NORMAL = 1;
+        NORMAL = 2;
 
         // Roughness factor.
-        ROUGHNESS = 2;
+        ROUGHNESS = 3;
+
+        // Metallic factor.
+        METALLIC = 4;
     }
 
     // The input selected for visualization.

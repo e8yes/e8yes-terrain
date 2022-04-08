@@ -50,7 +50,7 @@ class DepthMapPipelineOutput : public PipelineOutputInterface {
 
     FrameBuffer *GetFrameBuffer() const override;
     RenderPass const &GetRenderPass() const override;
-    FrameBufferAttachment const *ColorAttachment() const override;
+    std::vector<FrameBufferAttachment const *> ColorAttachments() const override;
     FrameBufferAttachment const *DepthAttachment() const override;
 
   private:

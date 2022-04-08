@@ -24,15 +24,14 @@ namespace e8 {
 
 FixedStageConfig::FixedStageConfig()
     : input_assembly{}, rasterizer{}, multisampling{}, depth_stencil{}, color_blending{},
-      viewport_state{}, color_blending_attachment{}, viewport{}, scissor{} {}
+      viewport_state{}, viewport{}, scissor{} {}
 
 FixedStageConfig::~FixedStageConfig() {}
 
-std::unique_ptr<FixedStageConfig> CreateFixedStageConfig(VkPolygonMode polygon_mode,
-                                                         VkCullModeFlags cull_mode,
-                                                         bool enable_depth_test,
-                                                         unsigned render_target_width,
-                                                         unsigned render_target_height) {
+std::unique_ptr<FixedStageConfig>
+CreateFixedStageConfig(VkPolygonMode polygon_mode, VkCullModeFlags cull_mode,
+                       bool enable_depth_test, unsigned render_target_width,
+                       unsigned render_target_height, unsigned color_attachment_count) {
     auto info = std::make_unique<FixedStageConfig>();
 
     info->input_assembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -69,16 +68,22 @@ std::unique_ptr<FixedStageConfig> CreateFixedStageConfig(VkPolygonMode polygon_m
     info->depth_stencil.maxDepthBounds = 1.0f;
     info->depth_stencil.stencilTestEnable = VK_FALSE;
 
-    info->color_blending_attachment.colorWriteMask =
-        VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
-        VK_COLOR_COMPONENT_A_BIT;
-    info->color_blending_attachment.blendEnable = VK_FALSE;
+    info->color_blending_attachments.resize(color_attachment_count);
+    for (unsigned i = 0; i < color_attachment_count; ++i) {
+        info->color_blending_attachments[i] = VkPipelineColorBlendAttachmentState{};
+        info->color_blending_attachments[i].colorWriteMask =
+            VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
+            VK_COLOR_COMPONENT_A_BIT;
+        info->color_blending_attachments[i].blendEnable = VK_FALSE;
+    }
 
     info->color_blending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
     info->color_blending.logicOpEnable = VK_FALSE;
     info->color_blending.logicOp = VK_LOGIC_OP_COPY;
-    info->color_blending.attachmentCount = 1;
-    info->color_blending.pAttachments = &info->color_blending_attachment;
+    if (!info->color_blending_attachments.empty()) {
+        info->color_blending.attachmentCount = info->color_blending_attachments.size();
+        info->color_blending.pAttachments = info->color_blending_attachments.data();
+    }
 
     info->viewport.width = render_target_width;
     info->viewport.height = render_target_height;
