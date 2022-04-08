@@ -107,7 +107,8 @@ void main() {
 
     float diffuse_term = diffuse_brdf * cos_w;
     float specular_term = cos_w * specular_brdf;
-    float mix_term = (1 - metallic) * diffuse_term + metallic * specular_term;
+    float specularity = mix(0.04f, 1.0f, metallic);
+    float mix_term = mix(diffuse_term, specular_term, specularity);
 
     vec3 radiance = plc.intensity * albedo * mix_term;
     out_radiance = vec4(radiance, 1.0f);
