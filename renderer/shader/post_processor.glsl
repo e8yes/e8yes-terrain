@@ -15,20 +15,11 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#version 450
+layout(set = 0, binding = 0) uniform PerFrameConstants {
+    float viewport_width;
+    float viewport_height;
+} pfc;
 
-void main() {
-    const vec2 vertices[4] = vec2[4](
-		vec2(-1.0f, -1.0f),
-		vec2( 1.0f, -1.0f),
-		vec2( 1.0f,  1.0f),
-        vec2(-1.0f,  1.0f)
-	);
-
-    const uint indices[6] = uint[6](
-        0, 2, 1, 0, 3, 2
-    );
-
-    uint index = indices[gl_VertexIndex + gl_InstanceIndex*3];
-    gl_Position = vec4(vertices[index], 1.0f, 1.0f);
+vec2 ScreenTexCoord() {
+    return vec2(gl_FragCoord.x / pfc.viewport_width, gl_FragCoord.y / pfc.viewport_height);
 }

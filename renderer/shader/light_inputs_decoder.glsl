@@ -15,20 +15,26 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#version 450
+layout(set = 1, binding = 0) uniform sampler2D normal_roughness;
+layout(set = 1, binding = 1) uniform sampler2D albedo_metallic;
 
-void main() {
-    const vec2 vertices[4] = vec2[4](
-		vec2(-1.0f, -1.0f),
-		vec2( 1.0f, -1.0f),
-		vec2( 1.0f,  1.0f),
-        vec2(-1.0f,  1.0f)
-	);
+vec3 DecodeAlbedo(vec2 screen_tex_coord) {
+    return texture(albedo_metallic, screen_tex_coord).xyz;
+}
 
-    const uint indices[6] = uint[6](
-        0, 2, 1, 0, 3, 2
-    );
+vec3 DecodeRawNormal(vec2 screen_tex_coord) {
+    return texture(normal_roughness, screen_tex_coord).xyz;
+}
 
-    uint index = indices[gl_VertexIndex + gl_InstanceIndex*3];
-    gl_Position = vec4(vertices[index], 1.0f, 1.0f);
+vec3 DecodeNormal(vec2 screen_tex_coord) {
+    vec3 encoded_normal = DecodeRawNormal(screen_tex_coord);
+    return 2.0f * encoded_normal - 1.0f;
+}
+
+float DecodeRoughness(vec2 screen_tex_coord) {
+    return texture(normal_roughness, screen_tex_coord).w;
+}
+
+float DecodeMetallic(vec2 screen_tex_coord) {
+    return texture(albedo_metallic, screen_tex_coord).w;
 }
