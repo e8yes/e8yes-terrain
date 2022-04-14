@@ -16,7 +16,8 @@ protoc --cpp_out=../renderer/proto \
        `find ../renderer/proto -name *.proto`
 
 # Shader code compilation.
-find ../renderer/shader -type f -exec glslc {} -o {}.spv \;
+find ../renderer/shader -type f -name *.vert -exec glslc {} -o {}.spv \;
+find ../renderer/shader -type f -name *.frag -exec glslc {} -o {}.spv \;
 mv ../renderer/shader/*.spv ./bin
 
 # C++ code compilation.
