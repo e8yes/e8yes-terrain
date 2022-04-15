@@ -26,6 +26,7 @@
 
 #include "common/tensor.h"
 #include "content/proto/entity.pb.h"
+#include "content/proto/light_source.pb.h"
 #include "content/proto/lod.pb.h"
 #include "resource/common.h"
 #include "resource/geometry.h"
@@ -91,6 +92,9 @@ struct SceneEntity {
 
     // A list of LOD references stored in decreasing level of detail.
     SceneEntityResources resources;
+
+    // Light source attached to the entity.
+    std::optional<LightSource> light_source;
 };
 
 /**
