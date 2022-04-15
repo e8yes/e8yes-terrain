@@ -20,6 +20,7 @@ syntax = "proto3";
 package e8;
 
 import "bbox.proto";
+import "light_source.proto";
 import "lod.proto";
 import "transform.proto";
 
@@ -54,4 +55,7 @@ message SceneEntityProto {
 
     // Resource references attached to this entity.
     SceneEntityResources resources = 7;
+
+    // Light source attached to this entity.
+    LightSource light_source = 8;
 }

@@ -15,6 +15,7 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 extern PROTOBUF_INTERNAL_EXPORT_bbox_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_AABB_bbox_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_light_5fsource_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<3> scc_info_LightSource_light_5fsource_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_lod_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_SceneEntityResources_lod_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_transform_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_SrtTransform_transform_2eproto;
 namespace e8 {
@@ -34,11 +35,12 @@ static void InitDefaultsscc_info_SceneEntityProto_entity_2eproto() {
   ::e8::SceneEntityProto::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<3> scc_info_SceneEntityProto_entity_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 3, 0, InitDefaultsscc_info_SceneEntityProto_entity_2eproto}, {
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<4> scc_info_SceneEntityProto_entity_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 4, 0, InitDefaultsscc_info_SceneEntityProto_entity_2eproto}, {
       &scc_info_SrtTransform_transform_2eproto.base,
       &scc_info_AABB_bbox_2eproto.base,
-      &scc_info_SceneEntityResources_lod_2eproto.base,}};
+      &scc_info_SceneEntityResources_lod_2eproto.base,
+      &scc_info_LightSource_light_5fsource_2eproto.base,}};
 
 static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_entity_2eproto[1];
 static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_entity_2eproto = nullptr;
@@ -57,6 +59,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_entity_2eproto::offsets[] PROT
   PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, srt_transform_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, bounding_box_),
   PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, resources_),
+  PROTOBUF_FIELD_OFFSET(::e8::SceneEntityProto, light_source_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::e8::SceneEntityProto)},
@@ -67,16 +70,19 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_entity_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\014entity.proto\022\002e8\032\nbbox.proto\032\tlod.prot"
-  "o\032\017transform.proto\"\306\001\n\020SceneEntityProto\022"
-  "\n\n\002id\030\001 \001(\003\022\014\n\004name\030\002 \001(\t\022\017\n\007movable\030\003 \001"
-  "(\010\022\021\n\ttransform\030\004 \003(\002\022\'\n\rsrt_transform\030\005"
-  " \001(\0132\020.e8.SrtTransform\022\036\n\014bounding_box\030\006"
-  " \001(\0132\010.e8.AABB\022+\n\tresources\030\007 \001(\0132\030.e8.S"
-  "ceneEntityResourcesb\006proto3"
+  "\n\014entity.proto\022\002e8\032\nbbox.proto\032\022light_so"
+  "urce.proto\032\tlod.proto\032\017transform.proto\"\355"
+  "\001\n\020SceneEntityProto\022\n\n\002id\030\001 \001(\003\022\014\n\004name\030"
+  "\002 \001(\t\022\017\n\007movable\030\003 \001(\010\022\021\n\ttransform\030\004 \003("
+  "\002\022\'\n\rsrt_transform\030\005 \001(\0132\020.e8.SrtTransfo"
+  "rm\022\036\n\014bounding_box\030\006 \001(\0132\010.e8.AABB\022+\n\tre"
+  "sources\030\007 \001(\0132\030.e8.SceneEntityResources\022"
+  "%\n\014light_source\030\010 \001(\0132\017.e8.LightSourceb\006"
+  "proto3"
   ;
-static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_entity_2eproto_deps[3] = {
+static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_entity_2eproto_deps[4] = {
   &::descriptor_table_bbox_2eproto,
+  &::descriptor_table_light_5fsource_2eproto,
   &::descriptor_table_lod_2eproto,
   &::descriptor_table_transform_2eproto,
 };
@@ -85,8 +91,8 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_ent
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_entity_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_entity_2eproto = {
-  false, false, descriptor_table_protodef_entity_2eproto, "entity.proto", 267,
-  &descriptor_table_entity_2eproto_once, descriptor_table_entity_2eproto_sccs, descriptor_table_entity_2eproto_deps, 1, 3,
+  false, false, descriptor_table_protodef_entity_2eproto, "entity.proto", 326,
+  &descriptor_table_entity_2eproto_once, descriptor_table_entity_2eproto_sccs, descriptor_table_entity_2eproto_deps, 1, 4,
   schemas, file_default_instances, TableStruct_entity_2eproto::offsets,
   file_level_metadata_entity_2eproto, 1, file_level_enum_descriptors_entity_2eproto, file_level_service_descriptors_entity_2eproto,
 };
@@ -104,12 +110,15 @@ void SceneEntityProto::InitAsDefaultInstance() {
       ::e8::AABB::internal_default_instance());
   ::e8::_SceneEntityProto_default_instance_._instance.get_mutable()->resources_ = const_cast< ::e8::SceneEntityResources*>(
       ::e8::SceneEntityResources::internal_default_instance());
+  ::e8::_SceneEntityProto_default_instance_._instance.get_mutable()->light_source_ = const_cast< ::e8::LightSource*>(
+      ::e8::LightSource::internal_default_instance());
 }
 class SceneEntityProto::_Internal {
  public:
   static const ::e8::SrtTransform& srt_transform(const SceneEntityProto* msg);
   static const ::e8::AABB& bounding_box(const SceneEntityProto* msg);
   static const ::e8::SceneEntityResources& resources(const SceneEntityProto* msg);
+  static const ::e8::LightSource& light_source(const SceneEntityProto* msg);
 };
 
 const ::e8::SrtTransform&
@@ -123,6 +132,10 @@ SceneEntityProto::_Internal::bounding_box(const SceneEntityProto* msg) {
 const ::e8::SceneEntityResources&
 SceneEntityProto::_Internal::resources(const SceneEntityProto* msg) {
   return *msg->resources_;
+}
+const ::e8::LightSource&
+SceneEntityProto::_Internal::light_source(const SceneEntityProto* msg) {
+  return *msg->light_source_;
 }
 void SceneEntityProto::clear_srt_transform() {
   if (GetArena() == nullptr && srt_transform_ != nullptr) {
@@ -141,6 +154,12 @@ void SceneEntityProto::clear_resources() {
     delete resources_;
   }
   resources_ = nullptr;
+}
+void SceneEntityProto::clear_light_source() {
+  if (GetArena() == nullptr && light_source_ != nullptr) {
+    delete light_source_;
+  }
+  light_source_ = nullptr;
 }
 SceneEntityProto::SceneEntityProto(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena),
@@ -173,6 +192,11 @@ SceneEntityProto::SceneEntityProto(const SceneEntityProto& from)
   } else {
     resources_ = nullptr;
   }
+  if (from._internal_has_light_source()) {
+    light_source_ = new ::e8::LightSource(*from.light_source_);
+  } else {
+    light_source_ = nullptr;
+  }
   ::memcpy(&id_, &from.id_,
     static_cast<size_t>(reinterpret_cast<char*>(&movable_) -
     reinterpret_cast<char*>(&id_)) + sizeof(movable_));
@@ -199,6 +223,7 @@ void SceneEntityProto::SharedDtor() {
   if (this != internal_default_instance()) delete srt_transform_;
   if (this != internal_default_instance()) delete bounding_box_;
   if (this != internal_default_instance()) delete resources_;
+  if (this != internal_default_instance()) delete light_source_;
 }
 
 void SceneEntityProto::ArenaDtor(void* object) {
@@ -236,6 +261,10 @@ void SceneEntityProto::Clear() {
     delete resources_;
   }
   resources_ = nullptr;
+  if (GetArena() == nullptr && light_source_ != nullptr) {
+    delete light_source_;
+  }
+  light_source_ = nullptr;
   ::memset(&id_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&movable_) -
       reinterpret_cast<char*>(&id_)) + sizeof(movable_));
@@ -301,6 +330,13 @@ const char* SceneEntityProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPA
       case 7:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
           ptr = ctx->ParseMessage(_internal_mutable_resources(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .e8.LightSource light_source = 8;
+      case 8:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 66)) {
+          ptr = ctx->ParseMessage(_internal_mutable_light_source(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -383,6 +419,14 @@ failure:
         7, _Internal::resources(this), target, stream);
   }
 
+  // .e8.LightSource light_source = 8;
+  if (this->has_light_source()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        8, _Internal::light_source(this), target, stream);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -442,6 +486,13 @@ size_t SceneEntityProto::ByteSizeLong() const {
         *resources_);
   }
 
+  // .e8.LightSource light_source = 8;
+  if (this->has_light_source()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *light_source_);
+  }
+
   // int64 id = 1;
   if (this->id() != 0) {
     total_size += 1 +
@@ -497,6 +548,9 @@ void SceneEntityProto::MergeFrom(const SceneEntityProto& from) {
   }
   if (from.has_resources()) {
     _internal_mutable_resources()->::e8::SceneEntityResources::MergeFrom(from._internal_resources());
+  }
+  if (from.has_light_source()) {
+    _internal_mutable_light_source()->::e8::LightSource::MergeFrom(from._internal_light_source());
   }
   if (from.id() != 0) {
     _internal_set_id(from._internal_id());

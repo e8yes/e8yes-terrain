@@ -33,6 +33,7 @@
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
 #include "bbox.pb.h"
+#include "light_source.pb.h"
 #include "lod.pb.h"
 #include "transform.pb.h"
 // @@protoc_insertion_point(includes)
@@ -187,6 +188,7 @@ class SceneEntityProto PROTOBUF_FINAL :
     kSrtTransformFieldNumber = 5,
     kBoundingBoxFieldNumber = 6,
     kResourcesFieldNumber = 7,
+    kLightSourceFieldNumber = 8,
     kIdFieldNumber = 1,
     kMovableFieldNumber = 3,
   };
@@ -291,6 +293,24 @@ class SceneEntityProto PROTOBUF_FINAL :
       ::e8::SceneEntityResources* resources);
   ::e8::SceneEntityResources* unsafe_arena_release_resources();
 
+  // .e8.LightSource light_source = 8;
+  bool has_light_source() const;
+  private:
+  bool _internal_has_light_source() const;
+  public:
+  void clear_light_source();
+  const ::e8::LightSource& light_source() const;
+  ::e8::LightSource* release_light_source();
+  ::e8::LightSource* mutable_light_source();
+  void set_allocated_light_source(::e8::LightSource* light_source);
+  private:
+  const ::e8::LightSource& _internal_light_source() const;
+  ::e8::LightSource* _internal_mutable_light_source();
+  public:
+  void unsafe_arena_set_allocated_light_source(
+      ::e8::LightSource* light_source);
+  ::e8::LightSource* unsafe_arena_release_light_source();
+
   // int64 id = 1;
   void clear_id();
   ::PROTOBUF_NAMESPACE_ID::int64 id() const;
@@ -322,6 +342,7 @@ class SceneEntityProto PROTOBUF_FINAL :
   ::e8::SrtTransform* srt_transform_;
   ::e8::AABB* bounding_box_;
   ::e8::SceneEntityResources* resources_;
+  ::e8::LightSource* light_source_;
   ::PROTOBUF_NAMESPACE_ID::int64 id_;
   bool movable_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -729,6 +750,81 @@ inline void SceneEntityProto::set_allocated_resources(::e8::SceneEntityResources
   }
   resources_ = resources;
   // @@protoc_insertion_point(field_set_allocated:e8.SceneEntityProto.resources)
+}
+
+// .e8.LightSource light_source = 8;
+inline bool SceneEntityProto::_internal_has_light_source() const {
+  return this != internal_default_instance() && light_source_ != nullptr;
+}
+inline bool SceneEntityProto::has_light_source() const {
+  return _internal_has_light_source();
+}
+inline const ::e8::LightSource& SceneEntityProto::_internal_light_source() const {
+  const ::e8::LightSource* p = light_source_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::e8::LightSource*>(
+      &::e8::_LightSource_default_instance_);
+}
+inline const ::e8::LightSource& SceneEntityProto::light_source() const {
+  // @@protoc_insertion_point(field_get:e8.SceneEntityProto.light_source)
+  return _internal_light_source();
+}
+inline void SceneEntityProto::unsafe_arena_set_allocated_light_source(
+    ::e8::LightSource* light_source) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(light_source_);
+  }
+  light_source_ = light_source;
+  if (light_source) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:e8.SceneEntityProto.light_source)
+}
+inline ::e8::LightSource* SceneEntityProto::release_light_source() {
+  auto temp = unsafe_arena_release_light_source();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::e8::LightSource* SceneEntityProto::unsafe_arena_release_light_source() {
+  // @@protoc_insertion_point(field_release:e8.SceneEntityProto.light_source)
+  
+  ::e8::LightSource* temp = light_source_;
+  light_source_ = nullptr;
+  return temp;
+}
+inline ::e8::LightSource* SceneEntityProto::_internal_mutable_light_source() {
+  
+  if (light_source_ == nullptr) {
+    auto* p = CreateMaybeMessage<::e8::LightSource>(GetArena());
+    light_source_ = p;
+  }
+  return light_source_;
+}
+inline ::e8::LightSource* SceneEntityProto::mutable_light_source() {
+  // @@protoc_insertion_point(field_mutable:e8.SceneEntityProto.light_source)
+  return _internal_mutable_light_source();
+}
+inline void SceneEntityProto::set_allocated_light_source(::e8::LightSource* light_source) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(light_source_);
+  }
+  if (light_source) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(light_source)->GetArena();
+    if (message_arena != submessage_arena) {
+      light_source = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, light_source, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  light_source_ = light_source;
+  // @@protoc_insertion_point(field_set_allocated:e8.SceneEntityProto.light_source)
 }
 
 #ifdef __GNUC__

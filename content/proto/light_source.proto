@@ -1,0 +1,73 @@
+/**
+ * e8yes demo web server.
+ *
+ * <p>Copyright (C) 2020 Chifeng Wen {daviesx66@gmail.com}
+ *
+ * <p>This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *reset
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * <p>You should have received a copy of the GNU General Public License along with this program. If
+ * not, see <http://www.gnu.org/licenses/>.
+ */
+
+syntax = "proto3";
+
+package e8;
+
+/**
+ * @brief the SunLight message Models a directional light.
+ */
+message SunLight {
+    // A 3-element unit vector defining the direction of the light source.
+    repeated float direction = 1;
+
+    // A 3-element array which represents the intensity of each RGB component.
+    repeated float intensity = 2;
+}
+
+/**
+ * @brief the PointLight message Models a point light.
+ */
+message PointLight {
+    // The location of the point light.
+    repeated float position = 1;
+
+    // A 3-element array which represents the intensity of each RGB component.
+    repeated float intensity = 2;
+}
+
+/**
+ * @brief the SpotLight message Models a spot light.
+ */
+message SpotLight {
+    // The location of the point light.
+    repeated float position = 1;
+
+    // A 3-element unit vector defining the direction of the light source.
+    repeated float direction = 2;
+
+    // A 3-element array which represents the intensity of each RGB component.
+    repeated float intensity = 3;
+
+    // The angle, in degree, which spans the inner cone of a spot light.
+    float inner_cone_angle = 4;
+
+    // The angle, in degree, which spans the outer cone of a spot light.
+    float outer_cone_angle = 5;
+}
+
+/**
+ * @brief the LightSource message Represents a light source.
+ */
+message LightSource {
+    oneof model {
+        SunLight sun_light = 1;
+        PointLight point_light = 2;
+        SpotLight spot_light = 3;
+    }
+}
