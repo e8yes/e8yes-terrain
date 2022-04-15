@@ -32,11 +32,16 @@ namespace e8 {
 constexpr char const *kVertexShaderFilePathDepthMap = "./depth.vert.spv";
 constexpr char const *kVertexShaderFilePathLightInputs = "./light_inputs.vert.spv";
 constexpr char const *kVertexShaderFilePathPostProcessor = "./post_processor.vert.spv";
+
 constexpr char const *kFragmentShaderFilePathDepthMapVisualizer = "./depth_visualizer.frag.spv";
+constexpr char const *kFragmentShaderFilePathHdrAces = "./hdr_aces.frag.spv";
+constexpr char const *kFragmentShaderFilePathHdrClamp = "./hdr_clamp.frag.spv";
 constexpr char const *kFragmentShaderFilePathLightInputs = "./light_inputs.frag.spv";
 constexpr char const *kFragmentShaderFilePathLightInputsVisualizer =
     "./light_inputs_visualizer.frag.spv";
 constexpr char const *kFragmentShaderFilePathPostProcessorEmpty = "./post_processor.frag.spv";
+constexpr char const *kFragmentShaderFilePathRadianceDirectional =
+    "./radiance_directional.frag.spv";
 
 /**
  * @brief The ShaderStages struct Stores the shader handle and stage information of a graphics
