@@ -22,7 +22,6 @@
 
 #include "common/device.h"
 #include "content/proto/light_source.pb.h"
-#include "renderer/basic/projection.h"
 #include "renderer/output/pipeline_output.h"
 #include "renderer/pipeline/light_inputs.h"
 #include "renderer/transfer/descriptor_set.h"
@@ -41,9 +40,10 @@ class DirectionalRadiancePipeline {
 
     /**
      * @brief Run Computes the radiance produced by the specified sun light based on screen-space
-     * geometric and material parameters.
+     * geometric and material parameters. Note, the sun light must be defined in the view space
+     * where the light inputs were generated.
      */
-    UnboundedColorPipelineOutput *Run(SunLight const &light, ProjectionInterface const &projection,
+    UnboundedColorPipelineOutput *Run(SunLight const &light,
                                       LightInputsPipelineOutput const &light_inputs);
 
   private:

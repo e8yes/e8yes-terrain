@@ -42,6 +42,7 @@ SOURCES += \
     postprocessor/tone_map.cc \
     proto/renderer.pb.cc \
     query/drawable_instance.cc \
+    query/light_source.cc \
     query/query_fn.cc \
     renderer.cc \
     renderer_depth.cc \
@@ -81,6 +82,7 @@ HEADERS += \
     postprocessor/tone_map.h \
     proto/renderer.pb.h \
     query/drawable_instance.h \
+    query/light_source.h \
     query/query_fn.h \
     renderer.h \
     renderer_depth.h \

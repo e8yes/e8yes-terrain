@@ -102,23 +102,16 @@ DirectionalRadiancePipeline::DirectionalRadiancePipeline(
 DirectionalRadiancePipeline::~DirectionalRadiancePipeline() {}
 
 UnboundedColorPipelineOutput *
-DirectionalRadiancePipeline::Run(SunLight const &light, ProjectionInterface const &projection,
+DirectionalRadiancePipeline::Run(SunLight const &light,
                                  LightInputsPipelineOutput const &light_inputs) {
     PipelineOutputInterface *output = pimpl_->post_processor_pipeline->Run(
         *light_inputs.promise, /*set_uniforms_fn=*/
-        [this, &light, &projection, &light_inputs](ShaderUniformLayout const &uniform_layout,
-                                                   DescriptorSet const &input_images_desc_set,
-                                                   VkCommandBuffer cmds) {
-            vec4 world_space_direction = ToVec3(light.direction()).homo(0.0f);
-            vec4 view_space_direction = projection.ViewTransform() * world_space_direction;
-            vec4 input_direction = view_space_direction.normalize();
-
-            vec4 input_intensity = ToVec3(light.intensity()).homo(0.0f);
-
-            // Sets projection and visualizer parameters.
+        [this, &light, &light_inputs](ShaderUniformLayout const &uniform_layout,
+                                      DescriptorSet const &input_images_desc_set,
+                                      VkCommandBuffer cmds) {
             PushConstants push_constants;
-            push_constants.dir = input_direction;
-            push_constants.intensity = input_intensity;
+            push_constants.dir = ToVec3(light.direction()).homo(0.0f);
+            push_constants.intensity = ToVec3(light.intensity()).homo(1.0f);
 
             vkCmdPushConstants(cmds, uniform_layout.layout,
                                /*stageFlags=*/VK_SHADER_STAGE_FRAGMENT_BIT,

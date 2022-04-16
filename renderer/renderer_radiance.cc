@@ -21,7 +21,6 @@
 #include <vector>
 
 #include "common/device.h"
-#include "content/proto/light_source.pb.h"
 #include "content/scene.h"
 #include "renderer/output/pipeline_output.h"
 #include "renderer/pipeline/light_inputs.h"
@@ -29,6 +28,7 @@
 #include "renderer/postprocessor/tone_map.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/query/drawable_instance.h"
+#include "renderer/query/light_source.h"
 #include "renderer/query/query_fn.h"
 #include "renderer/renderer.h"
 #include "renderer/renderer_radiance.h"
@@ -38,19 +38,6 @@
 #include "resource/accessor.h"
 
 namespace e8 {
-namespace {
-
-std::vector<LightSource const *> LightSources(std::vector<SceneEntity const *> entities) {
-    std::vector<LightSource const *> light_sources;
-    for (auto entity : entities) {
-        if (entity->light_source.has_value()) {
-            light_sources.push_back(&entity->light_source.value());
-        }
-    }
-    return light_sources;
-}
-
-} // namespace
 
 struct RadianceRenderer::RadianceRendererImpl {
     RadianceRendererImpl(VulkanContext *context);
@@ -121,12 +108,13 @@ void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_access
             drawables, camera_projection, frame_context.acquire_swap_chain_image_barrier,
             &pimpl_->tex_desc_set_cache, &pimpl_->geo_vram, &pimpl_->tex_vram);
 
-        std::vector<LightSource const *> light_sources = LightSources(scene_entities);
-        for (auto light_source : light_sources) {
-            switch (light_source->model_case()) {
+        std::vector<LightSourceInstance> light_sources =
+            ToLightSources(scene_entities, camera_projection);
+        for (auto instance : light_sources) {
+            switch (instance.light_source.model_case()) {
             case LightSource::ModelCase::kSunLight: {
-                pimpl_->directional_radiance_pipeline.Run(light_source->sun_light(),
-                                                          camera_projection, *light_inputs);
+                pimpl_->directional_radiance_pipeline.Run(instance.light_source.sun_light(),
+                                                          *light_inputs);
                 break;
             }
             case LightSource::ModelCase::kPointLight: {

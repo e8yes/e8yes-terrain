@@ -31,7 +31,7 @@ namespace e8 {
 
 /**
  * @brief The DrawableInstance struct Stores references to a geometry, material definition and
- * transformation. This instanced drawable is what get actually rendered.
+ * transformation. This instanced drawable is what gets rendered.
  */
 struct DrawableInstance {
     // The geometry selected from a series of LODs.
