@@ -123,11 +123,8 @@ DepthMapPipelineOutput::DepthMapPipelineOutputImpl::~DepthMapPipelineOutputImpl(
 
 DepthMapPipelineOutput::DepthMapPipelineOutput(unsigned width, unsigned height,
                                                VulkanContext *context)
-    : PipelineOutputInterface(context),
-      pimpl_(std::make_unique<DepthMapPipelineOutputImpl>(width, height, context)) {
-    this->width = width;
-    this->height = height;
-}
+    : PipelineOutputInterface(width, height, context),
+      pimpl_(std::make_unique<DepthMapPipelineOutputImpl>(width, height, context)) {}
 
 DepthMapPipelineOutput::~DepthMapPipelineOutput() {}
 

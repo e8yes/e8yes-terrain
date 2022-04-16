@@ -31,6 +31,7 @@
 #include "renderer/transfer/descriptor_set.h"
 
 namespace e8 {
+namespace {
 
 struct PushConstants {
     int input_to_visualize;
@@ -45,6 +46,8 @@ VkPushConstantRange PushConstantRange() {
 
     return push_constant;
 }
+
+} // namespace
 
 std::vector<VkDescriptorSetLayoutBinding> LightInputsBinding() {
     VkDescriptorSetLayoutBinding normal_roughness_binding{};

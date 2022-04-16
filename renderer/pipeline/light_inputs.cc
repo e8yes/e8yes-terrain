@@ -192,7 +192,7 @@ struct LightInputsPipelineOutput::LightInputsPipelineOutputImpl {
 LightInputsPipelineOutput::LightInputsPipelineOutputImpl::LightInputsPipelineOutputImpl(
     unsigned width, unsigned height, VulkanContext *context) {
     normal_roughness_ =
-        CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R8G8B8A8_SRGB, context);
+        CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R16G16B16A16_UNORM, context);
     albedo_metallic_ =
         CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R8G8B8A8_SRGB, context);
     depth_attachment_ = CreateDepthAttachment(width, height, /*samplable=*/true, context);
@@ -211,11 +211,8 @@ LightInputsPipelineOutput::LightInputsPipelineOutputImpl::~LightInputsPipelineOu
 
 LightInputsPipelineOutput::LightInputsPipelineOutput(unsigned width, unsigned height,
                                                      VulkanContext *context)
-    : PipelineOutputInterface(context),
-      pimpl_(std::make_unique<LightInputsPipelineOutputImpl>(width, height, context)) {
-    this->width = width;
-    this->height = height;
-}
+    : PipelineOutputInterface(width, height, context),
+      pimpl_(std::make_unique<LightInputsPipelineOutputImpl>(width, height, context)) {}
 
 LightInputsPipelineOutput::~LightInputsPipelineOutput() {}
 

@@ -103,6 +103,11 @@ PostProcessorPipeline::PostProcessorPipelineImpl::PostProcessorPipelineImpl(
                                                 /*enable_depth_test=*/false, output->width,
                                                 output->height, /*color_attachment_count=*/1);
 
+    // Creates the post processing pipeline.
+    pipeline =
+        CreateGraphicsPipeline(output->GetRenderPass(), *shader_stages, *this->uniform_layout,
+                               *vertex_inputs, *fixed_stage_config, context);
+
     // Allocate descriptor sets.
     viewport_dimension_desc_set = desc_set_allocator->Allocate(DescriptorType::DT_UNIFORM_BUFFER,
                                                                uniform_layout->per_frame_desc_set);
@@ -118,11 +123,6 @@ PostProcessorPipeline::PostProcessorPipelineImpl::PostProcessorPipelineImpl(
 
     WriteUniformBufferDescriptor(&dimension, *viewport_dimension_ubo, *viewport_dimension_desc_set,
                                  /*binding=*/0, context);
-
-    // Creates the post processing pipeline.
-    pipeline =
-        CreateGraphicsPipeline(output->GetRenderPass(), *shader_stages, *this->uniform_layout,
-                               *vertex_inputs, *fixed_stage_config, context);
 }
 
 PostProcessorPipeline::PostProcessorPipelineImpl::~PostProcessorPipelineImpl() {}

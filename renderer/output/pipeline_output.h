@@ -36,7 +36,7 @@ namespace e8 {
  */
 class PipelineOutputInterface {
   public:
-    PipelineOutputInterface(VulkanContext *context);
+    PipelineOutputInterface(unsigned width, unsigned height, VulkanContext *context);
     virtual ~PipelineOutputInterface();
 
     /**
@@ -118,6 +118,25 @@ class SwapChainPipelineOutput : public PipelineOutputInterface {
   private:
     struct SwapChainPipelineOutputImpl;
     std::unique_ptr<SwapChainPipelineOutputImpl> pimpl_;
+};
+
+/**
+ * @brief The UnboundedColorPipelineOutput class Stores unormalized RGBA color values.
+ */
+class UnboundedColorPipelineOutput : public PipelineOutputInterface {
+  public:
+    UnboundedColorPipelineOutput(unsigned width, unsigned height, bool with_depth_buffer,
+                                 VulkanContext *context);
+    ~UnboundedColorPipelineOutput() override;
+
+    FrameBuffer *GetFrameBuffer() const override;
+    RenderPass const &GetRenderPass() const override;
+    std::vector<FrameBufferAttachment const *> ColorAttachments() const override;
+    FrameBufferAttachment const *DepthAttachment() const override;
+
+  private:
+    struct UnboundedColorPipelineOutputImpl;
+    std::unique_ptr<UnboundedColorPipelineOutputImpl> pimpl_;
 };
 
 } // namespace e8
