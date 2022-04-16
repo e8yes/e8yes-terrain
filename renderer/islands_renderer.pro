@@ -38,12 +38,15 @@ SOURCES += \
     postprocessor/depth_map_visualizer.cc \
     postprocessor/light_inputs_visualizer.cc \
     postprocessor/post_processor.cc \
+    postprocessor/radiance_directional.cc \
+    postprocessor/tone_map.cc \
     proto/renderer.pb.cc \
     query/drawable_instance.cc \
     query/query_fn.cc \
     renderer.cc \
     renderer_depth.cc \
     renderer_light_inputs.cc \
+    renderer_radiance.cc \
     renderer_solid_color.cc \
     transfer/descriptor_set.cc \
     transfer/descriptor_set_texture.cc \
@@ -74,12 +77,15 @@ HEADERS += \
     postprocessor/depth_map_visualizer.h \
     postprocessor/light_inputs_visualizer.h \
     postprocessor/post_processor.h \
+    postprocessor/radiance_directional.h \
+    postprocessor/tone_map.h \
     proto/renderer.pb.h \
     query/drawable_instance.h \
     query/query_fn.h \
     renderer.h \
     renderer_depth.h \
     renderer_light_inputs.h \
+    renderer_radiance.h \
     renderer_solid_color.h \
     transfer/descriptor_set.h \
     transfer/descriptor_set_texture.h \
