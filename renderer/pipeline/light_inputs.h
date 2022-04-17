@@ -41,6 +41,7 @@ class LightInputsPipelineOutput : public PipelineOutputInterface {
     enum ColorOutput {
         NORMAL_ROUGHNESS,
         ALBEDO_METALLIC,
+        ColorOutputCount,
     };
 
     /**

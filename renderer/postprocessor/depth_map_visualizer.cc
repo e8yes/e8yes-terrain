@@ -15,7 +15,6 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cassert>
 #include <memory>
 #include <optional>
 #include <vector>
@@ -32,38 +31,51 @@
 namespace e8 {
 namespace {
 
-struct PushConstants {
-    PushConstants();
-    ~PushConstants();
-
+struct DepthMapVisualizerParameters {
     float z_near;
     float z_far;
     float alpha;
 };
 
-PushConstants::PushConstants() : z_near(1), z_far(10), alpha(0.0f) {}
+class DepthMapPostProcessorConfigurator : public PostProcessorConfiguratorInterface {
+  public:
+    DepthMapPostProcessorConfigurator(float alpha, std::optional<PerspectiveProjection> projection,
+                                      DepthMapPipelineOutput const &depth_map);
+    ~DepthMapPostProcessorConfigurator() override;
 
-PushConstants::~PushConstants() {}
+    void InputImages(std::vector<VkImageView> *input_images) const override;
+    void PushConstants(std::vector<uint8_t> *push_constants) const override;
 
-VkPushConstantRange PushConstantRange() {
-    VkPushConstantRange push_constant{};
+  private:
+    float const alpha_;
+    std::optional<PerspectiveProjection> const projection_;
+    DepthMapPipelineOutput const &depth_map_;
+};
 
-    push_constant.offset = 0;
-    push_constant.size = sizeof(PushConstants);
-    push_constant.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+DepthMapPostProcessorConfigurator::DepthMapPostProcessorConfigurator(
+    float alpha, std::optional<PerspectiveProjection> projection,
+    DepthMapPipelineOutput const &depth_map)
+    : alpha_(alpha), projection_(projection), depth_map_(depth_map) {}
 
-    return push_constant;
+DepthMapPostProcessorConfigurator::~DepthMapPostProcessorConfigurator() {}
+
+void DepthMapPostProcessorConfigurator::InputImages(std::vector<VkImageView> *input_images) const {
+    input_images->at(0) = depth_map_.DepthAttachment()->view;
 }
 
-std::vector<VkDescriptorSetLayoutBinding> DepthMapBinding() {
-    VkDescriptorSetLayoutBinding depth_map_binding{};
+void DepthMapPostProcessorConfigurator::PushConstants(std::vector<uint8_t> *push_constants) const {
+    DepthMapVisualizerParameters *parameters =
+        reinterpret_cast<DepthMapVisualizerParameters *>(push_constants->data());
 
-    depth_map_binding.binding = 0;
-    depth_map_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-    depth_map_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    depth_map_binding.descriptorCount = 1;
+    parameters->alpha = alpha_;
 
-    return std::vector<VkDescriptorSetLayoutBinding>{depth_map_binding};
+    if (projection_.has_value()) {
+        parameters->z_near = projection_->Frustum().z_near;
+        parameters->z_far = projection_->Frustum().z_far;
+    } else {
+        parameters->z_near = 1.0f;
+        parameters->z_far = 100.0f;
+    }
 }
 
 } // namespace
@@ -76,21 +88,17 @@ struct DepthMapVisualizerPipeline::DepthMapVisualizerPipelineImpl {
 
     VulkanContext *context;
     DescriptorSetAllocator *desc_set_allocator;
-
-    std::unique_ptr<ImageSampler> depth_map_sampler;
-    DepthMapPipelineOutput const *current_depth_map_input;
     std::unique_ptr<PostProcessorPipeline> post_processor_pipeline;
 };
 
 DepthMapVisualizerPipeline::DepthMapVisualizerPipelineImpl::DepthMapVisualizerPipelineImpl(
     PipelineOutputInterface *visualizer_output, DescriptorSetAllocator *desc_set_allocator,
     VulkanContext *context)
-    : context(context), desc_set_allocator(desc_set_allocator), current_depth_map_input(nullptr) {
-    depth_map_sampler = CreateReadBackSampler(context);
-
+    : context(context), desc_set_allocator(desc_set_allocator) {
     post_processor_pipeline = std::make_unique<PostProcessorPipeline>(
-        kFragmentShaderFilePathDepthMapVisualizer, PushConstantRange(), DepthMapBinding(),
-        visualizer_output, desc_set_allocator, context);
+        kFragmentShaderFilePathDepthMapVisualizer, /*input_image_count=*/1,
+        /*push_constant_size=*/sizeof(DepthMapVisualizerParameters), visualizer_output,
+        desc_set_allocator, context);
 }
 
 DepthMapVisualizerPipeline::DepthMapVisualizerPipelineImpl::~DepthMapVisualizerPipelineImpl() {}
@@ -106,38 +114,8 @@ DepthMapVisualizerPipeline::~DepthMapVisualizerPipeline() {}
 PipelineOutputInterface *
 DepthMapVisualizerPipeline::Run(float alpha, std::optional<PerspectiveProjection> projection,
                                 DepthMapPipelineOutput const &depth_map) {
-    return pimpl_->post_processor_pipeline->Run(
-        *depth_map.promise, /*set_uniforms_fn=*/
-        [this, alpha, projection, &depth_map](ShaderUniformLayout const &uniform_layout,
-                                              DescriptorSet const &input_images_desc_set,
-                                              VkCommandBuffer cmds) {
-            // Sets projection and visualizer parameters.
-            PushConstants push_constants;
-            push_constants.alpha = alpha;
-            if (projection.has_value()) {
-                push_constants.z_near = projection->Frustum().z_near;
-                push_constants.z_far = projection->Frustum().z_far;
-            }
-
-            vkCmdPushConstants(cmds, uniform_layout.layout,
-                               /*stageFlags=*/VK_SHADER_STAGE_FRAGMENT_BIT,
-                               /*offset=*/0,
-                               /*size=*/sizeof(PushConstants), &push_constants);
-
-            // Sets the depth map input.
-            if (&depth_map != pimpl_->current_depth_map_input) {
-                WriteImageDescriptor(depth_map.DepthAttachment()->view, *pimpl_->depth_map_sampler,
-                                     input_images_desc_set, /*binding=*/0, pimpl_->context);
-
-                pimpl_->current_depth_map_input = &depth_map;
-            }
-
-            vkCmdBindDescriptorSets(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
-                                    /*firstSet=*/1,
-                                    /*descriptorSetCount=*/1, &input_images_desc_set.descriptor_set,
-                                    /*dynamicOffsetCount=*/0,
-                                    /*pDynamicOffsets=*/nullptr);
-        });
+    DepthMapPostProcessorConfigurator configurator(alpha, projection, depth_map);
+    return pimpl_->post_processor_pipeline->Run(configurator, *depth_map.promise);
 }
 
 } // namespace e8

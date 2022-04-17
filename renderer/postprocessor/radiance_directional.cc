@@ -16,6 +16,7 @@
  */
 
 #include <memory>
+#include <vector>
 
 #include "common/device.h"
 #include "common/tensor.h"
@@ -23,6 +24,7 @@
 #include "renderer/basic/sampler.h"
 #include "renderer/basic/shader.h"
 #include "renderer/output/pipeline_output.h"
+#include "renderer/output/promise.h"
 #include "renderer/pipeline/light_inputs.h"
 #include "renderer/postprocessor/post_processor.h"
 #include "renderer/postprocessor/radiance_directional.h"
@@ -32,36 +34,44 @@
 namespace e8 {
 namespace {
 
-struct PushConstants {
+struct SunLightParameters {
     vec4 dir;
     vec4 intensity;
 };
 
-VkPushConstantRange PushConstantRange() {
-    VkPushConstantRange push_constant{};
+class SunLightPostProcessorConfigurator : public PostProcessorConfiguratorInterface {
+  public:
+    SunLightPostProcessorConfigurator(SunLight const &sun_light,
+                                      LightInputsPipelineOutput const &light_inputs);
+    ~SunLightPostProcessorConfigurator() override;
 
-    push_constant.offset = 0;
-    push_constant.size = sizeof(PushConstants);
-    push_constant.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    void InputImages(std::vector<VkImageView> *input_images) const override;
+    void PushConstants(std::vector<uint8_t> *push_constants) const override;
 
-    return push_constant;
+  private:
+    SunLight const &sun_light_;
+    LightInputsPipelineOutput const &light_inputs_;
+};
+
+SunLightPostProcessorConfigurator::SunLightPostProcessorConfigurator(
+    SunLight const &sun_light, LightInputsPipelineOutput const &light_inputs)
+    : sun_light_(sun_light), light_inputs_(light_inputs) {}
+
+SunLightPostProcessorConfigurator::~SunLightPostProcessorConfigurator() {}
+
+void SunLightPostProcessorConfigurator::InputImages(std::vector<VkImageView> *input_images) const {
+    input_images->at(LightInputsPipelineOutput::NORMAL_ROUGHNESS) =
+        light_inputs_.ColorAttachments()[LightInputsPipelineOutput::NORMAL_ROUGHNESS]->view;
+
+    input_images->at(LightInputsPipelineOutput::ALBEDO_METALLIC) =
+        light_inputs_.ColorAttachments()[LightInputsPipelineOutput::ALBEDO_METALLIC]->view;
 }
 
-std::vector<VkDescriptorSetLayoutBinding> LightInputsBinding() {
-    VkDescriptorSetLayoutBinding normal_roughness_binding{};
-    normal_roughness_binding.binding = 0;
-    normal_roughness_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-    normal_roughness_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    normal_roughness_binding.descriptorCount = 1;
+void SunLightPostProcessorConfigurator::PushConstants(std::vector<uint8_t> *push_constants) const {
+    SunLightParameters *parameters = reinterpret_cast<SunLightParameters *>(push_constants->data());
 
-    VkDescriptorSetLayoutBinding albedo_metallic_binding{};
-    albedo_metallic_binding.binding = 1;
-    albedo_metallic_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-    albedo_metallic_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    albedo_metallic_binding.descriptorCount = 1;
-
-    return std::vector<VkDescriptorSetLayoutBinding>{normal_roughness_binding,
-                                                     albedo_metallic_binding};
+    parameters->dir = ToVec3(sun_light_.direction()).homo(0.0f);
+    parameters->intensity = ToVec3(sun_light_.intensity()).homo(1.0f);
 }
 
 } // namespace
@@ -72,23 +82,17 @@ struct DirectionalRadiancePipeline::DirectionalRadiancePipelineImpl {
                                     VulkanContext *context);
     ~DirectionalRadiancePipelineImpl();
 
-    VulkanContext *context;
-    DescriptorSetAllocator *desc_set_allocator;
-    std::unique_ptr<ImageSampler> light_inputs_sampler;
-    std::unique_ptr<PostProcessorPipeline> post_processor_pipeline;
-
-    LightInputsPipelineOutput const *current_light_inputs;
+    std::unique_ptr<PostProcessorPipeline> sun_light_pipeline;
 };
 
 DirectionalRadiancePipeline::DirectionalRadiancePipelineImpl::DirectionalRadiancePipelineImpl(
     UnboundedColorPipelineOutput *radiance_output, DescriptorSetAllocator *desc_set_allocator,
-    VulkanContext *context)
-    : context(context), desc_set_allocator(desc_set_allocator), current_light_inputs(nullptr) {
-    light_inputs_sampler = CreateReadBackSampler(context);
-
-    post_processor_pipeline = std::make_unique<PostProcessorPipeline>(
-        kFragmentShaderFilePathRadianceDirectional, PushConstantRange(), LightInputsBinding(),
-        radiance_output, desc_set_allocator, context);
+    VulkanContext *context) {
+    sun_light_pipeline = std::make_unique<PostProcessorPipeline>(
+        kFragmentShaderFilePathRadianceDirectional,
+        /*input_image_count=*/LightInputsPipelineOutput::ColorOutputCount,
+        /*push_constant_size=*/sizeof(SunLightParameters), radiance_output, desc_set_allocator,
+        context);
 }
 
 DirectionalRadiancePipeline::DirectionalRadiancePipelineImpl::~DirectionalRadiancePipelineImpl() {}
@@ -103,44 +107,10 @@ DirectionalRadiancePipeline::~DirectionalRadiancePipeline() {}
 
 UnboundedColorPipelineOutput *
 DirectionalRadiancePipeline::Run(SunLight const &light,
-                                 LightInputsPipelineOutput const &light_inputs) {
-    PipelineOutputInterface *output = pimpl_->post_processor_pipeline->Run(
-        *light_inputs.promise, /*set_uniforms_fn=*/
-        [this, &light, &light_inputs](ShaderUniformLayout const &uniform_layout,
-                                      DescriptorSet const &input_images_desc_set,
-                                      VkCommandBuffer cmds) {
-            PushConstants push_constants;
-            push_constants.dir = ToVec3(light.direction()).homo(0.0f);
-            push_constants.intensity = ToVec3(light.intensity()).homo(1.0f);
-
-            vkCmdPushConstants(cmds, uniform_layout.layout,
-                               /*stageFlags=*/VK_SHADER_STAGE_FRAGMENT_BIT,
-                               /*offset=*/0,
-                               /*size=*/sizeof(PushConstants), &push_constants);
-
-            if (&light_inputs != pimpl_->current_light_inputs) {
-                // Sets the light inputs.
-                WriteImageDescriptor(
-                    light_inputs.ColorAttachments()[LightInputsPipelineOutput::NORMAL_ROUGHNESS]
-                        ->view,
-                    *pimpl_->light_inputs_sampler, input_images_desc_set,
-                    /*binding=*/0, pimpl_->context);
-
-                WriteImageDescriptor(
-                    light_inputs.ColorAttachments()[LightInputsPipelineOutput::ALBEDO_METALLIC]
-                        ->view,
-                    *pimpl_->light_inputs_sampler, input_images_desc_set,
-                    /*binding=*/1, pimpl_->context);
-
-                pimpl_->current_light_inputs = &light_inputs;
-            }
-
-            vkCmdBindDescriptorSets(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
-                                    /*firstSet=*/DescriptorSetType::DST_PER_PASS,
-                                    /*descriptorSetCount=*/1, &input_images_desc_set.descriptor_set,
-                                    /*dynamicOffsetCount=*/0,
-                                    /*pDynamicOffsets=*/nullptr);
-        });
+                                 LightInputsPipelineOutput const &light_inputs,
+                                 GpuPromise const &promise) {
+    SunLightPostProcessorConfigurator configurator(light, light_inputs);
+    PipelineOutputInterface *output = pimpl_->sun_light_pipeline->Run(configurator, promise);
 
     return static_cast<UnboundedColorPipelineOutput *>(output);
 }

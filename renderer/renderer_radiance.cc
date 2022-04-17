@@ -24,6 +24,7 @@
 #include "content/scene.h"
 #include "renderer/output/pipeline_output.h"
 #include "renderer/pipeline/light_inputs.h"
+#include "renderer/pipeline/solid_color.h"
 #include "renderer/postprocessor/radiance_directional.h"
 #include "renderer/postprocessor/tone_map.h"
 #include "renderer/proto/renderer.pb.h"
@@ -53,6 +54,7 @@ struct RadianceRenderer::RadianceRendererImpl {
     TextureVramTransfer tex_vram;
 
     LightInputsPipeline light_inputs_pipeline;
+    SolidColorPipeline solid_color_pipeline;
     DirectionalRadiancePipeline directional_radiance_pipeline;
     ToneMapPipeline tone_map_pipeline;
 
@@ -68,6 +70,7 @@ RadianceRenderer::RadianceRendererImpl::RadianceRendererImpl(VulkanContext *cont
       final_output(/*with_depth_buffer=*/false, context), desc_set_alloc(context),
       tex_desc_set_cache(&desc_set_alloc), geo_vram(context), tex_vram(context),
       light_inputs_pipeline(&light_inputs_output, context),
+      solid_color_pipeline(&radiance_output, context),
       directional_radiance_pipeline(&radiance_output, &desc_set_alloc, context),
       tone_map_pipeline(&final_output, &desc_set_alloc, context) {}
 
@@ -108,13 +111,18 @@ void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_access
             drawables, camera_projection, frame_context.acquire_swap_chain_image_barrier,
             &pimpl_->tex_desc_set_cache, &pimpl_->geo_vram, &pimpl_->tex_vram);
 
+        PipelineOutputInterface *clear_output =
+            pimpl_->solid_color_pipeline.Run(vec3{0.1f, 0.1f, 0.1f}, *light_inputs->promise);
+
         std::vector<LightSourceInstance> light_sources =
             ToLightSources(scene_entities, camera_projection);
+        GpuPromise *current_promise = clear_output->promise.get();
+
         for (auto instance : light_sources) {
             switch (instance.light_source.model_case()) {
             case LightSource::ModelCase::kSunLight: {
                 pimpl_->directional_radiance_pipeline.Run(instance.light_source.sun_light(),
-                                                          *light_inputs);
+                                                          *light_inputs, *current_promise);
                 break;
             }
             case LightSource::ModelCase::kPointLight: {
@@ -129,6 +137,8 @@ void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_access
                 assert(false);
             }
             }
+
+            current_promise = pimpl_->radiance_output.promise.get();
         }
 
         final_output = pimpl_->tone_map_pipeline.Run(pimpl_->radiance_output);

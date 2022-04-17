@@ -18,9 +18,12 @@
 #ifndef ISLANDS_RENDERER_PIPELINE_POST_PROCESSOR_H
 #define ISLANDS_RENDERER_PIPELINE_POST_PROCESSOR_H
 
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <string>
+#include <vector>
+#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "renderer/basic/uniform_layout.h"
@@ -31,31 +34,46 @@
 namespace e8 {
 
 /**
+ * @brief The PostProcessorConfiguratorInterface class For configuring what shader uniform setup to
+ * apply to the post processing pipeline.
+ */
+class PostProcessorConfiguratorInterface {
+  public:
+    PostProcessorConfiguratorInterface();
+    virtual ~PostProcessorConfiguratorInterface();
+
+    /**
+     * @brief InputImages Returns the input images to the post processor. The input_images array has
+     * been pre-allocated. Indexes the image by its descriptor binding.
+     */
+    virtual void InputImages(std::vector<VkImageView> *input_images) const;
+
+    /**
+     * @brief PushConstants A byte array containing push constant data of the post processing
+     * pipeline.
+     */
+    virtual void PushConstants(std::vector<uint8_t> *push_constants) const;
+};
+
+/**
  * @brief The PostProcessorPipeline class It offers a basic framework for setting up a post
  * processing graphics pipeline. Supplies proper arguments to the constructor of this class to
  * define the actual effect.
  */
 class PostProcessorPipeline {
   public:
-    //
-    using SetPostProcessorUniformsExFn =
-        std::function<void(ShaderUniformLayout const &uniform_layout,
-                           DescriptorSet const &image_inputs_desc_set, VkCommandBuffer cmds)>;
-
     /**
      * @brief PostProcessorPipeline Constructs a custom post processor.
      *
      * @param fragment_shader The fragment shader to create the desired post processing effect.
-     * @param push_constant
-     * @param per_pass_desc_set
+     * @param input_image_count The number of input images the post processor requires.
+     * @param push_constant_size The number of bytes the post processor's push constants requires.
      * @param output To receive output from the post processor.
-     * @param desc_set_allocator
+     * @param desc_set_allocator Descriptor set allocator.
      * @param context Contextual Vulkan handles.
      */
-    PostProcessorPipeline(std::string const &fragment_shader,
-                          std::optional<VkPushConstantRange> const &push_constant,
-                          std::vector<VkDescriptorSetLayoutBinding> const &per_pass_desc_set,
-                          PipelineOutputInterface *output,
+    PostProcessorPipeline(std::string const &fragment_shader, unsigned input_image_count,
+                          unsigned push_constant_size, PipelineOutputInterface *output,
                           DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
 
     /**
@@ -63,7 +81,7 @@ class PostProcessorPipeline {
      * processor shader and outputs the UV coordinate as color.
      *
      * @param output To receive output from the post processor.
-     * @param desc_set_allocator
+     * @param desc_set_allocator Descriptor set allocator.
      * @param context Contextual Vulkan handles.
      */
     PostProcessorPipeline(PipelineOutputInterface *output,
@@ -75,13 +93,13 @@ class PostProcessorPipeline {
      * @brief Run Runs the post processing graphics pipeline. The pipeline can only be run when the
      * previous run was finished (indicated by the output's barrier).
      *
-     * @param barrier The previous tasks' barrier.
-     * @param set_uniforms_fn A function to set the values of the shader's uniform variables. If not
-     * supplied, an empty function will be used.
+     * @param configurator For configuring what shader uniform setup to apply to the post processing
+     * pipeline.
+     * @param promise The previous tasks' promise.
      * @return The output object set from the constructor, with a barrier assigned.
      */
-    PipelineOutputInterface *Run(GpuPromise const &barrier,
-                                 SetPostProcessorUniformsExFn const &set_uniforms_fn = nullptr);
+    PipelineOutputInterface *Run(PostProcessorConfiguratorInterface const &configurator,
+                                 GpuPromise const &promise);
 
   private:
     struct PostProcessorPipelineImpl;

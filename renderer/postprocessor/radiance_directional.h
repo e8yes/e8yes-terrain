@@ -23,6 +23,7 @@
 #include "common/device.h"
 #include "content/proto/light_source.pb.h"
 #include "renderer/output/pipeline_output.h"
+#include "renderer/output/promise.h"
 #include "renderer/pipeline/light_inputs.h"
 #include "renderer/transfer/descriptor_set.h"
 
@@ -44,7 +45,8 @@ class DirectionalRadiancePipeline {
      * where the light inputs were generated.
      */
     UnboundedColorPipelineOutput *Run(SunLight const &light,
-                                      LightInputsPipelineOutput const &light_inputs);
+                                      LightInputsPipelineOutput const &light_inputs,
+                                      GpuPromise const &promise);
 
   private:
     struct DirectionalRadiancePipelineImpl;

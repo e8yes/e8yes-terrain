@@ -30,15 +30,30 @@
 namespace e8 {
 namespace {
 
-std::vector<VkDescriptorSetLayoutBinding> RadianceInputBinding() {
-    VkDescriptorSetLayoutBinding radiance_binding{};
-    radiance_binding.binding = 0;
-    radiance_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-    radiance_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    radiance_binding.descriptorCount = 1;
+class ToneMapPostProcessorConfigurator : public PostProcessorConfiguratorInterface {
+  public:
+    ToneMapPostProcessorConfigurator(UnboundedColorPipelineOutput const &radiance);
+    ~ToneMapPostProcessorConfigurator() override;
 
-    return std::vector<VkDescriptorSetLayoutBinding>{radiance_binding};
+    void InputImages(std::vector<VkImageView> *input_images) const override;
+    void PushConstants(std::vector<uint8_t> *push_constants) const override;
+
+  private:
+    UnboundedColorPipelineOutput const &radiance_;
+};
+
+ToneMapPostProcessorConfigurator::ToneMapPostProcessorConfigurator(
+    UnboundedColorPipelineOutput const &radiance)
+    : radiance_(radiance) {}
+
+ToneMapPostProcessorConfigurator::~ToneMapPostProcessorConfigurator() {}
+
+void ToneMapPostProcessorConfigurator::InputImages(std::vector<VkImageView> *input_images) const {
+    input_images->at(0) = radiance_.ColorAttachments()[0]->view;
 }
+
+void ToneMapPostProcessorConfigurator::PushConstants(
+    std::vector<uint8_t> * /*push_constants*/) const {}
 
 } // namespace
 
@@ -49,20 +64,15 @@ struct ToneMapPipeline::ToneMapPipelineImpl {
 
     VulkanContext *context;
     DescriptorSetAllocator *desc_set_allocator;
-    std::unique_ptr<ImageSampler> radiance_sampler;
     std::unique_ptr<PostProcessorPipeline> post_processor_pipeline;
-
-    UnboundedColorPipelineOutput const *current_radiance;
 };
 
 ToneMapPipeline::ToneMapPipelineImpl::ToneMapPipelineImpl(
     PipelineOutputInterface *color_output, DescriptorSetAllocator *desc_set_allocator,
     VulkanContext *context)
     : context(context) {
-    radiance_sampler = CreateReadBackSampler(context);
-
     post_processor_pipeline = std::make_unique<PostProcessorPipeline>(
-        kFragmentShaderFilePathHdrClamp, /*push_constant=*/std::nullopt, RadianceInputBinding(),
+        kFragmentShaderFilePathHdrClamp, /*input_image_count=*/1, /*push_constant_size=*/0,
         color_output, desc_set_allocator, context);
 }
 
@@ -75,25 +85,8 @@ ToneMapPipeline::ToneMapPipeline(PipelineOutputInterface *color_output,
 ToneMapPipeline::~ToneMapPipeline() {}
 
 PipelineOutputInterface *ToneMapPipeline::Run(UnboundedColorPipelineOutput const &radiance) {
-    return pimpl_->post_processor_pipeline->Run(
-        *radiance.promise, /*set_uniforms_fn=*/
-        [this, &radiance](ShaderUniformLayout const &uniform_layout,
-                          DescriptorSet const &input_images_desc_set, VkCommandBuffer cmds) {
-            if (&radiance != pimpl_->current_radiance) {
-                // Sets the radiance map.
-                WriteImageDescriptor(radiance.ColorAttachments()[0]->view,
-                                     *pimpl_->radiance_sampler, input_images_desc_set,
-                                     /*binding=*/0, pimpl_->context);
-
-                pimpl_->current_radiance = &radiance;
-            }
-
-            vkCmdBindDescriptorSets(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
-                                    /*firstSet=*/DescriptorSetType::DST_PER_PASS,
-                                    /*descriptorSetCount=*/1, &input_images_desc_set.descriptor_set,
-                                    /*dynamicOffsetCount=*/0,
-                                    /*pDynamicOffsets=*/nullptr);
-        });
+    ToneMapPostProcessorConfigurator configurator(radiance);
+    return pimpl_->post_processor_pipeline->Run(configurator, *radiance.promise);
 }
 
 } // namespace e8
