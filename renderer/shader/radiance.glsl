@@ -34,7 +34,8 @@ vec4 Radiance(vec3 incident_intensity,
     vec3 diffuse_f0 = albedo * (1.0f - metallic);
     vec3 specular_f0 = mix(vec3(0.04f), albedo, metallic);
 
-    vec3 diffuse_brdf = LambertianDiffuseBrdf(diffuse_f0);
+    vec3 diffuse_brdf = FresnelDiffuseBrdf(diffuse_f0, roughness,
+                                           cos_h_o, cos_n_i, cos_n_o);
     vec3 specular_brdf = GgxSpecularBrdf(specular_f0, roughness,
                                       cos_h_o, cos_n_i, cos_n_o, cos_n_h);
     vec3 final_brdf = diffuse_brdf + specular_brdf;

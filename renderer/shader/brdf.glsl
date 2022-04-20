@@ -44,9 +44,21 @@ float GgxDistribution(float cos_n_h, float slope_stddev)
     return slope_var / (M_PI * f * f);
 }
 
-vec3 LambertianDiffuseBrdf(vec3 albedo)
+vec3 FresnelDiffuseBrdf(vec3 albedo,
+                        float slope_stddev,
+                        float cos_h_o,
+                        float cos_n_i,
+                        float cos_n_o)
 {
-    return albedo / M_PI;
+    float fd90 = 0.5f + 2.0f*slope_stddev*cos_h_o*cos_h_o;
+
+    float compl_cos_n_i = max(0.0f, 1.0f - cos_n_i);
+    float compl_cos_n_o = max(0.0f, 1.0f - cos_n_o);
+
+    float fresnel = (1.0f + (fd90 - 1.0f)*pow(compl_cos_n_i, 5.0f))*
+            (1.0f + (fd90 - 1.0f)*pow(compl_cos_n_o, 5.0f));
+
+    return fresnel*albedo/M_PI;
 }
 
 vec3 GgxSpecularBrdf(vec3 f0,
