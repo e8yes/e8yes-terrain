@@ -50,13 +50,10 @@ RendererInterface::StagePerformance::StagePerformance()
 RendererInterface::StagePerformance::~StagePerformance() {}
 
 RendererInterface::FrameContext::FrameContext(VulkanContext *context)
-    : acquire_swap_chain_image_barrier(context), swap_chain_image_index(0) {}
+    : swap_chain_image_promise(/*task_cmds=*/VK_NULL_HANDLE, context), swap_chain_image_index(0) {}
 
-RendererInterface::RendererInterface(unsigned num_stages,
-                                     std::chrono::nanoseconds const &max_frame_duration,
-                                     VulkanContext *context)
-    : context(context), max_frame_duration(max_frame_duration), stage_performance_(num_stages + 2),
-      mu_(std::make_unique<std::mutex>()) {}
+RendererInterface::RendererInterface(unsigned num_stages, VulkanContext *context)
+    : context(context), stage_performance_(num_stages + 2), mu_(std::make_unique<std::mutex>()) {}
 
 RendererInterface::~RendererInterface() {}
 
@@ -68,39 +65,37 @@ std::vector<RendererInterface::StagePerformance> RendererInterface::GetPerforman
 RendererInterface::FrameContext RendererInterface::BeginFrame() {
     FrameContext frame_context(context);
 
-    VkSemaphore done_signal;
-    VkSemaphoreCreateInfo semaphore_info{};
-    semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-    assert(VK_SUCCESS == vkCreateSemaphore(context->device, &semaphore_info,
-                                           /*pAllocator=*/nullptr, &done_signal));
-
     this->BeginStage(/*index=*/0, /*name=*/"Acquire Next Image");
-    assert(VK_SUCCESS == vkAcquireNextImageKHR(context->device, context->swap_chain,
-                                               /*timeout=*/UINT64_MAX, done_signal,
-                                               /*fence=*/nullptr,
-                                               &frame_context.swap_chain_image_index));
-    frame_context.acquire_swap_chain_image_barrier.tasks_signal.push_back(done_signal);
+    assert(VK_SUCCESS == vkAcquireNextImageKHR(
+                             context->device, context->swap_chain,
+                             /*timeout=*/UINT64_MAX, frame_context.swap_chain_image_promise.signal,
+                             /*fence=*/nullptr, &frame_context.swap_chain_image_index));
     this->EndStage(/*index=*/0);
 
     return frame_context;
 }
 
 void RendererInterface::EndFrame(FrameContext const &frame_context,
-                                 PipelineOutputInterface *final_ouput) {
+                                 std::vector<PipelineOutputInterface *> pipeline_ouputs) {
+
     VkPresentInfoKHR present_info{};
     present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
     present_info.pSwapchains = &context->swap_chain;
     present_info.swapchainCount = 1;
     present_info.pImageIndices = &frame_context.swap_chain_image_index;
-    if (!final_ouput->promise->tasks_signal.empty()) {
-        present_info.pWaitSemaphores = final_ouput->promise->tasks_signal.data();
-        present_info.waitSemaphoreCount = final_ouput->promise->tasks_signal.size();
+
+    if (!pipeline_ouputs.empty()) {
+        PipelineOutputInterface *final_output = pipeline_ouputs.back();
+        present_info.pWaitSemaphores = &final_output->Promise()->signal;
+        present_info.waitSemaphoreCount = 1;
     }
 
     assert(VK_SUCCESS == vkQueuePresentKHR(context->present_queue, &present_info));
 
-    this->BeginStage(stage_performance_.size() - 1, /*name=*/"Final Output");
-    final_ouput->Fulfill(max_frame_duration);
+    this->BeginStage(stage_performance_.size() - 1, /*name=*/"Wait For GPU Work");
+    for (int i = pipeline_ouputs.size() - 1; i >= 0; --i) {
+        pipeline_ouputs[i]->Fulfill();
+    }
     this->EndStage(stage_performance_.size() - 1);
 }
 

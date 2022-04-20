@@ -18,7 +18,6 @@
 #ifndef ISLANDS_RENDERER_H
 #define ISLANDS_RENDERER_H
 
-#include <chrono>
 #include <filesystem>
 #include <memory>
 #include <mutex>
@@ -73,12 +72,10 @@ class RendererInterface {
      *
      * @param type The renderer's type.
      * @param num_stages The total number of stages of interest for a renderer subclass.
-     * @param max_frame_duration The greatest possible amount of time the frame's rendering process
      * will take before failing this function. This avoids the function from hanging without bound.
      * @param context Contextual Vulkan handles.
      */
-    RendererInterface(unsigned num_stages, std::chrono::nanoseconds const &max_frame_duration,
-                      VulkanContext *context);
+    RendererInterface(unsigned num_stages, VulkanContext *context);
     virtual ~RendererInterface();
 
     /**
@@ -118,7 +115,7 @@ class RendererInterface {
 
         // When the swap chain image indexed by the swap_chain_image_index becomes available, the
         // barrier will be signaled.
-        GpuPromise acquire_swap_chain_image_barrier;
+        GpuPromise swap_chain_image_promise;
 
         // The index of the swap chain image which will soon be available for presentation.
         unsigned swap_chain_image_index;
@@ -135,7 +132,8 @@ class RendererInterface {
      * @param frame_context Created by RendererInterface::BeginFrame().
      * @param final_ouput The last output to be fulfilled before the frame can be presented.
      */
-    void EndFrame(FrameContext const &frame_context, PipelineOutputInterface *final_ouput);
+    void EndFrame(FrameContext const &frame_context,
+                  std::vector<PipelineOutputInterface *> pipeline_ouputs);
 
     /**
      * @brief BeginStage Marks the beginning of a stage.
@@ -152,7 +150,6 @@ class RendererInterface {
     VulkanContext *context;
 
   private:
-    std::chrono::nanoseconds max_frame_duration;
     std::vector<StagePerformance> stage_performance_;
     std::unique_ptr<std::mutex> mu_;
 };

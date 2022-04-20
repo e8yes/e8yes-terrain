@@ -17,7 +17,7 @@
 
 #include <algorithm>
 #include <cassert>
-#include <chrono>
+#include <limits>
 #include <memory>
 #include <vector>
 #include <vulkan/vulkan.h>
@@ -33,26 +33,36 @@ namespace e8 {
 
 PipelineOutputInterface::PipelineOutputInterface(unsigned width, unsigned height,
                                                  VulkanContext *context)
-    : width(width), height(height), context(context) {
-    VkFenceCreateInfo fence_info{};
-    fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    : width_(width), height_(height), context_(context) {}
 
-    assert(VK_SUCCESS ==
-           vkCreateFence(context->device, &fence_info, /*pAllocator=*/nullptr, &fence));
+PipelineOutputInterface::~PipelineOutputInterface() {}
+
+unsigned PipelineOutputInterface::Width() const { return width_; }
+
+unsigned PipelineOutputInterface::Height() const { return height_; }
+
+void PipelineOutputInterface::Fulfill() {
+    for (auto const &promise : cpu_promises_) {
+        assert(VK_SUCCESS == vkWaitForFences(context_->device, /*fenceCount=*/1, &promise->signal,
+                                             /*waitAll=*/VK_TRUE,
+                                             /*timeout=*/std::numeric_limits<uint64_t>::max()));
+    }
+
+    gpu_promises_.clear();
+    cpu_promises_.clear();
 }
 
-PipelineOutputInterface::~PipelineOutputInterface() {
-    vkDestroyFence(context->device, fence, /*pAllocator=*/nullptr);
+GpuPromise const *PipelineOutputInterface::Promise() const {
+    if (gpu_promises_.empty()) {
+        return nullptr;
+    }
+    return gpu_promises_.back().get();
 }
 
-VkFence PipelineOutputInterface::AcquireFence() {
-    assert(VK_SUCCESS == vkResetFences(context->device, /*fenceCount=*/1, &fence));
-    return fence;
-}
-
-void PipelineOutputInterface::Fulfill(std::chrono::nanoseconds const &timeout) {
-    assert(VK_SUCCESS == vkWaitForFences(context->device, /*fenceCount=*/1, &fence,
-                                         /*waitAll=*/VK_TRUE, timeout.count()));
+void PipelineOutputInterface::AddWriter(std::unique_ptr<GpuPromise> &&gpu_promise,
+                                        std::unique_ptr<CpuPromise> &&cpu_promise) {
+    gpu_promises_.push_back(std::move(gpu_promise));
+    cpu_promises_.push_back(std::move(cpu_promise));
 }
 
 struct SwapChainPipelineOutput::SwapChainPipelineOutputImpl {

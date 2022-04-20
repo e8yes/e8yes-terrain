@@ -40,8 +40,9 @@ constexpr char const *kFragmentShaderFilePathLightInputs = "./light_inputs.frag.
 constexpr char const *kFragmentShaderFilePathLightInputsVisualizer =
     "./light_inputs_visualizer.frag.spv";
 constexpr char const *kFragmentShaderFilePathPostProcessorEmpty = "./post_processor.frag.spv";
-constexpr char const *kFragmentShaderFilePathRadianceDirectional =
-    "./radiance_directional.frag.spv";
+constexpr char const *kFragmentShaderFilePathRadiancePointLight = "./radiance_point_light.frag.spv";
+constexpr char const *kFragmentShaderFilePathRadianceSpotLight = "./radiance_spot_light.frag.spv";
+constexpr char const *kFragmentShaderFilePathRadianceSunLight = "./radiance_sun_light.frag.spv";
 
 /**
  * @brief The ShaderStages struct Stores the shader handle and stage information of a graphics

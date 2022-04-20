@@ -46,8 +46,8 @@ class LightInputsRenderer::LightInputsRendererImpl {
     LightInputsRendererImpl(VulkanContext *context);
     ~LightInputsRendererImpl();
 
-    LightInputsPipelineOutput light_inputs_output;
-    SwapChainPipelineOutput final_output;
+    LightInputsPipelineOutput light_inputs_map;
+    SwapChainPipelineOutput color_map;
 
     DescriptorSetAllocator desc_set_alloc;
     TextureDescriptorSetCache tex_desc_set_cache;
@@ -61,17 +61,17 @@ class LightInputsRenderer::LightInputsRendererImpl {
 };
 
 LightInputsRenderer::LightInputsRendererImpl::LightInputsRendererImpl(VulkanContext *context)
-    : light_inputs_output(context->swap_chain_image_extent.width,
-                          context->swap_chain_image_extent.height, context),
-      final_output(/*with_depth_buffer=*/false, context), desc_set_alloc(context),
+    : light_inputs_map(context->swap_chain_image_extent.width,
+                       context->swap_chain_image_extent.height, context),
+      color_map(/*with_depth_buffer=*/false, context), desc_set_alloc(context),
       tex_desc_set_cache(&desc_set_alloc), geo_vram(context), tex_vram(context),
-      light_inputs_pipeline(&light_inputs_output, context),
-      light_inputs_visualizer_pipeline(&final_output, &desc_set_alloc, context) {}
+      light_inputs_pipeline(&light_inputs_map, context),
+      light_inputs_visualizer_pipeline(&color_map, &desc_set_alloc, context) {}
 
 LightInputsRenderer::LightInputsRendererImpl::~LightInputsRendererImpl() {}
 
 LightInputsRenderer::LightInputsRenderer(VulkanContext *context)
-    : RendererInterface(/*num_stages=*/1, /*max_frame_duration=*/std::chrono::seconds(10), context),
+    : RendererInterface(/*num_stages=*/1, context),
       pimpl_(std::make_unique<LightInputsRendererImpl>(context)) {}
 
 LightInputsRenderer::~LightInputsRenderer() {}
@@ -79,9 +79,7 @@ LightInputsRenderer::~LightInputsRenderer() {}
 void LightInputsRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor) {
     FrameContext frame_context = this->BeginFrame();
 
-    pimpl_->final_output.SetSwapChainImageIndex(frame_context.swap_chain_image_index);
-
-    PipelineOutputInterface *final_output;
+    pimpl_->color_map.SetSwapChainImageIndex(frame_context.swap_chain_image_index);
 
     this->BeginStage(/*index=*/1, /*name=*/"Pipeline Preparation");
     {
@@ -100,15 +98,18 @@ void LightInputsRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_acc
                         option, resource_accessor);
 
         LightInputsPipelineOutput *light_inputs = pimpl_->light_inputs_pipeline.Run(
-            drawables, camera_projection, frame_context.acquire_swap_chain_image_barrier,
+            drawables, camera_projection, frame_context.swap_chain_image_promise,
             &pimpl_->tex_desc_set_cache, &pimpl_->geo_vram, &pimpl_->tex_vram);
 
-        final_output = pimpl_->light_inputs_visualizer_pipeline.Run(
+        pimpl_->light_inputs_visualizer_pipeline.Run(
             pimpl_->config.light_inputs_renderer_params().input_to_visualize(), *light_inputs);
     }
     this->EndStage(/*index=*/1);
 
-    this->EndFrame(frame_context, final_output);
+    this->EndFrame(frame_context, std::vector<PipelineOutputInterface *>{
+                                      &pimpl_->light_inputs_map,
+                                      &pimpl_->color_map,
+                                  });
 }
 
 void LightInputsRenderer::ApplyConfiguration(RendererConfiguration const &config) {

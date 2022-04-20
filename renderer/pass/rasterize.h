@@ -54,6 +54,25 @@ VkCommandBuffer StartRenderPass(RenderPass const &pass, FrameBuffer const &frame
                                 VulkanContext *context);
 
 /**
+ * @brief The RenderPassPromise struct Contains GPU and CPU promises. They gets signaled once the
+ * render pass is complete.
+ */
+struct RenderPassPromise {
+    /**
+     * @brief RenderPassPromise Should only be constructed via a FinishRenderPass() call.
+     */
+    RenderPassPromise();
+    RenderPassPromise(RenderPassPromise const &) = delete;
+    RenderPassPromise(RenderPassPromise &&other);
+    ~RenderPassPromise();
+
+    RenderPassPromise &operator=(RenderPassPromise &&other);
+
+    std::unique_ptr<GpuPromise> gpu;
+    std::unique_ptr<CpuPromise> cpu;
+};
+
+/**
  * @brief FinishRenderPass Submits the command buffer to the graphics queue and returns a barrier
  * for this render pass.
  *
@@ -64,8 +83,8 @@ VkCommandBuffer StartRenderPass(RenderPass const &pass, FrameBuffer const &frame
  * @param context Contextual Vulkan handles.
  * @return The task barrier for this render pass.
  */
-std::unique_ptr<GpuPromise> FinishRenderPass(VkCommandBuffer cmds, GpuPromise const &prerequisites,
-                                             VkFence fence, VulkanContext *context);
+RenderPassPromise FinishRenderPass(VkCommandBuffer cmds, GpuPromise const &prerequisites,
+                                   VulkanContext *context);
 
 /**
  * @brief RenderDrawables Renders an array of drawables with the specified graphics pipeline. Note,

@@ -38,7 +38,7 @@ SOURCES += \
     postprocessor/depth_map_visualizer.cc \
     postprocessor/light_inputs_visualizer.cc \
     postprocessor/post_processor.cc \
-    postprocessor/radiance_directional.cc \
+    postprocessor/radiance.cc \
     postprocessor/tone_map.cc \
     proto/renderer.pb.cc \
     query/drawable_instance.cc \
@@ -78,7 +78,7 @@ HEADERS += \
     postprocessor/depth_map_visualizer.h \
     postprocessor/light_inputs_visualizer.h \
     postprocessor/post_processor.h \
-    postprocessor/radiance_directional.h \
+    postprocessor/radiance.h \
     postprocessor/tone_map.h \
     proto/renderer.pb.h \
     query/drawable_instance.h \
@@ -105,4 +105,5 @@ unix {
 DISTFILES += \
     proto/renderer.proto \
     shader/hdr_aces.frag \
-    shader/hdr_clamp.frag
+    shader/hdr_clamp.frag \
+    shader/radiance_point_light.frag

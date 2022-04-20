@@ -58,8 +58,8 @@ PipelineOutputInterface *SolidColorPipeline::Run(vec3 const &color,
 
     VkCommandBuffer cmds =
         StartRenderPass(pimpl_->output->GetRenderPass(), *frame_buffer, pimpl_->context);
-    pimpl_->output->promise =
-        FinishRenderPass(cmds, prerequisites, pimpl_->output->AcquireFence(), pimpl_->context);
+    RenderPassPromise promise = FinishRenderPass(cmds, prerequisites, pimpl_->context);
+    pimpl_->output->AddWriter(std::move(promise.gpu), std::move(promise.cpu));
 
     return pimpl_->output;
 }

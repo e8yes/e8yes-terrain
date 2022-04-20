@@ -15,37 +15,39 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_RADIANCE_DIRECTIONAL_H
-#define ISLANDS_RENDERER_RADIANCE_DIRECTIONAL_H
+#ifndef ISLANDS_RENDERER_RADIANCE_PIPELINE_H
+#define ISLANDS_RENDERER_RADIANCE_PIPELINE_H
 
 #include <memory>
 
 #include "common/device.h"
-#include "content/proto/light_source.pb.h"
+#include "common/tensor.h"
 #include "renderer/output/pipeline_output.h"
 #include "renderer/output/promise.h"
 #include "renderer/pipeline/light_inputs.h"
+#include "renderer/query/light_source.h"
 #include "renderer/transfer/descriptor_set.h"
 
 namespace e8 {
 
 /**
- * @brief The DirectionalRadiancePipeline class Computes the direct radiance produced by a
- * directional light source for each pixel.
+ * @brief The RadiancePipeline class Computes the direct radiance produced by a light source for
+ * each pixel.
  */
-class DirectionalRadiancePipeline {
+class RadiancePipeline {
   public:
-    DirectionalRadiancePipeline(UnboundedColorPipelineOutput *radiance_output,
-                                DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
-    ~DirectionalRadiancePipeline();
+    RadiancePipeline(UnboundedColorPipelineOutput *radiance_output,
+                     DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
+    ~RadiancePipeline();
 
     /**
-     * @brief Run Computes the radiance produced by the specified sun light based on screen-space
-     * geometric and material parameters. Note, the sun light must be defined in the view space
+     * @brief Run Computes the radiance produced by the specified light source based on screen-space
+     * geometric and material parameters. Note, the light source must be defined in the view space
      * where the light inputs were generated.
      */
-    UnboundedColorPipelineOutput *Run(SunLight const &light,
+    UnboundedColorPipelineOutput *Run(LightSourceInstance const &instance,
                                       LightInputsPipelineOutput const &light_inputs,
+                                      frustum const &light_inputs_frustum,
                                       GpuPromise const &promise);
 
   private:
@@ -55,4 +57,4 @@ class DirectionalRadiancePipeline {
 
 } // namespace e8
 
-#endif // ISLANDS_RENDERER_RADIANCE_DIRECTIONAL_H
+#endif // ISLANDS_RENDERER_RADIANCE_PIPELINE_H

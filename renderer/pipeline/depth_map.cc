@@ -15,6 +15,7 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -173,8 +174,8 @@ DepthMapPipeline::DepthMapPipelineImpl::DepthMapPipelineImpl(DepthMapPipelineOut
     vertex_inputs_ = CreateVertexInputState(VertexShaderInputAttributes());
     fixed_stage_config_ = CreateFixedStageConfig(/*polygon_mode=*/VK_POLYGON_MODE_FILL,
                                                  /*cull_mode=*/VK_CULL_MODE_BACK_BIT,
-                                                 /*enable_depth_test=*/true, output->width,
-                                                 output->height, /*color_attachment_count=*/0);
+                                                 /*enable_depth_test=*/true, output->Width(),
+                                                 output->Height(), /*color_attachment_count=*/0);
 
     pipeline_ = CreateGraphicsPipeline(output->GetRenderPass(), *shader_stages_, *uniform_layout_,
                                        *vertex_inputs_, *fixed_stage_config_, context);
@@ -208,8 +209,8 @@ DepthMapPipelineOutput *DepthMapPipeline::Run(std::vector<DrawableInstance> cons
     RenderDrawables(drawables, pimpl_->GetGraphicsPipeline(), pimpl_->GetUniformLayout(),
                     configurator, tex_desc_set_cache, geo_vram, tex_vram, cmds);
 
-    pimpl_->output->promise =
-        FinishRenderPass(cmds, prerequisites, pimpl_->output->AcquireFence(), pimpl_->context);
+    RenderPassPromise promise = FinishRenderPass(cmds, prerequisites, pimpl_->context);
+    pimpl_->output->AddWriter(std::move(promise.gpu), std::move(promise.cpu));
 
     return pimpl_->output;
 }

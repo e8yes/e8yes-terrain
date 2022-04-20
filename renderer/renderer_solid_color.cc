@@ -37,34 +37,34 @@ struct SolidColorRenderer::SolidColorRendererImpl {
     SolidColorRendererImpl(VulkanContext *context);
     ~SolidColorRendererImpl();
 
-    SwapChainPipelineOutput output;
+    SwapChainPipelineOutput color_map;
     SolidColorPipeline pipeline;
 };
 
 SolidColorRenderer::SolidColorRendererImpl::SolidColorRendererImpl(VulkanContext *context)
-    : output(/*with_depth_buffer=*/false, context), pipeline(&output, context) {}
+    : color_map(/*with_depth_buffer=*/false, context), pipeline(&color_map, context) {}
 
 SolidColorRenderer::SolidColorRendererImpl::~SolidColorRendererImpl() {}
 
 SolidColorRenderer::SolidColorRenderer(VulkanContext *context)
-    : RendererInterface(0, /*max_frame_duration=*/std::chrono::seconds(10), context),
-      pimpl_(std::make_unique<SolidColorRendererImpl>(context)) {}
+    : RendererInterface(0, context), pimpl_(std::make_unique<SolidColorRendererImpl>(context)) {}
 
 SolidColorRenderer::~SolidColorRenderer() {}
 
 void SolidColorRenderer::DrawFrame(Scene *scene, ResourceAccessor * /*resource_accessor*/) {
     FrameContext frame_context = this->BeginFrame();
 
-    pimpl_->output.SetSwapChainImageIndex(frame_context.swap_chain_image_index);
+    pimpl_->color_map.SetSwapChainImageIndex(frame_context.swap_chain_image_index);
 
-    PipelineOutputInterface *final_output;
     {
         Scene::ReadAccess read_access = scene->GainReadAccess();
-        final_output = pimpl_->pipeline.Run(scene->background_color,
-                                            frame_context.acquire_swap_chain_image_barrier);
+        pimpl_->pipeline.Run(scene->background_color,
+                             frame_context.swap_chain_image_promise);
     }
 
-    this->EndFrame(frame_context, final_output);
+    this->EndFrame(frame_context, std::vector<PipelineOutputInterface *>{
+                                      &pimpl_->color_map,
+                                  });
 }
 
 void SolidColorRenderer::ApplyConfiguration(RendererConfiguration const & /*config*/) {}

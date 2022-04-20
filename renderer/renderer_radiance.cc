@@ -25,7 +25,7 @@
 #include "renderer/output/pipeline_output.h"
 #include "renderer/pipeline/light_inputs.h"
 #include "renderer/pipeline/solid_color.h"
-#include "renderer/postprocessor/radiance_directional.h"
+#include "renderer/postprocessor/radiance.h"
 #include "renderer/postprocessor/tone_map.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/query/drawable_instance.h"
@@ -44,9 +44,9 @@ struct RadianceRenderer::RadianceRendererImpl {
     RadianceRendererImpl(VulkanContext *context);
     ~RadianceRendererImpl();
 
-    LightInputsPipelineOutput light_inputs_output;
-    UnboundedColorPipelineOutput radiance_output;
-    SwapChainPipelineOutput final_output;
+    LightInputsPipelineOutput light_inputs_map;
+    UnboundedColorPipelineOutput radiance_map;
+    SwapChainPipelineOutput final_color_map;
 
     DescriptorSetAllocator desc_set_alloc;
     TextureDescriptorSetCache tex_desc_set_cache;
@@ -55,29 +55,28 @@ struct RadianceRenderer::RadianceRendererImpl {
 
     LightInputsPipeline light_inputs_pipeline;
     SolidColorPipeline solid_color_pipeline;
-    DirectionalRadiancePipeline directional_radiance_pipeline;
+    RadiancePipeline radiance_pipeline;
     ToneMapPipeline tone_map_pipeline;
 
     RendererConfiguration config;
 };
 
 RadianceRenderer::RadianceRendererImpl::RadianceRendererImpl(VulkanContext *context)
-    : light_inputs_output(context->swap_chain_image_extent.width,
-                          context->swap_chain_image_extent.height, context),
-      radiance_output(context->swap_chain_image_extent.width,
-                      context->swap_chain_image_extent.height, /*with_depth_buffer=*/false,
-                      context),
-      final_output(/*with_depth_buffer=*/false, context), desc_set_alloc(context),
+    : light_inputs_map(context->swap_chain_image_extent.width,
+                       context->swap_chain_image_extent.height, context),
+      radiance_map(context->swap_chain_image_extent.width, context->swap_chain_image_extent.height,
+                   /*with_depth_buffer=*/false, context),
+      final_color_map(/*with_depth_buffer=*/false, context), desc_set_alloc(context),
       tex_desc_set_cache(&desc_set_alloc), geo_vram(context), tex_vram(context),
-      light_inputs_pipeline(&light_inputs_output, context),
-      solid_color_pipeline(&radiance_output, context),
-      directional_radiance_pipeline(&radiance_output, &desc_set_alloc, context),
-      tone_map_pipeline(&final_output, &desc_set_alloc, context) {}
+      light_inputs_pipeline(&light_inputs_map, context),
+      solid_color_pipeline(&radiance_map, context),
+      radiance_pipeline(&radiance_map, &desc_set_alloc, context),
+      tone_map_pipeline(&final_color_map, &desc_set_alloc, context) {}
 
 RadianceRenderer::RadianceRendererImpl::~RadianceRendererImpl() {}
 
 RadianceRenderer::RadianceRenderer(VulkanContext *context)
-    : RendererInterface(/*num_stages=*/1, /*max_frame_duration=*/std::chrono::seconds(10), context),
+    : RendererInterface(/*num_stages=*/1, context),
       pimpl_(std::make_unique<RadianceRendererImpl>(context)) {}
 
 RadianceRenderer::~RadianceRenderer() {}
@@ -85,15 +84,12 @@ RadianceRenderer::~RadianceRenderer() {}
 void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor) {
     FrameContext frame_context = this->BeginFrame();
 
-    pimpl_->final_output.SetSwapChainImageIndex(frame_context.swap_chain_image_index);
-
-    PipelineOutputInterface *final_output;
+    pimpl_->final_color_map.SetSwapChainImageIndex(frame_context.swap_chain_image_index);
 
     this->BeginStage(/*index=*/1, /*name=*/"Pipeline Preparation");
     {
         Scene::ReadAccess read_access = scene->GainReadAccess();
 
-        PerspectiveProjection camera_projection(scene->camera);
         std::vector<SceneEntity const *> scene_entities =
             scene->SceneEntityStructure()->QueryEntities(QueryAllSceneEntities);
 
@@ -107,45 +103,35 @@ void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_access
                         option, resource_accessor);
 
         // Render passes.
+        PerspectiveProjection camera_projection(scene->camera);
+
         LightInputsPipelineOutput *light_inputs = pimpl_->light_inputs_pipeline.Run(
-            drawables, camera_projection, frame_context.acquire_swap_chain_image_barrier,
+            drawables, camera_projection, frame_context.swap_chain_image_promise,
             &pimpl_->tex_desc_set_cache, &pimpl_->geo_vram, &pimpl_->tex_vram);
 
         PipelineOutputInterface *clear_output =
-            pimpl_->solid_color_pipeline.Run(vec3{0.1f, 0.1f, 0.1f}, *light_inputs->promise);
+            pimpl_->solid_color_pipeline.Run(vec3{0.0f, 0.0f, 0.0f}, *light_inputs->Promise());
+
+        GpuPromise const *current_promise = clear_output->Promise();
 
         std::vector<LightSourceInstance> light_sources =
             ToLightSources(scene_entities, camera_projection);
-        GpuPromise *current_promise = clear_output->promise.get();
 
         for (auto instance : light_sources) {
-            switch (instance.light_source.model_case()) {
-            case LightSource::ModelCase::kSunLight: {
-                pimpl_->directional_radiance_pipeline.Run(instance.light_source.sun_light(),
-                                                          *light_inputs, *current_promise);
-                break;
-            }
-            case LightSource::ModelCase::kPointLight: {
-                // TODO: Implements point light.
-                break;
-            }
-            case LightSource::ModelCase::kSpotLight: {
-                // TODO: Implements spot light.
-                break;
-            }
-            default: {
-                assert(false);
-            }
-            }
-
-            current_promise = pimpl_->radiance_output.promise.get();
+            pimpl_->radiance_pipeline.Run(instance, *light_inputs, camera_projection.Frustum(),
+                                          *current_promise);
+            current_promise = pimpl_->radiance_map.Promise();
         }
 
-        final_output = pimpl_->tone_map_pipeline.Run(pimpl_->radiance_output);
+        pimpl_->tone_map_pipeline.Run(pimpl_->radiance_map);
     }
     this->EndStage(/*index=*/1);
 
-    this->EndFrame(frame_context, final_output);
+    this->EndFrame(frame_context, std::vector<PipelineOutputInterface *>{
+                                      &pimpl_->light_inputs_map,
+                                      &pimpl_->radiance_map,
+                                      &pimpl_->final_color_map,
+                                  });
 }
 
 void RadianceRenderer::ApplyConfiguration(RendererConfiguration const &config) {

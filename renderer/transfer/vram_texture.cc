@@ -34,7 +34,7 @@ namespace {
 VkFormat SuitableOneChannelImageFormat(unsigned channel_size) {
     switch (channel_size) {
     case sizeof(uint8_t): {
-        return VkFormat::VK_FORMAT_R8_SRGB;
+        return VkFormat::VK_FORMAT_R8_UNORM;
     }
     default: {
         assert(false);
@@ -45,10 +45,10 @@ VkFormat SuitableOneChannelImageFormat(unsigned channel_size) {
 VkFormat SuitableThreeChannelsImageFormat(unsigned channel_size) {
     switch (channel_size) {
     case sizeof(uint8_t): {
-        return VkFormat::VK_FORMAT_R8G8B8_SRGB;
+        return VkFormat::VK_FORMAT_R8G8B8_UNORM;
     }
     case sizeof(uint16_t): {
-        return VkFormat::VK_FORMAT_R16G16B16_SNORM;
+        return VkFormat::VK_FORMAT_R16G16B16_UNORM;
     }
     default: {
         assert(false);
@@ -59,7 +59,10 @@ VkFormat SuitableThreeChannelsImageFormat(unsigned channel_size) {
 VkFormat SuitableFourChannelsImageFormat(unsigned channel_size) {
     switch (channel_size) {
     case sizeof(uint8_t): {
-        return VkFormat::VK_FORMAT_R8G8B8A8_SRGB;
+        return VkFormat::VK_FORMAT_R8G8B8A8_UNORM;
+    }
+    case sizeof(uint16_t): {
+        return VkFormat::VK_FORMAT_R16G16B16A16_UNORM;
     }
     default: {
         assert(false);

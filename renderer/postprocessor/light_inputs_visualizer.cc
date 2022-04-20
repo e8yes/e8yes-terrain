@@ -115,7 +115,7 @@ PipelineOutputInterface *
 LightInputsVisualizerPipeline::Run(LightInputsRendererParameters::InputType input_to_visualize,
                                    LightInputsPipelineOutput const &light_inputs) {
     LightInputsVisualizerPostProcessorConfigurator configurator(input_to_visualize, light_inputs);
-    return pimpl_->post_processor_pipeline->Run(configurator, *light_inputs.promise);
+    return pimpl_->post_processor_pipeline->Run(configurator, *light_inputs.Promise());
 }
 
 } // namespace e8

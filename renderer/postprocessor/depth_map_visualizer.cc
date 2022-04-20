@@ -115,7 +115,7 @@ PipelineOutputInterface *
 DepthMapVisualizerPipeline::Run(float alpha, std::optional<PerspectiveProjection> projection,
                                 DepthMapPipelineOutput const &depth_map) {
     DepthMapPostProcessorConfigurator configurator(alpha, projection, depth_map);
-    return pimpl_->post_processor_pipeline->Run(configurator, *depth_map.promise);
+    return pimpl_->post_processor_pipeline->Run(configurator, *depth_map.Promise());
 }
 
 } // namespace e8

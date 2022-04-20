@@ -16,6 +16,9 @@
  */
 
 #include <cassert>
+#include <cmath>
+#include <cstdint>
+#include <limits>
 
 #include "common/tensor.h"
 #include "content/common.h"
@@ -28,7 +31,34 @@
 namespace e8 {
 namespace {
 
-TextureProto ToTextureProto(unsigned texture_index, tinygltf::Model const &model) {
+float SrgbToLinear(float u) {
+    float const a = 1.0f / 1.055f;
+    float const b = -0.055f / 1.055f;
+    float const c = 1.0f / 12.92f;
+    float const d = 0.04045f;
+    float const gamma = 2.4f;
+
+    if (u < d) {
+        return c * u;
+    } else {
+        return std::pow(a * u + b, gamma);
+    }
+}
+
+vec4 SrgbToLinear(vec4 const &u) {
+    vec4 result;
+    for (unsigned i = 0; i < 4; ++i) {
+        result(i) = SrgbToLinear(u(i));
+    }
+    return result;
+}
+
+uint8_t SrgbToLinear(uint8_t u) {
+    float f = SrgbToLinear(static_cast<float>(u) / (std::numeric_limits<uint8_t>::max() - 1));
+    return f * (std::numeric_limits<uint8_t>::max() - 1);
+}
+
+TextureProto ToTextureProto(unsigned texture_index, tinygltf::Model const &model, bool to_linear) {
     tinygltf::Texture const &texture = model.textures[texture_index];
     assert(texture.source >= 0);
     tinygltf::Image const &image = model.images[texture.source];
@@ -41,8 +71,18 @@ TextureProto ToTextureProto(unsigned texture_index, tinygltf::Model const &model
     texture_proto.set_channel_count(image.component);
     texture_proto.set_channel_size(image.bits / 8);
 
-    EncodeTextureData(image.image.data(), &texture_proto);
+    if (!to_linear) {
+        EncodeTextureData(image.image.data(), &texture_proto);
+        return texture_proto;
+    }
 
+    std::vector<uint8_t> linear_image(image.image.size());
+    for (unsigned i = 0; i < image.image.size(); ++i) {
+        uint8_t linear_rgb = SrgbToLinear(image.image[i]);
+        linear_image[i] = linear_rgb;
+    }
+
+    EncodeTextureData(linear_image.data(), &texture_proto);
     return texture_proto;
 }
 
@@ -99,15 +139,20 @@ MaterialProto LoadMaterial(tinygltf::Material const &material, tinygltf::Model c
     material_proto.set_id(GenerateUuid());
     material_proto.set_name(material.name);
 
+    // Base color is usually drawn in sRGB space. Converts it to linear space in order for it to be
+    // used as albedo.
     if (material.pbrMetallicRoughness.baseColorTexture.index < 0) {
-        *material_proto.mutable_albedo() = OneByOneAlbedoTexture(
+        vec4 srgb_albedo =
             vec4{static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[0]),
                  static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[1]),
                  static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[2]),
-                 static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[3])});
+                 static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[3])};
+        vec4 albedo = SrgbToLinear(srgb_albedo);
+
+        *material_proto.mutable_albedo() = OneByOneAlbedoTexture(albedo);
     } else {
-        *material_proto.mutable_albedo() =
-            ToTextureProto(material.pbrMetallicRoughness.baseColorTexture.index, model);
+        *material_proto.mutable_albedo() = ToTextureProto(
+            material.pbrMetallicRoughness.baseColorTexture.index, model, /*to_linear=*/true);
         assert(material_proto.albedo().channel_size() == 1);
     }
 
@@ -125,7 +170,8 @@ MaterialProto LoadMaterial(tinygltf::Material const &material, tinygltf::Model c
     if (material.normalTexture.index < 0) {
         *material_proto.mutable_normal() = OneByOneNormalTexture();
     } else {
-        *material_proto.mutable_normal() = ToTextureProto(material.normalTexture.index, model);
+        *material_proto.mutable_normal() =
+            ToTextureProto(material.normalTexture.index, model, /*to_linear=*/false);
     }
 
     return material_proto;

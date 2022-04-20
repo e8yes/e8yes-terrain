@@ -15,6 +15,7 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -78,14 +79,21 @@ std::vector<VkVertexInputAttributeDescription> VertexShaderInputAttributes() {
     tangent_attribute.format = VK_FORMAT_R32G32B32_SFLOAT;
     tangent_attribute.offset = offsetof(PrimitiveVertex, tangent);
 
+    VkVertexInputAttributeDescription bitangent_sign_attribute{};
+    bitangent_sign_attribute.binding = 0;
+    bitangent_sign_attribute.location = 3;
+    bitangent_sign_attribute.format = VK_FORMAT_R32_SFLOAT;
+    bitangent_sign_attribute.offset = offsetof(PrimitiveVertex, bitangent_sign);
+
     VkVertexInputAttributeDescription tex_coord_attribute{};
     tex_coord_attribute.binding = 0;
-    tex_coord_attribute.location = 3;
+    tex_coord_attribute.location = 4;
     tex_coord_attribute.format = VK_FORMAT_R32G32_SFLOAT;
     tex_coord_attribute.offset = offsetof(PrimitiveVertex, tex_coord);
 
-    return std::vector<VkVertexInputAttributeDescription>{position_attribute, normal_attribute,
-                                                          tangent_attribute, tex_coord_attribute};
+    return std::vector<VkVertexInputAttributeDescription>{
+        position_attribute, normal_attribute, tangent_attribute, bitangent_sign_attribute,
+        tex_coord_attribute};
 }
 
 std::vector<VkDescriptorSetLayoutBinding> DescriptorSetBindings() {
@@ -192,9 +200,9 @@ struct LightInputsPipelineOutput::LightInputsPipelineOutputImpl {
 LightInputsPipelineOutput::LightInputsPipelineOutputImpl::LightInputsPipelineOutputImpl(
     unsigned width, unsigned height, VulkanContext *context) {
     normal_roughness_ =
-        CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R16G16B16A16_UNORM, context);
+        CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R16G16B16A16_SNORM, context);
     albedo_metallic_ =
-        CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R8G8B8A8_SRGB, context);
+        CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R8G8B8A8_UNORM, context);
     depth_attachment_ = CreateDepthAttachment(width, height, /*samplable=*/true, context);
     render_pass_ = CreateRenderPass(
         /*color_attachments=*/std::vector<VkAttachmentDescription>{normal_roughness_->desc,
@@ -264,8 +272,8 @@ LightInputsPipeline::LightInputsPipelineImpl::LightInputsPipelineImpl(
     vertex_inputs = CreateVertexInputState(VertexShaderInputAttributes());
     fixed_stage_config = CreateFixedStageConfig(/*polygon_mode=*/VK_POLYGON_MODE_FILL,
                                                 /*cull_mode=*/VK_CULL_MODE_BACK_BIT,
-                                                /*enable_depth_test=*/true, output->width,
-                                                output->height, /*color_attachment_count=*/2);
+                                                /*enable_depth_test=*/true, output->Width(),
+                                                output->Height(), /*color_attachment_count=*/2);
 
     pipeline = CreateGraphicsPipeline(output->GetRenderPass(), *shader_stages, *uniform_layout,
                                       *vertex_inputs, *fixed_stage_config, context);
@@ -293,8 +301,8 @@ LightInputsPipelineOutput *LightInputsPipeline::Run(std::vector<DrawableInstance
     RenderDrawables(drawables, *pimpl_->pipeline, *pimpl_->uniform_layout, configurator,
                     tex_desc_set_cache, geo_vram, tex_vram, cmds);
 
-    pimpl_->output->promise =
-        FinishRenderPass(cmds, prerequisites, pimpl_->output->AcquireFence(), pimpl_->context);
+    RenderPassPromise promise = FinishRenderPass(cmds, prerequisites, pimpl_->context);
+    pimpl_->output->AddWriter(std::move(promise.gpu), std::move(promise.cpu));
 
     return pimpl_->output;
 }

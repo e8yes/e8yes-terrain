@@ -24,7 +24,7 @@
 #include "radiance.glsl"
 
 layout (push_constant) uniform PerLightConstants {
-    vec4 dir;
+    vec4 direction;
     vec4 intensity;
 } plc;
 
@@ -39,7 +39,7 @@ void main() {
     float metallic = DecodeMetallic(screen_tex_coord);
 
     vec3 incident_intensity = vec3(plc.intensity);
-    vec3 incident_ray = -vec3(plc.dir);
+    vec3 incident_ray = -vec3(plc.direction);
     out_radiance = Radiance(incident_intensity, incident_ray, normal,
                          albedo, metallic, roughness);
 }

@@ -15,8 +15,9 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
+#include <cassert>
 #include <memory>
-#include <vector>
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
@@ -24,41 +25,59 @@
 
 namespace e8 {
 
-GpuPromise::GpuPromise(VulkanContext *context) : context_(context) {}
+CpuPromise::CpuPromise(VulkanContext *context) : context_(context) {
+    VkFenceCreateInfo fence_info{};
+    fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 
-GpuPromise::GpuPromise(VkSemaphore task_signal, VkCommandBuffer task_cmds, VulkanContext *context)
-    : tasks_signal{task_signal}, tasks_cmds{task_cmds}, context_(context) {}
+    assert(VK_SUCCESS ==
+           vkCreateFence(context->device, &fence_info, /*pAllocator=*/nullptr, &signal));
+}
 
-GpuPromise::GpuPromise(GpuPromise &&other) {
-    tasks_signal = other.tasks_signal;
-    tasks_cmds = other.tasks_cmds;
+CpuPromise::CpuPromise(CpuPromise &&other) : signal(VK_NULL_HANDLE), context_(nullptr) {
+    *this = std::move(other);
+}
+
+CpuPromise &CpuPromise::operator=(CpuPromise &&other) {
+    std::swap(signal, other.signal);
     context_ = other.context_;
+    return *this;
+}
 
-    other.tasks_signal.clear();
-    other.tasks_cmds.clear();
+CpuPromise::~CpuPromise() {
+    if (signal != VK_NULL_HANDLE) {
+        vkDestroyFence(context_->device, signal, /*pAllocator=*/nullptr);
+    }
+}
+
+GpuPromise::GpuPromise(VkCommandBuffer task_cmds, VulkanContext *context)
+    : cmds{task_cmds}, context_(context) {
+    VkSemaphoreCreateInfo semaphore_info{};
+    semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+    assert(VK_SUCCESS == vkCreateSemaphore(context->device, &semaphore_info,
+                                           /*pAllocator=*/nullptr, &signal));
+}
+
+GpuPromise::GpuPromise(GpuPromise &&other)
+    : signal(VK_NULL_HANDLE), cmds(VK_NULL_HANDLE), context_(nullptr) {
+    *this = std::move(other);
 }
 
 GpuPromise::~GpuPromise() {
-    for (auto task_signal : tasks_signal) {
-        vkDestroySemaphore(context_->device, task_signal, /*pAllocator=*/nullptr);
+    if (signal != VK_NULL_HANDLE) {
+        vkDestroySemaphore(context_->device, signal, /*pAllocator=*/nullptr);
     }
-
-    if (!tasks_cmds.empty()) {
-        vkFreeCommandBuffers(context_->device, context_->command_pool, tasks_cmds.size(),
-                             tasks_cmds.data());
+    if (cmds != VK_NULL_HANDLE) {
+        vkFreeCommandBuffers(context_->device, context_->command_pool, /*commandBufferCount=*/1,
+                             &cmds);
     }
 }
 
-void GpuPromise::Merge(std::unique_ptr<GpuPromise> &&other) {
-    for (auto signal : other->tasks_signal) {
-        tasks_signal.push_back(signal);
-    }
-    other->tasks_signal.clear();
-
-    for (auto cmds : other->tasks_cmds) {
-        tasks_cmds.push_back(cmds);
-    }
-    other->tasks_cmds.clear();
+GpuPromise &GpuPromise::operator=(GpuPromise &&other) {
+    std::swap(signal, other.signal);
+    std::swap(cmds, other.cmds);
+    context_ = other.context_;
+    return *this;
 }
 
 } // namespace e8

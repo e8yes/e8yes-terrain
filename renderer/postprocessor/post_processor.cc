@@ -169,8 +169,8 @@ PostProcessorPipeline::PostProcessorPipelineImpl::PostProcessorPipelineImpl(
         /*input_attributes=*/std::vector<VkVertexInputAttributeDescription>());
     fixed_stage_config = CreateFixedStageConfig(/*polygon_mode=*/VK_POLYGON_MODE_FILL,
                                                 /*cull_mode=*/VK_CULL_MODE_NONE,
-                                                /*enable_depth_test=*/false, output->width,
-                                                output->height, /*color_attachment_count=*/1);
+                                                /*enable_depth_test=*/false, output->Width(),
+                                                output->Height(), /*color_attachment_count=*/1);
 
     // Creates the post processing pipeline.
     pipeline =
@@ -184,8 +184,8 @@ PostProcessorPipeline::PostProcessorPipelineImpl::PostProcessorPipelineImpl(
     viewport_dimension_ubo = CreateUniformBuffer(/*size=*/sizeof(ViewportDimension), context);
 
     ViewportDimension dimension;
-    dimension.viewport_width = output->width;
-    dimension.viewport_height = output->height;
+    dimension.viewport_width = output->Width();
+    dimension.viewport_height = output->Height();
 
     WriteUniformBufferDescriptor(&dimension, *viewport_dimension_ubo, *viewport_dimension_desc_set,
                                  /*binding=*/0, context);
@@ -247,8 +247,8 @@ PostProcessorPipeline::Run(PostProcessorConfiguratorInterface const &configurato
         },
         cmds);
 
-    pimpl_->output->promise =
-        FinishRenderPass(cmds, promise, pimpl_->output->AcquireFence(), pimpl_->context);
+    RenderPassPromise output_promise = FinishRenderPass(cmds, promise, pimpl_->context);
+    pimpl_->output->AddWriter(std::move(output_promise.gpu), std::move(output_promise.cpu));
 
     return pimpl_->output;
 }

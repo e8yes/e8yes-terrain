@@ -44,24 +44,24 @@ ToLightSources(std::vector<SceneEntity const *> const &scene_entities,
             vec4 direction = ToVec3(light_source.mutable_sun_light()->direction()).homo(0.0f);
             direction = view_model * direction;
 
-            *light_source.mutable_sun_light()->mutable_direction() = ToProto(direction);
+            *light_source.mutable_sun_light()->mutable_direction() = ToProto(direction.trunc());
             break;
         }
         case LightSource::ModelCase::kPointLight: {
             vec4 position = ToVec3(light_source.mutable_point_light()->position()).homo(1.0f);
             position = view_model * position;
 
-            *light_source.mutable_point_light()->mutable_position() = ToProto(position);
+            *light_source.mutable_point_light()->mutable_position() = ToProto(position.trunc());
             break;
         }
         case LightSource::ModelCase::kSpotLight: {
             vec4 position = ToVec3(light_source.mutable_spot_light()->position()).homo(1.0f);
             vec4 direction = ToVec3(light_source.mutable_spot_light()->direction()).homo(0.0f);
-            direction = view_model * direction;
             position = view_model * position;
+            direction = view_model * direction;
 
-            *light_source.mutable_spot_light()->mutable_position() = ToProto(position);
-            *light_source.mutable_spot_light()->mutable_direction() = ToProto(position);
+            *light_source.mutable_spot_light()->mutable_position() = ToProto(position.trunc());
+            *light_source.mutable_spot_light()->mutable_direction() = ToProto(direction.trunc());
             break;
         }
         default: {

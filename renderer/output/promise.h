@@ -19,7 +19,6 @@
 #define ISLANDS_RENDERER_PROMISE_H
 
 #include <memory>
-#include <vector>
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
@@ -27,40 +26,54 @@
 namespace e8 {
 
 /**
- * @brief The GpuBarrier struct Stores a series of task semaphores. When later tasks are submitted
- * with waiting for this barrier, they will be blocked until all previous tasks merged in this
- * barrier are finished. It will clean up task semaphores and recycle task command buffers by the
- * end of its lifecycle.
+ * @brief The CpuPromise struct Stores a CPU task fence. The fence gets signaled once the task is
+ * complete. It will clean up task fence by the end of its lifecycle regardless of the task's
+ * completion status.
+ */
+struct CpuPromise {
+    /**
+     * @brief CpuPromise Constructs a new CPU promise.
+     *
+     * @param context Contextual Vulkan handles.
+     */
+    explicit CpuPromise(VulkanContext *context);
+    CpuPromise(CpuPromise const &) = delete;
+    CpuPromise(CpuPromise &&other);
+    ~CpuPromise();
+
+    CpuPromise &operator=(CpuPromise &&other);
+
+    // The task's CPU signal.
+    VkFence signal;
+
+    // Contextual Vulkan handles.
+    VulkanContext *context_;
+};
+
+/**
+ * @brief The GpuPromise struct Stores a GPU task semaphore. The semaphore gets signaled once the
+ * task is complete. It will clean up task semaphore and recycle task command buffers by the end of
+ * its lifecycle regardless of the task's completion status.
  */
 struct GpuPromise {
     /**
-     * @brief GpuBarrier Constructs an empty barrier.
+     * @brief GpuBarrier Constructs a GPU promise with the specified task commands.
+     *
+     * @param task_cmds Optional. The task's GPU commands.
      * @param context Contextual Vulkan handles.
      */
-    explicit GpuPromise(VulkanContext *context);
-
-    /**
-     * @brief GpuBarrier Constructs a barrier with one task.
-     * @param task_signal The task's semaphore which will be signaled by the moment of completion
-     * (when all the task_cmds finish running).
-     * @param task_cmds The commands the task consists of.
-     * @param context Contextual Vulkan handles.
-     */
-    GpuPromise(VkSemaphore task_signal, VkCommandBuffer task_cmds, VulkanContext *context);
+    GpuPromise(VkCommandBuffer task_cmds, VulkanContext *context);
     GpuPromise(GpuPromise const &) = delete;
     GpuPromise(GpuPromise &&other);
     ~GpuPromise();
 
-    /**
-     * @brief Merge Merges tasks from another barrier.
-     */
-    void Merge(std::unique_ptr<GpuPromise> &&other);
+    GpuPromise &operator=(GpuPromise &&other);
 
-    // Tasks' signal.
-    std::vector<VkSemaphore> tasks_signal;
+    // Task's signal.
+    VkSemaphore signal;
 
-    // Tasks' commands.
-    std::vector<VkCommandBuffer> tasks_cmds;
+    // Task's commands.
+    VkCommandBuffer cmds;
 
     // Contextual Vulkan handles.
     VulkanContext *context_;

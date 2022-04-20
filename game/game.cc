@@ -40,33 +40,36 @@ unsigned const kDisplayWindowHeight = 768;
 
 void UpdateSystemInputs(Display const &display, UserInputs *system_inputs) {
     SDL_Event event;
-    if (!SDL_PollEvent(&event)) {
-        return;
-    }
+    while (SDL_PollEvent(&event)) {
+        switch (event.type) {
+        case SDL_KEYDOWN: {
+            system_inputs->key_pressed = event.key.keysym.sym;
+            break;
+        }
+        case SDL_KEYUP: {
+            system_inputs->key_pressed = '\0';
+            break;
+        }
+        case SDL_MOUSEMOTION: {
+            int width;
+            int height;
+            SDL_GL_GetDrawableSize(display.window, &width, &height);
 
-    //
-    if (event.key.state == SDL_PRESSED) {
-        system_inputs->key_pressed = event.key.keysym.sym;
-    } else {
-        system_inputs->key_pressed = '\0';
-    }
+            system_inputs->dx = 0;
+            system_inputs->dy = 0;
+            if (std::abs(event.motion.xrel) < width) {
+                system_inputs->dx = static_cast<float>(event.motion.xrel) / width;
+            }
+            if (std::abs(event.motion.yrel) < height) {
+                system_inputs->dy = static_cast<float>(event.motion.yrel) / height;
+            }
 
-    //
-    int width;
-    int height;
-    SDL_GL_GetDrawableSize(display.window, &width, &height);
-
-    system_inputs->dx = 0;
-    system_inputs->dy = 0;
-    if (std::abs(event.motion.xrel) < width) {
-        system_inputs->dx = static_cast<float>(event.motion.xrel) / width;
+            system_inputs->left_mouse_button_pressed = event.motion.state & SDL_BUTTON_LMASK;
+            system_inputs->right_mouse_button_pressed = event.motion.state & SDL_BUTTON_RMASK;
+            break;
+        }
+        }
     }
-    if (std::abs(event.motion.yrel) < height) {
-        system_inputs->dy = static_cast<float>(event.motion.yrel) / height;
-    }
-
-    system_inputs->left_mouse_button_pressed = event.motion.state & SDL_BUTTON_LMASK;
-    system_inputs->right_mouse_button_pressed = event.motion.state & SDL_BUTTON_RMASK;
 }
 
 } // namespace

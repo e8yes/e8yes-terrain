@@ -119,36 +119,45 @@ VkCommandBuffer StartRenderPass(RenderPass const &render_pass, FrameBuffer const
     return cmds;
 }
 
-std::unique_ptr<GpuPromise> FinishRenderPass(VkCommandBuffer cmds, GpuPromise const &prerequisites,
-                                             VkFence fence, VulkanContext *context) {
+RenderPassPromise::RenderPassPromise() {}
+
+RenderPassPromise::RenderPassPromise(RenderPassPromise &&other) { *this = std::move(other); }
+
+RenderPassPromise::~RenderPassPromise() {}
+
+RenderPassPromise &RenderPassPromise::operator=(RenderPassPromise &&other) {
+    std::swap(cpu, other.cpu);
+    std::swap(gpu, other.gpu);
+    return *this;
+}
+
+RenderPassPromise FinishRenderPass(VkCommandBuffer cmds, GpuPromise const &prerequisites,
+                                   VulkanContext *context) {
     // Finalizes the render pass and command buffers.
     vkCmdEndRenderPass(cmds);
     assert(VK_SUCCESS == vkEndCommandBuffer(cmds));
 
     // For render pass synchronization.
-    VkSemaphore done_signal;
-    VkSemaphoreCreateInfo semaphore_info{};
-    semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-    assert(VK_SUCCESS == vkCreateSemaphore(context->device, &semaphore_info,
-                                           /*pAllocator=*/nullptr, &done_signal));
+    RenderPassPromise promise;
+    promise.gpu = std::make_unique<GpuPromise>(cmds, context);
+    promise.cpu = std::make_unique<CpuPromise>(context);
 
     // Submit command buffers.
     VkSubmitInfo submit{};
     submit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    if (!prerequisites.tasks_signal.empty()) {
-        submit.pWaitSemaphores = prerequisites.tasks_signal.data();
-        submit.waitSemaphoreCount = prerequisites.tasks_signal.size();
-        submit.pWaitDstStageMask = &wait_stage;
-    }
-    submit.pSignalSemaphores = &done_signal;
+    submit.pWaitSemaphores = &prerequisites.signal;
+    submit.waitSemaphoreCount = 1;
+    submit.pWaitDstStageMask = &wait_stage;
+    submit.pSignalSemaphores = &promise.gpu->signal;
     submit.signalSemaphoreCount = 1;
     submit.pCommandBuffers = &cmds;
     submit.commandBufferCount = 1;
 
-    assert(VK_SUCCESS == vkQueueSubmit(context->graphics_queue, /*submitCount=*/1, &submit, fence));
+    assert(VK_SUCCESS ==
+           vkQueueSubmit(context->graphics_queue, /*submitCount=*/1, &submit, promise.cpu->signal));
 
-    return std::make_unique<GpuPromise>(done_signal, cmds, context);
+    return promise;
 }
 
 void RenderDrawables(std::vector<DrawableInstance> const &drawables,

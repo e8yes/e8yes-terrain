@@ -18,7 +18,6 @@
 #ifndef ISLANDS_RENDERER_PIPELINE_OUTPUT_H
 #define ISLANDS_RENDERER_PIPELINE_OUTPUT_H
 
-#include <chrono>
 #include <memory>
 #include <vector>
 #include <vulkan/vulkan.h>
@@ -60,32 +59,48 @@ class PipelineOutputInterface {
     virtual FrameBufferAttachment const *DepthAttachment() const = 0;
 
     /**
-     * @brief RequireFence Returns an unsignaled fence of this output.
+     * @brief Width The width, in pixels, of the pipeline output.
      */
-    VkFence AcquireFence();
+    unsigned Width() const;
 
     /**
-     * @brief Fulfill Waits until either the output is fulfilled or gets timed out. If the wait is
-     * timed out, this function will fail.
+     * @brief Height The height, in pixels, of the pipeline output.
      */
-    void Fulfill(std::chrono::nanoseconds const &timeout);
+    unsigned Height() const;
 
-  public:
+    /**
+     * @brief Fulfill Waits until either the output is fulfilled. The underlying promises will be
+     * cleared out.
+     */
+    void Fulfill();
+
+    /**
+     * @brief Promise Gets the current GPU promises associated with the pipeline output. It's
+     * nullable.
+     */
+    GpuPromise const *Promise() const;
+
+    /**
+     * @brief AddWriter Adds a writer task to the output.
+     */
+    void AddWriter(std::unique_ptr<GpuPromise> &&gpu_promise,
+                   std::unique_ptr<CpuPromise> &&cpu_promise);
+
+  private:
     // The width of the rendered image.
-    unsigned width;
+    unsigned width_;
 
     // The height of the rendered image.
-    unsigned height;
+    unsigned height_;
 
-    // Barrier of the rendering task. Semaphores in this barrier must all be signaled before the
-    // output can be read or used again.
-    std::unique_ptr<GpuPromise> promise;
+    // Writer tasks' GPU promise.
+    std::vector<std::unique_ptr<GpuPromise>> gpu_promises_;
 
-    // A CPU fence which gets signaled when the output is fulfilled.
-    VkFence fence;
+    // Writer tasks' CPU promise.
+    std::vector<std::unique_ptr<CpuPromise>> cpu_promises_;
 
     // Contextual Vulkan handles.
-    VulkanContext *context;
+    VulkanContext *context_;
 };
 
 /**

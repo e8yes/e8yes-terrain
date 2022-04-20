@@ -86,7 +86,7 @@ ToneMapPipeline::~ToneMapPipeline() {}
 
 PipelineOutputInterface *ToneMapPipeline::Run(UnboundedColorPipelineOutput const &radiance) {
     ToneMapPostProcessorConfigurator configurator(radiance);
-    return pimpl_->post_processor_pipeline->Run(configurator, *radiance.promise);
+    return pimpl_->post_processor_pipeline->Run(configurator, *radiance.Promise());
 }
 
 } // namespace e8
