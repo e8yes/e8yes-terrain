@@ -18,12 +18,7 @@
 layout (location = 0) out vec4 out_normal_roughness;
 layout (location = 1) out vec4 out_albedo_metallic;
 
-vec3 EncodeNormal(vec3 normal) {
-    return 0.5f*normal + 0.5f;
-}
-
 void Encode(vec3 albedo, vec3 normal, float roughness, float metallic) {
-    vec3 encoded_normal = EncodeNormal(normal);
-    out_normal_roughness = vec4(encoded_normal.x, encoded_normal.y, encoded_normal.z, roughness);
+    out_normal_roughness = vec4(normal.x, normal.y, normal.z, roughness);
     out_albedo_metallic = vec4(albedo.x, albedo.y, albedo.z, metallic);
 }

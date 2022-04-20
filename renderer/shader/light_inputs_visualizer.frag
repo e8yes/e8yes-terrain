@@ -36,7 +36,8 @@ void main() {
         out_frag_color = vec4(DecodeAlbedo(screen_tex_coord), 1.0);
     } else if (ppc.input_to_visualize == 2) {
         // Visualizes the normal vector.
-        out_frag_color = vec4(DecodeRawNormal(screen_tex_coord), 1.0);
+        vec3 normal = DecodeNormal(screen_tex_coord);
+        out_frag_color = vec4(0.5f*normal + 0.5f, 1.0);
     } else if (ppc.input_to_visualize == 3) {
         // Visualizes the roughness factor.
         float roughness = DecodeRoughness(screen_tex_coord);
@@ -47,4 +48,3 @@ void main() {
         out_frag_color = vec4(metallic, metallic, metallic, 1.0);
     }
 }
-
