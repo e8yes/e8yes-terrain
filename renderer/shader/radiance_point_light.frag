@@ -26,10 +26,11 @@
 layout (push_constant) uniform PerLightConstants {
     vec4 position;
     vec4 intensity;
-    float sensor_width;
-    float sensor_height;
-    float z_near;
-    float z_far;
+
+    float rec_x_a;
+    float rec_y_a;
+    float rec_z_a;
+    float rec_z_b;
 } plc;
 
 layout (location = 0) out vec4 out_radiance;
@@ -43,8 +44,8 @@ void main() {
     float metallic = DecodeMetallic(screen_tex_coord);
 
     vec3 hit_point = DecodePosition(screen_tex_coord,
-                                    plc.sensor_width, plc.sensor_height,
-                                    plc.z_near, plc.z_far);
+                                    plc.rec_x_a, plc.rec_y_a,
+                                    plc.rec_z_a, plc.rec_z_b);
     vec3 light_ray = vec3(plc.position) - hit_point;
     float inv_r2 = 1.0f/(dot(light_ray, light_ray) + 1e-4f);
 

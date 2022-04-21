@@ -21,7 +21,7 @@
 #include "post_processor.glsl"
 
 layout (push_constant) uniform PerPassConstants {
-	float z_near;
+    float z_near;
     float z_far;
     float alpha;
 } ppc;

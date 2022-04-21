@@ -15,6 +15,7 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cmath>
 #include <memory>
 #include <vector>
 
@@ -100,10 +101,10 @@ struct PointLightParameters {
     vec4 position;
     vec4 intensity;
 
-    float sensor_width;
-    float sensor_height;
-    float z_near;
-    float z_far;
+    float rec_x_a;
+    float rec_y_a;
+    float rec_z_a;
+    float rec_z_b;
 };
 
 class PointLightPostProcessorConfigurator : public RadiancePostProcessorConfigurator {
@@ -136,10 +137,10 @@ void PointLightPostProcessorConfigurator::PushConstants(
     parameters->position = ToVec3(point_light_.position()).homo(1.0f);
     parameters->intensity = ToVec3(point_light_.intensity()).homo(1.0f);
 
-    parameters->sensor_width = light_inputs_frustum_.right - light_inputs_frustum_.left;
-    parameters->sensor_height = light_inputs_frustum_.top - light_inputs_frustum_.bottom;
-    parameters->z_near = light_inputs_frustum_.z_near;
-    parameters->z_far = light_inputs_frustum_.z_far;
+    parameters->rec_x_a = light_inputs_frustum_.XUnprojectionConstant();
+    parameters->rec_y_a = light_inputs_frustum_.YUnprojectionConstant();
+    parameters->rec_z_a = light_inputs_frustum_.ZUnProjectionConstantA();
+    parameters->rec_z_b = light_inputs_frustum_.ZUnprojectionConstantB();
 }
 
 // Spot light.
@@ -147,13 +148,13 @@ struct SpotLightParameters {
     vec4 position;
     vec4 direction;
     vec4 intensity;
-    float inner_cone_angle;
-    float outer_cone_angle;
+    float cos_inner_cone;
+    float cos_outer_cone;
 
-    float sensor_width;
-    float sensor_height;
-    float z_near;
-    float z_far;
+    float rec_x_a;
+    float rec_y_a;
+    float rec_z_a;
+    float rec_z_b;
 };
 
 class SpotLightPostProcessorConfigurator : public RadiancePostProcessorConfigurator {
@@ -185,13 +186,13 @@ void SpotLightPostProcessorConfigurator::PushConstants(std::vector<uint8_t> *pus
     parameters->position = ToVec3(spot_light_.position()).homo(1.0f);
     parameters->direction = ToVec3(spot_light_.direction()).homo(0.0f);
     parameters->intensity = ToVec3(spot_light_.intensity()).homo(1.0f);
-    parameters->inner_cone_angle = spot_light_.inner_cone_angle();
-    parameters->outer_cone_angle = spot_light_.outer_cone_angle();
+    parameters->cos_inner_cone = std::cos(deg2rad(spot_light_.inner_cone_angle()));
+    parameters->cos_outer_cone = std::cos(deg2rad(spot_light_.outer_cone_angle()));
 
-    parameters->sensor_width = light_inputs_frustum_.right - light_inputs_frustum_.left;
-    parameters->sensor_height = light_inputs_frustum_.top - light_inputs_frustum_.bottom;
-    parameters->z_near = light_inputs_frustum_.z_near;
-    parameters->z_far = light_inputs_frustum_.z_far;
+    parameters->rec_x_a = light_inputs_frustum_.XUnprojectionConstant();
+    parameters->rec_y_a = light_inputs_frustum_.YUnprojectionConstant();
+    parameters->rec_z_a = light_inputs_frustum_.ZUnProjectionConstantA();
+    parameters->rec_z_b = light_inputs_frustum_.ZUnprojectionConstantB();
 }
 
 } // namespace
@@ -222,11 +223,11 @@ RadiancePipeline::DirectionalRadiancePipelineImpl::DirectionalRadiancePipelineIm
         /*push_constant_size=*/sizeof(PointLightParameters), radiance_output, desc_set_allocator,
         context);
 
-    //    spot_light_pipeline = std::make_unique<PostProcessorPipeline>(
-    //        kFragmentShaderFilePathRadianceSpotLight,
-    //        /*input_image_count=*/LightInputsPipelineOutput::ColorOutputCount + 1,
-    //        /*push_constant_size=*/sizeof(SpotLightParameters), radiance_output,
-    //        desc_set_allocator, context);
+    spot_light_pipeline = std::make_unique<PostProcessorPipeline>(
+        kFragmentShaderFilePathRadianceSpotLight,
+        /*input_image_count=*/LightInputsPipelineOutput::ColorOutputCount + 1,
+        /*push_constant_size=*/sizeof(SpotLightParameters), radiance_output, desc_set_allocator,
+        context);
 }
 
 RadiancePipeline::DirectionalRadiancePipelineImpl::~DirectionalRadiancePipelineImpl() {}

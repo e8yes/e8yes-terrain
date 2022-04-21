@@ -972,6 +972,10 @@ struct frustum {
     frustum(float left, float right, float bottom, float top, float z_near, float z_far);
 
     mat44 projective_transform() const;
+    float XUnprojectionConstant() const;
+    float YUnprojectionConstant() const;
+    float ZUnProjectionConstantA() const;
+    float ZUnprojectionConstantB() const;
 
     float left;
     float right;
@@ -995,6 +999,36 @@ inline mat44 frustum::projective_transform() const {
 
     return mat44({a / width, 0, 0, 0, 0, a / height, 0, 0, delta_x / width, delta_y / height,
                   z_near / d, -1, 0, 0, z_near * z_far / d, 0});
+}
+
+inline float frustum::XUnprojectionConstant() const {
+    double d_left = left;
+    double d_right = right;
+    double d_z_near = z_near;
+
+    return -(d_right - d_left) / (2 * d_z_near);
+}
+
+inline float frustum::YUnprojectionConstant() const {
+    double d_top = top;
+    double d_bottom = bottom;
+    double d_z_near = z_near;
+
+    return -(d_top - d_bottom) / (2 * d_z_near);
+}
+
+inline float frustum::ZUnProjectionConstantA() const {
+    double d_z_near = z_near;
+    double d_z_far = z_far;
+
+    return -d_z_near * d_z_far / (d_z_far - d_z_near);
+}
+
+inline float frustum::ZUnprojectionConstantB() const {
+    double d_z_near = z_near;
+    double d_z_far = z_far;
+
+    return -d_z_near / (d_z_far - d_z_near);
 }
 
 inline frustum frustum_perspective2(float tan_fovy, float aspect, float z_near, float z_far) {

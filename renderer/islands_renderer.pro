@@ -101,9 +101,3 @@ unix {
     target.path = /usr/lib
 }
 !isEmpty(target.path): INSTALLS += target
-
-DISTFILES += \
-    proto/renderer.proto \
-    shader/hdr_aces.frag \
-    shader/hdr_clamp.frag \
-    shader/radiance_point_light.frag
