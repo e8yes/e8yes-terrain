@@ -36,12 +36,8 @@ class LightInputsVisualizerPipeline {
     /**
      * @brief LightInputsVisualizerPipeline Constructs a post processing graphics pipeline for
      * visualizing a rendered light inputs map.
-     *
-     * @param visualizer_output An object for storing the depth map image in grayscale.
-     * @param context Contextual Vulkan handles.
      */
-    LightInputsVisualizerPipeline(PipelineOutputInterface *visualizer_output,
-                                  DescriptorSetAllocator *desc_set_allocator,
+    LightInputsVisualizerPipeline(DescriptorSetAllocator *desc_set_allocator,
                                   VulkanContext *context);
 
     ~LightInputsVisualizerPipeline();
@@ -52,13 +48,17 @@ class LightInputsVisualizerPipeline {
      *
      * @param input_to_visualize Selects the input to be visualized.
      * @param light_inputs The light inputs map to be visualized.
-     * @return The output object set from the constructor, with a barrier assigned.
+     * @param output An object for storing the depth map image in grayscale.
      */
-    PipelineOutputInterface *Run(LightInputsRendererParameters::InputType input_to_visualize,
-                                 LightInputsPipelineOutput const &light_inputs);
+    void Run(LightInputsRendererParameters::InputType input_to_visualize,
+             LightInputsPipelineOutput const &light_inputs, PipelineOutputInterface *output);
 
   private:
     struct LightInputsVisualizerPipelineImpl;
+
+    DescriptorSetAllocator *desc_set_allocator_;
+    VulkanContext *context_;
+    PipelineOutputInterface *current_output_;
     std::unique_ptr<LightInputsVisualizerPipelineImpl> pimpl_;
 };
 

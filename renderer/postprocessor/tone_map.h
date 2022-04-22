@@ -31,17 +31,20 @@ namespace e8 {
  */
 class ToneMapPipeline {
   public:
-    ToneMapPipeline(PipelineOutputInterface *color_output,
-                    DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
+    ToneMapPipeline(DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
     ~ToneMapPipeline();
 
     /**
      * @brief Run Runs the tone mapping pipeline.
      */
-    PipelineOutputInterface *Run(UnboundedColorPipelineOutput const &radiance);
+    void Run(UnboundedColorPipelineOutput const &radiance, PipelineOutputInterface *output);
 
   private:
     struct ToneMapPipelineImpl;
+
+    DescriptorSetAllocator *desc_set_allocator_;
+    VulkanContext *context_;
+    PipelineOutputInterface *current_output_;
     std::unique_ptr<ToneMapPipelineImpl> pimpl_;
 };
 

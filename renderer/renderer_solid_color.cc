@@ -42,7 +42,7 @@ struct SolidColorRenderer::SolidColorRendererImpl {
 };
 
 SolidColorRenderer::SolidColorRendererImpl::SolidColorRendererImpl(VulkanContext *context)
-    : color_map(/*with_depth_buffer=*/false, context), pipeline(&color_map, context) {}
+    : color_map(/*with_depth_buffer=*/false, context), pipeline(context) {}
 
 SolidColorRenderer::SolidColorRendererImpl::~SolidColorRendererImpl() {}
 
@@ -58,8 +58,8 @@ void SolidColorRenderer::DrawFrame(Scene *scene, ResourceAccessor * /*resource_a
 
     {
         Scene::ReadAccess read_access = scene->GainReadAccess();
-        pimpl_->pipeline.Run(scene->background_color,
-                             frame_context.swap_chain_image_promise);
+        pimpl_->pipeline.Run(scene->background_color, frame_context.swap_chain_image_promise,
+                             &pimpl_->color_map);
     }
 
     this->EndFrame(frame_context, std::vector<PipelineOutputInterface *>{

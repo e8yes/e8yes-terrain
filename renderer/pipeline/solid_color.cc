@@ -15,8 +15,6 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <algorithm>
-#include <memory>
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
@@ -29,39 +27,21 @@
 
 namespace e8 {
 
-struct SolidColorPipeline::SolidColorPipelineImpl {
-    SolidColorPipelineImpl(PipelineOutputInterface *output, VulkanContext *context);
-    ~SolidColorPipelineImpl();
-
-    PipelineOutputInterface *output;
-    VulkanContext *context;
-};
-
-SolidColorPipeline::SolidColorPipelineImpl::SolidColorPipelineImpl(PipelineOutputInterface *output,
-                                                                   VulkanContext *context)
-    : output(output), context(context) {}
-
-SolidColorPipeline::SolidColorPipelineImpl::~SolidColorPipelineImpl() {}
-
-SolidColorPipeline::SolidColorPipeline(PipelineOutputInterface *output, VulkanContext *context)
-    : pimpl_(std::make_unique<SolidColorPipelineImpl>(output, context)) {}
+SolidColorPipeline::SolidColorPipeline(VulkanContext *context) : context_(context) {}
 
 SolidColorPipeline::~SolidColorPipeline() {}
 
-PipelineOutputInterface *SolidColorPipeline::Run(vec3 const &color,
-                                                 GpuPromise const &prerequisites) {
-    FrameBuffer *frame_buffer = pimpl_->output->GetFrameBuffer();
+void SolidColorPipeline::Run(vec3 const &color, GpuPromise const &prerequisites,
+                             PipelineOutputInterface *output) {
+    FrameBuffer *frame_buffer = output->GetFrameBuffer();
 
     frame_buffer->clear_values[0].color.float32[0] = color(0);
     frame_buffer->clear_values[0].color.float32[1] = color(1);
     frame_buffer->clear_values[0].color.float32[2] = color(2);
 
-    VkCommandBuffer cmds =
-        StartRenderPass(pimpl_->output->GetRenderPass(), *frame_buffer, pimpl_->context);
-    RenderPassPromise promise = FinishRenderPass(cmds, prerequisites, pimpl_->context);
-    pimpl_->output->AddWriter(std::move(promise.gpu), std::move(promise.cpu));
-
-    return pimpl_->output;
+    VkCommandBuffer cmds = StartRenderPass(output->GetRenderPass(), *frame_buffer, context_);
+    RenderPassPromise promise = FinishRenderPass(cmds, prerequisites, context_);
+    output->AddWriter(std::move(promise.gpu), std::move(promise.cpu));
 }
 
 } // namespace e8

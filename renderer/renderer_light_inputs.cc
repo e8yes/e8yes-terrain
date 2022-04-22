@@ -65,8 +65,7 @@ LightInputsRenderer::LightInputsRendererImpl::LightInputsRendererImpl(VulkanCont
                        context->swap_chain_image_extent.height, context),
       color_map(/*with_depth_buffer=*/false, context), desc_set_alloc(context),
       tex_desc_set_cache(&desc_set_alloc), geo_vram(context), tex_vram(context),
-      light_inputs_pipeline(&light_inputs_map, context),
-      light_inputs_visualizer_pipeline(&color_map, &desc_set_alloc, context) {}
+      light_inputs_pipeline(context), light_inputs_visualizer_pipeline(&desc_set_alloc, context) {}
 
 LightInputsRenderer::LightInputsRendererImpl::~LightInputsRendererImpl() {}
 
@@ -97,12 +96,14 @@ void LightInputsRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_acc
             ToDrawables(scene_entities, /*viewer_location=*/ToVec3(scene->camera.position()),
                         option, resource_accessor);
 
-        LightInputsPipelineOutput *light_inputs = pimpl_->light_inputs_pipeline.Run(
-            drawables, camera_projection, frame_context.swap_chain_image_promise,
-            &pimpl_->tex_desc_set_cache, &pimpl_->geo_vram, &pimpl_->tex_vram);
+        pimpl_->light_inputs_pipeline.Run(drawables, camera_projection,
+                                          frame_context.swap_chain_image_promise,
+                                          &pimpl_->tex_desc_set_cache, &pimpl_->geo_vram,
+                                          &pimpl_->tex_vram, &pimpl_->light_inputs_map);
 
         pimpl_->light_inputs_visualizer_pipeline.Run(
-            pimpl_->config.light_inputs_renderer_params().input_to_visualize(), *light_inputs);
+            pimpl_->config.light_inputs_renderer_params().input_to_visualize(),
+            pimpl_->light_inputs_map, &pimpl_->color_map);
     }
     this->EndStage(/*index=*/1);
 

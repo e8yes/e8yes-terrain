@@ -62,15 +62,12 @@ struct ToneMapPipeline::ToneMapPipelineImpl {
                         DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
     ~ToneMapPipelineImpl();
 
-    VulkanContext *context;
-    DescriptorSetAllocator *desc_set_allocator;
     std::unique_ptr<PostProcessorPipeline> post_processor_pipeline;
 };
 
 ToneMapPipeline::ToneMapPipelineImpl::ToneMapPipelineImpl(
     PipelineOutputInterface *color_output, DescriptorSetAllocator *desc_set_allocator,
-    VulkanContext *context)
-    : context(context) {
+    VulkanContext *context) {
     post_processor_pipeline = std::make_unique<PostProcessorPipeline>(
         kFragmentShaderFilePathHdrClamp, /*input_image_count=*/1, /*push_constant_size=*/0,
         color_output, desc_set_allocator, context);
@@ -78,15 +75,20 @@ ToneMapPipeline::ToneMapPipelineImpl::ToneMapPipelineImpl(
 
 ToneMapPipeline::ToneMapPipelineImpl::~ToneMapPipelineImpl() {}
 
-ToneMapPipeline::ToneMapPipeline(PipelineOutputInterface *color_output,
-                                 DescriptorSetAllocator *desc_set_allocator, VulkanContext *context)
-    : pimpl_(std::make_unique<ToneMapPipelineImpl>(color_output, desc_set_allocator, context)) {}
+ToneMapPipeline::ToneMapPipeline(DescriptorSetAllocator *desc_set_allocator, VulkanContext *context)
+    : desc_set_allocator_(desc_set_allocator), context_(context), current_output_(nullptr) {}
 
 ToneMapPipeline::~ToneMapPipeline() {}
 
-PipelineOutputInterface *ToneMapPipeline::Run(UnboundedColorPipelineOutput const &radiance) {
+void ToneMapPipeline::Run(UnboundedColorPipelineOutput const &radiance,
+                          PipelineOutputInterface *output) {
+    if (output != current_output_) {
+        pimpl_ = std::make_unique<ToneMapPipelineImpl>(output, desc_set_allocator_, context_);
+        current_output_ = output;
+    }
+
     ToneMapPostProcessorConfigurator configurator(radiance);
-    return pimpl_->post_processor_pipeline->Run(configurator, *radiance.Promise());
+    pimpl_->post_processor_pipeline->Run(configurator, *radiance.Promise());
 }
 
 } // namespace e8

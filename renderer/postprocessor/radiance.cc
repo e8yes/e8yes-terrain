@@ -234,45 +234,45 @@ RadiancePipeline::DirectionalRadiancePipelineImpl::DirectionalRadiancePipelineIm
 
 RadiancePipeline::DirectionalRadiancePipelineImpl::~DirectionalRadiancePipelineImpl() {}
 
-RadiancePipeline::RadiancePipeline(UnboundedColorPipelineOutput *radiance_output,
-                                   DescriptorSetAllocator *desc_set_allocator,
+RadiancePipeline::RadiancePipeline(DescriptorSetAllocator *desc_set_allocator,
                                    VulkanContext *context)
-    : pimpl_(std::make_unique<DirectionalRadiancePipelineImpl>(radiance_output, desc_set_allocator,
-                                                               context)) {}
+    : desc_set_allocator_(desc_set_allocator), context_(context), current_output_(nullptr) {}
 
 RadiancePipeline::~RadiancePipeline() {}
 
-UnboundedColorPipelineOutput *RadiancePipeline::Run(LightSourceInstance const &instance,
-                                                    LightInputsPipelineOutput const &light_inputs,
-                                                    frustum const &light_inputs_frustum,
-                                                    GpuPromise const &promise) {
-    PipelineOutputInterface *output;
+void RadiancePipeline::Run(LightSourceInstance const &instance,
+                           LightInputsPipelineOutput const &light_inputs,
+                           frustum const &light_inputs_frustum, GpuPromise const &promise,
+                           UnboundedColorPipelineOutput *output) {
+    if (output != current_output_) {
+        pimpl_ = std::make_unique<DirectionalRadiancePipelineImpl>(current_output_,
+                                                                   desc_set_allocator_, context_);
+        current_output_ = output;
+    }
 
     switch (instance.light_source.model_case()) {
     case LightSource::ModelCase::kSunLight: {
         SunLightPostProcessorConfigurator configurator(instance.light_source.sun_light(),
                                                        light_inputs);
-        output = pimpl_->sun_light_pipeline->Run(configurator, promise);
+        pimpl_->sun_light_pipeline->Run(configurator, promise);
         break;
     }
     case LightSource::ModelCase::kPointLight: {
         PointLightPostProcessorConfigurator configurator(instance.light_source.point_light(),
                                                          light_inputs, light_inputs_frustum);
-        output = pimpl_->point_light_pipeline->Run(configurator, promise);
+        pimpl_->point_light_pipeline->Run(configurator, promise);
         break;
     }
     case LightSource::ModelCase::kSpotLight: {
         SpotLightPostProcessorConfigurator configurator(instance.light_source.spot_light(),
                                                         light_inputs, light_inputs_frustum);
-        output = pimpl_->spot_light_pipeline->Run(configurator, promise);
+        pimpl_->spot_light_pipeline->Run(configurator, promise);
         break;
     }
     default: {
         assert(false);
     }
     }
-
-    return static_cast<UnboundedColorPipelineOutput *>(output);
 }
 
 } // namespace e8

@@ -149,9 +149,6 @@ class DepthMapPipeline::DepthMapPipelineImpl {
     ShaderUniformLayout const &GetUniformLayout() const;
     GraphicsPipeline const &GetGraphicsPipeline() const;
 
-  public:
-    DepthMapPipelineOutput *output;
-
   private:
     std::unique_ptr<ShaderStages> shader_stages_;
     std::unique_ptr<ShaderUniformLayout> uniform_layout_;
@@ -162,8 +159,7 @@ class DepthMapPipeline::DepthMapPipelineImpl {
 };
 
 DepthMapPipeline::DepthMapPipelineImpl::DepthMapPipelineImpl(DepthMapPipelineOutput *output,
-                                                             VulkanContext *context)
-    : output(output) {
+                                                             VulkanContext *context) {
     uniform_layout_ = CreateShaderUniformLayout(
         PushConstantLayout(), /*per_frame_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
         /*per_pass_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
@@ -205,15 +201,15 @@ void DepthMapPipeline::Run(std::vector<DrawableInstance> const &drawables,
         current_output_ = output;
     }
 
-    VkCommandBuffer cmds = StartRenderPass(pimpl_->output->GetRenderPass(),
-                                           *pimpl_->output->GetFrameBuffer(), context_);
+    VkCommandBuffer cmds =
+        StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), context_);
 
     RenderPassConfigurator configurator(projection);
     RenderDrawables(drawables, pimpl_->GetGraphicsPipeline(), pimpl_->GetUniformLayout(),
                     configurator, tex_desc_set_cache, geo_vram, tex_vram, cmds);
 
     RenderPassPromise promise = FinishRenderPass(cmds, prerequisites, context_);
-    pimpl_->output->AddWriter(std::move(promise.gpu), std::move(promise.cpu));
+    output->AddWriter(std::move(promise.gpu), std::move(promise.cpu));
 }
 
 } // namespace e8

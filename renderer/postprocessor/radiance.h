@@ -36,8 +36,7 @@ namespace e8 {
  */
 class RadiancePipeline {
   public:
-    RadiancePipeline(UnboundedColorPipelineOutput *radiance_output,
-                     DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
+    RadiancePipeline(DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
     ~RadiancePipeline();
 
     /**
@@ -45,13 +44,16 @@ class RadiancePipeline {
      * geometric and material parameters. Note, the light source must be defined in the view space
      * where the light inputs were generated.
      */
-    UnboundedColorPipelineOutput *Run(LightSourceInstance const &instance,
-                                      LightInputsPipelineOutput const &light_inputs,
-                                      frustum const &light_inputs_frustum,
-                                      GpuPromise const &promise);
+    void Run(LightSourceInstance const &instance, LightInputsPipelineOutput const &light_inputs,
+             frustum const &light_inputs_frustum, GpuPromise const &promise,
+             UnboundedColorPipelineOutput *output);
 
   private:
     struct DirectionalRadiancePipelineImpl;
+
+    DescriptorSetAllocator *desc_set_allocator_;
+    VulkanContext *context_;
+    UnboundedColorPipelineOutput *current_output_;
     std::unique_ptr<DirectionalRadiancePipelineImpl> pimpl_;
 };
 

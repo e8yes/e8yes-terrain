@@ -86,15 +86,12 @@ struct DepthMapVisualizerPipeline::DepthMapVisualizerPipelineImpl {
                                    VulkanContext *context);
     ~DepthMapVisualizerPipelineImpl();
 
-    VulkanContext *context;
-    DescriptorSetAllocator *desc_set_allocator;
     std::unique_ptr<PostProcessorPipeline> post_processor_pipeline;
 };
 
 DepthMapVisualizerPipeline::DepthMapVisualizerPipelineImpl::DepthMapVisualizerPipelineImpl(
     PipelineOutputInterface *visualizer_output, DescriptorSetAllocator *desc_set_allocator,
-    VulkanContext *context)
-    : context(context), desc_set_allocator(desc_set_allocator) {
+    VulkanContext *context) {
     post_processor_pipeline = std::make_unique<PostProcessorPipeline>(
         kFragmentShaderFilePathDepthMapVisualizer, /*input_image_count=*/1,
         /*push_constant_size=*/sizeof(DepthMapVisualizerParameters), visualizer_output,

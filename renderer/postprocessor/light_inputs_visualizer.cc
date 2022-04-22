@@ -84,15 +84,12 @@ struct LightInputsVisualizerPipeline::LightInputsVisualizerPipelineImpl {
                                       VulkanContext *context);
     ~LightInputsVisualizerPipelineImpl();
 
-    VulkanContext *context;
-    DescriptorSetAllocator *desc_set_allocator;
     std::unique_ptr<PostProcessorPipeline> post_processor_pipeline;
 };
 
 LightInputsVisualizerPipeline::LightInputsVisualizerPipelineImpl::LightInputsVisualizerPipelineImpl(
     PipelineOutputInterface *visualizer_output, DescriptorSetAllocator *desc_set_allocator,
-    VulkanContext *context)
-    : context(context), desc_set_allocator(desc_set_allocator) {
+    VulkanContext *context) {
     post_processor_pipeline = std::make_unique<PostProcessorPipeline>(
         kFragmentShaderFilePathLightInputsVisualizer,
         /*input_image_count=*/LightInputsPipelineOutput::ColorOutputCount,
@@ -104,18 +101,22 @@ LightInputsVisualizerPipeline::LightInputsVisualizerPipelineImpl::
     ~LightInputsVisualizerPipelineImpl() {}
 
 LightInputsVisualizerPipeline::LightInputsVisualizerPipeline(
-    PipelineOutputInterface *visualizer_output, DescriptorSetAllocator *desc_set_allocator,
-    VulkanContext *context)
-    : pimpl_(std::make_unique<LightInputsVisualizerPipelineImpl>(visualizer_output,
-                                                                 desc_set_allocator, context)) {}
+    DescriptorSetAllocator *desc_set_allocator, VulkanContext *context)
+    : desc_set_allocator_(desc_set_allocator), context_(context), current_output_(nullptr) {}
 
 LightInputsVisualizerPipeline::~LightInputsVisualizerPipeline() {}
 
-PipelineOutputInterface *
-LightInputsVisualizerPipeline::Run(LightInputsRendererParameters::InputType input_to_visualize,
-                                   LightInputsPipelineOutput const &light_inputs) {
+void LightInputsVisualizerPipeline::Run(LightInputsRendererParameters::InputType input_to_visualize,
+                                        LightInputsPipelineOutput const &light_inputs,
+                                        PipelineOutputInterface *output) {
+    if (output != current_output_) {
+        pimpl_ = std::make_unique<LightInputsVisualizerPipelineImpl>(output, desc_set_allocator_,
+                                                                     context_);
+        current_output_ = output;
+    }
+
     LightInputsVisualizerPostProcessorConfigurator configurator(input_to_visualize, light_inputs);
-    return pimpl_->post_processor_pipeline->Run(configurator, *light_inputs.Promise());
+    pimpl_->post_processor_pipeline->Run(configurator, *light_inputs.Promise());
 }
 
 } // namespace e8

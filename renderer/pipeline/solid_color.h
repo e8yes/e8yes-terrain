@@ -18,8 +18,6 @@
 #ifndef ISLANDS_RENDERER_PIPELINE_SOLID_COLOR_H
 #define ISLANDS_RENDERER_PIPELINE_SOLID_COLOR_H
 
-#include <memory>
-
 #include "common/device.h"
 #include "common/tensor.h"
 #include "renderer/output/pipeline_output.h"
@@ -36,11 +34,8 @@ class SolidColorPipeline {
     /**
      * @brief SolidColorPipeline Constructs a graphics pipeline for filling the color output with a
      * solid color.
-     *
-     * @param output The output to be filled with solid color.
-     * @param context Contextual Vulkan handles.
      */
-    SolidColorPipeline(PipelineOutputInterface *output, VulkanContext *context);
+    SolidColorPipeline(VulkanContext *context);
     ~SolidColorPipeline();
 
     /**
@@ -49,13 +44,12 @@ class SolidColorPipeline {
      *
      * @param color The color value to fill into the output.
      * @param prerequisites Dependent tasks.
-     * @return The output object set from the constructor, with a barrier assigned.
+     * @param output The output to be filled with solid color.
      */
-    PipelineOutputInterface *Run(vec3 const &color, GpuPromise const &prerequisites);
+    void Run(vec3 const &color, GpuPromise const &prerequisites, PipelineOutputInterface *output);
 
   private:
-    struct SolidColorPipelineImpl;
-    std::unique_ptr<SolidColorPipelineImpl> pimpl_;
+    VulkanContext *context_;
 };
 
 } // namespace e8

@@ -245,10 +245,6 @@ class LightInputsPipeline::LightInputsPipelineImpl {
     ~LightInputsPipelineImpl();
 
   public:
-    LightInputsPipelineOutput *output;
-    VulkanContext *context;
-
-  public:
     std::unique_ptr<ShaderStages> shader_stages;
     std::unique_ptr<ShaderUniformLayout> uniform_layout;
     std::unique_ptr<VertexInputInfo> vertex_inputs;
@@ -260,8 +256,7 @@ class LightInputsPipeline::LightInputsPipelineImpl {
 };
 
 LightInputsPipeline::LightInputsPipelineImpl::LightInputsPipelineImpl(
-    LightInputsPipelineOutput *output, VulkanContext *context)
-    : output(output), context(context) {
+    LightInputsPipelineOutput *output, VulkanContext *context) {
     uniform_layout = CreateShaderUniformLayout(
         PushConstantLayout(), /*per_frame_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
         /*per_pass_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
@@ -283,28 +278,31 @@ LightInputsPipeline::LightInputsPipelineImpl::LightInputsPipelineImpl(
 
 LightInputsPipeline::LightInputsPipelineImpl::~LightInputsPipelineImpl() {}
 
-LightInputsPipeline::LightInputsPipeline(LightInputsPipelineOutput *output, VulkanContext *context)
-    : pimpl_(std::make_unique<LightInputsPipelineImpl>(output, context)) {}
+LightInputsPipeline::LightInputsPipeline(VulkanContext *context)
+    : context_(context), current_output_(nullptr) {}
 
 LightInputsPipeline::~LightInputsPipeline() {}
 
-LightInputsPipelineOutput *LightInputsPipeline::Run(std::vector<DrawableInstance> const &drawables,
-                                                    ProjectionInterface const &projection,
-                                                    GpuPromise const &prerequisites,
-                                                    TextureDescriptorSetCache *tex_desc_set_cache,
-                                                    GeometryVramTransfer *geo_vram,
-                                                    TextureVramTransfer *tex_vram) {
-    VkCommandBuffer cmds = StartRenderPass(pimpl_->output->GetRenderPass(),
-                                           *pimpl_->output->GetFrameBuffer(), pimpl_->context);
+void LightInputsPipeline::Run(std::vector<DrawableInstance> const &drawables,
+                              ProjectionInterface const &projection,
+                              GpuPromise const &prerequisites,
+                              TextureDescriptorSetCache *tex_desc_set_cache,
+                              GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram,
+                              LightInputsPipelineOutput *output) {
+    if (output != current_output_) {
+        pimpl_ = std::make_unique<LightInputsPipelineImpl>(output, context_);
+        current_output_ = output;
+    }
+
+    VkCommandBuffer cmds =
+        StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), context_);
 
     RenderPassConfigurator configurator(projection, *pimpl_->texture_sampler);
     RenderDrawables(drawables, *pimpl_->pipeline, *pimpl_->uniform_layout, configurator,
                     tex_desc_set_cache, geo_vram, tex_vram, cmds);
 
-    RenderPassPromise promise = FinishRenderPass(cmds, prerequisites, pimpl_->context);
-    pimpl_->output->AddWriter(std::move(promise.gpu), std::move(promise.cpu));
-
-    return pimpl_->output;
+    RenderPassPromise promise = FinishRenderPass(cmds, prerequisites, context_);
+    output->AddWriter(std::move(promise.gpu), std::move(promise.cpu));
 }
 
 } // namespace e8

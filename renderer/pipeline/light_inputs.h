@@ -74,11 +74,8 @@ class LightInputsPipeline {
   public:
     /**
      * @brief LightInputsPipeline Constructs a graphics pipeline for generate light inputs.
-     *
-     * @param output An object for storing the rendered geometry and depth data.
-     * @param context Contextual Vulkan handles.
      */
-    LightInputsPipeline(LightInputsPipelineOutput *output, VulkanContext *context);
+    LightInputsPipeline(VulkanContext *context);
     ~LightInputsPipeline();
 
     /**
@@ -91,17 +88,18 @@ class LightInputsPipeline {
      * @param tex_desc_set_cache
      * @param geo_vram The geometry VRAM transferer.
      * @param tex_vram The texture VRAM transferer.
-     * @return The output object set from the constructor, with a barrier assigned.
+     * @param output An object for storing the rendered geometry and depth data.
      */
-    LightInputsPipelineOutput *Run(std::vector<DrawableInstance> const &drawables,
-                                   ProjectionInterface const &projection,
-                                   GpuPromise const &prerequisites,
-                                   TextureDescriptorSetCache *tex_desc_set_cache,
-                                   GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram);
+    void Run(std::vector<DrawableInstance> const &drawables, ProjectionInterface const &projection,
+             GpuPromise const &prerequisites, TextureDescriptorSetCache *tex_desc_set_cache,
+             GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram,
+             LightInputsPipelineOutput *output);
 
   private:
     class LightInputsPipelineImpl;
 
+    VulkanContext *context_;
+    LightInputsPipelineOutput *current_output_;
     std::unique_ptr<LightInputsPipelineImpl> pimpl_;
 };
 

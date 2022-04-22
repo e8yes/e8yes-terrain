@@ -68,10 +68,8 @@ RadianceRenderer::RadianceRendererImpl::RadianceRendererImpl(VulkanContext *cont
                    /*with_depth_buffer=*/false, context),
       final_color_map(/*with_depth_buffer=*/false, context), desc_set_alloc(context),
       tex_desc_set_cache(&desc_set_alloc), geo_vram(context), tex_vram(context),
-      light_inputs_pipeline(&light_inputs_map, context),
-      solid_color_pipeline(&radiance_map, context),
-      radiance_pipeline(&radiance_map, &desc_set_alloc, context),
-      tone_map_pipeline(&final_color_map, &desc_set_alloc, context) {}
+      light_inputs_pipeline(context), solid_color_pipeline(context),
+      radiance_pipeline(&desc_set_alloc, context), tone_map_pipeline(&desc_set_alloc, context) {}
 
 RadianceRenderer::RadianceRendererImpl::~RadianceRendererImpl() {}
 
@@ -105,25 +103,24 @@ void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_access
         // Render passes.
         PerspectiveProjection camera_projection(scene->camera);
 
-        LightInputsPipelineOutput *light_inputs = pimpl_->light_inputs_pipeline.Run(
-            drawables, camera_projection, frame_context.swap_chain_image_promise,
-            &pimpl_->tex_desc_set_cache, &pimpl_->geo_vram, &pimpl_->tex_vram);
+        pimpl_->light_inputs_pipeline.Run(drawables, camera_projection,
+                                          frame_context.swap_chain_image_promise,
+                                          &pimpl_->tex_desc_set_cache, &pimpl_->geo_vram,
+                                          &pimpl_->tex_vram, &pimpl_->light_inputs_map);
 
-        PipelineOutputInterface *clear_output =
-            pimpl_->solid_color_pipeline.Run(vec3{0.0f, 0.0f, 0.0f}, *light_inputs->Promise());
-
-        GpuPromise const *current_promise = clear_output->Promise();
+        pimpl_->solid_color_pipeline.Run(
+            vec3{0.0f, 0.0f, 0.0f}, *pimpl_->light_inputs_map.Promise(), &pimpl_->radiance_map);
 
         std::vector<LightSourceInstance> light_sources =
             ToLightSources(scene_entities, camera_projection);
 
         for (auto instance : light_sources) {
-            pimpl_->radiance_pipeline.Run(instance, *light_inputs, camera_projection.Frustum(),
-                                          *current_promise);
-            current_promise = pimpl_->radiance_map.Promise();
+            pimpl_->radiance_pipeline.Run(instance, pimpl_->light_inputs_map,
+                                          camera_projection.Frustum(),
+                                          *pimpl_->radiance_map.Promise(), &pimpl_->radiance_map);
         }
 
-        pimpl_->tone_map_pipeline.Run(pimpl_->radiance_map);
+        pimpl_->tone_map_pipeline.Run(pimpl_->radiance_map, &pimpl_->final_color_map);
     }
     this->EndStage(/*index=*/1);
 
