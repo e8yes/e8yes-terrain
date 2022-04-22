@@ -65,11 +65,8 @@ class DepthMapPipeline {
   public:
     /**
      * @brief DepthMapPipeline Constructs a graphics pipeline for rendering a depth map.
-     *
-     * @param output An object for storing the rendered depth map.
-     * @param context Contextual Vulkan handles.
      */
-    DepthMapPipeline(DepthMapPipelineOutput *output, VulkanContext *context);
+    DepthMapPipeline(VulkanContext *context);
     ~DepthMapPipeline();
 
     /**
@@ -82,17 +79,18 @@ class DepthMapPipeline {
      * @param tex_desc_set_cache
      * @param geo_vram The geometry VRAM transferer.
      * @param tex_vram The texture VRAM transferer.
-     * @return The output object set from the constructor, with a barrier assigned.
+     * @param output An object for storing the rendered depth map.
      */
-    DepthMapPipelineOutput *Run(std::vector<DrawableInstance> const &drawables,
-                                ProjectionInterface const &projection,
-                                GpuPromise const &prerequisites,
-                                TextureDescriptorSetCache *tex_desc_set_cache,
-                                GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram);
+    void Run(std::vector<DrawableInstance> const &drawables, ProjectionInterface const &projection,
+             GpuPromise const &prerequisites, TextureDescriptorSetCache *tex_desc_set_cache,
+             GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram,
+             DepthMapPipelineOutput *output);
 
   private:
     class DepthMapPipelineImpl;
 
+    VulkanContext *context_;
+    DepthMapPipelineOutput *current_output_;
     std::unique_ptr<DepthMapPipelineImpl> pimpl_;
 };
 

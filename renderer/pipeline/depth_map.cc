@@ -151,7 +151,6 @@ class DepthMapPipeline::DepthMapPipelineImpl {
 
   public:
     DepthMapPipelineOutput *output;
-    VulkanContext *context;
 
   private:
     std::unique_ptr<ShaderStages> shader_stages_;
@@ -164,7 +163,7 @@ class DepthMapPipeline::DepthMapPipelineImpl {
 
 DepthMapPipeline::DepthMapPipelineImpl::DepthMapPipelineImpl(DepthMapPipelineOutput *output,
                                                              VulkanContext *context)
-    : output(output), context(context) {
+    : output(output) {
     uniform_layout_ = CreateShaderUniformLayout(
         PushConstantLayout(), /*per_frame_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
         /*per_pass_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
@@ -191,28 +190,30 @@ GraphicsPipeline const &DepthMapPipeline::DepthMapPipelineImpl::GetGraphicsPipel
     return *pipeline_;
 }
 
-DepthMapPipeline::DepthMapPipeline(DepthMapPipelineOutput *output, VulkanContext *context)
-    : pimpl_(std::make_unique<DepthMapPipelineImpl>(output, context)) {}
+DepthMapPipeline::DepthMapPipeline(VulkanContext *context)
+    : context_(context), current_output_(nullptr) {}
 
 DepthMapPipeline::~DepthMapPipeline() {}
 
-DepthMapPipelineOutput *DepthMapPipeline::Run(std::vector<DrawableInstance> const &drawables,
-                                              ProjectionInterface const &projection,
-                                              GpuPromise const &prerequisites,
-                                              TextureDescriptorSetCache *tex_desc_set_cache,
-                                              GeometryVramTransfer *geo_vram,
-                                              TextureVramTransfer *tex_vram) {
+void DepthMapPipeline::Run(std::vector<DrawableInstance> const &drawables,
+                           ProjectionInterface const &projection, GpuPromise const &prerequisites,
+                           TextureDescriptorSetCache *tex_desc_set_cache,
+                           GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram,
+                           DepthMapPipelineOutput *output) {
+    if (output != current_output_) {
+        pimpl_ = std::make_unique<DepthMapPipelineImpl>(output, context_);
+        current_output_ = output;
+    }
+
     VkCommandBuffer cmds = StartRenderPass(pimpl_->output->GetRenderPass(),
-                                           *pimpl_->output->GetFrameBuffer(), pimpl_->context);
+                                           *pimpl_->output->GetFrameBuffer(), context_);
 
     RenderPassConfigurator configurator(projection);
     RenderDrawables(drawables, pimpl_->GetGraphicsPipeline(), pimpl_->GetUniformLayout(),
                     configurator, tex_desc_set_cache, geo_vram, tex_vram, cmds);
 
-    RenderPassPromise promise = FinishRenderPass(cmds, prerequisites, pimpl_->context);
+    RenderPassPromise promise = FinishRenderPass(cmds, prerequisites, context_);
     pimpl_->output->AddWriter(std::move(promise.gpu), std::move(promise.cpu));
-
-    return pimpl_->output;
 }
 
 } // namespace e8

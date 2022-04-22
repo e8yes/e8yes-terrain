@@ -42,8 +42,7 @@ class DepthMapVisualizerPipeline {
      * @param desc_set_allocator
      * @param context Contextual Vulkan handles.
      */
-    DepthMapVisualizerPipeline(PipelineOutputInterface *visualizer_output,
-                               DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
+    DepthMapVisualizerPipeline(DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
 
     ~DepthMapVisualizerPipeline();
 
@@ -58,11 +57,14 @@ class DepthMapVisualizerPipeline {
      * @param depth_map The depth map to be visualized.
      * @return The output object set from the constructor, with a barrier assigned.
      */
-    PipelineOutputInterface *Run(float alpha, std::optional<PerspectiveProjection> projection,
-                                 DepthMapPipelineOutput const &depth_map);
+    void Run(float alpha, std::optional<PerspectiveProjection> projection,
+             DepthMapPipelineOutput const &depth_map, PipelineOutputInterface *visualizer_output);
 
   private:
     struct DepthMapVisualizerPipelineImpl;
+    DescriptorSetAllocator *desc_set_allocator_;
+    VulkanContext *context_;
+    PipelineOutputInterface *current_output_;
     std::unique_ptr<DepthMapVisualizerPipelineImpl> pimpl_;
 };
 

@@ -65,8 +65,7 @@ DepthRenderer::DepthRendererImpl::DepthRendererImpl(VulkanContext *context)
                 context),
       color_map(/*with_depth_buffer=*/false, context), desc_set_alloc(context),
       tex_desc_set_cache(&desc_set_alloc), geo_vram(context), tex_vram(context),
-      depth_map_pipeline(&depth_map, context),
-      depth_map_visualizer_pipeline(&color_map, &desc_set_alloc, context) {}
+      depth_map_pipeline(context), depth_map_visualizer_pipeline(&desc_set_alloc, context) {}
 
 DepthRenderer::DepthRendererImpl::~DepthRendererImpl() {}
 
@@ -96,12 +95,13 @@ void DepthRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor)
             ToDrawables(scene_entities, /*viewer_location=*/ToVec3(scene->camera.position()),
                         option, resource_accessor);
 
-        DepthMapPipelineOutput *depth_map_output = pimpl_->depth_map_pipeline.Run(
+        pimpl_->depth_map_pipeline.Run(
             drawables, camera_projection, frame_context.swap_chain_image_promise,
-            &pimpl_->tex_desc_set_cache, &pimpl_->geo_vram, &pimpl_->tex_vram);
+            &pimpl_->tex_desc_set_cache, &pimpl_->geo_vram, &pimpl_->tex_vram, &pimpl_->depth_map);
 
         pimpl_->depth_map_visualizer_pipeline.Run(pimpl_->config.depth_renderer_params().alpha(),
-                                                  camera_projection, *depth_map_output);
+                                                  camera_projection, pimpl_->depth_map,
+                                                  &pimpl_->color_map);
     }
     this->EndStage(/*index=*/1);
 
