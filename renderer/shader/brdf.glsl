@@ -15,11 +15,14 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+
 const float M_PI = 3.1415926535897932384626433832795f;
+const float INV_M_PI = 1.0f/3.1415926535897932384626433832795f;
 
 vec3 Fresnel(vec3 f0, float cos_h_o)
 {
-    return f0 + (1.0f - f0) * pow(clamp(1.0f - cos_h_o, 0.0f, 1.0f), 5.0f);
+    float compl_cos_h_o = max(0.0f, 1.0f - cos_h_o);
+    return f0 + (1.0f - f0) * pow(compl_cos_h_o, 5.0f);
 }
 
 float GgxVisibility(float NdotL, float NdotV, float slope_stddev)
@@ -30,11 +33,7 @@ float GgxVisibility(float NdotL, float NdotV, float slope_stddev)
     float GGXL = NdotV * sqrt(NdotL * NdotL * (1.0f - slope_var) + slope_var);
 
     float GGX = GGXV + GGXL;
-    if (GGX > 0.0f)
-    {
-        return 0.5f / GGX;
-    }
-    return 0.0f;
+    return 0.5f / (GGX + 1e-4f);
 }
 
 float GgxDistribution(float cos_n_h, float slope_stddev)
@@ -58,7 +57,7 @@ vec3 FresnelDiffuseBrdf(vec3 albedo,
     float fresnel = (1.0f + (fd90 - 1.0f)*pow(compl_cos_n_i, 5.0f))*
             (1.0f + (fd90 - 1.0f)*pow(compl_cos_n_o, 5.0f));
 
-    return fresnel*albedo/M_PI;
+    return fresnel*albedo*INV_M_PI;
 }
 
 vec3 GgxSpecularBrdf(vec3 f0,

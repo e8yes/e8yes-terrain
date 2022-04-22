@@ -148,8 +148,8 @@ struct SpotLightParameters {
     vec4 position;
     vec4 direction;
     vec4 intensity;
-    float cos_inner_cone;
     float cos_outer_cone;
+    float cone_normalizer;
 
     float rec_x_a;
     float rec_y_a;
@@ -186,8 +186,10 @@ void SpotLightPostProcessorConfigurator::PushConstants(std::vector<uint8_t> *pus
     parameters->position = ToVec3(spot_light_.position()).homo(1.0f);
     parameters->direction = ToVec3(spot_light_.direction()).homo(0.0f);
     parameters->intensity = ToVec3(spot_light_.intensity()).homo(1.0f);
-    parameters->cos_inner_cone = std::cos(deg2rad(spot_light_.inner_cone_angle()));
-    parameters->cos_outer_cone = std::cos(deg2rad(spot_light_.outer_cone_angle()));
+    parameters->cos_outer_cone = std::cos(deg2rad(spot_light_.outer_cone_angle() / 2.0f));
+
+    float cos_inner_cone = std::cos(deg2rad(spot_light_.inner_cone_angle() / 2.0f));
+    parameters->cone_normalizer = 1.0f / (cos_inner_cone - parameters->cos_outer_cone);
 
     parameters->rec_x_a = light_inputs_frustum_.XUnprojectionConstant();
     parameters->rec_y_a = light_inputs_frustum_.YUnprojectionConstant();
