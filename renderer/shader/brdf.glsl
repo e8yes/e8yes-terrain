@@ -16,77 +16,58 @@
  */
 
 
-const float M_PI = 3.1415926535897932384626433832795f;
-const float INV_M_PI = 1.0f/3.1415926535897932384626433832795f;
+const float M_PI = 3.1415926535897932384626433832795;
+const float INV_M_PI = 1.0f/M_PI;
 
-float Fresnel(float cos_h_o) {
-    float compl_cos_h_o = max(0.0f, 1.0f - cos_h_o);
-    float a = 4.0f*pow(compl_cos_h_o, 5.0f) + 3.0f;
-    float b = 4.0f + 1.5f*1.5f;
-    return a/b;
+vec3 SchlickFresnel(vec3 r0, float cos_h_i) {
+    float compl_cos_h_i = max(0.0f, 1.0f - cos_h_i);
+    float compl_cos_h_i2 = compl_cos_h_i*compl_cos_h_i;
+    float compl_cos_h_i4 = compl_cos_h_i2*compl_cos_h_i2;
+    float compl_cos_h_i5 = compl_cos_h_i4*compl_cos_h_i;
+    return mix(r0, vec3(1.0f), compl_cos_h_i5);
 }
 
-float GgxLambda(float cos_n_w, float slope_var) {
-    float cos_n_w2 = cos_n_w*cos_n_w;
-    float sin_n_w2 = max(0.0f, 1.0f - cos_n_w2);
-    float tan_n_w2 = sin_n_w2 / cos_n_w2;
-    return 2.0f/(1.0f + sqrt(1.0f + slope_var*tan_n_w2));
+float GgxInvGeometry(float cos_n_i, float cos_n_o, float alpha) {
+    float smooth_surface = 2.0f*cos_n_i*cos_n_o;
+    float rough_surface = cos_n_i + cos_n_o;
+    return 2.0f*mix(smooth_surface, rough_surface, alpha);
 }
 
-float GgxGeometry(float cos_n_i, float cos_n_o, float slope_var) {
-    return GgxLambda(cos_n_i, slope_var)*GgxLambda(cos_n_o, slope_var);
-}
-
-float GgxDistribution(float cos_n_h, float slope_var) {
+float GgxDistribution(float cos_n_h, float alpha2) {
     float cos_n_h2 = cos_n_h*cos_n_h;
-    float cos_n_h4 = cos_n_h2*cos_n_h2;
-
-    float sin_n_h2 = max(0.0f, 1.0f - cos_n_h2);
-    float tan_n_h2 = sin_n_h2/cos_n_h2;
-
-    float c = slope_var + tan_n_h2;
-    float c2 = c*c;
-
-    return slope_var/(M_PI * cos_n_h4 * c2);
+    float c = cos_n_h2*(alpha2 - 1.0f) + 1.0f;
+    return alpha2/(M_PI * c*c);
 }
 
-vec3 FresnelDiffuseBrdf(vec3 albedo,
-                        float slope_stddev,
-                        float cos_h_o,
-                        float cos_n_i,
-                        float cos_n_o)
+vec3 RoughDiffuseBrdf(vec3 albedo,
+                      float alpha,
+                      float cos_i_o,
+                      float cos_n_i,
+                      float cos_n_o,
+                      float cos_n_h)
 {
-    float fd90 = 0.5f + 2.0f*slope_stddev*cos_h_o*cos_h_o;
+    float smooth_surface = 1.0f;
 
-    float compl_cos_n_i = max(0.0f, 1.0f - cos_n_i);
-    float compl_cos_n_o = max(0.0f, 1.0f - cos_n_o);
+    float facing = 0.5f + 0.5f*cos_i_o;
+    float rough_surface = facing*(0.9f - 0.4f*facing)*cos_n_h/(cos_n_h + 0.5f);
 
-    float fresnel = (1.0f + (fd90 - 1.0f)*pow(compl_cos_n_i, 5.0f))*
-            (1.0f + (fd90 - 1.0f)*pow(compl_cos_n_o, 5.0f));
+    float single = INV_M_PI*mix(smooth_surface, rough_surface, alpha);
+    float multi = 0.1159f*alpha;
 
-    return fresnel*albedo*INV_M_PI;
+    return albedo*(single + albedo*multi);
 }
 
-vec3 GgxSpecularBrdf(vec3 f0,
-                   float slope_stddev,
-                   float cos_h_o,
-                   float cos_n_i,
-                   float cos_n_o,
-                   float cos_n_h)
+float GgxSpecularBrdf(float alpha,
+                    float cos_n_i,
+                    float cos_n_o,
+                    float cos_n_h)
 {
-    vec3 f = f0*Fresnel(cos_h_o);
-
-    float slope_var = slope_stddev*slope_stddev;
-    float d = GgxDistribution(cos_n_h, slope_var);
-    float g = GgxGeometry(cos_n_i, cos_n_o, slope_var);
-
-    float normalizer = 4.0f*cos_n_i*cos_n_o + 1e-2f;
-
-    return clamp(f*d*g/normalizer, 0.0f, 2.0f);
+    float d = GgxDistribution(cos_n_h, alpha*alpha);
+    float inv_g = GgxInvGeometry(cos_n_i, cos_n_o, alpha);
+    return d/inv_g;
 }
 
-vec3 FresnelMixBrdf(vec3 f0_color, float ior, float cos_h_o, float metallic_factor,
-                  vec3 base_brdf, vec3 layer_brdf) {
-    vec3 fr = f0_color*Fresnel(cos_h_o);
-    return mix(base_brdf, layer_brdf, fr);
+vec3 FresnelMix(vec3 r0, float cos_h_i, vec3 diffuse, float specular) {
+    vec3 f = SchlickFresnel(r0, cos_h_i);
+    return mix(diffuse, vec3(specular), f);
 }

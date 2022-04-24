@@ -17,6 +17,8 @@
 
 #include "brdf.glsl"
 
+const vec3 DIELETRIC_R0 = vec3(0.04f);
+
 vec4 Radiance(vec3 incident_intensity,
              vec3 incident_ray,
              vec3 normal,
@@ -26,19 +28,20 @@ vec4 Radiance(vec3 incident_intensity,
     vec3 exitent_ray = vec3(0.0f, 0.0f, 1.0f);
     vec3 half_way = normalize(incident_ray + exitent_ray);
 
-    float cos_h_o = max(0.0f, dot(half_way, exitent_ray));
+    float cos_h_i = max(0.0f, dot(half_way, incident_ray));
     float cos_n_i = max(0.0f, dot(normal, incident_ray));
     float cos_n_o = max(0.0f, dot(normal, exitent_ray));
+    float cos_i_o = max(0.0f, dot(incident_ray, exitent_ray));
     float cos_n_h = max(0.0f, dot(normal, half_way));
 
-    vec3 diffuse_f0 = albedo * (1.0f - metallic);
-    vec3 specular_f0 = mix(vec3(0.04f), albedo, metallic);
+    vec3 diffuse_albedo = albedo * (1.0f - metallic);
+    vec3 r0 = mix(DIELETRIC_R0, albedo, metallic);
+    float alpha = roughness*roughness;
 
-    vec3 diffuse_brdf = FresnelDiffuseBrdf(diffuse_f0, roughness,
-                                           cos_h_o, cos_n_i, cos_n_o);
-    vec3 specular_brdf = GgxSpecularBrdf(specular_f0, roughness,
-                                      cos_h_o, cos_n_i, cos_n_o, cos_n_h);
-    vec3 final_brdf = diffuse_brdf + specular_brdf;
+    vec3 diffuse_brdf = RoughDiffuseBrdf(diffuse_albedo, alpha,
+                                         cos_i_o, cos_n_i, cos_n_o, cos_n_h);
+    float specular_brdf = GgxSpecularBrdf(alpha, cos_n_i, cos_n_o, cos_n_h);
+    vec3 final_brdf = FresnelMix(r0, cos_h_i, diffuse_brdf, specular_brdf);
 
     vec3 radiance = incident_intensity * final_brdf * cos_n_i;
 
