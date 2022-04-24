@@ -245,8 +245,8 @@ void RadiancePipeline::Run(LightSourceInstance const &instance,
                            frustum const &light_inputs_frustum, GpuPromise const &promise,
                            UnboundedColorPipelineOutput *output) {
     if (output != current_output_) {
-        pimpl_ = std::make_unique<DirectionalRadiancePipelineImpl>(current_output_,
-                                                                   desc_set_allocator_, context_);
+        pimpl_ = std::make_unique<DirectionalRadiancePipelineImpl>(output, desc_set_allocator_,
+                                                                   context_);
         current_output_ = output;
     }
 
