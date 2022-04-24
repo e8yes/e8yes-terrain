@@ -1,6 +1,3 @@
-// Vertex Stage: post_processor.vert
-
-#version 450
 /**
  * e8yes demo web.
  *
@@ -17,6 +14,10 @@
  * <p>You should have received a copy of the GNU General Public License along with this program. If
  * not, see <http://www.gnu.org/licenses/>.
  */
+
+// Vertex Stage: post_processor.vert
+
+#version 450
 
 #include "post_processor.glsl"
 

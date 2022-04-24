@@ -33,7 +33,8 @@ void main() {
 
     if (ppc.input_to_visualize == 1) {
         // Visualizes the albedo color.
-        out_frag_color = vec4(DecodeAlbedo(screen_tex_coord), 1.0);
+        vec3 albedo = DecodeAlbedo(screen_tex_coord);
+        out_frag_color = vec4(albedo, 1.0);
     } else if (ppc.input_to_visualize == 2) {
         // Visualizes the normal vector.
         vec3 normal = DecodeNormal(screen_tex_coord);
