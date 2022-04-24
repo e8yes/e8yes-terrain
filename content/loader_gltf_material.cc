@@ -31,19 +31,7 @@
 namespace e8 {
 namespace {
 
-float SrgbToLinear(float u) {
-    float const a = 1.0f / 1.055f;
-    float const b = -0.055f / 1.055f;
-    float const c = 1.0f / 12.92f;
-    float const d = 0.04045f;
-    float const gamma = 2.4f;
-
-    if (u < d) {
-        return c * u;
-    } else {
-        return std::pow(a * u + b, gamma);
-    }
-}
+float SrgbToLinear(float u) { return std::pow(u, 2.2f); }
 
 vec4 SrgbToLinear(vec4 const &u) {
     vec4 result;
