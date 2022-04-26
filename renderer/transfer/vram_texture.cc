@@ -23,6 +23,7 @@
 
 #include "common/cache.h"
 #include "common/device.h"
+#include "renderer/basic/mipmap.h"
 #include "renderer/transfer/texture_group.h"
 #include "renderer/transfer/vram.h"
 #include "renderer/transfer/vram_texture.h"
@@ -94,9 +95,12 @@ void UploadStagingTextureToVram(StagingTextureBuffer const *staging_buffer, Vulk
     assert(staging_buffer->Valid());
     assert(staging_buffer->context == context);
 
+    unsigned mip_level_count = MipLevelCount(staging_buffer->width, staging_buffer->height);
+
     // Creates a memory region to store the image data.
     VkFormat suitable_format = SuitableImageFormat(staging_buffer);
-    gpu_image->Allocate(staging_buffer->width, staging_buffer->height, suitable_format, context);
+    gpu_image->Allocate(staging_buffer->width, staging_buffer->height, suitable_format,
+                        mip_level_count, context);
 
     // Transitions the image's layout to something suitable for data transfer.
     VkImageMemoryBarrier to_transfer_optimal{};
@@ -141,14 +145,19 @@ void UploadStagingTextureToVram(StagingTextureBuffer const *staging_buffer, Vulk
                            /*dstImageLayout=*/VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                            /*regionCount=*/1, &copy_region);
 
+    // Generate mip maps.
+    GenerateMipMapFor(gpu_image->image, staging_buffer->width, staging_buffer->height, cmds);
+
     // Transitions the image's layout to something samplable by a shader.
     VkImageMemoryBarrier to_shader_readable = to_transfer_optimal;
 
-    to_shader_readable.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    to_shader_readable.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     to_shader_readable.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
     to_shader_readable.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
     to_shader_readable.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+    to_shader_readable.subresourceRange.levelCount = mip_level_count;
 
     // barrier the image into the shader readable layout
     vkCmdPipelineBarrier(cmds, /*srcStageMask=*/VK_PIPELINE_STAGE_TRANSFER_BIT,

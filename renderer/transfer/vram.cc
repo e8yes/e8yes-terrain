@@ -105,7 +105,7 @@ VramTransfer::GpuTexture &VramTransfer::GpuTexture::operator=(VramTransfer::GpuT
 }
 
 void VramTransfer::GpuTexture::Allocate(unsigned width, unsigned height, VkFormat image_format,
-                                        VulkanContext *context) {
+                                        unsigned mip_level_count, VulkanContext *context) {
     this->Free();
 
     this->context = context;
@@ -117,11 +117,12 @@ void VramTransfer::GpuTexture::Allocate(unsigned width, unsigned height, VkForma
     image_info.extent.width = width;
     image_info.extent.height = height;
     image_info.extent.depth = 1;
-    image_info.mipLevels = 1;
+    image_info.mipLevels = mip_level_count;
     image_info.arrayLayers = 1;
     image_info.samples = VK_SAMPLE_COUNT_1_BIT;
     image_info.tiling = VK_IMAGE_TILING_OPTIMAL;
-    image_info.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+    image_info.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
+                       VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
     VmaAllocationCreateInfo allocation_create_info{};
     allocation_create_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
@@ -136,7 +137,7 @@ void VramTransfer::GpuTexture::Allocate(unsigned width, unsigned height, VkForma
     view_info.image = image;
     view_info.format = image_format;
     view_info.subresourceRange.baseMipLevel = 0;
-    view_info.subresourceRange.levelCount = 1;
+    view_info.subresourceRange.levelCount = mip_level_count;
     view_info.subresourceRange.baseArrayLayer = 0;
     view_info.subresourceRange.layerCount = 1;
     view_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;

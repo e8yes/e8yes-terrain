@@ -74,7 +74,7 @@ class VramTransfer {
         GpuTexture &operator=(GpuTexture &&other);
 
         void Allocate(unsigned width, unsigned height, VkFormat image_format,
-                      VulkanContext *context);
+                      unsigned mip_level_count, VulkanContext *context);
         void Free();
 
         /**

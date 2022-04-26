@@ -20,6 +20,7 @@ SOURCES += \
     basic/attachment.cc \
     basic/fixed_function.cc \
     basic/frame_buffer.cc \
+    basic/mipmap.cc \
     basic/pipeline.cc \
     basic/projection.cc \
     basic/render_pass.cc \
@@ -60,6 +61,7 @@ HEADERS += \
     basic/attachment.h \
     basic/fixed_function.h \
     basic/frame_buffer.h \
+    basic/mipmap.h \
     basic/pipeline.h \
     basic/projection.h \
     basic/render_pass.h \

@@ -35,8 +35,8 @@
 namespace e8 {
 namespace {
 
-unsigned const kDisplayWindowWidth = 1024;
-unsigned const kDisplayWindowHeight = 768;
+unsigned const kDisplayWindowWidth = 1280;
+unsigned const kDisplayWindowHeight = 960;
 
 void UpdateSystemInputs(Display const &display, UserInputs *system_inputs) {
     SDL_Event event;

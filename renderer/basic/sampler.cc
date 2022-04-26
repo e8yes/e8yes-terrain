@@ -60,6 +60,10 @@ std::unique_ptr<ImageSampler> CreateTextureSampler(VulkanContext *context) {
     sampler_info.magFilter = VK_FILTER_LINEAR;
     sampler_info.minFilter = VK_FILTER_LINEAR;
     sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    sampler_info.minLod = 0.0f;
+    sampler_info.maxLod = 20.0f;
+    sampler_info.anisotropyEnable = VK_TRUE;
+    sampler_info.maxAnisotropy = 8;
 
     auto info = std::make_unique<ImageSampler>(context);
     assert(VK_SUCCESS ==
