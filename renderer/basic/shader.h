@@ -39,6 +39,7 @@ constexpr char const *kFragmentShaderFilePathHdrClamp = "./hdr_clamp.frag.spv";
 constexpr char const *kFragmentShaderFilePathLightInputs = "./light_inputs.frag.spv";
 constexpr char const *kFragmentShaderFilePathLightInputsVisualizer =
     "./light_inputs_visualizer.frag.spv";
+constexpr char const *kFragmentShaderFilePathLogLuminance = "./log_luminance.frag.spv";
 constexpr char const *kFragmentShaderFilePathPostProcessorEmpty = "./post_processor.frag.spv";
 constexpr char const *kFragmentShaderFilePathRadiancePointLight = "./radiance_point_light.frag.spv";
 constexpr char const *kFragmentShaderFilePathRadianceSpotLight = "./radiance_spot_light.frag.spv";

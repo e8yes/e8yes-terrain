@@ -41,6 +41,21 @@ unsigned MipLevelCount(unsigned width, unsigned height);
  */
 void GenerateMipMapFor(VkImage image, unsigned width, unsigned height, VkCommandBuffer cmds);
 
+/**
+ * @brief AverageValueOf Computes the average value of the image and stores the result in a 1x1
+ * target image. Note, the average computation occurs only when the commands are submitted. The
+ * image layouts of both the input and output will be transitioned to
+ * VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL by the end of the call.
+ *
+ * @param image The image to compute average of.
+ * @param width The width of the image.
+ * @param height The height of the image.
+ * @param cmds Stores the average computation commands.
+ * @param output A 1x1 image which stores the average value of the input image.
+ */
+void AverageValueOf(VkImage image, unsigned width, unsigned height, VkCommandBuffer cmds,
+                    VkImage output);
+
 } // namespace e8
 
 #endif // ISLANDS_RENDERER_MIPMAP_H

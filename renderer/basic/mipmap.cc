@@ -49,8 +49,11 @@ void GenerateMipMapFor(VkImage image, unsigned width, unsigned height, VkCommand
         barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
         barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
 
-        vkCmdPipelineBarrier(cmds, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
-                             0, 0, nullptr, 0, nullptr, 1, &barrier);
+        vkCmdPipelineBarrier(cmds, /*srcStageMask=*/VK_PIPELINE_STAGE_TRANSFER_BIT,
+                             /*dstStageMask=*/VK_PIPELINE_STAGE_TRANSFER_BIT, /*dependencyFlags=*/0,
+                             /*memoryBarrierCount=*/0, /*pMemoryBarriers=*/nullptr,
+                             /*bufferMemoryBarrierCount=*/0, /*pBufferMemoryBarriers=*/nullptr,
+                             /*imageMemoryBarrierCount=*/1, &barrier);
 
         barrier.subresourceRange.baseMipLevel = i;
         barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -110,6 +113,104 @@ void GenerateMipMapFor(VkImage image, unsigned width, unsigned height, VkCommand
         mip_width = next_mip_width;
         mip_height = next_mip_height;
     }
+}
+
+void AverageValueOf(VkImage image, unsigned width, unsigned height, VkCommandBuffer cmds,
+                    VkImage output) {
+    VkImageMemoryBarrier barrier{};
+    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    barrier.subresourceRange.layerCount = 1;
+    barrier.subresourceRange.levelCount = 1;
+
+    // Transitions the input image to be source optimal.
+    barrier.image = image;
+    barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+    barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+
+    vkCmdPipelineBarrier(cmds, /*srcStageMask=*/VK_PIPELINE_STAGE_TRANSFER_BIT,
+                         /*dstStageMask=*/VK_PIPELINE_STAGE_TRANSFER_BIT, /*dependencyFlags=*/0,
+                         /*memoryBarrierCount=*/0, /*pMemoryBarriers=*/nullptr,
+                         /*bufferMemoryBarrierCount=*/0, /*pBufferMemoryBarriers=*/nullptr,
+                         /*imageMemoryBarrierCount=*/1, &barrier);
+
+    // Transitions the output image to be destination optimal.
+    barrier.image = output;
+    barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+
+    vkCmdPipelineBarrier(cmds, /*srcStageMask=*/VK_PIPELINE_STAGE_TRANSFER_BIT,
+                         /*dstStageMask=*/VK_PIPELINE_STAGE_TRANSFER_BIT, /*dependencyFlags=*/0,
+                         /*memoryBarrierCount=*/0, /*pMemoryBarriers=*/nullptr,
+                         /*bufferMemoryBarrierCount=*/0, /*pBufferMemoryBarriers=*/nullptr,
+                         /*imageMemoryBarrierCount=*/1, &barrier);
+
+    // Downsamples (averages) the source image into a 1x1 image.
+    VkImageBlit blit{};
+
+    blit.srcOffsets[0] = {0, 0, 0};
+    blit.srcOffsets[1].x = width;
+    blit.srcOffsets[1].y = height;
+    blit.srcOffsets[1].z = 1;
+
+    blit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    blit.srcSubresource.mipLevel = 0;
+    blit.srcSubresource.baseArrayLayer = 0;
+    blit.srcSubresource.layerCount = 1;
+
+    blit.dstOffsets[0] = {0, 0, 0};
+    blit.dstOffsets[1].x = 1;
+    blit.dstOffsets[1].y = 1;
+    blit.dstOffsets[1].z = 1;
+
+    blit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    blit.dstSubresource.mipLevel = 0;
+    blit.dstSubresource.baseArrayLayer = 0;
+    blit.dstSubresource.layerCount = 1;
+
+    vkCmdBlitImage(cmds, /*srcImage=*/image,
+                   /*srcImageLayout=*/VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                   /*dstImage=*/output,
+                   /*dstImageLayout=*/VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, /*regionCount=*/1,
+                   /*pRegions=*/&blit, /*filter=*/VK_FILTER_LINEAR);
+
+    // Transitions the input image to be shader readonly optimal.
+    barrier.image = image;
+
+    barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+    barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+    vkCmdPipelineBarrier(cmds, /*srcStageMask=*/VK_PIPELINE_STAGE_TRANSFER_BIT,
+                         /*dstStageMask=*/VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                         /*dependencyFlags=*/0,
+                         /*memoryBarrierCount=*/0, /*pMemoryBarriers=*/nullptr,
+                         /*bufferMemoryBarrierCount=*/0, /*pBufferMemoryBarriers=*/nullptr,
+                         /*imageMemoryBarrierCount=*/1, &barrier);
+
+    // Transitions the output image to be shader readonly optimal.
+    barrier.image = output;
+
+    barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+    barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+    vkCmdPipelineBarrier(cmds, /*srcStageMask=*/VK_PIPELINE_STAGE_TRANSFER_BIT,
+                         /*dstStageMask=*/VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                         /*dependencyFlags=*/0,
+                         /*memoryBarrierCount=*/0, /*pMemoryBarriers=*/nullptr,
+                         /*bufferMemoryBarrierCount=*/0, /*pBufferMemoryBarriers=*/nullptr,
+                         /*imageMemoryBarrierCount=*/1, &barrier);
 }
 
 } // namespace e8

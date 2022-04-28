@@ -22,9 +22,9 @@
 #include <memory>
 #include <vulkan/vulkan.h>
 
-#include "basic/sampler.h"
-#include "basic/uniform_buffer.h"
 #include "common/device.h"
+#include "renderer/basic/sampler.h"
+#include "renderer/basic/uniform_buffer.h"
 #include "renderer/transfer/descriptor_set.h"
 #include "third_party/vma/vk_mem_alloc.h"
 

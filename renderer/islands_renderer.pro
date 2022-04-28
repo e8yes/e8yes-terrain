@@ -37,6 +37,7 @@ SOURCES += \
     pipeline/light_inputs.cc \
     pipeline/solid_color.cc \
     postprocessor/depth_map_visualizer.cc \
+    postprocessor/exposure.cc \
     postprocessor/light_inputs_visualizer.cc \
     postprocessor/post_processor.cc \
     postprocessor/radiance.cc \
@@ -78,6 +79,7 @@ HEADERS += \
     pipeline/light_inputs.h \
     pipeline/solid_color.h \
     postprocessor/depth_map_visualizer.h \
+    postprocessor/exposure.h \
     postprocessor/light_inputs_visualizer.h \
     postprocessor/post_processor.h \
     postprocessor/radiance.h \

@@ -22,12 +22,13 @@
 
 #include "common/device.h"
 #include "renderer/output/pipeline_output.h"
+#include "renderer/postprocessor/exposure.h"
 #include "renderer/transfer/descriptor_set.h"
 
 namespace e8 {
 
 /**
- * @brief The ToneMapPipeline class Maps radiance values to the displayable range.
+ * @brief The ToneMapPipeline class Maps radiance values to displayable color range.
  */
 class ToneMapPipeline {
   public:
@@ -36,8 +37,14 @@ class ToneMapPipeline {
 
     /**
      * @brief Run Runs the tone mapping pipeline.
+     *
+     * @param radiance The radiance values to be mapped.
+     * @param exposure The pipeline only uses the ACES tone mapper when the exposure value is
+     * provided. Otherwise, it simply clamps the radiance value into the [0, 1] range.
+     * @param output To store the tone mapped colors.
      */
-    void Run(UnboundedColorPipelineOutput const &radiance, PipelineOutputInterface *output);
+    void Run(UnboundedColorPipelineOutput const &radiance,
+             ExposureEstimationPipelineOutput const *exposure, PipelineOutputInterface *output);
 
   private:
     struct ToneMapPipelineImpl;

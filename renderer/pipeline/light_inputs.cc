@@ -199,10 +199,10 @@ struct LightInputsPipelineOutput::LightInputsPipelineOutputImpl {
 
 LightInputsPipelineOutput::LightInputsPipelineOutputImpl::LightInputsPipelineOutputImpl(
     unsigned width, unsigned height, VulkanContext *context) {
-    normal_roughness_ =
-        CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R16G16B16A16_SNORM, context);
-    albedo_metallic_ =
-        CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R8G8B8A8_UNORM, context);
+    normal_roughness_ = CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R16G16B16A16_SNORM,
+                                              /*transfer_src=*/false, context);
+    albedo_metallic_ = CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R8G8B8A8_UNORM,
+                                             /*transfer_src=*/false, context);
     depth_attachment_ = CreateDepthAttachment(width, height, /*samplable=*/true, context);
     render_pass_ = CreateRenderPass(
         /*color_attachments=*/std::vector<VkAttachmentDescription>{normal_roughness_->desc,

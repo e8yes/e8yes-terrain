@@ -19,9 +19,9 @@
 #include <memory>
 #include <vulkan/vulkan.h>
 
-#include "basic/pipeline.h"
 #include "common/device.h"
 #include "renderer/basic/fixed_function.h"
+#include "renderer/basic/pipeline.h"
 #include "renderer/basic/render_pass.h"
 #include "renderer/basic/shader.h"
 #include "renderer/basic/uniform_layout.h"

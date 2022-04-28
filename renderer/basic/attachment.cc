@@ -62,8 +62,9 @@ CreateColorAttachmentsForSwapChain(VulkanContext *context) {
     return infos;
 }
 
-std::unique_ptr<FrameBufferAttachment>
-CreateColorAttachment(unsigned width, unsigned height, VkFormat format, VulkanContext *context) {
+std::unique_ptr<FrameBufferAttachment> CreateColorAttachment(unsigned width, unsigned height,
+                                                             VkFormat format, bool transfer_src,
+                                                             VulkanContext *context) {
     auto info = std::make_unique<FrameBufferAttachment>(/*swap_chain_image=*/false, context);
 
     VkImageCreateInfo image_info{};
@@ -78,6 +79,9 @@ CreateColorAttachment(unsigned width, unsigned height, VkFormat format, VulkanCo
     image_info.samples = VK_SAMPLE_COUNT_1_BIT;
     image_info.tiling = VK_IMAGE_TILING_OPTIMAL;
     image_info.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    if (transfer_src) {
+        image_info.usage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+    }
 
     VmaAllocationCreateInfo allocation_create_info{};
     allocation_create_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
@@ -171,6 +175,50 @@ CreateDepthAttachment(unsigned width, unsigned height, bool samplable, VulkanCon
     } else {
         info->desc.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
     }
+
+    return info;
+}
+
+std::unique_ptr<FrameBufferAttachment>
+CreateStorageAttachment(unsigned width, unsigned height, VkFormat format, VulkanContext *context) {
+    auto info = std::make_unique<FrameBufferAttachment>(/*swap_chain_image=*/false, context);
+
+    VkImageCreateInfo image_info{};
+    image_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    image_info.imageType = VK_IMAGE_TYPE_2D;
+    image_info.format = format;
+    image_info.extent.width = width;
+    image_info.extent.height = height;
+    image_info.extent.depth = 1;
+    image_info.mipLevels = 1;
+    image_info.arrayLayers = 1;
+    image_info.samples = VK_SAMPLE_COUNT_1_BIT;
+    image_info.tiling = VK_IMAGE_TILING_OPTIMAL;
+    image_info.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT |
+                       VK_IMAGE_USAGE_SAMPLED_BIT;
+
+    VmaAllocationCreateInfo allocation_create_info{};
+    allocation_create_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+    allocation_create_info.requiredFlags =
+        VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+    assert(VK_SUCCESS == vmaCreateImage(context->allocator, &image_info, &allocation_create_info,
+                                        &info->image, &info->allocation,
+                                        /*pAllocationInfo=*/nullptr));
+
+    VkImageViewCreateInfo view_info{};
+    view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    view_info.image = info->image;
+    view_info.format = format;
+    view_info.subresourceRange.baseMipLevel = 0;
+    view_info.subresourceRange.levelCount = 1;
+    view_info.subresourceRange.baseArrayLayer = 0;
+    view_info.subresourceRange.layerCount = 1;
+    view_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+
+    assert(VK_SUCCESS == vkCreateImageView(context->device, &view_info,
+                                           /*pAllocator=*/nullptr, &info->view));
 
     return info;
 }

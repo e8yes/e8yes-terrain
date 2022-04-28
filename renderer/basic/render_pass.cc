@@ -21,14 +21,18 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
-#include "basic/render_pass.h"
 #include "common/device.h"
+#include "renderer/basic/render_pass.h"
 
 namespace e8 {
 
 RenderPass::RenderPass(VulkanContext *context) : pass(VK_NULL_HANDLE), context_(context) {}
 
-RenderPass::~RenderPass() { vkDestroyRenderPass(context_->device, pass, /*pAllocator=*/nullptr); }
+RenderPass::~RenderPass() {
+    if (pass != VK_NULL_HANDLE) {
+        vkDestroyRenderPass(context_->device, pass, /*pAllocator=*/nullptr);
+    }
+}
 
 std::unique_ptr<RenderPass>
 CreateRenderPass(std::vector<VkAttachmentDescription> const &color_attachment_descs,

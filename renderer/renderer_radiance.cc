@@ -25,6 +25,7 @@
 #include "renderer/output/pipeline_output.h"
 #include "renderer/pipeline/light_inputs.h"
 #include "renderer/pipeline/solid_color.h"
+#include "renderer/postprocessor/exposure.h"
 #include "renderer/postprocessor/radiance.h"
 #include "renderer/postprocessor/tone_map.h"
 #include "renderer/proto/renderer.pb.h"
@@ -46,6 +47,8 @@ struct RadianceRenderer::RadianceRendererImpl {
 
     LightInputsPipelineOutput light_inputs_map;
     UnboundedColorPipelineOutput radiance_map;
+    LogLuminancePipelineOutput log_lumiance_map;
+    ExposureEstimationPipelineOutput exposure_value;
     SwapChainPipelineOutput final_color_map;
 
     DescriptorSetAllocator desc_set_alloc;
@@ -56,6 +59,7 @@ struct RadianceRenderer::RadianceRendererImpl {
     LightInputsPipeline light_inputs_pipeline;
     SolidColorPipeline solid_color_pipeline;
     RadiancePipeline radiance_pipeline;
+    ExposureEstimationPipeline exposure_estimation_pipeline;
     ToneMapPipeline tone_map_pipeline;
 
     RendererConfiguration config;
@@ -66,10 +70,14 @@ RadianceRenderer::RadianceRendererImpl::RadianceRendererImpl(VulkanContext *cont
                        context->swap_chain_image_extent.height, context),
       radiance_map(context->swap_chain_image_extent.width, context->swap_chain_image_extent.height,
                    /*with_depth_buffer=*/false, context),
-      final_color_map(/*with_depth_buffer=*/false, context), desc_set_alloc(context),
-      tex_desc_set_cache(&desc_set_alloc), geo_vram(context), tex_vram(context),
-      light_inputs_pipeline(context), solid_color_pipeline(context),
-      radiance_pipeline(&desc_set_alloc, context), tone_map_pipeline(&desc_set_alloc, context) {}
+      log_lumiance_map(context->swap_chain_image_extent.width,
+                       context->swap_chain_image_extent.height, context),
+      exposure_value(context), final_color_map(/*with_depth_buffer=*/false, context),
+      desc_set_alloc(context), tex_desc_set_cache(&desc_set_alloc), geo_vram(context),
+      tex_vram(context), light_inputs_pipeline(context), solid_color_pipeline(context),
+      radiance_pipeline(&desc_set_alloc, context),
+      exposure_estimation_pipeline(&desc_set_alloc, context),
+      tone_map_pipeline(&desc_set_alloc, context) {}
 
 RadianceRenderer::RadianceRendererImpl::~RadianceRendererImpl() {}
 
@@ -90,6 +98,19 @@ void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_access
 
         std::vector<SceneEntity const *> scene_entities =
             scene->SceneEntityStructure()->QueryEntities(QueryAllSceneEntities);
+
+        LightSource spot_light;
+        *spot_light.mutable_spot_light()->mutable_intensity() =
+            ToProto(vec3{1.0f, 1.0f, 1.4f} * 100.0f);
+        *spot_light.mutable_spot_light()->mutable_position() = ToProto(vec3{0, 0, 8});
+        *spot_light.mutable_spot_light()->mutable_direction() = ToProto(vec3{0, 0, -1});
+        spot_light.mutable_spot_light()->set_inner_cone_angle(80.0f);
+        spot_light.mutable_spot_light()->set_outer_cone_angle(100.f);
+
+        SceneEntity light("test");
+        light.transform = mat44_identity();
+        light.light_source = spot_light;
+        scene_entities.push_back(&light);
 
         // Loads drawables to the host memory.
         ResourceLoadingOption option;
@@ -113,20 +134,24 @@ void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_access
 
         std::vector<LightSourceInstance> light_sources =
             ToLightSources(scene_entities, camera_projection);
-
         for (auto instance : light_sources) {
             pimpl_->radiance_pipeline.Run(instance, pimpl_->light_inputs_map,
                                           camera_projection.Frustum(),
                                           *pimpl_->radiance_map.Promise(), &pimpl_->radiance_map);
         }
 
-        pimpl_->tone_map_pipeline.Run(pimpl_->radiance_map, &pimpl_->final_color_map);
+        pimpl_->exposure_estimation_pipeline.Run(pimpl_->radiance_map, &pimpl_->log_lumiance_map,
+                                                 &pimpl_->exposure_value);
+        pimpl_->tone_map_pipeline.Run(pimpl_->radiance_map, &pimpl_->exposure_value,
+                                      &pimpl_->final_color_map);
     }
     this->EndStage(/*index=*/1);
 
     this->EndFrame(frame_context, std::vector<PipelineOutputInterface *>{
                                       &pimpl_->light_inputs_map,
                                       &pimpl_->radiance_map,
+                                      &pimpl_->log_lumiance_map,
+                                      &pimpl_->exposure_value,
                                       &pimpl_->final_color_map,
                                   });
 }

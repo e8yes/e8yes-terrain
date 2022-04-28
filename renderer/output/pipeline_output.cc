@@ -165,8 +165,8 @@ struct UnboundedColorPipelineOutput::UnboundedColorPipelineOutputImpl {
 
 UnboundedColorPipelineOutput::UnboundedColorPipelineOutputImpl::UnboundedColorPipelineOutputImpl(
     unsigned width, unsigned height, bool with_depth_buffer, VulkanContext *context) {
-    color_attachment =
-        CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R16G16B16A16_SFLOAT, context);
+    color_attachment = CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R16G16B16A16_SFLOAT,
+                                             /*transfer_src=*/false, context);
 
     if (with_depth_buffer) {
         depth_attachment = CreateDepthAttachment(context->swap_chain_image_extent.width,

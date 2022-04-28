@@ -22,30 +22,12 @@
 #include "post_processor.glsl"
 
 layout(set = 1, binding = 0) uniform sampler2D radiance_map;
-layout(set = 1, binding = 1) uniform sampler2D exposure_pixel;
 
-layout (location = 0) out vec4 out_radiance;
-
-vec3 AcesToneMapping(vec3 radiance, float exposure) {
-    const float A = 2.51f;
-    const float B = 0.03f;
-    const float C = 2.43f;
-    const float D = 0.59f;
-    const float E = 0.14f;
-
-    vec3 color = radiance * exposure;
-    vec3 ldr = color * (color * A + B) / (color * (color * C + D) + E);
-
-    return clamp(ldr, 0.0f, 1.0f);
-}
+layout (location = 0) out float out_log_luminance;
 
 void main() {
     vec2 screen_tex_coord = ScreenTexCoord();
-
     vec3 radiance = texture(radiance_map, screen_tex_coord).xyz;
-    float log_exposure = texture(exposure_pixel, vec2(0.0, 0.0f)).x;
-    float exposure = exp(log_exposure);
-    vec3 mapped = AcesToneMapping(radiance, exposure);
-
-    out_radiance = vec4(mapped, 1.0f);
+    float luminance = 0.27f*radiance.x + 0.67f*radiance.y + 0.06f*radiance.z;
+    out_log_luminance = log(luminance + 1e-4f);
 }

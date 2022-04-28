@@ -80,11 +80,13 @@ CreateColorAttachmentsForSwapChain(VulkanContext *context);
  * @param width The width, in pixels, of the color buffer.
  * @param height The height, in pixels, of the color buffer.
  * @param format The color pixel's format.
+ * @param transfer_src If true, allows the color attachment to be a potential transfer source.
  * @param context Contextual Vulkan handles.
  * @return A valid unique pointer to the FrameBufferAttachment structure.
  */
-std::unique_ptr<FrameBufferAttachment>
-CreateColorAttachment(unsigned width, unsigned height, VkFormat format, VulkanContext *context);
+std::unique_ptr<FrameBufferAttachment> CreateColorAttachment(unsigned width, unsigned height,
+                                                             VkFormat format, bool transfer_src,
+                                                             VulkanContext *context);
 
 /**
  * @brief CreateDepthAttachment Creates a depth attachment and allocates an image for depth
@@ -99,6 +101,17 @@ CreateColorAttachment(unsigned width, unsigned height, VkFormat format, VulkanCo
  */
 std::unique_ptr<FrameBufferAttachment>
 CreateDepthAttachment(unsigned width, unsigned height, bool samplable, VulkanContext *context);
+
+/**
+ * @brief CreateStorageAttachment
+ * @param width
+ * @param height
+ * @param format
+ * @param context
+ * @return
+ */
+std::unique_ptr<FrameBufferAttachment>
+CreateStorageAttachment(unsigned width, unsigned height, VkFormat format, VulkanContext *context);
 
 } // namespace e8
 

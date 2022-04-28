@@ -21,9 +21,9 @@
 #include <memory>
 #include <vulkan/vulkan.h>
 
-#include "basic/sampler.h"
-#include "basic/uniform_buffer.h"
 #include "common/device.h"
+#include "renderer/basic/sampler.h"
+#include "renderer/basic/uniform_buffer.h"
 
 namespace e8 {
 namespace descriptor_set_internal {
