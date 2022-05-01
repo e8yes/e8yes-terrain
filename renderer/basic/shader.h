@@ -34,6 +34,7 @@ constexpr char const *kVertexShaderFilePathLightInputs = "./light_inputs.vert.sp
 constexpr char const *kVertexShaderFilePathPostProcessor = "./post_processor.vert.spv";
 
 constexpr char const *kFragmentShaderFilePathDepthMapVisualizer = "./depth_visualizer.frag.spv";
+constexpr char const *kFragmentShaderFilePathFxaa = "./fxaa.frag.spv";
 constexpr char const *kFragmentShaderFilePathHdrAces = "./hdr_aces.frag.spv";
 constexpr char const *kFragmentShaderFilePathHdrClamp = "./hdr_clamp.frag.spv";
 constexpr char const *kFragmentShaderFilePathLightInputs = "./light_inputs.frag.spv";

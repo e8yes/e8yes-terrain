@@ -29,7 +29,8 @@ void main() {
     vec2 screen_tex_coord = ScreenTexCoord();
 
     vec3 radiance = texture(radiance_map, screen_tex_coord).xyz;
-    vec3 mapped = clamp(radiance, 0.0f, 1.0f);
+    vec3 color = clamp(radiance, 0.0, 1.0);
+    float luminance = sqrt(dot(color, vec3(0.299, 0.587, 0.114)));
 
-    out_radiance = vec4(mapped, 1.0f);
+    out_radiance = vec4(color, luminance);
 }

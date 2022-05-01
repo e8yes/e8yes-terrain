@@ -45,7 +45,8 @@ void main() {
     vec3 radiance = texture(radiance_map, screen_tex_coord).xyz;
     float log_exposure = texture(exposure_pixel, vec2(0.0, 0.0f)).x;
     float exposure = exp(log_exposure);
-    vec3 mapped = AcesToneMapping(radiance, exposure);
+    vec3 color = AcesToneMapping(radiance, exposure);
+    float luminance = sqrt(dot(color, vec3(0.299, 0.587, 0.114)));
 
-    out_radiance = vec4(mapped, 1.0f);
+    out_radiance = vec4(color, luminance);
 }

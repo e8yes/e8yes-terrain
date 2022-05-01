@@ -49,7 +49,7 @@ std::unique_ptr<ImageSampler> CreateReadBackSampler(VulkanContext *context) {
     return info;
 }
 
-std::unique_ptr<ImageSampler> CreateContinuousReadBackSampler(VulkanContext *context) {
+std::unique_ptr<ImageSampler> CreateContinuousSampler(VulkanContext *context) {
     VkSamplerCreateInfo sampler_info{};
     sampler_info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
     sampler_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;

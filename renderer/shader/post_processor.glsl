@@ -23,3 +23,7 @@ layout(set = 0, binding = 0) uniform PerFrameConstants {
 vec2 ScreenTexCoord() {
     return vec2(gl_FragCoord.x / pfc.viewport_width, gl_FragCoord.y / pfc.viewport_height);
 }
+
+vec2 ScreenResolution() {
+    return vec2(pfc.viewport_width, pfc.viewport_height);
+}

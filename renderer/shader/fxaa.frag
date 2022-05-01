@@ -19,15 +19,16 @@
 
 #version 450
 
+#include "fxaa.glsl"
 #include "post_processor.glsl"
 
-layout(set = 1, binding = 0) uniform sampler2D radiance_map;
+layout(set = 1, binding = 0) uniform sampler2D ldr_map;
 
-layout (location = 0) out float out_log_luminance;
+layout (location = 0) out vec4 out_ldr;
 
 void main() {
     vec2 screen_tex_coord = ScreenTexCoord();
-    vec3 radiance = texture(radiance_map, screen_tex_coord).xyz;
-    float luminance = 0.299f*radiance.x + 0.587f*radiance.y + 0.114f*radiance.z;
-    out_log_luminance = log(luminance + 1e-4f);
+    vec2 screen_resolution = ScreenResolution();
+    vec3 aa_color = Fxaa(ldr_map, screen_tex_coord, screen_resolution);
+    out_ldr = vec4(aa_color, 1.0f);
 }

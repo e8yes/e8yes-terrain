@@ -26,6 +26,7 @@
 #include "renderer/pipeline/light_inputs.h"
 #include "renderer/pipeline/solid_color.h"
 #include "renderer/postprocessor/exposure.h"
+#include "renderer/postprocessor/fxaa.h"
 #include "renderer/postprocessor/radiance.h"
 #include "renderer/postprocessor/tone_map.h"
 #include "renderer/proto/renderer.pb.h"
@@ -49,6 +50,7 @@ struct RadianceRenderer::RadianceRendererImpl {
     UnboundedColorPipelineOutput radiance_map;
     LogLuminancePipelineOutput log_lumiance_map;
     ExposureEstimationPipelineOutput exposure_value;
+    LdrColorPipelineOutput ldr_color_map;
     SwapChainPipelineOutput final_color_map;
 
     DescriptorSetAllocator desc_set_alloc;
@@ -61,6 +63,7 @@ struct RadianceRenderer::RadianceRendererImpl {
     RadiancePipeline radiance_pipeline;
     ExposureEstimationPipeline exposure_estimation_pipeline;
     ToneMapPipeline tone_map_pipeline;
+    FxaaPipeline fxaa_pipeline;
 
     RendererConfiguration config;
 };
@@ -72,12 +75,15 @@ RadianceRenderer::RadianceRendererImpl::RadianceRendererImpl(VulkanContext *cont
                    /*with_depth_buffer=*/false, context),
       log_lumiance_map(context->swap_chain_image_extent.width,
                        context->swap_chain_image_extent.height, context),
-      exposure_value(context), final_color_map(/*with_depth_buffer=*/false, context),
-      desc_set_alloc(context), tex_desc_set_cache(&desc_set_alloc), geo_vram(context),
-      tex_vram(context), light_inputs_pipeline(context), solid_color_pipeline(context),
+      exposure_value(context),
+      ldr_color_map(context->swap_chain_image_extent.width, context->swap_chain_image_extent.height,
+                    /*with_depth_buffer=*/false, context),
+      final_color_map(/*with_depth_buffer=*/false, context), desc_set_alloc(context),
+      tex_desc_set_cache(&desc_set_alloc), geo_vram(context), tex_vram(context),
+      light_inputs_pipeline(context), solid_color_pipeline(context),
       radiance_pipeline(&desc_set_alloc, context),
       exposure_estimation_pipeline(&desc_set_alloc, context),
-      tone_map_pipeline(&desc_set_alloc, context) {}
+      tone_map_pipeline(&desc_set_alloc, context), fxaa_pipeline(&desc_set_alloc, context) {}
 
 RadianceRenderer::RadianceRendererImpl::~RadianceRendererImpl() {}
 
@@ -143,7 +149,8 @@ void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_access
         pimpl_->exposure_estimation_pipeline.Run(pimpl_->radiance_map, &pimpl_->log_lumiance_map,
                                                  &pimpl_->exposure_value);
         pimpl_->tone_map_pipeline.Run(pimpl_->radiance_map, &pimpl_->exposure_value,
-                                      &pimpl_->final_color_map);
+                                      &pimpl_->ldr_color_map);
+        pimpl_->fxaa_pipeline.Run(pimpl_->ldr_color_map, &pimpl_->final_color_map);
     }
     this->EndStage(/*index=*/1);
 
