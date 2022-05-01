@@ -217,4 +217,65 @@ FrameBufferAttachment const *UnboundedColorPipelineOutput::DepthAttachment() con
     return pimpl_->depth_attachment.get();
 }
 
+struct LdrColorPipelineOutput::LdrColorPipelineOutputImpl {
+    LdrColorPipelineOutputImpl(unsigned width, unsigned height, bool with_depth_buffer,
+                               VulkanContext *context);
+    ~LdrColorPipelineOutputImpl();
+
+    std::unique_ptr<FrameBufferAttachment> color_attachment;
+    std::unique_ptr<FrameBufferAttachment> depth_attachment;
+    std::unique_ptr<RenderPass> render_pass;
+    std::unique_ptr<FrameBuffer> frame_buffer;
+
+    VulkanContext *context;
+};
+
+LdrColorPipelineOutput::LdrColorPipelineOutputImpl::LdrColorPipelineOutputImpl(
+    unsigned width, unsigned height, bool with_depth_buffer, VulkanContext *context) {
+    color_attachment = CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R8G8B8A8_SNORM,
+                                             /*transfer_src=*/false, context);
+
+    if (with_depth_buffer) {
+        depth_attachment = CreateDepthAttachment(context->swap_chain_image_extent.width,
+                                                 context->swap_chain_image_extent.height,
+                                                 /*samplable=*/false, context);
+
+        render_pass = CreateRenderPass(std::vector<VkAttachmentDescription>{color_attachment->desc},
+                                       depth_attachment->desc, context);
+
+        frame_buffer = CreateFrameBuffer(*render_pass, width, height,
+                                         std::vector<VkImageView>{color_attachment->view},
+                                         /*depth_attachment=*/depth_attachment->view, context);
+    } else {
+        render_pass = CreateRenderPass(std::vector<VkAttachmentDescription>{color_attachment->desc},
+                                       /*depth_attachment_desc=*/std::nullopt, context);
+
+        frame_buffer = CreateFrameBuffer(*render_pass, width, height,
+                                         std::vector<VkImageView>{color_attachment->view},
+                                         /*depth_attachment=*/std::nullopt, context);
+    }
+}
+
+LdrColorPipelineOutput::LdrColorPipelineOutputImpl::~LdrColorPipelineOutputImpl() {}
+
+LdrColorPipelineOutput::LdrColorPipelineOutput(unsigned width, unsigned height,
+                                               bool with_depth_buffer, VulkanContext *context)
+    : PipelineOutputInterface(width, height, context),
+      pimpl_(std::make_unique<LdrColorPipelineOutputImpl>(width, height, with_depth_buffer,
+                                                          context)) {}
+
+LdrColorPipelineOutput::~LdrColorPipelineOutput() {}
+
+FrameBuffer *LdrColorPipelineOutput::GetFrameBuffer() const { return pimpl_->frame_buffer.get(); }
+
+RenderPass const &LdrColorPipelineOutput::GetRenderPass() const { return *pimpl_->render_pass; }
+
+std::vector<FrameBufferAttachment const *> LdrColorPipelineOutput::ColorAttachments() const {
+    return std::vector<FrameBufferAttachment const *>{pimpl_->color_attachment.get()};
+}
+
+FrameBufferAttachment const *LdrColorPipelineOutput::DepthAttachment() const {
+    return pimpl_->depth_attachment.get();
+}
+
 } // namespace e8

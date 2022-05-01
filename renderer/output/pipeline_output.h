@@ -154,6 +154,25 @@ class UnboundedColorPipelineOutput : public PipelineOutputInterface {
     std::unique_ptr<UnboundedColorPipelineOutputImpl> pimpl_;
 };
 
+/**
+ * @brief The LdrColorPipelineOutput class Stores LDR color values in sRGB color space.
+ */
+class LdrColorPipelineOutput : public PipelineOutputInterface {
+  public:
+    LdrColorPipelineOutput(unsigned width, unsigned height, bool with_depth_buffer,
+                           VulkanContext *context);
+    ~LdrColorPipelineOutput() override;
+
+    FrameBuffer *GetFrameBuffer() const override;
+    RenderPass const &GetRenderPass() const override;
+    std::vector<FrameBufferAttachment const *> ColorAttachments() const override;
+    FrameBufferAttachment const *DepthAttachment() const override;
+
+  private:
+    struct LdrColorPipelineOutputImpl;
+    std::unique_ptr<LdrColorPipelineOutputImpl> pimpl_;
+};
+
 } // namespace e8
 
 #endif // ISLANDS_RENDERER_PIPELINE_OUTPUT_H
