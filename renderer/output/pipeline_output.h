@@ -136,13 +136,13 @@ class SwapChainPipelineOutput : public PipelineOutputInterface {
 };
 
 /**
- * @brief The UnboundedColorPipelineOutput class Stores unormalized RGBA color values.
+ * @brief The HdrColorPipelineOutput class Stores unormalized HDR linear RGBA color values.
  */
-class UnboundedColorPipelineOutput : public PipelineOutputInterface {
+class HdrColorPipelineOutput : public PipelineOutputInterface {
   public:
-    UnboundedColorPipelineOutput(unsigned width, unsigned height, bool with_depth_buffer,
-                                 VulkanContext *context);
-    ~UnboundedColorPipelineOutput() override;
+    HdrColorPipelineOutput(unsigned width, unsigned height, bool with_depth_buffer,
+                           VulkanContext *context);
+    ~HdrColorPipelineOutput() override;
 
     FrameBuffer *GetFrameBuffer() const override;
     RenderPass const &GetRenderPass() const override;

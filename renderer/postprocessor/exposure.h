@@ -83,7 +83,7 @@ class ExposureEstimationPipeline {
      * @brief Run Transforms the specified radiance map into a logarithmic luminance map and
      * computes its average.
      */
-    void Run(UnboundedColorPipelineOutput const &radiance,
+    void Run(HdrColorPipelineOutput const &radiance,
              LogLuminancePipelineOutput *log_luminance_output,
              ExposureEstimationPipelineOutput *exposure_output);
 

@@ -47,7 +47,7 @@ struct RadianceRenderer::RadianceRendererImpl {
     ~RadianceRendererImpl();
 
     LightInputsPipelineOutput light_inputs_map;
-    UnboundedColorPipelineOutput radiance_map;
+    HdrColorPipelineOutput radiance_map;
     LogLuminancePipelineOutput log_lumiance_map;
     ExposureEstimationPipelineOutput exposure_value;
     LdrColorPipelineOutput ldr_color_map;

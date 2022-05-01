@@ -46,14 +46,14 @@ class RadiancePipeline {
      */
     void Run(LightSourceInstance const &instance, LightInputsPipelineOutput const &light_inputs,
              frustum const &light_inputs_frustum, GpuPromise const &promise,
-             UnboundedColorPipelineOutput *output);
+             HdrColorPipelineOutput *output);
 
   private:
     struct DirectionalRadiancePipelineImpl;
 
     DescriptorSetAllocator *desc_set_allocator_;
     VulkanContext *context_;
-    UnboundedColorPipelineOutput *current_output_;
+    HdrColorPipelineOutput *current_output_;
     std::unique_ptr<DirectionalRadiancePipelineImpl> pimpl_;
 };
 

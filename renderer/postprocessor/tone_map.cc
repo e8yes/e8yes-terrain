@@ -32,7 +32,7 @@ namespace {
 
 class ToneMapPostProcessorConfigurator : public PostProcessorConfiguratorInterface {
   public:
-    ToneMapPostProcessorConfigurator(UnboundedColorPipelineOutput const &radiance,
+    ToneMapPostProcessorConfigurator(HdrColorPipelineOutput const &radiance,
                                      ExposureEstimationPipelineOutput const *exposure);
     ~ToneMapPostProcessorConfigurator() override;
 
@@ -40,12 +40,12 @@ class ToneMapPostProcessorConfigurator : public PostProcessorConfiguratorInterfa
     void PushConstants(std::vector<uint8_t> *push_constants) const override;
 
   private:
-    UnboundedColorPipelineOutput const &radiance_;
+    HdrColorPipelineOutput const &radiance_;
     ExposureEstimationPipelineOutput const *exposure_;
 };
 
 ToneMapPostProcessorConfigurator::ToneMapPostProcessorConfigurator(
-    UnboundedColorPipelineOutput const &radiance, ExposureEstimationPipelineOutput const *exposure)
+    HdrColorPipelineOutput const &radiance, ExposureEstimationPipelineOutput const *exposure)
     : radiance_(radiance), exposure_(exposure) {}
 
 ToneMapPostProcessorConfigurator::~ToneMapPostProcessorConfigurator() {}
@@ -90,7 +90,7 @@ ToneMapPipeline::ToneMapPipeline(DescriptorSetAllocator *desc_set_allocator, Vul
 
 ToneMapPipeline::~ToneMapPipeline() {}
 
-void ToneMapPipeline::Run(UnboundedColorPipelineOutput const &radiance,
+void ToneMapPipeline::Run(HdrColorPipelineOutput const &radiance,
                           ExposureEstimationPipelineOutput const *exposure,
                           PipelineOutputInterface *output) {
     if (output != current_output_) {

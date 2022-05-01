@@ -42,16 +42,16 @@ using GpuAndCpuPromise = std::pair<std::unique_ptr<GpuPromise>, std::unique_ptr<
 
 class LogLuminanceConfigurator : public PostProcessorConfiguratorInterface {
   public:
-    LogLuminanceConfigurator(UnboundedColorPipelineOutput const &radiance);
+    LogLuminanceConfigurator(HdrColorPipelineOutput const &radiance);
     ~LogLuminanceConfigurator() override;
 
     void InputImages(std::vector<VkImageView> *input_images) const override;
 
   private:
-    UnboundedColorPipelineOutput const &radiance_;
+    HdrColorPipelineOutput const &radiance_;
 };
 
-LogLuminanceConfigurator::LogLuminanceConfigurator(UnboundedColorPipelineOutput const &radiance)
+LogLuminanceConfigurator::LogLuminanceConfigurator(HdrColorPipelineOutput const &radiance)
     : radiance_(radiance) {}
 
 LogLuminanceConfigurator::~LogLuminanceConfigurator() {}
@@ -187,7 +187,7 @@ ExposureEstimationPipeline::ExposureEstimationPipeline(DescriptorSetAllocator *d
 
 ExposureEstimationPipeline::~ExposureEstimationPipeline() {}
 
-void ExposureEstimationPipeline::Run(UnboundedColorPipelineOutput const &radiance,
+void ExposureEstimationPipeline::Run(HdrColorPipelineOutput const &radiance,
                                      LogLuminancePipelineOutput *log_luminance_output,
                                      ExposureEstimationPipelineOutput *exposure_output) {
     if (log_luminance_output != current_output_) {

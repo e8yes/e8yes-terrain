@@ -200,7 +200,7 @@ void SpotLightPostProcessorConfigurator::PushConstants(std::vector<uint8_t> *pus
 } // namespace
 
 struct RadiancePipeline::DirectionalRadiancePipelineImpl {
-    DirectionalRadiancePipelineImpl(UnboundedColorPipelineOutput *radiance_output,
+    DirectionalRadiancePipelineImpl(HdrColorPipelineOutput *radiance_output,
                                     DescriptorSetAllocator *desc_set_allocator,
                                     VulkanContext *context);
     ~DirectionalRadiancePipelineImpl();
@@ -211,7 +211,7 @@ struct RadiancePipeline::DirectionalRadiancePipelineImpl {
 };
 
 RadiancePipeline::DirectionalRadiancePipelineImpl::DirectionalRadiancePipelineImpl(
-    UnboundedColorPipelineOutput *radiance_output, DescriptorSetAllocator *desc_set_allocator,
+    HdrColorPipelineOutput *radiance_output, DescriptorSetAllocator *desc_set_allocator,
     VulkanContext *context) {
     sun_light_pipeline = std::make_unique<PostProcessorPipeline>(
         kFragmentShaderFilePathRadianceSunLight,
@@ -243,7 +243,7 @@ RadiancePipeline::~RadiancePipeline() {}
 void RadiancePipeline::Run(LightSourceInstance const &instance,
                            LightInputsPipelineOutput const &light_inputs,
                            frustum const &light_inputs_frustum, GpuPromise const &promise,
-                           UnboundedColorPipelineOutput *output) {
+                           HdrColorPipelineOutput *output) {
     if (output != current_output_) {
         pimpl_ = std::make_unique<DirectionalRadiancePipelineImpl>(output, desc_set_allocator_,
                                                                    context_);

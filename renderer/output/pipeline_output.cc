@@ -150,7 +150,7 @@ void SwapChainPipelineOutput::SetSwapChainImageIndex(unsigned swap_chain_image_i
     pimpl_->swap_chain_image_index = swap_chain_image_index;
 }
 
-struct UnboundedColorPipelineOutput::UnboundedColorPipelineOutputImpl {
+struct HdrColorPipelineOutput::UnboundedColorPipelineOutputImpl {
     UnboundedColorPipelineOutputImpl(unsigned width, unsigned height, bool with_depth_buffer,
                                      VulkanContext *context);
     ~UnboundedColorPipelineOutputImpl();
@@ -163,7 +163,7 @@ struct UnboundedColorPipelineOutput::UnboundedColorPipelineOutputImpl {
     VulkanContext *context;
 };
 
-UnboundedColorPipelineOutput::UnboundedColorPipelineOutputImpl::UnboundedColorPipelineOutputImpl(
+HdrColorPipelineOutput::UnboundedColorPipelineOutputImpl::UnboundedColorPipelineOutputImpl(
     unsigned width, unsigned height, bool with_depth_buffer, VulkanContext *context) {
     color_attachment = CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R16G16B16A16_SFLOAT,
                                              /*transfer_src=*/false, context);
@@ -189,31 +189,31 @@ UnboundedColorPipelineOutput::UnboundedColorPipelineOutputImpl::UnboundedColorPi
     }
 }
 
-UnboundedColorPipelineOutput::UnboundedColorPipelineOutputImpl::
+HdrColorPipelineOutput::UnboundedColorPipelineOutputImpl::
     ~UnboundedColorPipelineOutputImpl() {}
 
-UnboundedColorPipelineOutput::UnboundedColorPipelineOutput(unsigned width, unsigned height,
+HdrColorPipelineOutput::HdrColorPipelineOutput(unsigned width, unsigned height,
                                                            bool with_depth_buffer,
                                                            VulkanContext *context)
     : PipelineOutputInterface(width, height, context),
       pimpl_(std::make_unique<UnboundedColorPipelineOutputImpl>(width, height, with_depth_buffer,
                                                                 context)) {}
 
-UnboundedColorPipelineOutput::~UnboundedColorPipelineOutput() {}
+HdrColorPipelineOutput::~HdrColorPipelineOutput() {}
 
-FrameBuffer *UnboundedColorPipelineOutput::GetFrameBuffer() const {
+FrameBuffer *HdrColorPipelineOutput::GetFrameBuffer() const {
     return pimpl_->frame_buffer.get();
 }
 
-RenderPass const &UnboundedColorPipelineOutput::GetRenderPass() const {
+RenderPass const &HdrColorPipelineOutput::GetRenderPass() const {
     return *pimpl_->render_pass;
 }
 
-std::vector<FrameBufferAttachment const *> UnboundedColorPipelineOutput::ColorAttachments() const {
+std::vector<FrameBufferAttachment const *> HdrColorPipelineOutput::ColorAttachments() const {
     return std::vector<FrameBufferAttachment const *>{pimpl_->color_attachment.get()};
 }
 
-FrameBufferAttachment const *UnboundedColorPipelineOutput::DepthAttachment() const {
+FrameBufferAttachment const *HdrColorPipelineOutput::DepthAttachment() const {
     return pimpl_->depth_attachment.get();
 }
 

@@ -43,7 +43,7 @@ class ToneMapPipeline {
      * provided. Otherwise, it simply clamps the radiance value into the [0, 1] range.
      * @param output To store the tone mapped colors.
      */
-    void Run(UnboundedColorPipelineOutput const &radiance,
+    void Run(HdrColorPipelineOutput const &radiance,
              ExposureEstimationPipelineOutput const *exposure, PipelineOutputInterface *output);
 
   private:
