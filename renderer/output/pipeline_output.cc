@@ -232,7 +232,7 @@ struct LdrColorPipelineOutput::LdrColorPipelineOutputImpl {
 
 LdrColorPipelineOutput::LdrColorPipelineOutputImpl::LdrColorPipelineOutputImpl(
     unsigned width, unsigned height, bool with_depth_buffer, VulkanContext *context) {
-    color_attachment = CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R8G8B8A8_SNORM,
+    color_attachment = CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R8G8B8A8_SRGB,
                                              /*transfer_src=*/false, context);
 
     if (with_depth_buffer) {

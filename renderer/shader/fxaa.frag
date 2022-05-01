@@ -19,7 +19,7 @@
 
 #version 450
 
-#include "fxaa.glsl"
+#include "fxaa3.glsl"
 #include "post_processor.glsl"
 
 layout(set = 1, binding = 0) uniform sampler2D ldr_map;
@@ -29,6 +29,10 @@ layout (location = 0) out vec4 out_ldr;
 void main() {
     vec2 screen_tex_coord = ScreenTexCoord();
     vec2 screen_resolution = ScreenResolution();
-    vec3 aa_color = Fxaa(ldr_map, screen_tex_coord, screen_resolution);
-    out_ldr = vec4(aa_color, 1.0f);
+    out_ldr = FxaaPixelShader(screen_tex_coord,
+                              ldr_map,
+                              1.0/screen_resolution,
+                              /*fxaaQualitySubpix=*/0.75,
+                              /*fxaaQualityEdgeThreshold=*/0.125,
+                              /*fxaaQualityEdgeThresholdMin=*/0.0625);
 }
