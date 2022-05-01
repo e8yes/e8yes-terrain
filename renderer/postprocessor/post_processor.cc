@@ -193,7 +193,7 @@ PostProcessorPipeline::PostProcessorPipelineImpl::PostProcessorPipelineImpl(
     // Sets up the input image uniform variables.
     input_images_desc_set = desc_set_allocator->Allocate(DescriptorType::DT_COMBINED_IMAGE_SAMPLER,
                                                          uniform_layout->per_pass_desc_set);
-    input_image_sampler = CreateReadBackSampler(context);
+    input_image_sampler = CreateContinuousSampler(context);
 
     for (auto &past_input_image : past_input_images) {
         past_input_image = VK_NULL_HANDLE;

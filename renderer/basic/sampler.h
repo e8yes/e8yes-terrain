@@ -53,6 +53,15 @@ struct ImageSampler {
 std::unique_ptr<ImageSampler> CreateReadBackSampler(VulkanContext *context);
 
 /**
+ * @brief CreateContinuousReadBackSampler Creates an image sampler with bilinear filtering for
+ * magnification and minification.
+ *
+ * @param context Contextual Vulkan handles.
+ * @return A valid unique pointer to the ImageSampler structure.
+ */
+std::unique_ptr<ImageSampler> CreateContinuousSampler(VulkanContext *context);
+
+/**
  * @brief CreateTextureSampler Creates a high quality image sampler for sampling texture images.
  *
  * @param context Contextual Vulkan handles.
