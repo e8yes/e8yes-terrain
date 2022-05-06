@@ -25,7 +25,7 @@
 #include "content/scene.h"
 #include "content/scene_entity.h"
 #include "renderer/basic/projection.h"
-#include "renderer/output/pipeline_output.h"
+#include "renderer/output/common_output.h"
 #include "renderer/pipeline/light_inputs.h"
 #include "renderer/postprocessor/light_inputs_visualizer.h"
 #include "renderer/proto/renderer.pb.h"

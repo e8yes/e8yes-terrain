@@ -23,7 +23,7 @@
 #include "common/device.h"
 #include "content/scene.h"
 #include "renderer/lighting/direct_illuminator.h"
-#include "renderer/output/pipeline_output.h"
+#include "renderer/output/common_output.h"
 #include "renderer/pipeline/light_inputs.h"
 #include "renderer/pipeline/solid_color.h"
 #include "renderer/postprocessor/exposure.h"

@@ -22,7 +22,7 @@
 
 #include "common/device.h"
 #include "common/tensor.h"
-#include "renderer/output/pipeline_output.h"
+#include "renderer/output/common_output.h"
 #include "renderer/output/promise.h"
 #include "renderer/pipeline/light_inputs.h"
 #include "renderer/query/light_source.h"

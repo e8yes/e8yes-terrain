@@ -21,6 +21,7 @@
 #include <memory>
 
 #include "common/device.h"
+#include "renderer/output/common_output.h"
 #include "renderer/output/pipeline_output.h"
 #include "renderer/postprocessor/exposure.h"
 #include "renderer/transfer/descriptor_set.h"

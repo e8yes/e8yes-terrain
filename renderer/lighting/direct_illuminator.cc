@@ -20,7 +20,7 @@
 
 #include "common/device.h"
 #include "renderer/lighting/direct_illuminator.h"
-#include "renderer/output/pipeline_output.h"
+#include "renderer/output/common_output.h"
 #include "renderer/pipeline/solid_color.h"
 #include "renderer/postprocessor/radiance.h"
 #include "renderer/query/light_source.h"

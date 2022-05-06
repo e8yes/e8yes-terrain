@@ -26,6 +26,7 @@
 #include "renderer/basic/attachment.h"
 #include "renderer/basic/frame_buffer.h"
 #include "renderer/basic/render_pass.h"
+#include "renderer/output/common_output.h"
 #include "renderer/output/pipeline_output.h"
 #include "renderer/output/promise.h"
 #include "renderer/transfer/descriptor_set.h"

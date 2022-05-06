@@ -23,7 +23,7 @@
 
 #include "common/device.h"
 #include "renderer/basic/projection.h"
-#include "renderer/output/pipeline_output.h"
+#include "renderer/output/common_output.h"
 #include "renderer/pipeline/light_inputs.h"
 #include "renderer/query/light_source.h"
 #include "renderer/transfer/descriptor_set.h"

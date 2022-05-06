@@ -27,6 +27,7 @@
 #include "renderer/basic/mipmap.h"
 #include "renderer/basic/render_pass.h"
 #include "renderer/basic/shader.h"
+#include "renderer/output/common_output.h"
 #include "renderer/output/pipeline_output.h"
 #include "renderer/output/promise.h"
 #include "renderer/pass/configurator.h"

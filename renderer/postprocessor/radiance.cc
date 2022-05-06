@@ -24,7 +24,7 @@
 #include "content/proto/light_source.pb.h"
 #include "renderer/basic/sampler.h"
 #include "renderer/basic/shader.h"
-#include "renderer/output/pipeline_output.h"
+#include "renderer/output/common_output.h"
 #include "renderer/output/promise.h"
 #include "renderer/pipeline/light_inputs.h"
 #include "renderer/postprocessor/post_processor.h"
