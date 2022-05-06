@@ -40,6 +40,8 @@ void main() {
 
     vec3 incident_intensity = vec3(plc.intensity);
     vec3 incident_ray = -vec3(plc.direction);
-    out_radiance = Radiance(incident_intensity, incident_ray, normal,
-                         albedo, metallic, roughness);
+    vec3 radiance = Radiance(incident_intensity, incident_ray, normal,
+                             albedo, metallic, roughness);
+
+    out_radiance = vec4(radiance, 1.0);
 }

@@ -51,6 +51,8 @@ void main() {
 
     vec3 incident_intensity = vec3(plc.intensity)*inv_r2;
     vec3 incident_ray = light_ray*sqrt(inv_r2);
-    out_radiance = Radiance(incident_intensity, incident_ray, normal,
-                         albedo, metallic, roughness);
+    vec3 radiance = Radiance(incident_intensity, incident_ray, normal,
+                             albedo, metallic, roughness);
+
+    out_radiance = vec4(radiance, 1.0);
 }

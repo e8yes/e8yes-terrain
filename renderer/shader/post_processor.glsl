@@ -15,6 +15,9 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef POST_PROCESSOR_GLSL
+#define POST_PROCESSOR_GLSL
+
 layout(set = 0, binding = 0) uniform PerFrameConstants {
     float viewport_width;
     float viewport_height;
@@ -27,3 +30,5 @@ vec2 ScreenTexCoord() {
 vec2 ScreenResolution() {
     return vec2(pfc.viewport_width, pfc.viewport_height);
 }
+
+#endif // POST_PROCESSOR_GLSL

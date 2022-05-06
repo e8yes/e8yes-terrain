@@ -15,6 +15,9 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIGHT_INPUTS_DECODER_GLSL
+#define LIGHT_INPUTS_DECODER_GLSL
+
 layout(set = 1, binding = 0) uniform sampler2D normal_roughness;
 layout(set = 1, binding = 1) uniform sampler2D albedo_metallic;
 layout(set = 1, binding = 2) uniform sampler2D depth;
@@ -23,9 +26,6 @@ float ToViewSpaceZ(float ndc_depth, float a, float b) {
     // ndc_depth = a*1/z + b, where a = -z_near*z_far/(z_far - z_near)
     // and b = -z_near/(z_far - z_near).
     // => z = a/(ndc_depth - b)
-//    float a = -z_near*z_far/(z_far - z_near);
-//    float b = -z_near/(z_far - z_near);
-
     return a/(ndc_depth - b);
 }
 
@@ -74,3 +74,5 @@ float DecodeRoughness(vec2 screen_tex_coord) {
 float DecodeMetallic(vec2 screen_tex_coord) {
     return texture(albedo_metallic, screen_tex_coord).w;
 }
+
+#endif // LIGHT_INPUTS_DECODER_GLSL

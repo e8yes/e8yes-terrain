@@ -19,7 +19,7 @@
 
 const vec3 DIELETRIC_R0 = vec3(0.04f);
 
-vec4 Radiance(vec3 incident_intensity,
+vec3 Radiance(vec3 incident_intensity,
              vec3 incident_ray,
              vec3 normal,
              vec3 albedo,
@@ -43,7 +43,5 @@ vec4 Radiance(vec3 incident_intensity,
     float specular_brdf = GgxSpecularBrdf(alpha, cos_n_i, cos_n_o, cos_n_h);
     vec3 final_brdf = FresnelMix(r0, cos_h_i, diffuse_brdf, specular_brdf);
 
-    vec3 radiance = incident_intensity * final_brdf * cos_n_i;
-
-    return vec4(radiance, 1.0f);
+    return incident_intensity * final_brdf * cos_n_i;
 }
