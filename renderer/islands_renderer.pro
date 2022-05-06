@@ -29,6 +29,7 @@ SOURCES += \
     basic/uniform_buffer.cc \
     basic/uniform_layout.cc \
     basic/vertex_input.cc \
+    lighting/direct_illuminator.cc \
     output/pipeline_output.cc \
     output/promise.cc \
     pass/configurator.cc \
@@ -72,6 +73,7 @@ HEADERS += \
     basic/uniform_buffer.h \
     basic/uniform_layout.h \
     basic/vertex_input.h \
+    lighting/direct_illuminator.h \
     output/pipeline_output.h \
     output/promise.h \
     pass/configurator.h \

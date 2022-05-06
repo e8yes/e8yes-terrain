@@ -18,13 +18,59 @@
 #ifndef ISLANDS_RENDERER_LIGHT_SOURCE_H
 #define ISLANDS_RENDERER_LIGHT_SOURCE_H
 
+#include <optional>
 #include <vector>
 
 #include "content/proto/light_source.pb.h"
 #include "content/scene_entity.h"
 #include "renderer/basic/projection.h"
+#include <common/tensor.h>
 
 namespace e8 {
+
+/**
+ * @brief The LightSourceLod enum
+ */
+enum LightSourceLod {
+    LSL_LEVEL0,
+    LSL_LEVEL1,
+    LSL_LEVEL2,
+    LSL_LEVEL3,
+    LSL_LEVEL4,
+};
+
+/**
+ * @brief The SunLightRegion struct
+ */
+struct SunLightRegion {
+    // Details level that should be used on the sun light region.
+    LightSourceLod lod;
+
+    // The region which encloses a part of the sun light's direct illumination.
+    aabb b;
+};
+
+/**
+ * @brief The PointLightRegion struct
+ */
+struct PointLightRegion {
+    // Details level that should be used on the point light.
+    LightSourceLod lod;
+
+    // The region which encloses the point light's direct illumination.
+    aabb b;
+};
+
+/**
+ * @brief The SpotLightRegion struct
+ */
+struct SpotLightRegion {
+    // Details level that should be used on the spot light.
+    LightSourceLod lod;
+
+    // The region which encloses the spot light's direct illumination.
+    frustum f;
+};
 
 /**
  * @brief The LightSourceInstance struct An instance of light source which contains the light source
@@ -33,6 +79,16 @@ namespace e8 {
 struct LightSourceInstance {
     // A light source defined in the view space.
     LightSource light_source;
+
+    // Filled when the light source is a sun light. Theoretically, a sun light can shine on a
+    // infinite region. However, these region LODs are generated according to the camera view.
+    std::vector<SunLightRegion> sun_light_regions;
+
+    // Filled when the light source is a point light.
+    std::optional<PointLightRegion> point_light_region;
+
+    // Filled when the light source is a spot light.
+    std::optional<SpotLightRegion> spot_light_region;
 };
 
 /**

@@ -22,6 +22,7 @@
 
 #include "common/device.h"
 #include "content/scene.h"
+#include "renderer/lighting/direct_illuminator.h"
 #include "renderer/output/pipeline_output.h"
 #include "renderer/pipeline/light_inputs.h"
 #include "renderer/pipeline/solid_color.h"
@@ -59,8 +60,7 @@ struct RadianceRenderer::RadianceRendererImpl {
     TextureVramTransfer tex_vram;
 
     LightInputsPipeline light_inputs_pipeline;
-    SolidColorPipeline solid_color_pipeline;
-    RadiancePipeline radiance_pipeline;
+    DirectIlluminator direct_illuminator;
     ExposureEstimationPipeline exposure_estimation_pipeline;
     ToneMapPipeline tone_map_pipeline;
     FxaaPipeline fxaa_pipeline;
@@ -80,8 +80,7 @@ RadianceRenderer::RadianceRendererImpl::RadianceRendererImpl(VulkanContext *cont
                     /*with_depth_buffer=*/false, context),
       final_color_map(/*with_depth_buffer=*/false, context), desc_set_alloc(context),
       tex_desc_set_cache(&desc_set_alloc), geo_vram(context), tex_vram(context),
-      light_inputs_pipeline(context), solid_color_pipeline(context),
-      radiance_pipeline(&desc_set_alloc, context),
+      light_inputs_pipeline(context), direct_illuminator(&desc_set_alloc, context),
       exposure_estimation_pipeline(&desc_set_alloc, context),
       tone_map_pipeline(&desc_set_alloc, context), fxaa_pipeline(&desc_set_alloc, context) {}
 
@@ -105,19 +104,6 @@ void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_access
         std::vector<SceneEntity const *> scene_entities =
             scene->SceneEntityStructure()->QueryEntities(QueryAllSceneEntities);
 
-        LightSource spot_light;
-        *spot_light.mutable_spot_light()->mutable_intensity() =
-            ToProto(vec3{1.0f, 1.0f, 1.4f} * 100.0f);
-        *spot_light.mutable_spot_light()->mutable_position() = ToProto(vec3{0, 0, 8});
-        *spot_light.mutable_spot_light()->mutable_direction() = ToProto(vec3{0, 0, -1});
-        spot_light.mutable_spot_light()->set_inner_cone_angle(80.0f);
-        spot_light.mutable_spot_light()->set_outer_cone_angle(100.f);
-
-        SceneEntity light("test");
-        light.transform = mat44_identity();
-        light.light_source = spot_light;
-        scene_entities.push_back(&light);
-
         // Loads drawables to the host memory.
         ResourceLoadingOption option;
         option.load_geometry = true;
@@ -135,16 +121,10 @@ void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_access
                                           &pimpl_->tex_desc_set_cache, &pimpl_->geo_vram,
                                           &pimpl_->tex_vram, &pimpl_->light_inputs_map);
 
-        pimpl_->solid_color_pipeline.Run(
-            vec3{0.0f, 0.0f, 0.0f}, *pimpl_->light_inputs_map.Promise(), &pimpl_->radiance_map);
-
         std::vector<LightSourceInstance> light_sources =
             ToLightSources(scene_entities, camera_projection);
-        for (auto instance : light_sources) {
-            pimpl_->radiance_pipeline.Run(instance, pimpl_->light_inputs_map,
-                                          camera_projection.Frustum(),
-                                          *pimpl_->radiance_map.Promise(), &pimpl_->radiance_map);
-        }
+        pimpl_->direct_illuminator.Run(light_sources, pimpl_->light_inputs_map, camera_projection,
+                                       &pimpl_->radiance_map);
 
         pimpl_->exposure_estimation_pipeline.Run(pimpl_->radiance_map, &pimpl_->log_lumiance_map,
                                                  &pimpl_->exposure_value);
