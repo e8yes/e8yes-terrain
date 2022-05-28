@@ -17,6 +17,9 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstdint>
+#include <iostream>
+#include <limits>
 #include <memory>
 #include <vulkan/vulkan.h>
 
@@ -25,12 +28,22 @@
 
 namespace e8 {
 
-CpuPromise::CpuPromise(VulkanContext *context) : context_(context) {
+CpuPromise::CpuPromise(VulkanContext *context) : signal(VK_NULL_HANDLE), context_(context) {
+    if (context == nullptr) {
+        return;
+    }
+
     VkFenceCreateInfo fence_info{};
     fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 
     assert(VK_SUCCESS ==
            vkCreateFence(context->device, &fence_info, /*pAllocator=*/nullptr, &signal));
+}
+
+CpuPromise::~CpuPromise() {
+    if (signal != VK_NULL_HANDLE) {
+        vkDestroyFence(context_->device, signal, /*pAllocator=*/nullptr);
+    }
 }
 
 CpuPromise::CpuPromise(CpuPromise &&other) : signal(VK_NULL_HANDLE), context_(nullptr) {
@@ -43,14 +56,22 @@ CpuPromise &CpuPromise::operator=(CpuPromise &&other) {
     return *this;
 }
 
-CpuPromise::~CpuPromise() {
-    if (signal != VK_NULL_HANDLE) {
-        vkDestroyFence(context_->device, signal, /*pAllocator=*/nullptr);
-    }
+void CpuPromise::Wait() {
+    assert(VK_SUCCESS == vkWaitForFences(context_->device, /*fenceCount=*/1, &signal,
+                                         /*waitAll=*/VK_TRUE,
+                                         /*timeout=*/std::numeric_limits<uint64_t>::max()));
 }
 
-GpuPromise::GpuPromise(VkCommandBuffer task_cmds, VulkanContext *context)
-    : cmds{task_cmds}, context_(context) {
+GpuPromise::GpuPromise(VulkanContext *context) : cmds(VK_NULL_HANDLE), context_(context) {
+    VkSemaphoreCreateInfo semaphore_info{};
+    semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+    assert(VK_SUCCESS == vkCreateSemaphore(context->device, &semaphore_info,
+                                           /*pAllocator=*/nullptr, &signal));
+}
+
+GpuPromise::GpuPromise(VkCommandBuffer cmds, VulkanContext *context)
+    : cmds(cmds), context_(context) {
     VkSemaphoreCreateInfo semaphore_info{};
     semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -59,7 +80,7 @@ GpuPromise::GpuPromise(VkCommandBuffer task_cmds, VulkanContext *context)
 }
 
 GpuPromise::GpuPromise(GpuPromise &&other)
-    : signal(VK_NULL_HANDLE), cmds(VK_NULL_HANDLE), context_(nullptr) {
+    : cmds(VK_NULL_HANDLE), signal(VK_NULL_HANDLE), context_(nullptr) {
     *this = std::move(other);
 }
 
@@ -67,6 +88,7 @@ GpuPromise::~GpuPromise() {
     if (signal != VK_NULL_HANDLE) {
         vkDestroySemaphore(context_->device, signal, /*pAllocator=*/nullptr);
     }
+
     if (cmds != VK_NULL_HANDLE) {
         vkFreeCommandBuffers(context_->device, context_->command_pool, /*commandBufferCount=*/1,
                              &cmds);
@@ -75,9 +97,31 @@ GpuPromise::~GpuPromise() {
 
 GpuPromise &GpuPromise::operator=(GpuPromise &&other) {
     std::swap(signal, other.signal);
-    std::swap(cmds, other.cmds);
     context_ = other.context_;
     return *this;
+}
+
+Fulfillment::Fulfillment(VkCommandBuffer cmds, VulkanContext *context)
+    : cmds(cmds), completion(context), context_(context) {}
+
+Fulfillment::Fulfillment(Fulfillment &&other)
+    : cmds(VK_NULL_HANDLE), completion(/*context=*/nullptr), context_(nullptr) {
+    *this = std::move(other);
+}
+
+Fulfillment &Fulfillment::operator=(Fulfillment &&other) {
+    std::swap(cmds, other.cmds);
+    std::swap(completion, other.completion);
+    std::swap(child_operations_signal, other.child_operations_signal);
+    context_ = other.context_;
+    return *this;
+}
+
+Fulfillment::~Fulfillment() {
+    if (cmds != VK_NULL_HANDLE) {
+        vkFreeCommandBuffers(context_->device, context_->command_pool, /*commandBufferCount=*/1,
+                             &cmds);
+    }
 }
 
 } // namespace e8

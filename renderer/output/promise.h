@@ -19,6 +19,7 @@
 #define ISLANDS_RENDERER_PROMISE_H
 
 #include <memory>
+#include <utility>
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
@@ -43,6 +44,11 @@ struct CpuPromise {
 
     CpuPromise &operator=(CpuPromise &&other);
 
+    /**
+     * @brief Wait
+     */
+    void Wait();
+
     // The task's CPU signal.
     VkFence signal;
 
@@ -62,18 +68,52 @@ struct GpuPromise {
      * @param task_cmds Optional. The task's GPU commands.
      * @param context Contextual Vulkan handles.
      */
-    GpuPromise(VkCommandBuffer task_cmds, VulkanContext *context);
+    GpuPromise(VulkanContext *context);
+    GpuPromise(VkCommandBuffer cmds, VulkanContext *context);
     GpuPromise(GpuPromise const &) = delete;
     GpuPromise(GpuPromise &&other);
     ~GpuPromise();
 
     GpuPromise &operator=(GpuPromise &&other);
 
+    //
+    VkCommandBuffer cmds;
+
     // Task's signal.
     VkSemaphore signal;
 
-    // Task's commands.
+    // Contextual Vulkan handles.
+    VulkanContext *context_;
+};
+
+/**
+ * @brief The Fulfillment struct A promise-like abstraction of an asychronous GPU operation.
+ */
+struct Fulfillment {
+    /**
+     * @brief Fulfillment Constructs an empty fulfillment. Completion signal and child operations'
+     * signal need to be assigned after the construction.
+     *
+     * @param cmds Optional. The GPU commands (task) that are running asynchronously. This class
+     * manages the lifecycle of the command buffer.
+     * @param context Contextual Vulkan handles.
+     */
+    Fulfillment(VkCommandBuffer cmds, VulkanContext *context);
+    Fulfillment(Fulfillment const &) = delete;
+    Fulfillment(Fulfillment &&other);
+    ~Fulfillment();
+
+    Fulfillment &operator=(Fulfillment &&other);
+
+    // Optional. The GPU commands (task) that are running asynchronously.
     VkCommandBuffer cmds;
+
+    // A host signal for notifying when the operation associated with this fulfillment is resolved.
+    CpuPromise completion;
+
+    // For signaling child operations. Each child operation should index into this array to find its
+    // signal.
+    std::vector<GpuPromise> child_operations_signal;
 
     // Contextual Vulkan handles.
     VulkanContext *context_;
