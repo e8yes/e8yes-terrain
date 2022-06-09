@@ -87,6 +87,21 @@ RenderPassPromise FinishRenderPass(VkCommandBuffer cmds, GpuPromise const &prere
                                    VulkanContext *context);
 
 /**
+ * @brief FinishRenderPass2 Submits the command buffer to the graphics queue to have it been
+ * executed asynchronously and returns a fulfillment which represents the state of the execution.
+ *
+ * @param cmds The command buffer to be submitted.
+ * @param completion_signal_count The number of completion signals to generate once it completes the
+ * execution of the commands.
+ * @param prerequisites Dependent signals to wait upon before executing the commands.
+ * @param context Contextual Vulkan handles.
+ * @return The fulfillment which represents the state of the asynchronous command execution.
+ */
+Fulfillment FinishRenderPass2(VkCommandBuffer cmds, unsigned completion_signal_count,
+                              std::vector<GpuPromise *> const &prerequisites,
+                              VulkanContext *context);
+
+/**
  * @brief RenderDrawables Renders an array of drawables with the specified graphics pipeline. Note,
  * it doesn't actually draw the drawables but only adds Vulkan commands to the command buffer.
  *

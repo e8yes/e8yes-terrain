@@ -160,6 +160,46 @@ RenderPassPromise FinishRenderPass(VkCommandBuffer cmds, GpuPromise const &prere
     return promise;
 }
 
+Fulfillment FinishRenderPass2(VkCommandBuffer cmds, unsigned completion_signal_count,
+                              std::vector<GpuPromise *> const &prerequisites,
+                              VulkanContext *context) {
+    // Finalizes the render pass and command buffers.
+    vkCmdEndRenderPass(cmds);
+    assert(VK_SUCCESS == vkEndCommandBuffer(cmds));
+
+    // For render pass synchronization.
+    std::vector<VkSemaphore> waits(prerequisites.size());
+    for (unsigned i = 0; i < prerequisites.size(); ++i) {
+        waits[i] = prerequisites[i]->signal;
+    }
+
+    Fulfillment fulfillment(cmds, context);
+
+    std::vector<VkSemaphore> signals(completion_signal_count);
+    for (unsigned i = 0; i < completion_signal_count; ++i) {
+        GpuPromise promise(context);
+        signals[i] = promise.signal;
+        fulfillment.child_operations_signal.emplace_back(std::move(promise));
+    }
+
+    // Submit command buffers.
+    VkSubmitInfo submit{};
+    submit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    submit.pWaitSemaphores = waits.data();
+    submit.waitSemaphoreCount = waits.size();
+    submit.pWaitDstStageMask = &wait_stage;
+    submit.pSignalSemaphores = signals.data();
+    submit.signalSemaphoreCount = signals.size();
+    submit.pCommandBuffers = &cmds;
+    submit.commandBufferCount = 1;
+
+    assert(VK_SUCCESS == vkQueueSubmit(context->graphics_queue, /*submitCount=*/1, &submit,
+                                       fulfillment.completion.signal));
+
+    return fulfillment;
+}
+
 void RenderDrawables(std::vector<DrawableInstance> const &drawables,
                      GraphicsPipeline const &pipeline, ShaderUniformLayout const &uniform_layout,
                      RenderPassConfiguratorInterface const &configurator,
