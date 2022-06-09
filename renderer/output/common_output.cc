@@ -110,6 +110,10 @@ FrameBufferAttachment const *SwapChainPipelineOutput::DepthAttachment() const {
     return pimpl_->depth_attachment_.get();
 }
 
+unsigned SwapChainPipelineOutput::SwapChainImageIndex() const {
+    return pimpl_->swap_chain_image_index;
+}
+
 void SwapChainPipelineOutput::SetSwapChainImageIndex(unsigned swap_chain_image_index) {
     pimpl_->swap_chain_image_index = swap_chain_image_index;
 }

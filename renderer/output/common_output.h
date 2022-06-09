@@ -50,6 +50,12 @@ class SwapChainPipelineOutput : public PipelineOutputInterface {
     FrameBufferAttachment const *DepthAttachment() const override;
 
     /**
+     * @brief SwapChainImageIndex Gets the current swap chain image index (Returns the value set
+     * through SetSwapChainImageIndex()).
+     */
+    unsigned SwapChainImageIndex() const;
+
+    /**
      * @brief SetSwapChainImageIndex Sets the swap chain image to be used for storing rendering
      * output. The class functions will fail if the swap chain image index isn't set prior to
      * running a pipeline.
