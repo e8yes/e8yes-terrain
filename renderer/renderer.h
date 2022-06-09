@@ -26,7 +26,8 @@
 
 #include "common/device.h"
 #include "content/scene.h"
-#include "renderer/output/pipeline_output.h"
+#include "renderer/output/common_output.h"
+#include "renderer/output/pipeline_stage.h"
 #include "renderer/output/promise.h"
 #include "renderer/proto/renderer.pb.h"
 #include "resource/accessor.h"
@@ -136,6 +137,27 @@ class RendererInterface {
                   std::vector<PipelineOutputInterface *> pipeline_ouputs);
 
     /**
+     * @brief DoFirstStage Creates the first stage of the current frame. The first stage waits for
+     * the v-sync.
+     */
+    PipelineStage *DoFirstStage();
+
+    /**
+     * @brief DoFinalStage Creates the final stage of the current frame.
+     *
+     * @param parents Non-empty. Stages that must finish before running the final stage. Note, the
+     * first element of the parent array must be the first stage.
+     * @return The final stage.
+     */
+    PipelineStage *DoFinalStage(std::vector<PipelineStage *> const &parents);
+
+    /**
+     * @brief FinalOutput
+     * @return
+     */
+    std::shared_ptr<SwapChainPipelineOutput> const &FinalOutput() const;
+
+    /**
      * @brief BeginStage Marks the beginning of a stage.
      */
     void BeginStage(unsigned index, std::string const &name);
@@ -151,6 +173,9 @@ class RendererInterface {
 
   private:
     std::vector<StagePerformance> stage_performance_;
+    std::shared_ptr<SwapChainPipelineOutput> final_output_;
+    PipelineStage first_stage_;
+    PipelineStage final_stage_;
     std::unique_ptr<std::mutex> mu_;
 };
 
