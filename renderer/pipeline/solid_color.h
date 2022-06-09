@@ -18,9 +18,12 @@
 #ifndef ISLANDS_RENDERER_PIPELINE_SOLID_COLOR_H
 #define ISLANDS_RENDERER_PIPELINE_SOLID_COLOR_H
 
+#include <vector>
+
 #include "common/device.h"
 #include "common/tensor.h"
 #include "renderer/output/pipeline_output.h"
+#include "renderer/output/pipeline_stage.h"
 #include "renderer/output/promise.h"
 
 namespace e8 {
@@ -51,6 +54,18 @@ class SolidColorPipeline {
   private:
     VulkanContext *context_;
 };
+
+/**
+ * @brief DoFillColor Fills the target with the specified color. Note, it's an asynchronous
+ * function.
+ *
+ * @param color The color to fill to the target.
+ * @param parents Depending stages.
+ * @param context Contextual Vulkan handles.
+ * @param target The target to be filled.
+ */
+void DoFillColor(vec3 const &color, std::vector<PipelineStage *> parents, VulkanContext *context,
+                 PipelineStage *target);
 
 } // namespace e8
 

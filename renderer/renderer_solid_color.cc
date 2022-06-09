@@ -23,7 +23,7 @@
 #include "common/device.h"
 #include "common/tensor.h"
 #include "content/scene.h"
-#include "renderer/output/common_output.h"
+#include "renderer/output/pipeline_stage.h"
 #include "renderer/pass/rasterize.h"
 #include "renderer/pipeline/solid_color.h"
 #include "renderer/proto/renderer.pb.h"
@@ -34,37 +34,34 @@
 namespace e8 {
 
 struct SolidColorRenderer::SolidColorRendererImpl {
-    SolidColorRendererImpl(VulkanContext *context);
+    SolidColorRendererImpl(std::shared_ptr<PipelineOutputInterface> const &final_output);
     ~SolidColorRendererImpl();
 
-    SwapChainPipelineOutput color_map;
-    SolidColorPipeline pipeline;
+    PipelineStage fill_color;
 };
 
-SolidColorRenderer::SolidColorRendererImpl::SolidColorRendererImpl(VulkanContext *context)
-    : color_map(/*with_depth_buffer=*/false, context), pipeline(context) {}
+SolidColorRenderer::SolidColorRendererImpl::SolidColorRendererImpl(
+    std::shared_ptr<PipelineOutputInterface> const &final_output)
+    : fill_color(final_output) {}
 
 SolidColorRenderer::SolidColorRendererImpl::~SolidColorRendererImpl() {}
 
 SolidColorRenderer::SolidColorRenderer(VulkanContext *context)
-    : RendererInterface(0, context), pimpl_(std::make_unique<SolidColorRendererImpl>(context)) {}
+    : RendererInterface(0, context),
+      pimpl_(std::make_unique<SolidColorRendererImpl>(RendererInterface::FinalOutput())) {}
 
 SolidColorRenderer::~SolidColorRenderer() {}
 
 void SolidColorRenderer::DrawFrame(Scene *scene, ResourceAccessor * /*resource_accessor*/) {
-    FrameContext frame_context = this->BeginFrame();
+    Scene::ReadAccess read_access = scene->GainReadAccess();
 
-    pimpl_->color_map.SetSwapChainImageIndex(frame_context.swap_chain_image_index);
+    PipelineStage *first_stage = this->DoFirstStage();
+    DoFillColor(scene->background_color, /*parents=*/std::vector<PipelineStage *>{first_stage},
+                context, &pimpl_->fill_color);
+    PipelineStage *final_stage = this->DoFinalStage(
+        /*parents=*/std::vector<PipelineStage *>{first_stage, &pimpl_->fill_color});
 
-    {
-        Scene::ReadAccess read_access = scene->GainReadAccess();
-        pimpl_->pipeline.Run(scene->background_color, frame_context.swap_chain_image_promise,
-                             &pimpl_->color_map);
-    }
-
-    this->EndFrame(frame_context, std::vector<PipelineOutputInterface *>{
-                                      &pimpl_->color_map,
-                                  });
+    final_stage->Fulfill(context);
 }
 
 void SolidColorRenderer::ApplyConfiguration(RendererConfiguration const & /*config*/) {}

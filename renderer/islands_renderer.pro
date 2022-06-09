@@ -30,8 +30,10 @@ SOURCES += \
     basic/uniform_layout.cc \
     basic/vertex_input.cc \
     lighting/direct_illuminator.cc \
+    output/cached_pipeline.cc \
     output/common_output.cc \
     output/pipeline_output.cc \
+    output/pipeline_stage.cc \
     output/promise.cc \
     pass/configurator.cc \
     pass/rasterize.cc \
@@ -75,8 +77,10 @@ HEADERS += \
     basic/uniform_layout.h \
     basic/vertex_input.h \
     lighting/direct_illuminator.h \
+    output/cached_pipeline.h \
     output/common_output.h \
     output/pipeline_output.h \
+    output/pipeline_stage.h \
     output/promise.h \
     pass/configurator.h \
     pass/rasterize.h \
