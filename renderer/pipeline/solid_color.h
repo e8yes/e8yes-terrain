@@ -22,9 +22,7 @@
 
 #include "common/device.h"
 #include "common/tensor.h"
-#include "renderer/output/pipeline_output.h"
 #include "renderer/output/pipeline_stage.h"
-#include "renderer/output/promise.h"
 
 namespace e8 {
 
@@ -60,12 +58,12 @@ class SolidColorPipeline {
  * function.
  *
  * @param color The color to fill to the target.
- * @param parents Depending stages.
- * @param context Contextual Vulkan handles.
+ * * @param context Contextual Vulkan handles.
+ * @param first_stage The frame's first stage.
  * @param target The target to be filled.
  */
-void DoFillColor(vec3 const &color, std::vector<PipelineStage *> parents, VulkanContext *context,
-                 PipelineStage *target);
+void DoFillColor(vec3 const &color, VulkanContext *context,
+                 PipelineStage *first_stage, PipelineStage *target);
 
 } // namespace e8
 

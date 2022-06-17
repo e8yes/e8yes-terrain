@@ -143,19 +143,21 @@ class RendererInterface {
     PipelineStage *DoFirstStage();
 
     /**
-     * @brief DoFinalStage Creates the final stage of the current frame.
+     * @brief DoFinalStage Creates the final stage of the current frame. The final stage presents
+     * the color map to the screen.
      *
-     * @param parents Non-empty. Stages that must finish before running the final stage. Note, the
-     * first element of the parent array must be the first stage.
+     * @param first_stage Returned by RendererInterface::DoFirstStage().
+     * @param color_map_stage Returned by RendererInterface::ColorMapStage().
      * @return The final stage.
      */
-    PipelineStage *DoFinalStage(std::vector<PipelineStage *> const &parents);
+    PipelineStage *DoFinalStage(PipelineStage * first_stage, PipelineStage* color_map_stage);
+
 
     /**
-     * @brief FinalOutput
-     * @return
+     * @brief ColorMapStage Creates a color map stage. A color map is an image which will be
+     * presented as the final rendering result. It's also the last customizable pipeline stage.
      */
-    std::shared_ptr<SwapChainPipelineOutput> const &FinalOutput() const;
+    std::unique_ptr<PipelineStage> ColorMapStage() const;
 
     /**
      * @brief BeginStage Marks the beginning of a stage.

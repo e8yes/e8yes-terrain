@@ -89,15 +89,16 @@ void SolidColorPipeline::Run(vec3 const &color, GpuPromise const &prerequisites,
     output->AddWriter(std::move(promise.gpu), std::move(promise.cpu));
 }
 
-void DoFillColor(vec3 const &color, std::vector<PipelineStage *> parents, VulkanContext *context,
-                 PipelineStage *target) {
+void DoFillColor(vec3 const &color, VulkanContext *context,
+                 PipelineStage *first_stage, PipelineStage *target) {
     FillColorPipeline *pipeline = static_cast<FillColorPipeline *>(
         target->WithPipeline(kFillColorPipeline, [context](PipelineOutputInterface * /*output*/) {
             return std::make_unique<FillColorPipeline>(context);
         }));
     pipeline->SetFillColor(color);
 
-    target->Schedule(kFillColorPipeline, parents, /*instance_count=*/1);
+    target->Schedule(kFillColorPipeline, /*parents=*/std::vector<PipelineStage*>{first_stage},
+                     /*instance_count=*/1);
 }
 
 } // namespace e8

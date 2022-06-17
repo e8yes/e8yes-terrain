@@ -241,20 +241,21 @@ PipelineStage *RendererInterface::DoFirstStage() {
     return &first_stage_;
 }
 
-PipelineStage *RendererInterface::DoFinalStage(std::vector<PipelineStage *> const &parents) {
-    assert(!parents.empty());
-
+PipelineStage *RendererInterface::DoFinalStage(PipelineStage * first_stage,
+                                               PipelineStage* color_map_stage) {
     final_stage_.WithPipeline(kPresentImagePipeline, [this](PipelineOutputInterface * /*output*/) {
         return std::make_unique<PresentImagePipeline>(this->context);
     });
 
-    final_stage_.Schedule(kPresentImagePipeline, parents, /*instance_count=*/1);
+    final_stage_.Schedule(kPresentImagePipeline,
+                          /*parents=*/std::vector<PipelineStage*>{first_stage, color_map_stage},
+                          /*instance_count=*/1);
 
     return &final_stage_;
 }
 
-std::shared_ptr<SwapChainPipelineOutput> const &RendererInterface::FinalOutput() const {
-    return final_output_;
+std::unique_ptr<PipelineStage> RendererInterface::ColorMapStage() const {
+    return std::make_unique<PipelineStage>(final_output_);
 }
 
 void RendererInterface::BeginStage(unsigned index, std::string const &name) {
