@@ -5,15 +5,15 @@ mkdir -p bin
 # Protobuf code compilation.
 protoc --cpp_out=../resource/proto \
        --proto_path=../resource/proto \
-       `find ../resource/proto -name *.proto`
+       `find ../resource/proto -name "*.proto"`
 
 protoc --cpp_out=../content/proto \
        --proto_path=../content/proto \
-       `find ../content/proto -name *.proto`
+       `find ../content/proto -name "*.proto"`
 
 protoc --cpp_out=../renderer/proto \
        --proto_path=../renderer/proto \
-       `find ../renderer/proto -name *.proto`
+       `find ../renderer/proto -name "*.proto"`
 
 # Shader code compilation.
 find ../renderer/shader -type f -name *.vert -exec glslc {} -o {}.spv \;
