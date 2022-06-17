@@ -21,6 +21,13 @@ SOURCES += \
 HEADERS += \
     tiny_gltf.h
 
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../stb_image/release/ -lstb_image
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../stb_image/debug/ -lstb_image
+else:unix: LIBS += -L$$OUT_PWD/../stb_image/ -lstb_image
+
+INCLUDEPATH += $$PWD/../stb_image
+DEPENDPATH += $$PWD/../stb_image
+
 # Default rules for deployment.
 unix {
     target.path = /usr/lib

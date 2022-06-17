@@ -16,6 +16,14 @@ QMAKE_LFLAGS_RELEASE += -O3 -flto -march=native
 
 INCLUDEPATH += ../
 
+unix {
+    INCLUDEPATH += /usr/include
+    INCLUDEPATH += /usr/local/include
+
+    QMAKE_LFLAGS += -L/usr/lib
+    QMAKE_LFLAGS += -L/usr/local/lib
+}
+
 SOURCES += \
     accessor.cc \
     buffer.cc \
@@ -59,6 +67,33 @@ HEADERS += \
     ram_light_map.h \
     ram_material.h \
     table.h
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../third_party/stb_image/release/ -lstb_image
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../third_party/stb_image/debug/ -lstb_image
+else:unix: LIBS += -L$$OUT_PWD/../third_party/stb_image/ -lstb_image
+
+INCLUDEPATH += $$PWD/../third_party/stb_image
+DEPENDPATH += $$PWD/../third_party/stb_image
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../third_party/vma/release/ -lvma
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../third_party/vma/debug/ -lvma
+else:unix: LIBS += -L$$OUT_PWD/../third_party/vma/ -lvma
+
+INCLUDEPATH += $$PWD/../third_party/vma
+DEPENDPATH += $$PWD/../third_party/vma
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../third_party/uuid/release/ -luuid4
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../third_party/uuid/debug/ -luuid4
+else:unix: LIBS += -L$$OUT_PWD/../third_party/uuid/ -luuid4
+
+INCLUDEPATH += $$PWD/../third_party/uuid
+DEPENDPATH += $$PWD/../third_party/uuid
+
+LIBS += -lboost_log
+LIBS += -lboost_thread
+LIBS += -lprotobuf
+LIBS += -lSDL2
+LIBS += -lvulkan
 
 # Default rules for deployment.
 unix {

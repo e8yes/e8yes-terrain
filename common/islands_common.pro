@@ -17,6 +17,14 @@ QMAKE_LFLAGS_RELEASE += -O3 -flto -march=native
 
 INCLUDEPATH += ../
 
+unix {
+    INCLUDEPATH += /usr/include
+    INCLUDEPATH += /usr/local/include
+
+    QMAKE_LFLAGS += -L/usr/lib
+    QMAKE_LFLAGS += -L/usr/local/lib
+}
+
 SOURCES += \
     cache.cc \
     device.cc \
@@ -32,3 +40,13 @@ unix {
     target.path = /usr/lib
 }
 !isEmpty(target.path): INSTALLS += target
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../third_party/vma/release/ -lvma
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../third_party/vma/debug/ -lvma
+else:unix: LIBS += -L$$OUT_PWD/../third_party/vma/ -lvma
+
+INCLUDEPATH += $$PWD/../third_party/vma
+DEPENDPATH += $$PWD/../third_party/vma
+
+LIBS += -lSDL2
+LIBS += -lvulkan

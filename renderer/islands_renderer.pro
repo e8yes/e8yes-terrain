@@ -16,6 +16,14 @@ QMAKE_LFLAGS_RELEASE += -O3 -flto -march=native
 
 INCLUDEPATH += ../
 
+unix {
+    INCLUDEPATH += /usr/include
+    INCLUDEPATH += /usr/local/include
+
+    QMAKE_LFLAGS += -L/usr/lib
+    QMAKE_LFLAGS += -L/usr/local/lib
+}
+
 SOURCES += \
     basic/attachment.cc \
     basic/fixed_function.cc \
@@ -109,6 +117,37 @@ HEADERS += \
     transfer/vram.h \
     transfer/vram_geometry.h \
     transfer/vram_texture.h
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../content/release/ -lcontent
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../content/debug/ -lcontent
+else:unix: LIBS += -L$$OUT_PWD/../content/ -lcontent
+
+INCLUDEPATH += $$PWD/../content
+DEPENDPATH += $$PWD/../content
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../resource/release/ -lresource
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../resource/debug/ -lresource
+else:unix: LIBS += -L$$OUT_PWD/../resource/ -lresource
+
+INCLUDEPATH += $$PWD/../resource
+DEPENDPATH += $$PWD/../resource
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../common/release/ -lcommon
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../common/debug/ -lcommon
+else:unix: LIBS += -L$$OUT_PWD/../common/ -lcommon
+
+INCLUDEPATH += $$PWD/../common
+DEPENDPATH += $$PWD/../common
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../third_party/vma/release/ -lvma
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../third_party/vma/debug/ -lvma
+else:unix: LIBS += -L$$OUT_PWD/../third_party/vma/ -lvma
+
+INCLUDEPATH += $$PWD/../third_party/vma
+DEPENDPATH += $$PWD/../third_party/vma
+
+LIBS += -lprotobuf
+LIBS += -lvulkan
 
 # Default rules for deployment.
 unix {

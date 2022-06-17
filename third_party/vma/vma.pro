@@ -15,11 +15,21 @@ QMAKE_LFLAGS_RELEASE += -O3 -flto -march=native
 
 INCLUDEPATH += ../../
 
+unix {
+    INCLUDEPATH += /usr/include
+    INCLUDEPATH += /usr/local/include
+
+    QMAKE_LFLAGS += -L/usr/lib
+    QMAKE_LFLAGS += -L/usr/local/lib
+}
+
 SOURCES += \
     vk_mem_alloc.cc
 
 HEADERS += \
     vk_mem_alloc.h
+
+LIBS += -lvulkan
 
 # Default rules for deployment.
 unix {
