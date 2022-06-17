@@ -50,7 +50,7 @@ class PipelineStage {
     /**
      * @brief PipelineStage Constructs a pipeline stage attached with an optional output.
      */
-    PipelineStage(std::shared_ptr<PipelineOutputInterface> const &output);
+    explicit PipelineStage(std::shared_ptr<PipelineOutputInterface> const &output);
     PipelineStage(PipelineStage const &) = delete;
     ~PipelineStage();
 
