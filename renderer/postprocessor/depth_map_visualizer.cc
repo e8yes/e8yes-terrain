@@ -26,10 +26,13 @@
 #include "renderer/output/pipeline_output.h"
 #include "renderer/postprocessor/depth_map_visualizer.h"
 #include "renderer/postprocessor/post_processor.h"
+#include "renderer/output/pipeline_stage.h"
 #include "renderer/transfer/descriptor_set.h"
 
 namespace e8 {
 namespace {
+
+PipelineStage::PipelineKey kDepthMapVisualizerPipeline = "Depth Map Visualizer";
 
 struct DepthMapVisualizerParameters {
     float z_near;
@@ -40,7 +43,7 @@ struct DepthMapVisualizerParameters {
 class DepthMapPostProcessorConfigurator : public PostProcessorConfiguratorInterface {
   public:
     DepthMapPostProcessorConfigurator(float alpha, std::optional<PerspectiveProjection> projection,
-                                      DepthMapPipelineOutput const &depth_map);
+                                      PipelineOutputInterface const &depth_map);
     ~DepthMapPostProcessorConfigurator() override;
 
     void InputImages(std::vector<VkImageView> *input_images) const override;
@@ -49,12 +52,12 @@ class DepthMapPostProcessorConfigurator : public PostProcessorConfiguratorInterf
   private:
     float const alpha_;
     std::optional<PerspectiveProjection> const projection_;
-    DepthMapPipelineOutput const &depth_map_;
+    PipelineOutputInterface const &depth_map_;
 };
 
 DepthMapPostProcessorConfigurator::DepthMapPostProcessorConfigurator(
     float alpha, std::optional<PerspectiveProjection> projection,
-    DepthMapPipelineOutput const &depth_map)
+    PipelineOutputInterface const &depth_map)
     : alpha_(alpha), projection_(projection), depth_map_(depth_map) {}
 
 DepthMapPostProcessorConfigurator::~DepthMapPostProcessorConfigurator() {}
@@ -80,43 +83,22 @@ void DepthMapPostProcessorConfigurator::PushConstants(std::vector<uint8_t> *push
 
 } // namespace
 
-struct DepthMapVisualizerPipeline::DepthMapVisualizerPipelineImpl {
-    DepthMapVisualizerPipelineImpl(PipelineOutputInterface *visualizer_output,
-                                   DescriptorSetAllocator *desc_set_allocator,
-                                   VulkanContext *context);
-    ~DepthMapVisualizerPipelineImpl();
+void DoVisualizeDepthMap(float alpha, std::optional<PerspectiveProjection> projection,
+                         PipelineStage* depth_map_stage, DescriptorSetAllocator *desc_set_allocator,
+                         VulkanContext *context,  PipelineStage* target) {
+    PostProcessorPipeline2 *pipeline = static_cast<PostProcessorPipeline2 *>(
+        target->WithPipeline(kDepthMapVisualizerPipeline,
+                             [desc_set_allocator, context](PipelineOutputInterface * output) {
+            return std::make_unique<PostProcessorPipeline2>(kFragmentShaderFilePathDepthMapVisualizer, /*input_image_count=*/1,
+                    /*push_constant_size=*/sizeof(DepthMapVisualizerParameters), output,
+                    desc_set_allocator, context);
+        }));
+    auto configurator = std::make_unique<DepthMapPostProcessorConfigurator>(
+                alpha, projection, *depth_map_stage->Output());
+    pipeline->SetConfigurator(std::move(configurator));
 
-    std::unique_ptr<PostProcessorPipeline> post_processor_pipeline;
-};
-
-DepthMapVisualizerPipeline::DepthMapVisualizerPipelineImpl::DepthMapVisualizerPipelineImpl(
-    PipelineOutputInterface *visualizer_output, DescriptorSetAllocator *desc_set_allocator,
-    VulkanContext *context) {
-    post_processor_pipeline = std::make_unique<PostProcessorPipeline>(
-        kFragmentShaderFilePathDepthMapVisualizer, /*input_image_count=*/1,
-        /*push_constant_size=*/sizeof(DepthMapVisualizerParameters), visualizer_output,
-        desc_set_allocator, context);
-}
-
-DepthMapVisualizerPipeline::DepthMapVisualizerPipelineImpl::~DepthMapVisualizerPipelineImpl() {}
-
-DepthMapVisualizerPipeline::DepthMapVisualizerPipeline(DescriptorSetAllocator *desc_set_allocator,
-                                                       VulkanContext *context)
-    : desc_set_allocator_(desc_set_allocator), context_(context), current_output_(nullptr) {}
-
-DepthMapVisualizerPipeline::~DepthMapVisualizerPipeline() {}
-
-void DepthMapVisualizerPipeline::Run(float alpha, std::optional<PerspectiveProjection> projection,
-                                     DepthMapPipelineOutput const &depth_map,
-                                     PipelineOutputInterface *visualizer_output) {
-    if (visualizer_output != current_output_) {
-        pimpl_ = std::make_unique<DepthMapVisualizerPipelineImpl>(visualizer_output,
-                                                                  desc_set_allocator_, context_);
-        current_output_ = visualizer_output;
-    }
-
-    DepthMapPostProcessorConfigurator configurator(alpha, projection, depth_map);
-    pimpl_->post_processor_pipeline->Run(configurator, *depth_map.Promise());
+    target->Schedule(kDepthMapVisualizerPipeline, /*parents=*/std::vector<PipelineStage*>{depth_map_stage},
+                     /*instance_count=*/1);
 }
 
 } // namespace e8

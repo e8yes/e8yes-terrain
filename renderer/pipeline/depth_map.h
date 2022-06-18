@@ -23,8 +23,7 @@
 
 #include "common/device.h"
 #include "renderer/basic/projection.h"
-#include "renderer/output/pipeline_output.h"
-#include "renderer/output/promise.h"
+#include "renderer/output/pipeline_stage.h"
 #include "renderer/query/drawable_instance.h"
 #include "renderer/transfer/descriptor_set_texture.h"
 #include "renderer/transfer/vram_geometry.h"
@@ -33,66 +32,33 @@
 namespace e8 {
 
 /**
- * @brief The DepthMapPipelineOutput class For storing, depth-only rendering output. The depth
- * values are stored in 32-bit floats.
+ * @brief CreateDepthMapStage Creates a depth map pipeline stage with a 32-bit depth-only output in
+ *  the specified dimension.
+ *
+ * @param width
+ * @param height
+ * @param context
+ * @return
  */
-class DepthMapPipelineOutput : public PipelineOutputInterface {
-  public:
-    /**
-     * @brief DepthMapPipelineOutput Constructs a depth map output with the specified dimension.
-     *
-     * @param width The width of the depth map output.
-     * @param height The height of the depth map output.
-     * @param context Contextual Vulkan handles.
-     */
-    DepthMapPipelineOutput(unsigned width, unsigned height, VulkanContext *context);
-    ~DepthMapPipelineOutput();
-
-    FrameBuffer *GetFrameBuffer() const override;
-    RenderPass const &GetRenderPass() const override;
-    std::vector<FrameBufferAttachment const *> ColorAttachments() const override;
-    FrameBufferAttachment const *DepthAttachment() const override;
-
-  private:
-    struct DepthMapPipelineOutputImpl;
-    std::unique_ptr<DepthMapPipelineOutputImpl> pimpl_;
-};
+std::unique_ptr<PipelineStage> CreateDepthMapStage(unsigned width, unsigned height, VulkanContext* context);
 
 /**
- * @brief The DepthMapPipeline class A graphics pipeline for rendering a depth map.
+ * @brief DoDepthMapping Schedules a graphics pipeline for rendering a depth map.
+ *
+ * @param drawables An array of drawables to be rendered onto the depth map.
+ * @param projection Defines how drawables should be projected to the depth map.
+ * @param tex_desc_set_cache Texture descriptor cache.
+ * @param geo_vram The geometry VRAM transferer.
+ * @param tex_vram The texture VRAM transferer.
+ * @param context Contextual Vulkan handles.
+ * @param first_stage The frame's first stage.
+ * @param target The target stage which stores the rendered depth map.
  */
-class DepthMapPipeline {
-  public:
-    /**
-     * @brief DepthMapPipeline Constructs a graphics pipeline for rendering a depth map.
-     */
-    DepthMapPipeline(VulkanContext *context);
-    ~DepthMapPipeline();
-
-    /**
-     * @brief Run Runs the depth map graphics pipeline. The pipeline can only be run when the
-     * previous run was finished (indicated by the output's barrier).
-     *
-     * @param drawables An array of drawables to be rendered onto the depth map.
-     * @param projection Defines how drawables should be projected to the depth map.
-     * @param prerequisites Dependent tasks.
-     * @param tex_desc_set_cache
-     * @param geo_vram The geometry VRAM transferer.
-     * @param tex_vram The texture VRAM transferer.
-     * @param output An object for storing the rendered depth map.
-     */
-    void Run(std::vector<DrawableInstance> const &drawables, ProjectionInterface const &projection,
-             GpuPromise const &prerequisites, TextureDescriptorSetCache *tex_desc_set_cache,
-             GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram,
-             DepthMapPipelineOutput *output);
-
-  private:
-    class DepthMapPipelineImpl;
-
-    VulkanContext *context_;
-    DepthMapPipelineOutput *current_output_;
-    std::unique_ptr<DepthMapPipelineImpl> pimpl_;
-};
+void DoDepthMapping(std::vector<DrawableInstance> const &drawables,
+                    ProjectionInterface const &projection,
+                    TextureDescriptorSetCache *tex_desc_set_cache, GeometryVramTransfer *geo_vram,
+                    TextureVramTransfer *tex_vram,  VulkanContext *context,
+                    PipelineStage *first_stage, PipelineStage *target);
 
 } // namespace e8
 

@@ -27,6 +27,7 @@
 
 #include "common/device.h"
 #include "renderer/basic/uniform_layout.h"
+#include "renderer/output/cached_pipeline.h"
 #include "renderer/output/pipeline_output.h"
 #include "renderer/output/promise.h"
 #include "renderer/transfer/descriptor_set.h"
@@ -53,6 +54,43 @@ class PostProcessorConfiguratorInterface {
      * pipeline.
      */
     virtual void PushConstants(std::vector<uint8_t> *push_constants) const;
+};
+
+/**
+ * @brief The PostProcessorPipeline2 class A generic configurable post processing graphics pipeline.
+ */
+class PostProcessorPipeline2 : public CachedPipelineInterface {
+  public:
+    /**
+     * @brief PostProcessorPipeline Constructs a custom post processor.
+     *
+     * @param fragment_shader The fragment shader to create the desired post processing effect.
+     * @param input_image_count The number of input images the post processor requires.
+     * @param push_constant_size The number of bytes the post processor's push constants requires.
+     * @param output To receive output from the post processor.
+     * @param desc_set_allocator Descriptor set allocator.
+     * @param context Contextual Vulkan handles.
+     */
+    PostProcessorPipeline2(std::string const &fragment_shader, unsigned input_image_count,
+                          unsigned push_constant_size, PipelineOutputInterface *output,
+                          DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
+    ~PostProcessorPipeline2() override;
+
+    Fulfillment Launch(unsigned instance_id,
+                                   std::vector<PipelineOutputInterface *> const &inputs,
+                                   std::vector<GpuPromise *> const &prerequisites,
+                                   unsigned completion_signal_count,
+                                   PipelineOutputInterface *output) override;
+
+    /**
+     * @brief SetConfigurator For configuring what shader uniform setup to apply to the post
+     * processing pipeline.
+     */
+    void SetConfigurator(std::unique_ptr<PostProcessorConfiguratorInterface> &&configurator);
+
+  private:
+    struct PostProcessorPipelineImpl;
+    std::unique_ptr<PostProcessorPipelineImpl> pimpl_;
 };
 
 /**

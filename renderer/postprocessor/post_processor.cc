@@ -253,4 +253,107 @@ PostProcessorPipeline::Run(PostProcessorConfiguratorInterface const &configurato
     return pimpl_->output;
 }
 
+struct PostProcessorPipeline2::PostProcessorPipelineImpl {
+    PostProcessorPipelineImpl(ShaderUniformLayout const& uniform_layout,
+                              PipelineOutputInterface *output,
+                              DescriptorSetAllocator *desc_set_allocator,
+                              VulkanContext *context);
+    ~PostProcessorPipelineImpl();
+
+    std::unique_ptr<DescriptorSet> viewport_dimension_desc_set;
+    std::unique_ptr<UniformBuffer> viewport_dimension_ubo;
+
+    std::unique_ptr<DescriptorSet> input_images_desc_set;
+    std::unique_ptr<ImageSampler> input_image_sampler;
+    std::vector<VkImageView> past_input_images;
+
+    std::unique_ptr<PostProcessorConfiguratorInterface> configurator;
+};
+
+PostProcessorPipeline2::PostProcessorPipelineImpl::PostProcessorPipelineImpl(
+        ShaderUniformLayout const& uniform_layout,
+        PipelineOutputInterface *output,
+        DescriptorSetAllocator *desc_set_allocator,
+        VulkanContext *context) {
+    // Sets up the viewport dimension uniform variable.
+    viewport_dimension_desc_set = desc_set_allocator->Allocate(DescriptorType::DT_UNIFORM_BUFFER,
+                                                               uniform_layout.per_frame_desc_set);
+
+    viewport_dimension_ubo = CreateUniformBuffer(/*size=*/sizeof(ViewportDimension), context);
+
+    ViewportDimension dimension;
+    dimension.viewport_width = output->Width();
+    dimension.viewport_height = output->Height();
+
+    WriteUniformBufferDescriptor(&dimension, *viewport_dimension_ubo, *viewport_dimension_desc_set,
+                                 /*binding=*/0, context);
+
+    // Sets up the input image uniform variables.
+    input_images_desc_set = desc_set_allocator->Allocate(DescriptorType::DT_COMBINED_IMAGE_SAMPLER,
+                                                         uniform_layout.per_pass_desc_set);
+    input_image_sampler = CreateContinuousSampler(context);
+
+    for (auto &past_input_image : past_input_images) {
+        past_input_image = VK_NULL_HANDLE;
+    }
+}
+
+PostProcessorPipeline2::PostProcessorPipelineImpl::~PostProcessorPipelineImpl() {}
+
+PostProcessorPipeline2::PostProcessorPipeline2(std::string const &fragment_shader,
+                                               unsigned input_image_count,
+                                               unsigned push_constant_size,
+                                               PipelineOutputInterface *output,
+                                               DescriptorSetAllocator *desc_set_allocator,
+                                               VulkanContext *context): CachedPipelineInterface(context) {
+    shader_stages_ =
+        CreateShaderStages(/*vertex_shader_file_path=*/kVertexShaderFilePathPostProcessor,
+                           /*fragment_shader_file_path=*/fragment_shader, context);
+    uniform_layout_ = UniformLayout(input_image_count, push_constant_size, context);
+    vertex_inputs_ = CreateVertexInputState(
+        /*input_attributes=*/std::vector<VkVertexInputAttributeDescription>());
+    fixed_stage_config_ = CreateFixedStageConfig(/*polygon_mode=*/VK_POLYGON_MODE_FILL,
+                                                /*cull_mode=*/VK_CULL_MODE_NONE,
+                                                /*enable_depth_test=*/false, output->Width(),
+                                                output->Height(), /*color_attachment_count=*/1);
+
+    // Creates the post processing pipeline.
+    pipeline_ =
+        CreateGraphicsPipeline(output->GetRenderPass(), *shader_stages_, *uniform_layout_,
+                               *vertex_inputs_, *fixed_stage_config_, context);
+
+    // Sets up uniform variables.
+    pimpl_ = std::make_unique<PostProcessorPipelineImpl>(*uniform_layout_, output,
+                                                         desc_set_allocator, context);
+}
+
+PostProcessorPipeline2::~PostProcessorPipeline2() {}
+
+Fulfillment PostProcessorPipeline2::Launch(unsigned /*instance_id*/,
+                                           std::vector<PipelineOutputInterface *> const &/*inputs*/,
+                                           std::vector<GpuPromise *> const &prerequisites,
+                                           unsigned completion_signal_count,
+                                           PipelineOutputInterface *output) {
+    VkCommandBuffer cmds = StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(),
+                                           context_);
+
+    PostProcess(
+        *pipeline_, *uniform_layout_,
+        [this](ShaderUniformLayout const &uniform_layout, VkCommandBuffer cmds) {
+            ConfigureViewportDimensionUniformVariable(uniform_layout,
+                                                      *pimpl_->viewport_dimension_desc_set, cmds);
+            ConfigureCustomUniformVariables(
+                *pimpl_->configurator, uniform_layout, *pimpl_->input_images_desc_set,
+                *pimpl_->input_image_sampler, &pimpl_->past_input_images, context_, cmds);
+        },
+        cmds);
+
+    return FinishRenderPass2(cmds, completion_signal_count, prerequisites,  context_);
+}
+
+void PostProcessorPipeline2::SetConfigurator(
+        std::unique_ptr<PostProcessorConfiguratorInterface> &&configurator) {
+    pimpl_->configurator = std::move(configurator);
+}
+
 } // namespace e8
