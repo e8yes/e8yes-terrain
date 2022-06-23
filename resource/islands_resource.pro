@@ -16,7 +16,7 @@ QMAKE_LFLAGS_RELEASE += -O3 -flto -march=native
 
 INCLUDEPATH += ../
 
-unix {
+macx {
     INCLUDEPATH += /usr/include
     INCLUDEPATH += /usr/local/include
 
@@ -89,8 +89,14 @@ else:unix: LIBS += -L$$OUT_PWD/../third_party/uuid/ -luuid4
 INCLUDEPATH += $$PWD/../third_party/uuid
 DEPENDPATH += $$PWD/../third_party/uuid
 
-LIBS += -lboost_log
-LIBS += -lboost_thread
+unix:!macx {
+    LIBS += -lboost_log
+}
+
+macx {
+    LIBS += -lboost_log-mt
+}
+
 LIBS += -lprotobuf
 LIBS += -lSDL2
 LIBS += -lvulkan

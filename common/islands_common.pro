@@ -17,7 +17,7 @@ QMAKE_LFLAGS_RELEASE += -O3 -flto -march=native
 
 INCLUDEPATH += ../
 
-unix {
+macx {
     INCLUDEPATH += /usr/include
     INCLUDEPATH += /usr/local/include
 

@@ -16,6 +16,14 @@ QMAKE_LFLAGS_RELEASE += -O3 -flto -march=native
 
 INCLUDEPATH += ../
 
+macx {
+    INCLUDEPATH += /usr/include
+    INCLUDEPATH += /usr/local/include
+
+    QMAKE_LFLAGS += -L/usr/lib
+    QMAKE_LFLAGS += -L/usr/local/lib
+}
+
 SOURCES += \
     camera.cc \
     common.cc \
@@ -63,6 +71,37 @@ HEADERS += \
     scene_object.h \
     structure.h \
     structure_linear.h
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../resource/release/ -lresource
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../resource/debug/ -lresource
+else:unix: LIBS += -L$$OUT_PWD/../resource/ -lresource
+
+INCLUDEPATH += $$PWD/../resource
+DEPENDPATH += $$PWD/../resource
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../third_party/tiny_gltf/release/ -ltiny_gltf
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../third_party/tiny_gltf/debug/ -ltiny_gltf
+else:unix: LIBS += -L$$OUT_PWD/../third_party/tiny_gltf/ -ltiny_gltf
+
+INCLUDEPATH += $$PWD/../third_party/tiny_gltf
+DEPENDPATH += $$PWD/../third_party/tiny_gltf
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../third_party/uuid/release/ -luuid4
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../third_party/uuid/debug/ -luuid4
+else:unix: LIBS += -L$$OUT_PWD/../third_party/uuid/ -luuid4
+
+INCLUDEPATH += $$PWD/../third_party/uuid
+DEPENDPATH += $$PWD/../third_party/uuid
+
+unix:!macx {
+    LIBS += -lboost_log
+}
+
+macx {
+    LIBS += -lboost_log-mt
+}
+
+LIBS += -lprotobuf
 
 # Default rules for deployment.
 unix {

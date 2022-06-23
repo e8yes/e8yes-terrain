@@ -15,6 +15,14 @@ QMAKE_LFLAGS_RELEASE += -O3 -flto -march=native
 
 INCLUDEPATH += ../
 
+macx {
+    INCLUDEPATH += /usr/include
+    INCLUDEPATH += /usr/local/include
+
+    QMAKE_LFLAGS += -L/usr/lib
+    QMAKE_LFLAGS += -L/usr/local/lib
+}
+
 SOURCES += \
     basic/component_editor_portal_switcher.cc \
     basic/component_modification_monitor.cc \
@@ -145,8 +153,14 @@ else:unix: LIBS += -L$$OUT_PWD/../third_party/stb_image/ -lstb_image
 INCLUDEPATH += $$PWD/../third_party/stb_image
 DEPENDPATH += $$PWD/../third_party/stb_image
 
-LIBS += -lboost_log
-LIBS += -lboost_thread
+unix:!macx {
+    LIBS += -lboost_log
+}
+
+macx {
+    LIBS += -lboost_log-mt
+}
+
 LIBS += -lprotobuf
 LIBS += -lSDL2
 LIBS += -lvulkan
