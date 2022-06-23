@@ -19,6 +19,7 @@
 #define ISLANDS_RENDERER_CACHED_PIPELINE_H
 
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "common/device.h"
@@ -34,34 +35,45 @@
 
 namespace e8 {
 
+// The unique key assigned to a cached pipeline.
+using PipelineKey = std::string;
+
+/**
+ * @brief The CachedPipelineArgumentsInterface struct Generic arguments that pass to
+ * CachedPipelineInterface::Launch().
+ */
+struct CachedPipelineArgumentsInterface {};
+
 /**
  * @brief The CachedPipelineInterface class Encapsulates the common states and functionality of a
  * graphics pipeline.
  */
 class CachedPipelineInterface {
-  public:
+   public:
     CachedPipelineInterface(VulkanContext *context);
     virtual ~CachedPipelineInterface();
 
     /**
+     * @brief Key A unique key assigned to this pipeline.
+     */
+    virtual PipelineKey Key() const = 0;
+
+    /**
      * @brief Launch Launches a graphics pipeline, and let it run asynchronously on the GPU.
      *
-     * @param instance_id The zero-offset index of the instanced call. This function may be called
-     * multiple times with the same dependent inputs. Each of these calls is considered an instance.
-     * @param inputs Outputs of dependent parents.
+     * @param generic_args Arguments passed to this launch.
      * @param prerequisites The set of promises that need to be resolved before running this
      * pipeline.
      * @param completion_signal_count The number of signals to emit when the pipeline is complete.
      * @param output Stores the output of this pipeline.
      * @return The GPU operation's promised fulfillment.
      */
-    virtual Fulfillment Launch(unsigned instance_id,
-                               std::vector<PipelineOutputInterface *> const &inputs,
+    virtual Fulfillment Launch(CachedPipelineArgumentsInterface const &generic_args,
                                std::vector<GpuPromise *> const &prerequisites,
                                unsigned completion_signal_count,
                                PipelineOutputInterface *output) = 0;
 
-  protected:
+   protected:
     // Contextual Vulkan handles.
     VulkanContext *context_;
 
@@ -74,6 +86,6 @@ class CachedPipelineInterface {
     std::unique_ptr<ImageSampler> texture_sampler_;
 };
 
-} // namespace e8
+}  // namespace e8
 
-#endif // ISLANDS_RENDERER_CACHED_PIPELINE_H
+#endif  // ISLANDS_RENDERER_CACHED_PIPELINE_H

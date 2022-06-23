@@ -38,10 +38,7 @@ namespace e8 {
  * chained into a DAG compute graph.
  */
 class PipelineStage {
-  public:
-    // The key of a cached pipeline.
-    using PipelineKey = std::string;
-
+   public:
     // A graphics pipeline's construction is often paired with an output. This function standarized
     // the creation of a complete graphics pipeline.
     using CompilePipelineFn =
@@ -67,13 +64,14 @@ class PipelineStage {
      * @brief Schedule Schedules an added pipeline to be run with the specified parameters. The
      * pipeline is guaranteed to have run after calling PipelineStage::Fulfill().
      *
-     * @param key A unique key which identifies the pipeline.
+     * @param pipeline The pipeline to be scheduled to run.
      * @param parents The stages where the pipeline depends.
      * @param instance_count The number of times to call on the pipeline with the same dependent
      * parents.
      */
-    void Schedule(PipelineKey const &key, std::vector<PipelineStage *> const &parents,
-                  unsigned instance_count);
+    void Schedule(CachedPipelineInterface const *pipeline,
+                  std::unique_ptr<CachedPipelineArgumentsInterface> &&args,
+                  std::vector<PipelineStage *> const &parents);
 
     /**
      * @brief Output The output attached to this stage.
@@ -90,21 +88,19 @@ class PipelineStage {
      */
     void Fulfill(VulkanContext *context);
 
-  private:
+   private:
     using ChildId = unsigned;
 
     struct PipelineStageImpl;
-    struct PipelineAndSchedule;
-
+    struct ParentStage;
+    struct PipelineSchedule;
+    struct PipelineAndSchedules;
     ChildId AllocateChild();
 
-    std::unordered_set<PipelineStage *> Parents();
+    std::unordered_set<PipelineStage *> UniqueParents();
 
-    void
-    LaunchSchedule(PipelineKey const &pipeline_key,
-                   PipelineAndSchedule const &pipeline_and_schedule, unsigned child_count,
-                   PipelineOutputInterface *output,
-                   std::unordered_map<PipelineKey, std::vector<Fulfillment>> *fulfillment_cache);
+    Fulfillment LaunchSchedule(CachedPipelineInterface *pipeline, PipelineSchedule const &schedule,
+                               unsigned child_count, PipelineOutputInterface *output);
 
     std::vector<GpuPromise *> LaunchSchedulesFor(std::optional<ChildId> child_id);
 
@@ -113,6 +109,6 @@ class PipelineStage {
     std::unique_ptr<PipelineStageImpl> pimpl_;
 };
 
-} // namespace e8
+}  // namespace e8
 
-#endif // ISLANDS_RENDERER_PIPELINE_STAGE_H
+#endif  // ISLANDS_RENDERER_PIPELINE_STAGE_H

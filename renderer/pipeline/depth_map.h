@@ -35,12 +35,13 @@ namespace e8 {
  * @brief CreateDepthMapStage Creates a depth map pipeline stage with a 32-bit depth-only output in
  *  the specified dimension.
  *
- * @param width
- * @param height
- * @param context
- * @return
+ * @param width The width of the depth map output.
+ * @param height The height of the depth map output.
+ * @param context Contextual Vulkan handles.
+ * @return A pipeline stage created with the depth map output.
  */
-std::unique_ptr<PipelineStage> CreateDepthMapStage(unsigned width, unsigned height, VulkanContext* context);
+std::unique_ptr<PipelineStage> CreateDepthMapStage(unsigned width, unsigned height,
+                                                   VulkanContext *context);
 
 /**
  * @brief DoDepthMapping Schedules a graphics pipeline for rendering a depth map.
@@ -57,9 +58,9 @@ std::unique_ptr<PipelineStage> CreateDepthMapStage(unsigned width, unsigned heig
 void DoDepthMapping(std::vector<DrawableInstance> const &drawables,
                     ProjectionInterface const &projection,
                     TextureDescriptorSetCache *tex_desc_set_cache, GeometryVramTransfer *geo_vram,
-                    TextureVramTransfer *tex_vram,  VulkanContext *context,
+                    TextureVramTransfer *tex_vram, VulkanContext *context,
                     PipelineStage *first_stage, PipelineStage *target);
 
-} // namespace e8
+}  // namespace e8
 
-#endif // ISLANDS_RENDERER_PIPELINE_DEPTH_MAP_H
+#endif  // ISLANDS_RENDERER_PIPELINE_DEPTH_MAP_H

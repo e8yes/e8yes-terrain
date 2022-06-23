@@ -18,12 +18,12 @@
 #ifndef ISLANDS_RENDERER_PIPELINE_POST_PROCESSOR_H
 #define ISLANDS_RENDERER_PIPELINE_POST_PROCESSOR_H
 
+#include <vulkan/vulkan.h>
 #include <cstdint>
 #include <functional>
 #include <memory>
 #include <string>
 #include <vector>
-#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "renderer/basic/uniform_layout.h"
@@ -38,8 +38,8 @@ namespace e8 {
  * @brief The PostProcessorConfiguratorInterface class For configuring what shader uniform setup to
  * apply to the post processing pipeline.
  */
-class PostProcessorConfiguratorInterface {
-  public:
+class PostProcessorConfiguratorInterface : public CachedPipelineArgumentsInterface {
+   public:
     PostProcessorConfiguratorInterface();
     virtual ~PostProcessorConfiguratorInterface();
 
@@ -58,12 +58,16 @@ class PostProcessorConfiguratorInterface {
 
 /**
  * @brief The PostProcessorPipeline2 class A generic configurable post processing graphics pipeline.
+ * To configure the pipeline, the client should supply arguments to the constructor and pass a
+ * PostProcessorConfiguratorInterface as the argument while scheduling. Note, it's a
+ * fully implemented concrete class.
  */
 class PostProcessorPipeline2 : public CachedPipelineInterface {
-  public:
+   public:
     /**
      * @brief PostProcessorPipeline Constructs a custom post processor.
      *
+     * @param key A unique key assigned to this post processing pipeline.
      * @param fragment_shader The fragment shader to create the desired post processing effect.
      * @param input_image_count The number of input images the post processor requires.
      * @param push_constant_size The number of bytes the post processor's push constants requires.
@@ -71,24 +75,19 @@ class PostProcessorPipeline2 : public CachedPipelineInterface {
      * @param desc_set_allocator Descriptor set allocator.
      * @param context Contextual Vulkan handles.
      */
-    PostProcessorPipeline2(std::string const &fragment_shader, unsigned input_image_count,
-                          unsigned push_constant_size, PipelineOutputInterface *output,
-                          DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
+    PostProcessorPipeline2(PipelineKey const &key, std::string const &fragment_shader,
+                           unsigned input_image_count, unsigned push_constant_size,
+                           PipelineOutputInterface *output,
+                           DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
     ~PostProcessorPipeline2() override;
 
-    Fulfillment Launch(unsigned instance_id,
-                                   std::vector<PipelineOutputInterface *> const &inputs,
-                                   std::vector<GpuPromise *> const &prerequisites,
-                                   unsigned completion_signal_count,
-                                   PipelineOutputInterface *output) override;
+    PipelineKey Key() const override;
 
-    /**
-     * @brief SetConfigurator For configuring what shader uniform setup to apply to the post
-     * processing pipeline.
-     */
-    void SetConfigurator(std::unique_ptr<PostProcessorConfiguratorInterface> &&configurator);
+    Fulfillment Launch(CachedPipelineArgumentsInterface const &generic_args,
+                       std::vector<GpuPromise *> const &prerequisites,
+                       unsigned completion_signal_count, PipelineOutputInterface *output) override;
 
-  private:
+   private:
     struct PostProcessorPipelineImpl;
     std::unique_ptr<PostProcessorPipelineImpl> pimpl_;
 };
@@ -99,7 +98,7 @@ class PostProcessorPipeline2 : public CachedPipelineInterface {
  * define the actual effect.
  */
 class PostProcessorPipeline {
-  public:
+   public:
     /**
      * @brief PostProcessorPipeline Constructs a custom post processor.
      *
@@ -139,11 +138,11 @@ class PostProcessorPipeline {
     PipelineOutputInterface *Run(PostProcessorConfiguratorInterface const &configurator,
                                  GpuPromise const &promise);
 
-  private:
+   private:
     struct PostProcessorPipelineImpl;
     std::unique_ptr<PostProcessorPipelineImpl> pimpl_;
 };
 
-} // namespace e8
+}  // namespace e8
 
-#endif // ISLANDS_RENDERER_PIPELINE_POST_PROCESSOR_H
+#endif  // ISLANDS_RENDERER_PIPELINE_POST_PROCESSOR_H
