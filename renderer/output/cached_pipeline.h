@@ -42,14 +42,17 @@ using PipelineKey = std::string;
  * @brief The CachedPipelineArgumentsInterface struct Generic arguments that pass to
  * CachedPipelineInterface::Launch().
  */
-struct CachedPipelineArgumentsInterface {};
+struct CachedPipelineArgumentsInterface {
+    CachedPipelineArgumentsInterface();
+    virtual ~CachedPipelineArgumentsInterface();
+};
 
 /**
  * @brief The CachedPipelineInterface class Encapsulates the common states and functionality of a
  * graphics pipeline.
  */
 class CachedPipelineInterface {
-   public:
+  public:
     CachedPipelineInterface(VulkanContext *context);
     virtual ~CachedPipelineInterface();
 
@@ -73,7 +76,7 @@ class CachedPipelineInterface {
                                unsigned completion_signal_count,
                                PipelineOutputInterface *output) = 0;
 
-   protected:
+  protected:
     // Contextual Vulkan handles.
     VulkanContext *context_;
 
@@ -86,6 +89,6 @@ class CachedPipelineInterface {
     std::unique_ptr<ImageSampler> texture_sampler_;
 };
 
-}  // namespace e8
+} // namespace e8
 
-#endif  // ISLANDS_RENDERER_CACHED_PIPELINE_H
+#endif // ISLANDS_RENDERER_CACHED_PIPELINE_H

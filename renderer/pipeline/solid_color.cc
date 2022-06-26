@@ -44,7 +44,7 @@ struct FillColorPipelineArguments : public CachedPipelineArgumentsInterface {
 };
 
 class FillColorPipeline : public CachedPipelineInterface {
-   public:
+  public:
     FillColorPipeline(VulkanContext *context);
     ~FillColorPipeline() override;
 
@@ -65,7 +65,8 @@ Fulfillment FillColorPipeline::Launch(CachedPipelineArgumentsInterface const &ge
                                       std::vector<GpuPromise *> const &prerequisites,
                                       unsigned completion_signal_count,
                                       PipelineOutputInterface *output) {
-    auto args = static_cast<FillColorPipelineArguments const &>(generic_args);
+    FillColorPipelineArguments const &args =
+        static_cast<FillColorPipelineArguments const &>(generic_args);
 
     FrameBuffer *frame_buffer = output->GetFrameBuffer();
 
@@ -77,7 +78,7 @@ Fulfillment FillColorPipeline::Launch(CachedPipelineArgumentsInterface const &ge
     return FinishRenderPass2(cmds, completion_signal_count, prerequisites, context_);
 }
 
-}  // namespace
+} // namespace
 
 SolidColorPipeline::SolidColorPipeline(VulkanContext *context) : context_(context) {}
 
@@ -108,4 +109,4 @@ void DoFillColor(vec3 const &color, VulkanContext *context, PipelineStage *first
                      /*parents=*/std::vector<PipelineStage *>{first_stage});
 }
 
-}  // namespace e8
+} // namespace e8

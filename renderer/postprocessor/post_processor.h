@@ -18,12 +18,12 @@
 #ifndef ISLANDS_RENDERER_PIPELINE_POST_PROCESSOR_H
 #define ISLANDS_RENDERER_PIPELINE_POST_PROCESSOR_H
 
-#include <vulkan/vulkan.h>
 #include <cstdint>
 #include <functional>
 #include <memory>
 #include <string>
 #include <vector>
+#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "renderer/basic/uniform_layout.h"
@@ -39,7 +39,7 @@ namespace e8 {
  * apply to the post processing pipeline.
  */
 class PostProcessorConfiguratorInterface : public CachedPipelineArgumentsInterface {
-   public:
+  public:
     PostProcessorConfiguratorInterface();
     virtual ~PostProcessorConfiguratorInterface();
 
@@ -63,7 +63,7 @@ class PostProcessorConfiguratorInterface : public CachedPipelineArgumentsInterfa
  * fully implemented concrete class.
  */
 class PostProcessorPipeline2 : public CachedPipelineInterface {
-   public:
+  public:
     /**
      * @brief PostProcessorPipeline Constructs a custom post processor.
      *
@@ -87,7 +87,7 @@ class PostProcessorPipeline2 : public CachedPipelineInterface {
                        std::vector<GpuPromise *> const &prerequisites,
                        unsigned completion_signal_count, PipelineOutputInterface *output) override;
 
-   private:
+  private:
     struct PostProcessorPipelineImpl;
     std::unique_ptr<PostProcessorPipelineImpl> pimpl_;
 };
@@ -98,7 +98,7 @@ class PostProcessorPipeline2 : public CachedPipelineInterface {
  * define the actual effect.
  */
 class PostProcessorPipeline {
-   public:
+  public:
     /**
      * @brief PostProcessorPipeline Constructs a custom post processor.
      *
@@ -138,11 +138,11 @@ class PostProcessorPipeline {
     PipelineOutputInterface *Run(PostProcessorConfiguratorInterface const &configurator,
                                  GpuPromise const &promise);
 
-   private:
+  private:
     struct PostProcessorPipelineImpl;
     std::unique_ptr<PostProcessorPipelineImpl> pimpl_;
 };
 
-}  // namespace e8
+} // namespace e8
 
-#endif  // ISLANDS_RENDERER_PIPELINE_POST_PROCESSOR_H
+#endif // ISLANDS_RENDERER_PIPELINE_POST_PROCESSOR_H

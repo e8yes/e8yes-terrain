@@ -34,6 +34,10 @@
 
 namespace e8 {
 
+CachedPipelineArgumentsInterface::CachedPipelineArgumentsInterface() {}
+
+CachedPipelineArgumentsInterface::~CachedPipelineArgumentsInterface() {}
+
 CachedPipelineInterface::CachedPipelineInterface(VulkanContext *context) : context_(context) {}
 
 CachedPipelineInterface::~CachedPipelineInterface() {}

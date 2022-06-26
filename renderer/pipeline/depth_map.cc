@@ -15,7 +15,6 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vulkan/vulkan.h>
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
@@ -23,6 +22,7 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "common/tensor.h"
@@ -57,7 +57,7 @@ PipelineKey kDepthMapPipeline = "DepthMap";
  * values are stored in 32-bit floats.
  */
 class DepthMapPipelineOutput : public PipelineOutputInterface {
-   public:
+  public:
     /**
      * @brief DepthMapPipelineOutput Constructs a depth map output with the specified dimension.
      *
@@ -73,7 +73,7 @@ class DepthMapPipelineOutput : public PipelineOutputInterface {
     std::vector<FrameBufferAttachment const *> ColorAttachments() const override;
     FrameBufferAttachment const *DepthAttachment() const override;
 
-   private:
+  private:
     struct DepthMapPipelineOutputImpl;
     std::unique_ptr<DepthMapPipelineOutputImpl> pimpl_;
 };
@@ -142,13 +142,13 @@ std::vector<VkVertexInputAttributeDescription> VertexShaderInputAttributes() {
 }
 
 class RenderPassConfigurator : public RenderPassConfiguratorInterface {
-   public:
+  public:
     RenderPassConfigurator(ProjectionInterface const &projection);
     ~RenderPassConfigurator();
 
     std::vector<uint8_t> PushConstantOf(DrawableInstance const &drawable) const override;
 
-   private:
+  private:
     ProjectionInterface const &projection_;
 };
 
@@ -157,8 +157,8 @@ RenderPassConfigurator::RenderPassConfigurator(ProjectionInterface const &projec
 
 RenderPassConfigurator::~RenderPassConfigurator() {}
 
-std::vector<uint8_t> RenderPassConfigurator::PushConstantOf(
-    DrawableInstance const &drawable) const {
+std::vector<uint8_t>
+RenderPassConfigurator::PushConstantOf(DrawableInstance const &drawable) const {
     std::vector<uint8_t> bytes(sizeof(PushConstant));
 
     PushConstant *push_constant = reinterpret_cast<PushConstant *>(bytes.data());
@@ -173,11 +173,8 @@ struct DepthMapPipelineArguments : public CachedPipelineArgumentsInterface {
                               ProjectionInterface const &projection,
                               TextureDescriptorSetCache *tex_desc_set_cache,
                               GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram)
-        : drawables(drawables),
-          projection(projection),
-          tex_desc_set_cache(tex_desc_set_cache),
-          geo_vram(geo_vram),
-          tex_vram(tex_vram) {}
+        : drawables(drawables), projection(projection), tex_desc_set_cache(tex_desc_set_cache),
+          geo_vram(geo_vram), tex_vram(tex_vram) {}
 
     std::vector<DrawableInstance> const &drawables;
     ProjectionInterface const &projection;
@@ -187,7 +184,7 @@ struct DepthMapPipelineArguments : public CachedPipelineArgumentsInterface {
 };
 
 class DepthMapPipeline : public CachedPipelineInterface {
-   public:
+  public:
     DepthMapPipeline(DepthMapPipelineOutput *output, VulkanContext *context);
     ~DepthMapPipeline() override;
 
@@ -224,7 +221,8 @@ Fulfillment DepthMapPipeline::Launch(CachedPipelineArgumentsInterface const &gen
                                      std::vector<GpuPromise *> const &prerequisites,
                                      unsigned completion_signal_count,
                                      PipelineOutputInterface *output) {
-    auto args = static_cast<DepthMapPipelineArguments const &>(generic_args);
+    DepthMapPipelineArguments const &args =
+        static_cast<DepthMapPipelineArguments const &>(generic_args);
 
     VkCommandBuffer cmds =
         StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), context_);
@@ -236,7 +234,7 @@ Fulfillment DepthMapPipeline::Launch(CachedPipelineArgumentsInterface const &gen
     return FinishRenderPass2(cmds, completion_signal_count, prerequisites, context_);
 }
 
-}  // namespace
+} // namespace
 
 std::unique_ptr<PipelineStage> CreateDepthMapStage(unsigned width, unsigned height,
                                                    VulkanContext *context) {
@@ -261,4 +259,4 @@ void DoDepthMapping(std::vector<DrawableInstance> const &drawables,
                      /*parents=*/std::vector<PipelineStage *>{first_stage});
 }
 
-}  // namespace e8
+} // namespace e8

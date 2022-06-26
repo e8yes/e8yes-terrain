@@ -15,7 +15,6 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vulkan/vulkan.h>
 #include <cassert>
 #include <chrono>
 #include <cmath>
@@ -28,6 +27,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "content/scene.h"
@@ -56,7 +56,7 @@ PipelineKey const kPresentImagePipeline = "PresentImage";
  * @brief The AcquireImagePipeline class
  */
 class AcquireImagePipeline : public CachedPipelineInterface {
-   public:
+  public:
     explicit AcquireImagePipeline(VulkanContext *context);
     ~AcquireImagePipeline();
 
@@ -66,7 +66,7 @@ class AcquireImagePipeline : public CachedPipelineInterface {
                        std::vector<GpuPromise *> const &prerequisites,
                        unsigned completion_signal_count, PipelineOutputInterface *output) override;
 
-   private:
+  private:
     GpuPromise acquire_image_promise_;
 };
 
@@ -127,7 +127,7 @@ struct PresentImageArguments : public CachedPipelineArgumentsInterface {
  * @brief The PresentImagePipeline class
  */
 class PresentImagePipeline : public CachedPipelineInterface {
-   public:
+  public:
     PresentImagePipeline(VulkanContext *context);
     ~PresentImagePipeline();
 
@@ -153,7 +153,7 @@ Fulfillment PresentImagePipeline::Launch(CachedPipelineArgumentsInterface const 
     assert(!prerequisites.empty());
     assert(output == nullptr);
 
-    auto args = static_cast<PresentImageArguments const &>(generic_args);
+    PresentImageArguments const &args = static_cast<PresentImageArguments const &>(generic_args);
 
     unsigned swap_chain_image_index = args.output->SwapChainImageIndex();
 
@@ -176,7 +176,7 @@ Fulfillment PresentImagePipeline::Launch(CachedPipelineArgumentsInterface const 
     return empty_fulfillment;
 }
 
-}  // namespace
+} // namespace
 
 RendererInterface::StagePerformance::StagePerformance()
     : name("INVALID"), last_1_frame_ms(0), last_10_frame_ms(1), last_100_frame_ms(2) {}
@@ -187,12 +187,10 @@ RendererInterface::FrameContext::FrameContext(VulkanContext *context)
     : swap_chain_image_promise(/*task_cmds=*/VK_NULL_HANDLE, context), swap_chain_image_index(0) {}
 
 RendererInterface::RendererInterface(unsigned num_stages, VulkanContext *context)
-    : context(context),
-      stage_performance_(num_stages + 2),
+    : context(context), stage_performance_(num_stages + 2),
       final_output_(
           std::make_shared<SwapChainPipelineOutput>(/*with_depth_buffer=*/false, context)),
-      first_stage_(final_output_),
-      final_stage_(/*output=*/nullptr),
+      first_stage_(final_output_), final_stage_(/*output=*/nullptr),
       mu_(std::make_unique<std::mutex>()) {}
 
 RendererInterface::~RendererInterface() {}
@@ -316,29 +314,29 @@ void RendererInterface::EndStage(unsigned index) {
 
 std::unique_ptr<RendererInterface> CreateRenderer(RendererType type, VulkanContext *context) {
     switch (type) {
-        case RendererType::RT_SOLID_COLOR: {
-            return std::make_unique<SolidColorRenderer>(context);
-        }
-        case RendererType::RT_DEPTH: {
-            return std::make_unique<DepthRenderer>(context);
-        }
-        case RendererType::RT_LIGHT_INPUTS: {
-            return std::make_unique<LightInputsRenderer>(context);
-        }
-        case RendererType::RT_RADIANCE: {
-            return std::make_unique<RadianceRenderer>(context);
-        }
-        case RendererType::RT_RADIOSITY: {
-            assert(false);
-        }
-        default: {
-            assert(false);
-        }
+    case RendererType::RT_SOLID_COLOR: {
+        return std::make_unique<SolidColorRenderer>(context);
+    }
+    case RendererType::RT_DEPTH: {
+        return std::make_unique<DepthRenderer>(context);
+    }
+    case RendererType::RT_LIGHT_INPUTS: {
+        return std::make_unique<LightInputsRenderer>(context);
+    }
+    case RendererType::RT_RADIANCE: {
+        return std::make_unique<RadianceRenderer>(context);
+    }
+    case RendererType::RT_RADIOSITY: {
+        assert(false);
+    }
+    default: {
+        assert(false);
+    }
     }
 }
 
-std::unique_ptr<RendererConfiguration> LoadRendererConfiguration(
-    std::filesystem::path const &base_path) {
+std::unique_ptr<RendererConfiguration>
+LoadRendererConfiguration(std::filesystem::path const &base_path) {
     std::fstream config_file(base_path / kRendererConfigFileName, std::ios::in | std::ios::binary);
     if (!config_file.is_open()) {
         return nullptr;
@@ -372,4 +370,4 @@ std::unique_ptr<RendererConfiguration> DefaultRendererConfiguration() {
     return config;
 }
 
-}  // namespace e8
+} // namespace e8
