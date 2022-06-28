@@ -54,40 +54,7 @@ VkCommandBuffer StartRenderPass(RenderPass const &pass, FrameBuffer const &frame
                                 VulkanContext *context);
 
 /**
- * @brief The RenderPassPromise struct Contains GPU and CPU promises. They gets signaled once the
- * render pass is complete.
- */
-struct RenderPassPromise {
-    /**
-     * @brief RenderPassPromise Should only be constructed via a FinishRenderPass() call.
-     */
-    RenderPassPromise();
-    RenderPassPromise(RenderPassPromise const &) = delete;
-    RenderPassPromise(RenderPassPromise &&other);
-    ~RenderPassPromise();
-
-    RenderPassPromise &operator=(RenderPassPromise &&other);
-
-    std::unique_ptr<GpuPromise> gpu;
-    std::unique_ptr<CpuPromise> cpu;
-};
-
-/**
- * @brief FinishRenderPass Submits the command buffer to the graphics queue and returns a barrier
- * for this render pass.
- *
- * @param cmds The command buffer to be submitted.
- * @param prerequisites Barrier of previous tasks that need to be complete before this render pass
- * can be run.
- * @param fence Optional. If provided, the fence will be signaled when this render pass is finished.
- * @param context Contextual Vulkan handles.
- * @return The task barrier for this render pass.
- */
-RenderPassPromise FinishRenderPass(VkCommandBuffer cmds, GpuPromise const &prerequisites,
-                                   VulkanContext *context);
-
-/**
- * @brief FinishRenderPass2 Submits the command buffer to the graphics queue to have it been
+ * @brief FinishRenderPass Submits the command buffer to the graphics queue to have it been
  * executed asynchronously and returns a fulfillment which represents the state of the execution.
  *
  * @param cmds The command buffer to be submitted.
@@ -97,9 +64,9 @@ RenderPassPromise FinishRenderPass(VkCommandBuffer cmds, GpuPromise const &prere
  * @param context Contextual Vulkan handles.
  * @return The fulfillment which represents the state of the asynchronous command execution.
  */
-Fulfillment FinishRenderPass2(VkCommandBuffer cmds, unsigned completion_signal_count,
-                              std::vector<GpuPromise *> const &prerequisites,
-                              VulkanContext *context);
+Fulfillment FinishRenderPass(VkCommandBuffer cmds, unsigned completion_signal_count,
+                             std::vector<GpuPromise *> const &prerequisites,
+                             VulkanContext *context);
 
 /**
  * @brief RenderDrawables Renders an array of drawables with the specified graphics pipeline. Note,

@@ -23,7 +23,7 @@
 #include "common/device.h"
 #include "content/scene.h"
 #include "renderer/lighting/direct_illuminator.h"
-#include "renderer/output/common_output.h"
+#include "renderer/output/pipeline_stage.h"
 #include "renderer/pipeline/light_inputs.h"
 #include "renderer/pipeline/solid_color.h"
 #include "renderer/postprocessor/exposure.h"
@@ -44,103 +44,92 @@
 namespace e8 {
 
 struct RadianceRenderer::RadianceRendererImpl {
-    RadianceRendererImpl(VulkanContext *context);
+    RadianceRendererImpl(std::unique_ptr<PipelineStage> &&final_color_image,
+                         VulkanContext *context);
     ~RadianceRendererImpl();
 
-    LightInputsPipelineOutput light_inputs_map;
-    HdrColorPipelineOutput radiance_map;
-    LogLuminancePipelineOutput log_lumiance_map;
-    ExposureEstimationPipelineOutput exposure_value;
-    LdrColorPipelineOutput ldr_color_map;
-    SwapChainPipelineOutput final_color_map;
-
+    VulkanContext *context;
     DescriptorSetAllocator desc_set_alloc;
     TextureDescriptorSetCache tex_desc_set_cache;
     GeometryVramTransfer geo_vram;
     TextureVramTransfer tex_vram;
 
-    LightInputsPipeline light_inputs_pipeline;
+    std::unique_ptr<PipelineStage> light_inputs;
     DirectIlluminator direct_illuminator;
-    ExposureEstimationPipeline exposure_estimation_pipeline;
-    ToneMapPipeline tone_map_pipeline;
-    FxaaPipeline fxaa_pipeline;
+    std::unique_ptr<PipelineStage> log_luminance_map;
+    std::unique_ptr<PipelineStage> exposure_value;
+    std::unique_ptr<PipelineStage> ldr_image;
+    std::unique_ptr<PipelineStage> final_color_image;
 
     RendererConfiguration config;
 };
 
-RadianceRenderer::RadianceRendererImpl::RadianceRendererImpl(VulkanContext *context)
-    : light_inputs_map(context->swap_chain_image_extent.width,
-                       context->swap_chain_image_extent.height, context),
-      radiance_map(context->swap_chain_image_extent.width, context->swap_chain_image_extent.height,
-                   /*with_depth_buffer=*/false, context),
-      log_lumiance_map(context->swap_chain_image_extent.width,
-                       context->swap_chain_image_extent.height, context),
-      exposure_value(context),
-      ldr_color_map(context->swap_chain_image_extent.width, context->swap_chain_image_extent.height,
-                    /*with_depth_buffer=*/false, context),
-      final_color_map(/*with_depth_buffer=*/false, context), desc_set_alloc(context),
-      tex_desc_set_cache(&desc_set_alloc), geo_vram(context), tex_vram(context),
-      light_inputs_pipeline(context), direct_illuminator(&desc_set_alloc, context),
-      exposure_estimation_pipeline(&desc_set_alloc, context),
-      tone_map_pipeline(&desc_set_alloc, context), fxaa_pipeline(&desc_set_alloc, context) {}
+RadianceRenderer::RadianceRendererImpl::RadianceRendererImpl(
+    std::unique_ptr<PipelineStage> &&final_color_image, VulkanContext *context)
+    : context(context), desc_set_alloc(context), tex_desc_set_cache(&desc_set_alloc),
+      geo_vram(context), tex_vram(context),
+      light_inputs(CreateLightInputsStage(context->swap_chain_image_extent.width,
+                                          context->swap_chain_image_extent.height, context)),
+      direct_illuminator(context->swap_chain_image_extent.width,
+                         context->swap_chain_image_extent.height, context),
+      log_luminance_map(CreateLogLuminaneStage(context->swap_chain_image_extent.width,
+                                               context->swap_chain_image_extent.height, context)),
+      exposure_value(CreateExposureStage(context)),
+      ldr_image(CreateLdrImageStage(context->swap_chain_image_extent.width,
+                                    context->swap_chain_image_extent.height, context)),
+      final_color_image(std::move(final_color_image)) {}
 
 RadianceRenderer::RadianceRendererImpl::~RadianceRendererImpl() {}
 
 RadianceRenderer::RadianceRenderer(VulkanContext *context)
     : RendererInterface(/*num_stages=*/1, context),
-      pimpl_(std::make_unique<RadianceRendererImpl>(context)) {}
+      pimpl_(std::make_unique<RadianceRendererImpl>(RendererInterface::FinalColorImageStage(),
+                                                    context)) {}
 
 RadianceRenderer::~RadianceRenderer() {}
 
 void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor) {
-    FrameContext frame_context = this->BeginFrame();
+    Scene::ReadAccess read_access = scene->GainReadAccess();
 
-    pimpl_->final_color_map.SetSwapChainImageIndex(frame_context.swap_chain_image_index);
+    std::vector<SceneEntity const *> scene_entities =
+        scene->SceneEntityStructure()->QueryEntities(QueryAllSceneEntities);
 
-    this->BeginStage(/*index=*/1, /*name=*/"Pipeline Preparation");
-    {
-        Scene::ReadAccess read_access = scene->GainReadAccess();
+    // Loads drawables to the host memory.
+    ResourceLoadingOption option;
+    option.load_geometry = true;
+    option.load_material = true;
 
-        std::vector<SceneEntity const *> scene_entities =
-            scene->SceneEntityStructure()->QueryEntities(QueryAllSceneEntities);
+    std::vector<DrawableInstance> drawables =
+        ToDrawables(scene_entities, /*viewer_location=*/ToVec3(scene->camera.position()), option,
+                    resource_accessor);
 
-        // Loads drawables to the host memory.
-        ResourceLoadingOption option;
-        option.load_geometry = true;
-        option.load_material = true;
+    // Render passes.
+    PerspectiveProjection camera_projection(scene->camera);
 
-        std::vector<DrawableInstance> drawables =
-            ToDrawables(scene_entities, /*viewer_location=*/ToVec3(scene->camera.position()),
-                        option, resource_accessor);
+    PipelineStage *first_stage = this->DoFirstStage();
 
-        // Render passes.
-        PerspectiveProjection camera_projection(scene->camera);
+    DoGenerateLightInputs(drawables, camera_projection, &pimpl_->tex_desc_set_cache,
+                          &pimpl_->geo_vram, &pimpl_->tex_vram, pimpl_->context, first_stage,
+                          pimpl_->light_inputs.get());
 
-        pimpl_->light_inputs_pipeline.Run(drawables, camera_projection,
-                                          frame_context.swap_chain_image_promise,
-                                          &pimpl_->tex_desc_set_cache, &pimpl_->geo_vram,
-                                          &pimpl_->tex_vram, &pimpl_->light_inputs_map);
+    std::vector<LightSourceInstance> light_sources =
+        ToLightSources(scene_entities, camera_projection);
+    PipelineStage *radiance_map = pimpl_->direct_illuminator.DoComputeDirectIllumination(
+        light_sources, camera_projection, pimpl_->light_inputs.get(), first_stage,
+        &pimpl_->desc_set_alloc);
 
-        std::vector<LightSourceInstance> light_sources =
-            ToLightSources(scene_entities, camera_projection);
-        pimpl_->direct_illuminator.Run(light_sources, pimpl_->light_inputs_map, camera_projection,
-                                       &pimpl_->radiance_map);
+    DoEstimateExposure(radiance_map, &pimpl_->desc_set_alloc, pimpl_->context,
+                       pimpl_->log_luminance_map.get(), pimpl_->exposure_value.get());
+    DoToneMapping(radiance_map, pimpl_->exposure_value.get(), &pimpl_->desc_set_alloc,
+                  pimpl_->context, pimpl_->ldr_image.get());
+    DoFxaa(pimpl_->ldr_image.get(), &pimpl_->desc_set_alloc, pimpl_->context,
+           pimpl_->final_color_image.get());
 
-        pimpl_->exposure_estimation_pipeline.Run(pimpl_->radiance_map, &pimpl_->log_lumiance_map,
-                                                 &pimpl_->exposure_value);
-        pimpl_->tone_map_pipeline.Run(pimpl_->radiance_map, &pimpl_->exposure_value,
-                                      &pimpl_->ldr_color_map);
-        pimpl_->fxaa_pipeline.Run(pimpl_->ldr_color_map, &pimpl_->final_color_map);
-    }
-    this->EndStage(/*index=*/1);
+    PipelineStage *final_stage = this->DoFinalStage(
+        first_stage, pimpl_->final_color_image.get(),
+        /*dangling_stages=*/std::vector<PipelineStage *>{pimpl_->light_inputs.get()});
 
-    this->EndFrame(frame_context, std::vector<PipelineOutputInterface *>{
-                                      &pimpl_->light_inputs_map,
-                                      &pimpl_->radiance_map,
-                                      &pimpl_->log_lumiance_map,
-                                      &pimpl_->exposure_value,
-                                      &pimpl_->final_color_map,
-                                  });
+    final_stage->Fulfill(pimpl_->context);
 }
 
 void RadianceRenderer::ApplyConfiguration(RendererConfiguration const &config) {

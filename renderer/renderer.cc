@@ -183,9 +183,6 @@ RendererInterface::StagePerformance::StagePerformance()
 
 RendererInterface::StagePerformance::~StagePerformance() {}
 
-RendererInterface::FrameContext::FrameContext(VulkanContext *context)
-    : swap_chain_image_promise(/*task_cmds=*/VK_NULL_HANDLE, context), swap_chain_image_index(0) {}
-
 RendererInterface::RendererInterface(unsigned num_stages, VulkanContext *context)
     : context(context), stage_performance_(num_stages + 2),
       final_output_(
@@ -198,42 +195,6 @@ RendererInterface::~RendererInterface() {}
 std::vector<RendererInterface::StagePerformance> RendererInterface::GetPerformanceStats() const {
     std::lock_guard guard(*mu_);
     return stage_performance_;
-}
-
-RendererInterface::FrameContext RendererInterface::BeginFrame() {
-    FrameContext frame_context(context);
-
-    this->BeginStage(/*index=*/0, /*name=*/"Acquire Next Image");
-    assert(VK_SUCCESS == vkAcquireNextImageKHR(
-                             context->device, context->swap_chain,
-                             /*timeout=*/UINT64_MAX, frame_context.swap_chain_image_promise.signal,
-                             /*fence=*/nullptr, &frame_context.swap_chain_image_index));
-    this->EndStage(/*index=*/0);
-
-    return frame_context;
-}
-
-void RendererInterface::EndFrame(FrameContext const &frame_context,
-                                 std::vector<PipelineOutputInterface *> pipeline_ouputs) {
-    VkPresentInfoKHR present_info{};
-    present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-    present_info.pSwapchains = &context->swap_chain;
-    present_info.swapchainCount = 1;
-    present_info.pImageIndices = &frame_context.swap_chain_image_index;
-
-    if (!pipeline_ouputs.empty()) {
-        PipelineOutputInterface *final_output = pipeline_ouputs.back();
-        present_info.pWaitSemaphores = &final_output->Promise()->signal;
-        present_info.waitSemaphoreCount = 1;
-    }
-
-    assert(VK_SUCCESS == vkQueuePresentKHR(context->present_queue, &present_info));
-
-    this->BeginStage(stage_performance_.size() - 1, /*name=*/"Wait For GPU Work");
-    for (int i = pipeline_ouputs.size() - 1; i >= 0; --i) {
-        pipeline_ouputs[i]->Fulfill();
-    }
-    this->EndStage(stage_performance_.size() - 1);
 }
 
 PipelineStage *RendererInterface::DoFirstStage() {
@@ -249,8 +210,9 @@ PipelineStage *RendererInterface::DoFirstStage() {
     return &first_stage_;
 }
 
-PipelineStage *RendererInterface::DoFinalStage(PipelineStage *first_stage,
-                                               PipelineStage *color_map_stage) {
+PipelineStage *
+RendererInterface::DoFinalStage(PipelineStage *first_stage, PipelineStage *final_color_image_stage,
+                                std::vector<PipelineStage *> const &dangling_stages) {
     CachedPipelineInterface *pipeline = final_stage_.WithPipeline(
         kPresentImagePipeline, [this](PipelineOutputInterface * /*output*/) {
             return std::make_unique<PresentImagePipeline>(this->context);
@@ -258,13 +220,18 @@ PipelineStage *RendererInterface::DoFinalStage(PipelineStage *first_stage,
 
     auto args = std::make_unique<PresentImageArguments>(
         static_cast<SwapChainPipelineOutput *>(first_stage->Output()));
-    final_stage_.Schedule(pipeline, std::move(args),
-                          /*parents=*/std::vector<PipelineStage *>{first_stage, color_map_stage});
+
+    std::vector<PipelineStage *> dependent_parents{first_stage, final_color_image_stage};
+    for (auto dangling_stage : dangling_stages) {
+        dependent_parents.push_back(dangling_stage);
+    }
+
+    final_stage_.Schedule(pipeline, std::move(args), dependent_parents);
 
     return &final_stage_;
 }
 
-std::unique_ptr<PipelineStage> RendererInterface::ColorMapStage() const {
+std::unique_ptr<PipelineStage> RendererInterface::FinalColorImageStage() const {
     return std::make_unique<PipelineStage>(final_output_);
 }
 

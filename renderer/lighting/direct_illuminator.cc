@@ -19,8 +19,10 @@
 #include <vector>
 
 #include "common/device.h"
+#include "renderer/basic/projection.h"
 #include "renderer/lighting/direct_illuminator.h"
 #include "renderer/output/common_output.h"
+#include "renderer/output/pipeline_stage.h"
 #include "renderer/pipeline/solid_color.h"
 #include "renderer/postprocessor/radiance.h"
 #include "renderer/query/light_source.h"
@@ -29,35 +31,48 @@
 namespace e8 {
 
 struct DirectIlluminator::DirectIlluminatorImpl {
-    DirectIlluminatorImpl(DescriptorSetAllocator *desc_set_alloc, VulkanContext *context);
+    DirectIlluminatorImpl(unsigned width, unsigned height, VulkanContext *context);
     ~DirectIlluminatorImpl();
 
-    SolidColorPipeline solid_color_pipeline;
-    RadiancePipeline radiance_pipeline;
+    VulkanContext *context;
+    std::unique_ptr<PipelineStage> cleared_radiance_map;
+    std::unique_ptr<PipelineStage> filled_radiance_map;
 };
 
-DirectIlluminator::DirectIlluminatorImpl::DirectIlluminatorImpl(
-    DescriptorSetAllocator *desc_set_alloc, VulkanContext *context)
-    : solid_color_pipeline(context), radiance_pipeline(desc_set_alloc, context) {}
+DirectIlluminator::DirectIlluminatorImpl::DirectIlluminatorImpl(unsigned width, unsigned height,
+                                                                VulkanContext *context)
+    : context(context) {
+    auto output = std::make_shared<HdrColorPipelineOutput>(width, height,
+                                                           /*with_depth_buffer=*/false, context);
+    cleared_radiance_map = std::make_unique<PipelineStage>(output);
+    filled_radiance_map = std::make_unique<PipelineStage>(output);
+}
 
 DirectIlluminator::DirectIlluminatorImpl::~DirectIlluminatorImpl() {}
 
-DirectIlluminator::DirectIlluminator(DescriptorSetAllocator *desc_set_alloc, VulkanContext *context)
-    : pimpl_(std::make_unique<DirectIlluminatorImpl>(desc_set_alloc, context)) {}
+DirectIlluminator::DirectIlluminator(unsigned width, unsigned height, VulkanContext *context)
+    : pimpl_(std::make_unique<DirectIlluminatorImpl>(width, height, context)) {}
 
 DirectIlluminator::~DirectIlluminator() {}
 
-void DirectIlluminator::Run(std::vector<LightSourceInstance> const &light_sources,
-                            LightInputsPipelineOutput const &parameter_map,
-                            PerspectiveProjection const &parameter_projection,
-                            HdrColorPipelineOutput *radiance_map) {
-    pimpl_->solid_color_pipeline.Run(vec3{0.0f, 0.0f, 0.0f}, *parameter_map.Promise(),
-                                     radiance_map);
+PipelineStage *DirectIlluminator::DoComputeDirectIllumination(
+    std::vector<LightSourceInstance> const &light_sources,
+    PerspectiveProjection const &parameter_projection, PipelineStage *parameter_map,
+    PipelineStage *first_stage, DescriptorSetAllocator *desc_set_alloc) {
+    DoFillColor(/*color=*/vec3{0.0f, 0.0f, 0.0f}, pimpl_->context, first_stage,
+                pimpl_->cleared_radiance_map.get());
+
+    if (light_sources.empty()) {
+        return pimpl_->cleared_radiance_map.get();
+    }
 
     for (auto instance : light_sources) {
-        pimpl_->radiance_pipeline.Run(instance, parameter_map, parameter_projection.Frustum(),
-                                      *radiance_map->Promise(), radiance_map);
+        DoComputeRadiance(instance, parameter_projection.Frustum(), parameter_map,
+                          /*shadow_map=*/nullptr, pimpl_->cleared_radiance_map.get(),
+                          desc_set_alloc, pimpl_->context, pimpl_->filled_radiance_map.get());
     }
+
+    return pimpl_->filled_radiance_map.get();
 }
 
 } // namespace e8

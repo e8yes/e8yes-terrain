@@ -88,7 +88,7 @@ SwapChainPipelineOutput::SwapChainPipelineOutputImpl::~SwapChainPipelineOutputIm
 
 SwapChainPipelineOutput::SwapChainPipelineOutput(bool with_depth_buffer, VulkanContext *context)
     : PipelineOutputInterface(context->swap_chain_image_extent.width,
-                              context->swap_chain_image_extent.height, context),
+                              context->swap_chain_image_extent.height),
       pimpl_(std::make_unique<SwapChainPipelineOutputImpl>(with_depth_buffer, context)) {}
 
 SwapChainPipelineOutput::~SwapChainPipelineOutput() {}
@@ -161,7 +161,7 @@ HdrColorPipelineOutput::UnboundedColorPipelineOutputImpl::~UnboundedColorPipelin
 
 HdrColorPipelineOutput::HdrColorPipelineOutput(unsigned width, unsigned height,
                                                bool with_depth_buffer, VulkanContext *context)
-    : PipelineOutputInterface(width, height, context),
+    : PipelineOutputInterface(width, height),
       pimpl_(std::make_unique<UnboundedColorPipelineOutputImpl>(width, height, with_depth_buffer,
                                                                 context)) {}
 
@@ -222,9 +222,8 @@ LdrColorPipelineOutput::LdrColorPipelineOutputImpl::~LdrColorPipelineOutputImpl(
 
 LdrColorPipelineOutput::LdrColorPipelineOutput(unsigned width, unsigned height,
                                                bool with_depth_buffer, VulkanContext *context)
-    : PipelineOutputInterface(width, height, context),
-      pimpl_(std::make_unique<LdrColorPipelineOutputImpl>(width, height, with_depth_buffer,
-                                                          context)) {}
+    : PipelineOutputInterface(width, height), pimpl_(std::make_unique<LdrColorPipelineOutputImpl>(
+                                                  width, height, with_depth_buffer, context)) {}
 
 LdrColorPipelineOutput::~LdrColorPipelineOutput() {}
 

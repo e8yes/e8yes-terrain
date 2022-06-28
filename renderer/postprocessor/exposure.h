@@ -19,83 +19,48 @@
 #define ISLANDS_RENDERER_EXPOSURE_H
 
 #include <memory>
-#include <vector>
-#include <vulkan/vulkan.h>
 
 #include "common/device.h"
-#include "renderer/basic/attachment.h"
-#include "renderer/basic/frame_buffer.h"
-#include "renderer/basic/render_pass.h"
-#include "renderer/output/common_output.h"
-#include "renderer/output/pipeline_output.h"
-#include "renderer/output/promise.h"
+#include "renderer/output/pipeline_stage.h"
 #include "renderer/transfer/descriptor_set.h"
 
 namespace e8 {
 
 /**
- * @brief The LogLuminanceOutput class Stores the logarithmic luminance value of each radiance
- * pixel.
+ * @brief CreateLogLuminaneStage Creates a log luminance stage with a 16-bit float image output in
+ * the specified dimension.
+ *
+ * @param width The width of the log luminance map.
+ * @param height The height of the log luminance map.
+ * @param context Contextual Vulkan handles.
+ * @return A pipeline stage created with the 16-bit float image output.
  */
-class LogLuminancePipelineOutput : public PipelineOutputInterface {
-  public:
-    LogLuminancePipelineOutput(unsigned width, unsigned height, VulkanContext *context);
-    ~LogLuminancePipelineOutput();
-
-    FrameBuffer *GetFrameBuffer() const override;
-    RenderPass const &GetRenderPass() const override;
-    std::vector<FrameBufferAttachment const *> ColorAttachments() const override;
-    FrameBufferAttachment const *DepthAttachment() const override;
-
-  private:
-    std::unique_ptr<FrameBufferAttachment> color_attachment_;
-    std::unique_ptr<RenderPass> render_pass_;
-    std::unique_ptr<FrameBuffer> frame_buffer_;
-};
+std::unique_ptr<PipelineStage> CreateLogLuminaneStage(unsigned width, unsigned height,
+                                                      VulkanContext *context);
 
 /**
- * @brief The ExposureEstimationPipelineOutput class Stores the logarithmic lumiance average in a
- * 1x1 image as the exposure of the radiance map.
+ * @brief CreateExposureStage Creates an exposure stage with a 1 by 1 16-bit float image output for
+ * storing the exposure value.
+ *
+ * @param context Contextual Vulkan handles.
+ * @return A pipeline stage created with the 1 by 1 16-bit float image output.
  */
-class ExposureEstimationPipelineOutput : public PipelineOutputInterface {
-  public:
-    explicit ExposureEstimationPipelineOutput(VulkanContext *context);
-    ~ExposureEstimationPipelineOutput();
-
-    FrameBuffer *GetFrameBuffer() const override;
-    RenderPass const &GetRenderPass() const override;
-    std::vector<FrameBufferAttachment const *> ColorAttachments() const override;
-    FrameBufferAttachment const *DepthAttachment() const override;
-
-  private:
-    std::unique_ptr<FrameBufferAttachment> color_attachment_;
-    std::unique_ptr<RenderPass> render_pass_;
-};
+std::unique_ptr<PipelineStage> CreateExposureStage(VulkanContext *context);
 
 /**
- * @brief The ExposureEstimationPipeline class Estimates the exposure of a radiance map.
+ * @brief DoEstimateExposure Estimates the exposure of a radiance map. Precisely, it transforms the
+ * specified radiance map into a logarithmic luminance map, then it computes the average of the
+ * logarithmic luminance.
+ *
+ * @param radiance_map
+ * @param desc_set_allocator Descriptor set allocator.
+ * @param context
+ * @param log_luminance_map
+ * @param exposure
  */
-class ExposureEstimationPipeline {
-  public:
-    ExposureEstimationPipeline(DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
-    ~ExposureEstimationPipeline();
-
-    /**
-     * @brief Run Transforms the specified radiance map into a logarithmic luminance map and
-     * computes its average.
-     */
-    void Run(HdrColorPipelineOutput const &radiance,
-             LogLuminancePipelineOutput *log_luminance_output,
-             ExposureEstimationPipelineOutput *exposure_output);
-
-  private:
-    struct ExposureEstimationPipelineImpl;
-
-    DescriptorSetAllocator *desc_set_allocator_;
-    VulkanContext *context_;
-    LogLuminancePipelineOutput *current_output_;
-    std::unique_ptr<ExposureEstimationPipelineImpl> pimpl_;
-};
+void DoEstimateExposure(PipelineStage *radiance_map, DescriptorSetAllocator *desc_set_allocator,
+                        VulkanContext *context, PipelineStage *log_luminance_map,
+                        PipelineStage *exposure);
 
 } // namespace e8
 

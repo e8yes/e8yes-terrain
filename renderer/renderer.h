@@ -28,7 +28,6 @@
 #include "content/scene.h"
 #include "renderer/output/common_output.h"
 #include "renderer/output/pipeline_stage.h"
-#include "renderer/output/promise.h"
 #include "renderer/proto/renderer.pb.h"
 #include "resource/accessor.h"
 
@@ -103,40 +102,6 @@ class RendererInterface {
 
   protected:
     /**
-     * @brief The FrameContext struct Stores information about the swap chain image on which a new
-     * frame of rendering process will draw.
-     */
-    struct FrameContext {
-        /**
-         * @brief FrameContext Should be created only by calling BeginFrame().
-         */
-        FrameContext(VulkanContext *context);
-        FrameContext(FrameContext const &) = delete;
-        FrameContext(FrameContext &&) = default;
-
-        // When the swap chain image indexed by the swap_chain_image_index becomes available, the
-        // barrier will be signaled.
-        GpuPromise swap_chain_image_promise;
-
-        // The index of the swap chain image which will soon be available for presentation.
-        unsigned swap_chain_image_index;
-    };
-
-    /**
-     * @brief BeginFrame Makes preparation for a new frame.
-     */
-    FrameContext BeginFrame();
-
-    /**
-     * @brief EndFrame Marks the completion of a frame's rendering process.
-     *
-     * @param frame_context Created by RendererInterface::BeginFrame().
-     * @param final_ouput The last output to be fulfilled before the frame can be presented.
-     */
-    void EndFrame(FrameContext const &frame_context,
-                  std::vector<PipelineOutputInterface *> pipeline_ouputs);
-
-    /**
      * @brief DoFirstStage Creates the first stage of the current frame. The first stage waits for
      * the v-sync.
      */
@@ -147,17 +112,20 @@ class RendererInterface {
      * the color map to the screen.
      *
      * @param first_stage Returned by RendererInterface::DoFirstStage().
-     * @param color_map_stage Returned by RendererInterface::ColorMapStage().
+     * @param final_color_image_stage Returned by RendererInterface::ColorMapStage().
+     * @param dangling_stages Additional stages that potentially don't connect to the
+     * final_color_image_stage.
      * @return The final stage.
      */
-    PipelineStage *DoFinalStage(PipelineStage * first_stage, PipelineStage* color_map_stage);
-
+    PipelineStage *DoFinalStage(
+        PipelineStage *first_stage, PipelineStage *final_color_image_stage,
+        std::vector<PipelineStage *> const &dangling_stages = std::vector<PipelineStage *>());
 
     /**
-     * @brief ColorMapStage Creates a color map stage. A color map is an image which will be
+     * @brief FinalColorImageStage Creates a color map stage. A color map is an image which will be
      * presented as the final rendering result. It's also the last customizable pipeline stage.
      */
-    std::unique_ptr<PipelineStage> ColorMapStage() const;
+    std::unique_ptr<PipelineStage> FinalColorImageStage() const;
 
     /**
      * @brief BeginStage Marks the beginning of a stage.

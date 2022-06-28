@@ -75,27 +75,10 @@ Fulfillment FillColorPipeline::Launch(CachedPipelineArgumentsInterface const &ge
     frame_buffer->clear_values[0].color.float32[2] = args.color(2);
 
     VkCommandBuffer cmds = StartRenderPass(output->GetRenderPass(), *frame_buffer, context_);
-    return FinishRenderPass2(cmds, completion_signal_count, prerequisites, context_);
+    return FinishRenderPass(cmds, completion_signal_count, prerequisites, context_);
 }
 
 } // namespace
-
-SolidColorPipeline::SolidColorPipeline(VulkanContext *context) : context_(context) {}
-
-SolidColorPipeline::~SolidColorPipeline() {}
-
-void SolidColorPipeline::Run(vec3 const &color, GpuPromise const &prerequisites,
-                             PipelineOutputInterface *output) {
-    FrameBuffer *frame_buffer = output->GetFrameBuffer();
-
-    frame_buffer->clear_values[0].color.float32[0] = color(0);
-    frame_buffer->clear_values[0].color.float32[1] = color(1);
-    frame_buffer->clear_values[0].color.float32[2] = color(2);
-
-    VkCommandBuffer cmds = StartRenderPass(output->GetRenderPass(), *frame_buffer, context_);
-    RenderPassPromise promise = FinishRenderPass(cmds, prerequisites, context_);
-    output->AddWriter(std::move(promise.gpu), std::move(promise.cpu));
-}
 
 void DoFillColor(vec3 const &color, VulkanContext *context, PipelineStage *first_stage,
                  PipelineStage *target) {

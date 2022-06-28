@@ -33,6 +33,8 @@
 namespace e8 {
 namespace {
 
+PipelineKey const kLightInputsVisualizerPipeline = "Light Inputs Visualizer";
+
 struct LightInputsVisualizerParameters {
     int input_to_visualize;
 };
@@ -41,7 +43,7 @@ class LightInputsVisualizerPostProcessorConfigurator : public PostProcessorConfi
   public:
     LightInputsVisualizerPostProcessorConfigurator(
         LightInputsRendererParameters::InputType input_to_visualize,
-        LightInputsPipelineOutput const &light_inputs);
+        PipelineOutputInterface const &light_inputs);
     ~LightInputsVisualizerPostProcessorConfigurator() override;
 
     void InputImages(std::vector<VkImageView> *input_images) const override;
@@ -49,23 +51,23 @@ class LightInputsVisualizerPostProcessorConfigurator : public PostProcessorConfi
 
   private:
     LightInputsRendererParameters::InputType input_to_visualize_;
-    LightInputsPipelineOutput const &light_inputs_;
+    PipelineOutputInterface const &light_inputs_;
 };
 
 LightInputsVisualizerPostProcessorConfigurator::LightInputsVisualizerPostProcessorConfigurator(
     LightInputsRendererParameters::InputType input_to_visualize,
-    LightInputsPipelineOutput const &light_inputs)
+    PipelineOutputInterface const &light_inputs)
     : input_to_visualize_(input_to_visualize), light_inputs_(light_inputs) {}
 
 LightInputsVisualizerPostProcessorConfigurator::~LightInputsVisualizerPostProcessorConfigurator() {}
 
 void LightInputsVisualizerPostProcessorConfigurator::InputImages(
     std::vector<VkImageView> *input_images) const {
-    input_images->at(LightInputsPipelineOutput::NORMAL_ROUGHNESS) =
-        light_inputs_.ColorAttachments()[LightInputsPipelineOutput::NORMAL_ROUGHNESS]->view;
+    input_images->at(LightInputsColorOutput::LICO_NORMAL_ROUGHNESS) =
+        light_inputs_.ColorAttachments()[LightInputsColorOutput::LICO_NORMAL_ROUGHNESS]->view;
 
-    input_images->at(LightInputsPipelineOutput::ALBEDO_METALLIC) =
-        light_inputs_.ColorAttachments()[LightInputsPipelineOutput::ALBEDO_METALLIC]->view;
+    input_images->at(LightInputsColorOutput::LICO_ALBEDO_METALLIC) =
+        light_inputs_.ColorAttachments()[LightInputsColorOutput::LICO_ALBEDO_METALLIC]->view;
 }
 
 void LightInputsVisualizerPostProcessorConfigurator::PushConstants(
@@ -78,45 +80,23 @@ void LightInputsVisualizerPostProcessorConfigurator::PushConstants(
 
 } // namespace
 
-struct LightInputsVisualizerPipeline::LightInputsVisualizerPipelineImpl {
-    LightInputsVisualizerPipelineImpl(PipelineOutputInterface *visualizer_output,
-                                      DescriptorSetAllocator *desc_set_allocator,
-                                      VulkanContext *context);
-    ~LightInputsVisualizerPipelineImpl();
+void DoVisualizeLightInputs(LightInputsRendererParameters::InputType input_to_visualize,
+                            PipelineStage *light_inputs, DescriptorSetAllocator *desc_set_allocator,
+                            VulkanContext *context, PipelineStage *target) {
+    CachedPipelineInterface *pipeline = target->WithPipeline(
+        kLightInputsVisualizerPipeline,
+        [desc_set_allocator, context](PipelineOutputInterface *visualizer_output) {
+            return std::make_unique<PostProcessorPipeline>(
+                kLightInputsVisualizerPipeline, kFragmentShaderFilePathLightInputsVisualizer,
+                /*input_image_count=*/LightInputsColorOutput::LightInputsColorOutputCount,
+                /*push_constant_size=*/sizeof(LightInputsVisualizerParameters), visualizer_output,
+                desc_set_allocator, context);
+        });
 
-    std::unique_ptr<PostProcessorPipeline> post_processor_pipeline;
-};
-
-LightInputsVisualizerPipeline::LightInputsVisualizerPipelineImpl::LightInputsVisualizerPipelineImpl(
-    PipelineOutputInterface *visualizer_output, DescriptorSetAllocator *desc_set_allocator,
-    VulkanContext *context) {
-    post_processor_pipeline = std::make_unique<PostProcessorPipeline>(
-        kFragmentShaderFilePathLightInputsVisualizer,
-        /*input_image_count=*/LightInputsPipelineOutput::ColorOutputCount,
-        /*push_constant_size=*/sizeof(LightInputsVisualizerParameters), visualizer_output,
-        desc_set_allocator, context);
-}
-
-LightInputsVisualizerPipeline::LightInputsVisualizerPipelineImpl::
-    ~LightInputsVisualizerPipelineImpl() {}
-
-LightInputsVisualizerPipeline::LightInputsVisualizerPipeline(
-    DescriptorSetAllocator *desc_set_allocator, VulkanContext *context)
-    : desc_set_allocator_(desc_set_allocator), context_(context), current_output_(nullptr) {}
-
-LightInputsVisualizerPipeline::~LightInputsVisualizerPipeline() {}
-
-void LightInputsVisualizerPipeline::Run(LightInputsRendererParameters::InputType input_to_visualize,
-                                        LightInputsPipelineOutput const &light_inputs,
-                                        PipelineOutputInterface *output) {
-    if (output != current_output_) {
-        pimpl_ = std::make_unique<LightInputsVisualizerPipelineImpl>(output, desc_set_allocator_,
-                                                                     context_);
-        current_output_ = output;
-    }
-
-    LightInputsVisualizerPostProcessorConfigurator configurator(input_to_visualize, light_inputs);
-    pimpl_->post_processor_pipeline->Run(configurator, *light_inputs.Promise());
+    auto configurator = std::make_unique<LightInputsVisualizerPostProcessorConfigurator>(
+        input_to_visualize, *light_inputs->Output());
+    target->Schedule(pipeline, std::move(configurator),
+                     /*parents=*/std::vector<PipelineStage *>{light_inputs});
 }
 
 } // namespace e8

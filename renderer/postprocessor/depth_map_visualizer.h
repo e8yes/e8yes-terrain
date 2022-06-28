@@ -23,8 +23,8 @@
 
 #include "common/device.h"
 #include "renderer/basic/projection.h"
-#include "renderer/transfer/descriptor_set.h"
 #include "renderer/output/pipeline_stage.h"
+#include "renderer/transfer/descriptor_set.h"
 
 namespace e8 {
 
@@ -37,12 +37,13 @@ namespace e8 {
  * @param projection The projection used to create the depth map. If alpha is non-zero, this
  * argument is required in order to get the correct result.
  * @param depth_map_stage The depth map to be visualized.
+ * @param desc_set_allocator Descriptor set allocator.
  * @param context Contextual Vulkan handles.
  * @param target The target stage which stores the visualized depth map grayscale image.
  */
 void DoVisualizeDepthMap(float alpha, std::optional<PerspectiveProjection> projection,
-                         PipelineStage* depth_map_stage, DescriptorSetAllocator *desc_set_allocator,
-                         VulkanContext *context, PipelineStage* target);
+                         PipelineStage *depth_map_stage, DescriptorSetAllocator *desc_set_allocator,
+                         VulkanContext *context, PipelineStage *target);
 
 } // namespace e8
 

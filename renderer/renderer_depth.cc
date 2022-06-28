@@ -71,7 +71,7 @@ DepthRenderer::DepthRendererImpl::~DepthRendererImpl() {}
 
 DepthRenderer::DepthRenderer(VulkanContext *context)
     : RendererInterface(/*num_stages=*/1, context),
-      pimpl_(std::make_unique<DepthRendererImpl>(RendererInterface::ColorMapStage(), context)) {}
+      pimpl_(std::make_unique<DepthRendererImpl>(RendererInterface::FinalColorImageStage(), context)) {}
 
 DepthRenderer::~DepthRenderer() {}
 

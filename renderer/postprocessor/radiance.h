@@ -21,41 +21,33 @@
 #include <memory>
 
 #include "common/device.h"
-#include "common/tensor.h"
-#include "renderer/output/common_output.h"
-#include "renderer/output/promise.h"
-#include "renderer/pipeline/light_inputs.h"
+#include "renderer/output/pipeline_stage.h"
 #include "renderer/query/light_source.h"
 #include "renderer/transfer/descriptor_set.h"
 
 namespace e8 {
 
 /**
- * @brief The RadiancePipeline class Computes the direct radiance produced by a light source for
- * each pixel.
+ * @brief DoComputeRadiance Computes the radiance produced by the specified light source based on
+ * screen-space geometric and material parameters. Note, the light source must be defined in the
+ * view space where the light inputs were generated.
+ *
+ * @param instance The light source to compute direct radiance for.
+ * @param view_projection The frustum in which the light inputs are rendered.
+ * @param light_inputs Lighting parameters mapped to the screen.
+ * @param shadow_map Optional. A depth map rendered from the light source's perspective. When it is
+ * specified, this function computes the radiance the occlusion factor. Otherwise, the radiance
+ * penetrates all objects.
+ * @param cleared_radiance_map A zeroed-out radiance map.
+ * @param desc_set_allocator Descriptor set allocator.
+ * @param context Contextual Vulkan handles.
+ * @param target The target stage which stores the radiance map in an HDR color image.
  */
-class RadiancePipeline {
-  public:
-    RadiancePipeline(DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
-    ~RadiancePipeline();
-
-    /**
-     * @brief Run Computes the radiance produced by the specified light source based on screen-space
-     * geometric and material parameters. Note, the light source must be defined in the view space
-     * where the light inputs were generated.
-     */
-    void Run(LightSourceInstance const &instance, LightInputsPipelineOutput const &light_inputs,
-             frustum const &light_inputs_frustum, GpuPromise const &promise,
-             HdrColorPipelineOutput *output);
-
-  private:
-    struct DirectionalRadiancePipelineImpl;
-
-    DescriptorSetAllocator *desc_set_allocator_;
-    VulkanContext *context_;
-    HdrColorPipelineOutput *current_output_;
-    std::unique_ptr<DirectionalRadiancePipelineImpl> pimpl_;
-};
+void DoComputeRadiance(LightSourceInstance const &instance, frustum const &view_projection,
+                       PipelineStage *light_inputs, PipelineStage *shadow_map,
+                       PipelineStage *cleared_radiance_map,
+                       DescriptorSetAllocator *desc_set_allocator, VulkanContext *context,
+                       PipelineStage *target);
 
 } // namespace e8
 

@@ -20,12 +20,15 @@
 #include "common/device.h"
 #include "renderer/basic/shader.h"
 #include "renderer/output/pipeline_output.h"
+#include "renderer/output/pipeline_stage.h"
 #include "renderer/postprocessor/fxaa.h"
 #include "renderer/postprocessor/post_processor.h"
 #include "renderer/transfer/descriptor_set.h"
 
 namespace e8 {
 namespace {
+
+PipelineKey const &kFxaaPipeline = "FXAA";
 
 class FxaaPipelineConfigurator : public PostProcessorConfiguratorInterface {
   public:
@@ -49,37 +52,18 @@ void FxaaPipelineConfigurator::InputImages(std::vector<VkImageView> *input_image
 
 } // namespace
 
-struct FxaaPipeline::FxaaPipelineImpl {
-    FxaaPipelineImpl(PipelineOutputInterface *aa_output, DescriptorSetAllocator *desc_set_allocator,
-                     VulkanContext *context);
-    ~FxaaPipelineImpl();
+void DoFxaa(PipelineStage *ldr_image, DescriptorSetAllocator *desc_set_allocator,
+            VulkanContext *context, PipelineStage *target) {
+    CachedPipelineInterface *pipeline = target->WithPipeline(
+        kFxaaPipeline, [desc_set_allocator, context](PipelineOutputInterface *aa_output) {
+            return std::make_unique<PostProcessorPipeline>(
+                kFxaaPipeline, kFragmentShaderFilePathFxaa, /*input_image_count=*/1,
+                /*push_constant_size=*/0, aa_output, desc_set_allocator, context);
+        });
 
-    std::unique_ptr<PostProcessorPipeline> fxaa_pipeline;
-};
-
-FxaaPipeline::FxaaPipelineImpl::FxaaPipelineImpl(PipelineOutputInterface *aa_output,
-                                                 DescriptorSetAllocator *desc_set_allocator,
-                                                 VulkanContext *context) {
-    fxaa_pipeline = std::make_unique<PostProcessorPipeline>(
-        kFragmentShaderFilePathFxaa, /*input_image_count=*/1, /*push_constant_size=*/0, aa_output,
-        desc_set_allocator, context);
-}
-
-FxaaPipeline::FxaaPipelineImpl::~FxaaPipelineImpl() {}
-
-FxaaPipeline::FxaaPipeline(DescriptorSetAllocator *desc_set_allocator, VulkanContext *context)
-    : desc_set_allocator_(desc_set_allocator), context_(context), current_output_(nullptr) {}
-
-FxaaPipeline::~FxaaPipeline() {}
-
-void FxaaPipeline::Run(PipelineOutputInterface const &input, PipelineOutputInterface *output) {
-    if (current_output_ != output) {
-        pimpl_ = std::make_unique<FxaaPipelineImpl>(output, desc_set_allocator_, context_);
-        current_output_ = output;
-    }
-
-    FxaaPipelineConfigurator configurator(input);
-    pimpl_->fxaa_pipeline->Run(configurator, *input.Promise());
+    auto configurator = std::make_unique<FxaaPipelineConfigurator>(*ldr_image->Output());
+    target->Schedule(pipeline, std::move(configurator),
+                     /*parents=*/std::vector<PipelineStage *>{ldr_image});
 }
 
 } // namespace e8

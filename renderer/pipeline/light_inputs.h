@@ -19,12 +19,10 @@
 #define ISLANDS_RENDERER_PIPELINE_LIGHT_INPUTS_H
 
 #include <memory>
-#include <vector>
 
 #include "common/device.h"
 #include "renderer/basic/projection.h"
-#include "renderer/output/pipeline_output.h"
-#include "renderer/output/promise.h"
+#include "renderer/output/pipeline_stage.h"
 #include "renderer/query/drawable_instance.h"
 #include "renderer/transfer/descriptor_set_texture.h"
 #include "renderer/transfer/vram_geometry.h"
@@ -33,75 +31,52 @@
 namespace e8 {
 
 /**
- * @brief The LightInputsPipelineOutput class For storing a 32-bit RGBA color output containing the
- * geometry data as well as a 32-bit depth output.
+ * @brief The LightInputsColorOutput enum Index to the light input parameter images.
  */
-class LightInputsPipelineOutput : public PipelineOutputInterface {
-  public:
-    enum ColorOutput {
-        NORMAL_ROUGHNESS,
-        ALBEDO_METALLIC,
-        ColorOutputCount,
-    };
+enum LightInputsColorOutput {
+    // The image which stores the normal vector and the roughness factor.
+    LICO_NORMAL_ROUGHNESS,
 
-    /**
-     * @brief LightInputsPipelineOutput Constructs a light inputs map output with the specified
-     * dimension.
-     *
-     * @param width The width of the light inputs map output.
-     * @param height The height of the light inputs map output.
-     * @param context Contextual Vulkan handles.
-     */
-    LightInputsPipelineOutput(unsigned width, unsigned height, VulkanContext *context);
-    ~LightInputsPipelineOutput();
+    // The image which stores the albdeo color (in RGB) and the metallic factor.
+    LICO_ALBEDO_METALLIC,
 
-    FrameBuffer *GetFrameBuffer() const override;
-    RenderPass const &GetRenderPass() const override;
-    std::vector<FrameBufferAttachment const *> ColorAttachments() const override;
-    FrameBufferAttachment const *DepthAttachment() const override;
-
-  private:
-    struct LightInputsPipelineOutputImpl;
-    std::unique_ptr<LightInputsPipelineOutputImpl> pimpl_;
+    // The number of parameter images.
+    LightInputsColorOutputCount,
 };
 
 /**
- * @brief The LightInputsPipeline class A graphics pipeline for generating a map of geometry
+ * @brief CreateLightInputsOutput Creates a light inputs pipeline stage with two 32-bit parameter
+ * maps and a 32-bit depth map output in the specified dimension.
+ *
+ * @param width The width of the light parameter map output.
+ * @param height The width of the light parameter map output.
+ * @param context Contextual Vulkan handles.
+ * @return The light input stage.
+ */
+std::unique_ptr<PipelineStage> CreateLightInputsStage(unsigned width, unsigned height,
+                                                      VulkanContext *context);
+
+/**
+ * @brief DoGenerateLightInputs Schedules a graphics pipeline to generate a map of geometry
  * information. These information are essential for lighting computation. They are: normal vector,
  * roughness factor and depth.
+ *
+ * @param drawables An array of drawables to be rendered onto the light inputs map.
+ * @param projection Defines how drawables should be projected to the light inputs map.
+ * @param tex_desc_set_cache Texture descriptor cache.
+ * @param geo_vram The geometry VRAM transferer.
+ * @param tex_vram The texture VRAM transferer.
+ * @param context Contextual Vulkan handles.
+ * @param first_stage The frame's first stage.
+ * @param target The target stage which stores the rendered light inputs. It should be created using
+ * CreateLightInputsStage().
  */
-class LightInputsPipeline {
-  public:
-    /**
-     * @brief LightInputsPipeline Constructs a graphics pipeline for generate light inputs.
-     */
-    LightInputsPipeline(VulkanContext *context);
-    ~LightInputsPipeline();
-
-    /**
-     * @brief Run Runs the light inputs graphics pipeline. The pipeline can only be run when the
-     * previous run was finished (indicated by the output's barrier).
-     *
-     * @param drawables An array of drawables to be rendered onto the light inputs map.
-     * @param projection Defines how drawables should be projected to the light inputs map..
-     * @param prerequisites Dependent tasks.
-     * @param tex_desc_set_cache
-     * @param geo_vram The geometry VRAM transferer.
-     * @param tex_vram The texture VRAM transferer.
-     * @param output An object for storing the rendered geometry and depth data.
-     */
-    void Run(std::vector<DrawableInstance> const &drawables, ProjectionInterface const &projection,
-             GpuPromise const &prerequisites, TextureDescriptorSetCache *tex_desc_set_cache,
-             GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram,
-             LightInputsPipelineOutput *output);
-
-  private:
-    class LightInputsPipelineImpl;
-
-    VulkanContext *context_;
-    LightInputsPipelineOutput *current_output_;
-    std::unique_ptr<LightInputsPipelineImpl> pimpl_;
-};
+void DoGenerateLightInputs(std::vector<DrawableInstance> const &drawables,
+                           ProjectionInterface const &projection,
+                           TextureDescriptorSetCache *tex_desc_set_cache,
+                           GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram,
+                           VulkanContext *context, PipelineStage *first_stage,
+                           PipelineStage *target);
 
 } // namespace e8
 

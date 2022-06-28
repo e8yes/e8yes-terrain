@@ -38,7 +38,7 @@ namespace e8 {
  * chained into a DAG compute graph.
  */
 class PipelineStage {
-   public:
+  public:
     // A graphics pipeline's construction is often paired with an output. This function standarized
     // the creation of a complete graphics pipeline.
     using CompilePipelineFn =
@@ -65,13 +65,19 @@ class PipelineStage {
      * pipeline is guaranteed to have run after calling PipelineStage::Fulfill().
      *
      * @param pipeline The pipeline to be scheduled to run.
-     * @param parents The stages where the pipeline depends.
+     * @param parents The stages where the pipeline depends. The elements in this array is nullable.
+     * In the case when there are nullptrs, this function simply discards them.
      * @param instance_count The number of times to call on the pipeline with the same dependent
      * parents.
      */
     void Schedule(CachedPipelineInterface const *pipeline,
                   std::unique_ptr<CachedPipelineArgumentsInterface> &&args,
                   std::vector<PipelineStage *> const &parents);
+
+    /**
+     * @brief Output The immutable output attached to this stage.
+     */
+    PipelineOutputInterface const *Output() const;
 
     /**
      * @brief Output The output attached to this stage.
@@ -88,7 +94,7 @@ class PipelineStage {
      */
     void Fulfill(VulkanContext *context);
 
-   private:
+  private:
     using ChildId = unsigned;
 
     struct PipelineStageImpl;
@@ -109,6 +115,6 @@ class PipelineStage {
     std::unique_ptr<PipelineStageImpl> pimpl_;
 };
 
-}  // namespace e8
+} // namespace e8
 
-#endif  // ISLANDS_RENDERER_PIPELINE_STAGE_H
+#endif // ISLANDS_RENDERER_PIPELINE_STAGE_H

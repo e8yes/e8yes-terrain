@@ -21,40 +21,39 @@
 #include <memory>
 
 #include "common/device.h"
-#include "renderer/output/common_output.h"
-#include "renderer/output/pipeline_output.h"
-#include "renderer/postprocessor/exposure.h"
+#include "renderer/output/pipeline_stage.h"
 #include "renderer/transfer/descriptor_set.h"
 
 namespace e8 {
 
 /**
- * @brief The ToneMapPipeline class Maps radiance values to displayable color range.
+ * @brief CreateLdrImageStage Creates an LDR (low dynamic range) image stage with a 32-bit RGBA
+ * color image output in the specified dimension.
+ *
+ * @param width The width of the color image.
+ * @param height The height of the color image.
+ * @param context Contextual Vulkan handles.
+ * @return An LDR image stage with a color image output.
  */
-class ToneMapPipeline {
-  public:
-    ToneMapPipeline(DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
-    ~ToneMapPipeline();
+std::unique_ptr<PipelineStage> CreateLdrImageStage(unsigned width, unsigned height,
+                                                   VulkanContext *context);
 
-    /**
-     * @brief Run Runs the tone mapping pipeline.
-     *
-     * @param radiance The radiance values to be mapped.
-     * @param exposure The pipeline only uses the ACES tone mapper when the exposure value is
-     * provided. Otherwise, it simply clamps the radiance value into the [0, 1] range.
-     * @param output To store the tone mapped colors.
-     */
-    void Run(HdrColorPipelineOutput const &radiance,
-             ExposureEstimationPipelineOutput const *exposure, PipelineOutputInterface *output);
-
-  private:
-    struct ToneMapPipelineImpl;
-
-    DescriptorSetAllocator *desc_set_allocator_;
-    VulkanContext *context_;
-    PipelineOutputInterface *current_output_;
-    std::unique_ptr<ToneMapPipelineImpl> pimpl_;
-};
+/**
+ * @brief DoToneMapping Maps radiance values to the displayable color range. Besides that, it also
+ * attaches the luminance value to the alpha channel for potential post processing edge AA
+ * application.
+ *
+ * @param radiance_map The radiance values to be mapped.
+ * @param exposure Optional. It only uses the ACES tone mapper when the exposure value is provided.
+ * Otherwise, it simply clamps the radiance value into the [0, 1] range.
+ * @param desc_set_allocator Descriptor set allocator.
+ * @param context Contextual Vulkan handles.
+ * @param target The target stage which stores the tone mapped LDR color image. It should be created
+ * through CreateLdrImageStage().
+ */
+void DoToneMapping(PipelineStage *radiance_map, PipelineStage *exposure,
+                   DescriptorSetAllocator *desc_set_allocator, VulkanContext *context,
+                   PipelineStage *target);
 
 } // namespace e8
 

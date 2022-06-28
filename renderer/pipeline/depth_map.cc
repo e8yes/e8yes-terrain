@@ -103,7 +103,7 @@ DepthMapPipelineOutput::DepthMapPipelineOutputImpl::~DepthMapPipelineOutputImpl(
 
 DepthMapPipelineOutput::DepthMapPipelineOutput(unsigned width, unsigned height,
                                                VulkanContext *context)
-    : PipelineOutputInterface(width, height, context),
+    : PipelineOutputInterface(width, height),
       pimpl_(std::make_unique<DepthMapPipelineOutputImpl>(width, height, context)) {}
 
 DepthMapPipelineOutput::~DepthMapPipelineOutput() {}
@@ -231,7 +231,7 @@ Fulfillment DepthMapPipeline::Launch(CachedPipelineArgumentsInterface const &gen
     RenderDrawables(args.drawables, *pipeline_, *uniform_layout_, configurator,
                     args.tex_desc_set_cache, args.geo_vram, args.tex_vram, cmds);
 
-    return FinishRenderPass2(cmds, completion_signal_count, prerequisites, context_);
+    return FinishRenderPass(cmds, completion_signal_count, prerequisites, context_);
 }
 
 } // namespace

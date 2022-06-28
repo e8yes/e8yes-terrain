@@ -35,7 +35,7 @@ namespace e8 {
  */
 class PipelineOutputInterface {
   public:
-    PipelineOutputInterface(unsigned width, unsigned height, VulkanContext *context);
+    PipelineOutputInterface(unsigned width, unsigned height);
     virtual ~PipelineOutputInterface();
 
     /**
@@ -68,39 +68,12 @@ class PipelineOutputInterface {
      */
     unsigned Height() const;
 
-    /**
-     * @brief Fulfill Waits until either the output is fulfilled. The underlying promises will be
-     * cleared out.
-     */
-    void Fulfill();
-
-    /**
-     * @brief Promise Gets the current GPU promises associated with the pipeline output. It's
-     * nullable.
-     */
-    GpuPromise const *Promise() const;
-
-    /**
-     * @brief AddWriter Adds a writer task to the output.
-     */
-    void AddWriter(std::unique_ptr<GpuPromise> &&gpu_promise,
-                   std::unique_ptr<CpuPromise> &&cpu_promise);
-
   private:
     // The width of the rendered image.
     unsigned width_;
 
     // The height of the rendered image.
     unsigned height_;
-
-    // Writer tasks' GPU promise.
-    std::vector<std::unique_ptr<GpuPromise>> gpu_promises_;
-
-    // Writer tasks' CPU promise.
-    std::vector<std::unique_ptr<CpuPromise>> cpu_promises_;
-
-    // Contextual Vulkan handles.
-    VulkanContext *context_;
 };
 
 } // namespace e8

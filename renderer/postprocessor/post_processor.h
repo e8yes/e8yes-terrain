@@ -57,12 +57,12 @@ class PostProcessorConfiguratorInterface : public CachedPipelineArgumentsInterfa
 };
 
 /**
- * @brief The PostProcessorPipeline2 class A generic configurable post processing graphics pipeline.
+ * @brief The PostProcessorPipeline class A generic configurable post processing graphics pipeline.
  * To configure the pipeline, the client should supply arguments to the constructor and pass a
  * PostProcessorConfiguratorInterface as the argument while scheduling. Note, it's a
  * fully implemented concrete class.
  */
-class PostProcessorPipeline2 : public CachedPipelineInterface {
+class PostProcessorPipeline : public CachedPipelineInterface {
   public:
     /**
      * @brief PostProcessorPipeline Constructs a custom post processor.
@@ -75,68 +75,17 @@ class PostProcessorPipeline2 : public CachedPipelineInterface {
      * @param desc_set_allocator Descriptor set allocator.
      * @param context Contextual Vulkan handles.
      */
-    PostProcessorPipeline2(PipelineKey const &key, std::string const &fragment_shader,
-                           unsigned input_image_count, unsigned push_constant_size,
-                           PipelineOutputInterface *output,
-                           DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
-    ~PostProcessorPipeline2() override;
+    PostProcessorPipeline(PipelineKey const &key, std::string const &fragment_shader,
+                          unsigned input_image_count, unsigned push_constant_size,
+                          PipelineOutputInterface *output,
+                          DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
+    ~PostProcessorPipeline() override;
 
     PipelineKey Key() const override;
 
     Fulfillment Launch(CachedPipelineArgumentsInterface const &generic_args,
                        std::vector<GpuPromise *> const &prerequisites,
                        unsigned completion_signal_count, PipelineOutputInterface *output) override;
-
-  private:
-    struct PostProcessorPipelineImpl;
-    std::unique_ptr<PostProcessorPipelineImpl> pimpl_;
-};
-
-/**
- * @brief The PostProcessorPipeline class It offers a basic framework for setting up a post
- * processing graphics pipeline. Supplies proper arguments to the constructor of this class to
- * define the actual effect.
- */
-class PostProcessorPipeline {
-  public:
-    /**
-     * @brief PostProcessorPipeline Constructs a custom post processor.
-     *
-     * @param fragment_shader The fragment shader to create the desired post processing effect.
-     * @param input_image_count The number of input images the post processor requires.
-     * @param push_constant_size The number of bytes the post processor's push constants requires.
-     * @param output To receive output from the post processor.
-     * @param desc_set_allocator Descriptor set allocator.
-     * @param context Contextual Vulkan handles.
-     */
-    PostProcessorPipeline(std::string const &fragment_shader, unsigned input_image_count,
-                          unsigned push_constant_size, PipelineOutputInterface *output,
-                          DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
-
-    /**
-     * @brief PostProcessorPipeline Constructs an empty post processor. It loads the empty post
-     * processor shader and outputs the UV coordinate as color.
-     *
-     * @param output To receive output from the post processor.
-     * @param desc_set_allocator Descriptor set allocator.
-     * @param context Contextual Vulkan handles.
-     */
-    PostProcessorPipeline(PipelineOutputInterface *output,
-                          DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
-
-    ~PostProcessorPipeline();
-
-    /**
-     * @brief Run Runs the post processing graphics pipeline. The pipeline can only be run when the
-     * previous run was finished (indicated by the output's barrier).
-     *
-     * @param configurator For configuring what shader uniform setup to apply to the post processing
-     * pipeline.
-     * @param promise The previous tasks' promise.
-     * @return The output object set from the constructor, with a barrier assigned.
-     */
-    PipelineOutputInterface *Run(PostProcessorConfiguratorInterface const &configurator,
-                                 GpuPromise const &promise);
 
   private:
     struct PostProcessorPipelineImpl;

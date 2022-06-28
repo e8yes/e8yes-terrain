@@ -21,38 +21,23 @@
 #include <memory>
 
 #include "common/device.h"
-#include "renderer/output/pipeline_output.h"
+#include "renderer/output/pipeline_stage.h"
 #include "renderer/transfer/descriptor_set.h"
 
 namespace e8 {
 
 /**
- * @brief The FxaaPipeline class Reduces edge aliasing artifact through a post processing technique
- * devised by Timothy Lottes.
+ * @brief DoFxaa Reduces edge aliasing artifact through a post processing technique devised by
+ * Timothy Lottes.
+ *
+ * @param ldr_image An LDR RGB image where the alpha channel is populated with the color's
+ * luminance value.
+ * @param desc_set_allocator Descriptor set allocator.
+ * @param context Contextual Vulkan handles.
+ * @param target The target stage which stores the anti-aliased LDR color image.
  */
-class FxaaPipeline {
-  public:
-    FxaaPipeline(DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
-    ~FxaaPipeline();
-
-    /**
-     * @brief Run Runs the FXAA pipeline.
-     *
-     * @param input An LDR RGB image where the alpha channel is populated with the color's
-     * luminance value.
-     * @param output An edge anti-aliased LDR image with which the alpha channel is cleared
-     * to 1.0.
-     */
-    void Run(PipelineOutputInterface const &input, PipelineOutputInterface *output);
-
-  private:
-    struct FxaaPipelineImpl;
-
-    DescriptorSetAllocator *desc_set_allocator_;
-    VulkanContext *context_;
-    PipelineOutputInterface *current_output_;
-    std::unique_ptr<FxaaPipelineImpl> pimpl_;
-};
+void DoFxaa(PipelineStage *ldr_image, DescriptorSetAllocator *desc_set_allocator,
+            VulkanContext *context, PipelineStage *target);
 
 } // namespace e8
 

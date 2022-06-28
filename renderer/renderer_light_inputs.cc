@@ -25,7 +25,7 @@
 #include "content/scene.h"
 #include "content/scene_entity.h"
 #include "renderer/basic/projection.h"
-#include "renderer/output/common_output.h"
+#include "renderer/output/pipeline_stage.h"
 #include "renderer/pipeline/light_inputs.h"
 #include "renderer/postprocessor/light_inputs_visualizer.h"
 #include "renderer/proto/renderer.pb.h"
@@ -43,74 +43,64 @@ namespace e8 {
 
 class LightInputsRenderer::LightInputsRendererImpl {
   public:
-    LightInputsRendererImpl(VulkanContext *context);
+    LightInputsRendererImpl(std::unique_ptr<PipelineStage> &&final_color_image,
+                            VulkanContext *context);
     ~LightInputsRendererImpl();
 
-    LightInputsPipelineOutput light_inputs_map;
-    SwapChainPipelineOutput color_map;
-
+    VulkanContext *context;
     DescriptorSetAllocator desc_set_alloc;
     TextureDescriptorSetCache tex_desc_set_cache;
     GeometryVramTransfer geo_vram;
     TextureVramTransfer tex_vram;
 
-    LightInputsPipeline light_inputs_pipeline;
-    LightInputsVisualizerPipeline light_inputs_visualizer_pipeline;
+    std::unique_ptr<PipelineStage> light_inputs;
+    std::unique_ptr<PipelineStage> final_color_image;
 
     RendererConfiguration config;
 };
 
-LightInputsRenderer::LightInputsRendererImpl::LightInputsRendererImpl(VulkanContext *context)
-    : light_inputs_map(context->swap_chain_image_extent.width,
-                       context->swap_chain_image_extent.height, context),
-      color_map(/*with_depth_buffer=*/false, context), desc_set_alloc(context),
-      tex_desc_set_cache(&desc_set_alloc), geo_vram(context), tex_vram(context),
-      light_inputs_pipeline(context), light_inputs_visualizer_pipeline(&desc_set_alloc, context) {}
+LightInputsRenderer::LightInputsRendererImpl::LightInputsRendererImpl(
+    std::unique_ptr<PipelineStage> &&final_color_image, VulkanContext *context)
+    : context(context), desc_set_alloc(context), tex_desc_set_cache(&desc_set_alloc),
+      geo_vram(context), tex_vram(context),
+      light_inputs(CreateLightInputsStage(context->swap_chain_image_extent.width,
+                                          context->swap_chain_image_extent.height, context)),
+      final_color_image(std::move(final_color_image)) {}
 
 LightInputsRenderer::LightInputsRendererImpl::~LightInputsRendererImpl() {}
 
 LightInputsRenderer::LightInputsRenderer(VulkanContext *context)
     : RendererInterface(/*num_stages=*/1, context),
-      pimpl_(std::make_unique<LightInputsRendererImpl>(context)) {}
+      pimpl_(std::make_unique<LightInputsRendererImpl>(RendererInterface::FinalColorImageStage(),
+                                                       context)) {}
 
 LightInputsRenderer::~LightInputsRenderer() {}
 
 void LightInputsRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor) {
-    FrameContext frame_context = this->BeginFrame();
+    Scene::ReadAccess read_access = scene->GainReadAccess();
 
-    pimpl_->color_map.SetSwapChainImageIndex(frame_context.swap_chain_image_index);
+    PerspectiveProjection camera_projection(scene->camera);
+    std::vector<SceneEntity const *> scene_entities =
+        scene->SceneEntityStructure()->QueryEntities(QueryAllSceneEntities);
 
-    this->BeginStage(/*index=*/1, /*name=*/"Pipeline Preparation");
-    {
-        Scene::ReadAccess read_access = scene->GainReadAccess();
+    ResourceLoadingOption option;
+    option.load_geometry = true;
+    option.load_material = true;
 
-        PerspectiveProjection camera_projection(scene->camera);
-        std::vector<SceneEntity const *> scene_entities =
-            scene->SceneEntityStructure()->QueryEntities(QueryAllSceneEntities);
+    std::vector<DrawableInstance> drawables =
+        ToDrawables(scene_entities, /*viewer_location=*/ToVec3(scene->camera.position()), option,
+                    resource_accessor);
 
-        ResourceLoadingOption option;
-        option.load_geometry = true;
-        option.load_material = true;
+    PipelineStage *first_stage = this->DoFirstStage();
+    DoGenerateLightInputs(drawables, camera_projection, &pimpl_->tex_desc_set_cache,
+                          &pimpl_->geo_vram, &pimpl_->tex_vram, pimpl_->context, first_stage,
+                          pimpl_->light_inputs.get());
+    DoVisualizeLightInputs(pimpl_->config.light_inputs_renderer_params().input_to_visualize(),
+                           pimpl_->light_inputs.get(), &pimpl_->desc_set_alloc, pimpl_->context,
+                           pimpl_->final_color_image.get());
+    PipelineStage *final_stage = this->DoFinalStage(first_stage, pimpl_->final_color_image.get());
 
-        std::vector<DrawableInstance> drawables =
-            ToDrawables(scene_entities, /*viewer_location=*/ToVec3(scene->camera.position()),
-                        option, resource_accessor);
-
-        pimpl_->light_inputs_pipeline.Run(drawables, camera_projection,
-                                          frame_context.swap_chain_image_promise,
-                                          &pimpl_->tex_desc_set_cache, &pimpl_->geo_vram,
-                                          &pimpl_->tex_vram, &pimpl_->light_inputs_map);
-
-        pimpl_->light_inputs_visualizer_pipeline.Run(
-            pimpl_->config.light_inputs_renderer_params().input_to_visualize(),
-            pimpl_->light_inputs_map, &pimpl_->color_map);
-    }
-    this->EndStage(/*index=*/1);
-
-    this->EndFrame(frame_context, std::vector<PipelineOutputInterface *>{
-                                      &pimpl_->light_inputs_map,
-                                      &pimpl_->color_map,
-                                  });
+    final_stage->Fulfill(pimpl_->context);
 }
 
 void LightInputsRenderer::ApplyConfiguration(RendererConfiguration const &config) {

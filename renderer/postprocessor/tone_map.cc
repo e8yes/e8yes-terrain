@@ -24,6 +24,7 @@
 #include "renderer/basic/shader.h"
 #include "renderer/output/common_output.h"
 #include "renderer/output/pipeline_output.h"
+#include "renderer/output/pipeline_stage.h"
 #include "renderer/postprocessor/exposure.h"
 #include "renderer/postprocessor/post_processor.h"
 #include "renderer/postprocessor/tone_map.h"
@@ -32,23 +33,31 @@
 namespace e8 {
 namespace {
 
+PipelineKey const kClampedLinearToneMapPipeline = "Clamped Linear Tone Map";
+PipelineKey const kAcesToneMapPipeline = "ACES Tone Map";
+
 class ToneMapPostProcessorConfigurator : public PostProcessorConfiguratorInterface {
   public:
-    ToneMapPostProcessorConfigurator(HdrColorPipelineOutput const &radiance,
-                                     ExposureEstimationPipelineOutput const *exposure);
+    ToneMapPostProcessorConfigurator(PipelineStage const &radiance_map_stage,
+                                     PipelineStage *exposure_stage);
     ~ToneMapPostProcessorConfigurator() override;
 
     void InputImages(std::vector<VkImageView> *input_images) const override;
-    void PushConstants(std::vector<uint8_t> *push_constants) const override;
 
   private:
-    HdrColorPipelineOutput const &radiance_;
-    ExposureEstimationPipelineOutput const *exposure_;
+    PipelineOutputInterface const &radiance_;
+    PipelineOutputInterface const *exposure_;
 };
 
 ToneMapPostProcessorConfigurator::ToneMapPostProcessorConfigurator(
-    HdrColorPipelineOutput const &radiance, ExposureEstimationPipelineOutput const *exposure)
-    : radiance_(radiance), exposure_(exposure) {}
+    PipelineStage const &radiance_map_stage, PipelineStage *exposure_stage)
+    : radiance_(*radiance_map_stage.Output()) {
+    if (exposure_stage != nullptr) {
+        exposure_ = exposure_stage->Output();
+    } else {
+        exposure_ = nullptr;
+    }
+}
 
 ToneMapPostProcessorConfigurator::~ToneMapPostProcessorConfigurator() {}
 
@@ -60,52 +69,42 @@ void ToneMapPostProcessorConfigurator::InputImages(std::vector<VkImageView> *inp
     }
 }
 
-void ToneMapPostProcessorConfigurator::PushConstants(
-    std::vector<uint8_t> * /*push_constants*/) const {}
-
 } // namespace
 
-struct ToneMapPipeline::ToneMapPipelineImpl {
-    ToneMapPipelineImpl(PipelineOutputInterface *color_output,
-                        DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
-    ~ToneMapPipelineImpl();
-
-    std::unique_ptr<PostProcessorPipeline> hdr_clamp_pipeline;
-    std::unique_ptr<PostProcessorPipeline> hdr_aces_pipeline;
-};
-
-ToneMapPipeline::ToneMapPipelineImpl::ToneMapPipelineImpl(
-    PipelineOutputInterface *color_output, DescriptorSetAllocator *desc_set_allocator,
-    VulkanContext *context) {
-    hdr_clamp_pipeline = std::make_unique<PostProcessorPipeline>(
-        kFragmentShaderFilePathHdrClamp, /*input_image_count=*/1, /*push_constant_size=*/0,
-        color_output, desc_set_allocator, context);
-    hdr_aces_pipeline = std::make_unique<PostProcessorPipeline>(
-        kFragmentShaderFilePathHdrAces, /*input_image_count=*/2, /*push_constant_size=*/0,
-        color_output, desc_set_allocator, context);
+std::unique_ptr<PipelineStage> CreateLdrImageStage(unsigned width, unsigned height,
+                                                   VulkanContext *context) {
+    auto output = std::make_shared<LdrColorPipelineOutput>(width, height,
+                                                           /*with_depth_buffer=*/false, context);
+    return std::make_unique<PipelineStage>(output);
 }
 
-ToneMapPipeline::ToneMapPipelineImpl::~ToneMapPipelineImpl() {}
+void DoToneMapping(PipelineStage *radiance_map, PipelineStage *exposure,
+                   DescriptorSetAllocator *desc_set_allocator, VulkanContext *context,
+                   PipelineStage *target) {
+    CachedPipelineInterface *pipeline;
 
-ToneMapPipeline::ToneMapPipeline(DescriptorSetAllocator *desc_set_allocator, VulkanContext *context)
-    : desc_set_allocator_(desc_set_allocator), context_(context), current_output_(nullptr) {}
-
-ToneMapPipeline::~ToneMapPipeline() {}
-
-void ToneMapPipeline::Run(HdrColorPipelineOutput const &radiance,
-                          ExposureEstimationPipelineOutput const *exposure,
-                          PipelineOutputInterface *output) {
-    if (output != current_output_) {
-        pimpl_ = std::make_unique<ToneMapPipelineImpl>(output, desc_set_allocator_, context_);
-        current_output_ = output;
-    }
-
-    ToneMapPostProcessorConfigurator configurator(radiance, exposure);
     if (exposure != nullptr) {
-        pimpl_->hdr_aces_pipeline->Run(configurator, *exposure->Promise());
+        pipeline = target->WithPipeline(
+            kAcesToneMapPipeline,
+            [desc_set_allocator, context](PipelineOutputInterface *tone_map_output) {
+                return std::make_unique<PostProcessorPipeline>(
+                    kAcesToneMapPipeline, kFragmentShaderFilePathHdrAces, /*input_image_count=*/2,
+                    /*push_constant_size=*/0, tone_map_output, desc_set_allocator, context);
+            });
     } else {
-        pimpl_->hdr_clamp_pipeline->Run(configurator, *radiance.Promise());
+        pipeline = target->WithPipeline(
+            kClampedLinearToneMapPipeline,
+            [desc_set_allocator, context](PipelineOutputInterface *tone_map_output) {
+                return std::make_unique<PostProcessorPipeline>(
+                    kClampedLinearToneMapPipeline, kFragmentShaderFilePathHdrClamp,
+                    /*input_image_count=*/1, /*push_constant_size=*/0, tone_map_output,
+                    desc_set_allocator, context);
+            });
     }
+
+    auto configurator = std::make_unique<ToneMapPostProcessorConfigurator>(*radiance_map, exposure);
+    target->Schedule(pipeline, std::move(configurator),
+                     /*parents=*/std::vector<PipelineStage *>{radiance_map, exposure});
 }
 
 } // namespace e8

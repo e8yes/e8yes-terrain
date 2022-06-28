@@ -15,7 +15,6 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vulkan/vulkan.h>
 #include <cassert>
 #include <cstdint>
 #include <functional>
@@ -25,6 +24,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "renderer/output/cached_pipeline.h"
@@ -63,7 +63,7 @@ void WaitForStageCompletion(std::vector<Fulfillment> const &fulfillment_cache,
                                          /*timeout=*/std::numeric_limits<uint64_t>::max()));
 }
 
-}  // namespace
+} // namespace
 
 struct PipelineStage::ParentStage {
     PipelineStage *parent;
@@ -98,8 +98,8 @@ PipelineStage::PipelineAndSchedules::PipelineAndSchedules(PipelineAndSchedules &
     *this = std::move(other);
 }
 
-PipelineStage::PipelineAndSchedules &PipelineStage::PipelineAndSchedules::operator=(
-    PipelineAndSchedules &&other) {
+PipelineStage::PipelineAndSchedules &
+PipelineStage::PipelineAndSchedules::operator=(PipelineAndSchedules &&other) {
     std::swap(pipeline, other.pipeline);
     std::swap(schedules, other.schedules);
     return *this;
@@ -216,6 +216,10 @@ void PipelineStage::Schedule(CachedPipelineInterface const *pipeline,
 
     schedule.dependent_parents.reserve(parents.size());
     for (auto parent : parents) {
+        if (parent == nullptr) {
+            continue;
+        }
+
         ParentStage parent_stage;
         parent_stage.child_id = parent->AllocateChild();
         parent_stage.parent = parent;
@@ -231,6 +235,8 @@ void PipelineStage::Schedule(CachedPipelineInterface const *pipeline,
     pipeline_and_schedules.schedules.emplace_back(std::move(schedule));
 }
 
+PipelineOutputInterface const *PipelineStage::Output() const { return pimpl_->output.get(); }
+
 PipelineOutputInterface *PipelineStage::Output() { return pimpl_->output.get(); }
 
 void PipelineStage::Fulfill(VulkanContext *context) {
@@ -244,4 +250,4 @@ void PipelineStage::Fulfill(VulkanContext *context) {
     this->Reset();
 }
 
-}  // namespace e8
+} // namespace e8

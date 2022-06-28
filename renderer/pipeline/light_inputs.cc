@@ -35,6 +35,7 @@
 #include "renderer/basic/uniform_layout.h"
 #include "renderer/basic/vertex_input.h"
 #include "renderer/output/pipeline_output.h"
+#include "renderer/output/pipeline_stage.h"
 #include "renderer/output/promise.h"
 #include "renderer/pass/configurator.h"
 #include "renderer/pass/rasterize.h"
@@ -47,6 +48,90 @@
 
 namespace e8 {
 namespace {
+
+PipelineKey const kLightInputsPipeline = "Light Inputs";
+
+/**
+ * @brief The LightInputsPipelineOutput class For storing a 32-bit RGBA color output containing the
+ * geometry data as well as a 32-bit depth output.
+ */
+class LightInputsPipelineOutput : public PipelineOutputInterface {
+  public:
+    /**
+     * @brief LightInputsPipelineOutput Constructs a light inputs map output with the specified
+     * dimension.
+     *
+     * @param width The width of the light inputs map output.
+     * @param height The height of the light inputs map output.
+     * @param context Contextual Vulkan handles.
+     */
+    LightInputsPipelineOutput(unsigned width, unsigned height, VulkanContext *context);
+    ~LightInputsPipelineOutput();
+
+    FrameBuffer *GetFrameBuffer() const override;
+    RenderPass const &GetRenderPass() const override;
+    std::vector<FrameBufferAttachment const *> ColorAttachments() const override;
+    FrameBufferAttachment const *DepthAttachment() const override;
+
+  private:
+    struct LightInputsPipelineOutputImpl;
+    std::unique_ptr<LightInputsPipelineOutputImpl> pimpl_;
+};
+
+struct LightInputsPipelineOutput::LightInputsPipelineOutputImpl {
+    LightInputsPipelineOutputImpl(unsigned width, unsigned height, VulkanContext *context);
+    ~LightInputsPipelineOutputImpl();
+
+    std::unique_ptr<FrameBufferAttachment> normal_roughness_;
+    std::unique_ptr<FrameBufferAttachment> albedo_metallic_;
+    std::unique_ptr<FrameBufferAttachment> depth_attachment_;
+    std::unique_ptr<RenderPass> render_pass_;
+    std::unique_ptr<FrameBuffer> frame_buffer_;
+
+    VulkanContext *context;
+};
+
+LightInputsPipelineOutput::LightInputsPipelineOutputImpl::LightInputsPipelineOutputImpl(
+    unsigned width, unsigned height, VulkanContext *context) {
+    normal_roughness_ = CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R16G16B16A16_SNORM,
+                                              /*transfer_src=*/false, context);
+    albedo_metallic_ = CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R8G8B8A8_UNORM,
+                                             /*transfer_src=*/false, context);
+    depth_attachment_ = CreateDepthAttachment(width, height, /*samplable=*/true, context);
+    render_pass_ = CreateRenderPass(
+        /*color_attachments=*/std::vector<VkAttachmentDescription>{normal_roughness_->desc,
+                                                                   albedo_metallic_->desc},
+        depth_attachment_->desc, context);
+    frame_buffer_ =
+        CreateFrameBuffer(*render_pass_, width, height,
+                          /*color_attachments=*/
+                          std::vector<VkImageView>{normal_roughness_->view, albedo_metallic_->view},
+                          depth_attachment_->view, context);
+}
+
+LightInputsPipelineOutput::LightInputsPipelineOutputImpl::~LightInputsPipelineOutputImpl() {}
+
+LightInputsPipelineOutput::LightInputsPipelineOutput(unsigned width, unsigned height,
+                                                     VulkanContext *context)
+    : PipelineOutputInterface(width, height),
+      pimpl_(std::make_unique<LightInputsPipelineOutputImpl>(width, height, context)) {}
+
+LightInputsPipelineOutput::~LightInputsPipelineOutput() {}
+
+FrameBuffer *LightInputsPipelineOutput::GetFrameBuffer() const {
+    return pimpl_->frame_buffer_.get();
+}
+
+RenderPass const &LightInputsPipelineOutput::GetRenderPass() const { return *pimpl_->render_pass_; }
+
+std::vector<FrameBufferAttachment const *> LightInputsPipelineOutput::ColorAttachments() const {
+    return std::vector<FrameBufferAttachment const *>{pimpl_->normal_roughness_.get(),
+                                                      pimpl_->albedo_metallic_.get()};
+}
+
+FrameBufferAttachment const *LightInputsPipelineOutput::DepthAttachment() const {
+    return pimpl_->depth_attachment_.get();
+}
 
 struct PushConstants {
     mat44 view_model_trans;
@@ -125,6 +210,10 @@ std::vector<VkDescriptorSetLayoutBinding> DescriptorSetBindings() {
                                                      roughness_map_binding, metallic_map_binding};
 }
 
+/**
+ * @brief The RenderPassConfigurator class For setting up the light inputs shader's uniform
+ * variables.
+ */
 class RenderPassConfigurator : public RenderPassConfiguratorInterface {
   public:
     RenderPassConfigurator(ProjectionInterface const &projection,
@@ -182,127 +271,104 @@ TextureSelector RenderPassConfigurator::TexturesOf(DrawableInstance const &drawa
     return selector;
 }
 
-} // namespace
+/**
+ * @brief The LightInputsPipelineArgument struct Arguments to the LightInputsPipeline.
+ */
+struct LightInputsPipelineArgument : public CachedPipelineArgumentsInterface {
+    LightInputsPipelineArgument(std::vector<DrawableInstance> const &drawables,
+                                ProjectionInterface const &projection,
+                                TextureDescriptorSetCache *tex_desc_set_cache,
+                                GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram)
+        : drawables(drawables), projection(projection), tex_desc_set_cache(tex_desc_set_cache),
+          geo_vram(geo_vram), tex_vram(tex_vram) {}
 
-struct LightInputsPipelineOutput::LightInputsPipelineOutputImpl {
-    LightInputsPipelineOutputImpl(unsigned width, unsigned height, VulkanContext *context);
-    ~LightInputsPipelineOutputImpl();
-
-    std::unique_ptr<FrameBufferAttachment> normal_roughness_;
-    std::unique_ptr<FrameBufferAttachment> albedo_metallic_;
-    std::unique_ptr<FrameBufferAttachment> depth_attachment_;
-    std::unique_ptr<RenderPass> render_pass_;
-    std::unique_ptr<FrameBuffer> frame_buffer_;
-
-    VulkanContext *context;
+    std::vector<DrawableInstance> const &drawables;
+    ProjectionInterface const &projection;
+    TextureDescriptorSetCache *tex_desc_set_cache;
+    GeometryVramTransfer *geo_vram;
+    TextureVramTransfer *tex_vram;
 };
 
-LightInputsPipelineOutput::LightInputsPipelineOutputImpl::LightInputsPipelineOutputImpl(
-    unsigned width, unsigned height, VulkanContext *context) {
-    normal_roughness_ = CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R16G16B16A16_SNORM,
-                                              /*transfer_src=*/false, context);
-    albedo_metallic_ = CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R8G8B8A8_UNORM,
-                                             /*transfer_src=*/false, context);
-    depth_attachment_ = CreateDepthAttachment(width, height, /*samplable=*/true, context);
-    render_pass_ = CreateRenderPass(
-        /*color_attachments=*/std::vector<VkAttachmentDescription>{normal_roughness_->desc,
-                                                                   albedo_metallic_->desc},
-        depth_attachment_->desc, context);
-    frame_buffer_ =
-        CreateFrameBuffer(*render_pass_, width, height,
-                          /*color_attachments=*/
-                          std::vector<VkImageView>{normal_roughness_->view, albedo_metallic_->view},
-                          depth_attachment_->view, context);
-}
-
-LightInputsPipelineOutput::LightInputsPipelineOutputImpl::~LightInputsPipelineOutputImpl() {}
-
-LightInputsPipelineOutput::LightInputsPipelineOutput(unsigned width, unsigned height,
-                                                     VulkanContext *context)
-    : PipelineOutputInterface(width, height, context),
-      pimpl_(std::make_unique<LightInputsPipelineOutputImpl>(width, height, context)) {}
-
-LightInputsPipelineOutput::~LightInputsPipelineOutput() {}
-
-FrameBuffer *LightInputsPipelineOutput::GetFrameBuffer() const {
-    return pimpl_->frame_buffer_.get();
-}
-
-RenderPass const &LightInputsPipelineOutput::GetRenderPass() const { return *pimpl_->render_pass_; }
-
-std::vector<FrameBufferAttachment const *> LightInputsPipelineOutput::ColorAttachments() const {
-    return std::vector<FrameBufferAttachment const *>{pimpl_->normal_roughness_.get(),
-                                                      pimpl_->albedo_metallic_.get()};
-}
-
-FrameBufferAttachment const *LightInputsPipelineOutput::DepthAttachment() const {
-    return pimpl_->depth_attachment_.get();
-}
-
-class LightInputsPipeline::LightInputsPipelineImpl {
+/**
+ * @brief The LightInputsPipeline class For mapping the lighting parameters onto screen.
+ */
+class LightInputsPipeline : public CachedPipelineInterface {
   public:
-    LightInputsPipelineImpl(LightInputsPipelineOutput *output, VulkanContext *context);
-    ~LightInputsPipelineImpl();
+    LightInputsPipeline(PipelineOutputInterface *output, VulkanContext *context);
+    ~LightInputsPipeline() override;
 
-  public:
-    std::unique_ptr<ShaderStages> shader_stages;
-    std::unique_ptr<ShaderUniformLayout> uniform_layout;
-    std::unique_ptr<VertexInputInfo> vertex_inputs;
-    std::unique_ptr<FixedStageConfig> fixed_stage_config;
+    PipelineKey Key() const override;
 
-    std::unique_ptr<GraphicsPipeline> pipeline;
-
-    std::unique_ptr<ImageSampler> texture_sampler;
+    Fulfillment Launch(CachedPipelineArgumentsInterface const &generic_args,
+                       std::vector<GpuPromise *> const &prerequisites,
+                       unsigned completion_signal_count, PipelineOutputInterface *output) override;
 };
 
-LightInputsPipeline::LightInputsPipelineImpl::LightInputsPipelineImpl(
-    LightInputsPipelineOutput *output, VulkanContext *context) {
-    uniform_layout = CreateShaderUniformLayout(
+LightInputsPipeline::LightInputsPipeline(PipelineOutputInterface *output, VulkanContext *context)
+    : CachedPipelineInterface(context) {
+    uniform_layout_ = CreateShaderUniformLayout(
         PushConstantLayout(), /*per_frame_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
         /*per_pass_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
         /*per_drawable_desc_set=*/DescriptorSetBindings(), context);
-    shader_stages = CreateShaderStages(
+    shader_stages_ = CreateShaderStages(
         /*vertex_shader_file_path=*/kVertexShaderFilePathLightInputs,
         /*fragment_shader_file_path=*/kFragmentShaderFilePathLightInputs, context);
-    vertex_inputs = CreateVertexInputState(VertexShaderInputAttributes());
-    fixed_stage_config = CreateFixedStageConfig(/*polygon_mode=*/VK_POLYGON_MODE_FILL,
-                                                /*cull_mode=*/VK_CULL_MODE_BACK_BIT,
-                                                /*enable_depth_test=*/true, output->Width(),
-                                                output->Height(), /*color_attachment_count=*/2);
+    vertex_inputs_ = CreateVertexInputState(VertexShaderInputAttributes());
+    fixed_stage_config_ = CreateFixedStageConfig(/*polygon_mode=*/VK_POLYGON_MODE_FILL,
+                                                 /*cull_mode=*/VK_CULL_MODE_BACK_BIT,
+                                                 /*enable_depth_test=*/true, output->Width(),
+                                                 output->Height(), /*color_attachment_count=*/2);
 
-    pipeline = CreateGraphicsPipeline(output->GetRenderPass(), *shader_stages, *uniform_layout,
-                                      *vertex_inputs, *fixed_stage_config, context);
+    pipeline_ = CreateGraphicsPipeline(output->GetRenderPass(), *shader_stages_, *uniform_layout_,
+                                       *vertex_inputs_, *fixed_stage_config_, context);
 
-    texture_sampler = CreateTextureSampler(context);
+    texture_sampler_ = CreateTextureSampler(context);
 }
-
-LightInputsPipeline::LightInputsPipelineImpl::~LightInputsPipelineImpl() {}
-
-LightInputsPipeline::LightInputsPipeline(VulkanContext *context)
-    : context_(context), current_output_(nullptr) {}
 
 LightInputsPipeline::~LightInputsPipeline() {}
 
-void LightInputsPipeline::Run(std::vector<DrawableInstance> const &drawables,
-                              ProjectionInterface const &projection,
-                              GpuPromise const &prerequisites,
-                              TextureDescriptorSetCache *tex_desc_set_cache,
-                              GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram,
-                              LightInputsPipelineOutput *output) {
-    if (output != current_output_) {
-        pimpl_ = std::make_unique<LightInputsPipelineImpl>(output, context_);
-        current_output_ = output;
-    }
+PipelineKey LightInputsPipeline::Key() const { return kLightInputsPipeline; }
 
+Fulfillment LightInputsPipeline::Launch(CachedPipelineArgumentsInterface const &generic_args,
+                                        std::vector<GpuPromise *> const &prerequisites,
+                                        unsigned completion_signal_count,
+                                        PipelineOutputInterface *output) {
     VkCommandBuffer cmds =
         StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), context_);
 
-    RenderPassConfigurator configurator(projection, *pimpl_->texture_sampler);
-    RenderDrawables(drawables, *pimpl_->pipeline, *pimpl_->uniform_layout, configurator,
-                    tex_desc_set_cache, geo_vram, tex_vram, cmds);
+    LightInputsPipelineArgument const &args =
+        static_cast<LightInputsPipelineArgument const &>(generic_args);
 
-    RenderPassPromise promise = FinishRenderPass(cmds, prerequisites, context_);
-    output->AddWriter(std::move(promise.gpu), std::move(promise.cpu));
+    RenderPassConfigurator configurator(args.projection, *texture_sampler_);
+    RenderDrawables(args.drawables, *pipeline_, *uniform_layout_, configurator,
+                    args.tex_desc_set_cache, args.geo_vram, args.tex_vram, cmds);
+
+    return FinishRenderPass(cmds, completion_signal_count, prerequisites, context_);
+}
+
+} // namespace
+
+std::unique_ptr<PipelineStage> CreateLightInputsStage(unsigned width, unsigned height,
+                                                      VulkanContext *context) {
+    auto output = std::make_shared<LightInputsPipelineOutput>(width, height, context);
+    return std::make_unique<PipelineStage>(output);
+}
+
+void DoGenerateLightInputs(std::vector<DrawableInstance> const &drawables,
+                           ProjectionInterface const &projection,
+                           TextureDescriptorSetCache *tex_desc_set_cache,
+                           GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram,
+                           VulkanContext *context, PipelineStage *first_stage,
+                           PipelineStage *target) {
+    CachedPipelineInterface *pipeline =
+        target->WithPipeline(kLightInputsPipeline, [context](PipelineOutputInterface *output) {
+            return std::make_unique<LightInputsPipeline>(output, context);
+        });
+
+    auto args = std::make_unique<LightInputsPipelineArgument>(
+        drawables, projection, tex_desc_set_cache, geo_vram, tex_vram);
+    target->Schedule(pipeline, std::move(args),
+                     /*parents=*/std::vector<PipelineStage *>{first_stage});
 }
 
 } // namespace e8

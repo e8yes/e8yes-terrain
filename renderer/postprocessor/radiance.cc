@@ -24,7 +24,7 @@
 #include "content/proto/light_source.pb.h"
 #include "renderer/basic/sampler.h"
 #include "renderer/basic/shader.h"
-#include "renderer/output/common_output.h"
+#include "renderer/output/pipeline_stage.h"
 #include "renderer/output/promise.h"
 #include "renderer/pipeline/light_inputs.h"
 #include "renderer/postprocessor/post_processor.h"
@@ -36,32 +36,36 @@
 namespace e8 {
 namespace {
 
+PipelineKey const kSunLightPipeline = "Sun Light";
+PipelineKey const kPointLightPipeline = "Point Light";
+PipelineKey const kSpotLightPipeline = "Spot Light";
+
 // Base class.
 class RadiancePostProcessorConfigurator : public PostProcessorConfiguratorInterface {
   public:
-    RadiancePostProcessorConfigurator(LightInputsPipelineOutput const &light_inputs);
+    RadiancePostProcessorConfigurator(PipelineOutputInterface const &light_inputs);
     ~RadiancePostProcessorConfigurator() override;
 
     void InputImages(std::vector<VkImageView> *input_images) const override;
 
   private:
-    LightInputsPipelineOutput const &light_inputs_;
+    PipelineOutputInterface const &light_inputs_;
 };
 
 RadiancePostProcessorConfigurator::RadiancePostProcessorConfigurator(
-    LightInputsPipelineOutput const &light_inputs)
+    PipelineOutputInterface const &light_inputs)
     : light_inputs_(light_inputs) {}
 
 RadiancePostProcessorConfigurator::~RadiancePostProcessorConfigurator() {}
 
 void RadiancePostProcessorConfigurator::InputImages(std::vector<VkImageView> *input_images) const {
-    input_images->at(LightInputsPipelineOutput::NORMAL_ROUGHNESS) =
-        light_inputs_.ColorAttachments()[LightInputsPipelineOutput::NORMAL_ROUGHNESS]->view;
+    input_images->at(LightInputsColorOutput::LICO_NORMAL_ROUGHNESS) =
+        light_inputs_.ColorAttachments()[LightInputsColorOutput::LICO_NORMAL_ROUGHNESS]->view;
 
-    input_images->at(LightInputsPipelineOutput::ALBEDO_METALLIC) =
-        light_inputs_.ColorAttachments()[LightInputsPipelineOutput::ALBEDO_METALLIC]->view;
+    input_images->at(LightInputsColorOutput::LICO_ALBEDO_METALLIC) =
+        light_inputs_.ColorAttachments()[LightInputsColorOutput::LICO_ALBEDO_METALLIC]->view;
 
-    input_images->at(LightInputsPipelineOutput::ColorOutputCount) =
+    input_images->at(LightInputsColorOutput::LightInputsColorOutputCount) =
         light_inputs_.DepthAttachment()->view;
 }
 
@@ -74,7 +78,7 @@ struct SunLightParameters {
 class SunLightPostProcessorConfigurator : public RadiancePostProcessorConfigurator {
   public:
     SunLightPostProcessorConfigurator(SunLight const &sun_light,
-                                      LightInputsPipelineOutput const &light_inputs);
+                                      PipelineOutputInterface const &light_inputs);
     ~SunLightPostProcessorConfigurator() override;
 
     void PushConstants(std::vector<uint8_t> *push_constants) const override;
@@ -84,7 +88,7 @@ class SunLightPostProcessorConfigurator : public RadiancePostProcessorConfigurat
 };
 
 SunLightPostProcessorConfigurator::SunLightPostProcessorConfigurator(
-    SunLight const &sun_light, LightInputsPipelineOutput const &light_inputs)
+    SunLight const &sun_light, PipelineOutputInterface const &light_inputs)
     : RadiancePostProcessorConfigurator(light_inputs), sun_light_(sun_light) {}
 
 SunLightPostProcessorConfigurator::~SunLightPostProcessorConfigurator() {}
@@ -110,7 +114,7 @@ struct PointLightParameters {
 class PointLightPostProcessorConfigurator : public RadiancePostProcessorConfigurator {
   public:
     PointLightPostProcessorConfigurator(PointLight const &point_light,
-                                        LightInputsPipelineOutput const &light_inputs,
+                                        PipelineOutputInterface const &light_inputs,
                                         frustum const &light_inputs_frustum);
     ~PointLightPostProcessorConfigurator() override;
 
@@ -122,7 +126,7 @@ class PointLightPostProcessorConfigurator : public RadiancePostProcessorConfigur
 };
 
 PointLightPostProcessorConfigurator::PointLightPostProcessorConfigurator(
-    PointLight const &point_light, LightInputsPipelineOutput const &light_inputs,
+    PointLight const &point_light, PipelineOutputInterface const &light_inputs,
     frustum const &light_inputs_frustum)
     : RadiancePostProcessorConfigurator(light_inputs), point_light_(point_light),
       light_inputs_frustum_(light_inputs_frustum) {}
@@ -160,7 +164,7 @@ struct SpotLightParameters {
 class SpotLightPostProcessorConfigurator : public RadiancePostProcessorConfigurator {
   public:
     SpotLightPostProcessorConfigurator(SpotLight const &spot_light,
-                                       LightInputsPipelineOutput const &light_inputs,
+                                       PipelineOutputInterface const &light_inputs,
                                        frustum const &light_inputs_frustum);
     ~SpotLightPostProcessorConfigurator() override;
 
@@ -172,7 +176,7 @@ class SpotLightPostProcessorConfigurator : public RadiancePostProcessorConfigura
 };
 
 SpotLightPostProcessorConfigurator::SpotLightPostProcessorConfigurator(
-    SpotLight const &spot_light, LightInputsPipelineOutput const &light_inputs,
+    SpotLight const &spot_light, PipelineOutputInterface const &light_inputs,
     frustum const &light_inputs_frustum)
     : RadiancePostProcessorConfigurator(light_inputs), spot_light_(spot_light),
       light_inputs_frustum_(light_inputs_frustum) {}
@@ -199,80 +203,68 @@ void SpotLightPostProcessorConfigurator::PushConstants(std::vector<uint8_t> *pus
 
 } // namespace
 
-struct RadiancePipeline::DirectionalRadiancePipelineImpl {
-    DirectionalRadiancePipelineImpl(HdrColorPipelineOutput *radiance_output,
-                                    DescriptorSetAllocator *desc_set_allocator,
-                                    VulkanContext *context);
-    ~DirectionalRadiancePipelineImpl();
-
-    std::unique_ptr<PostProcessorPipeline> sun_light_pipeline;
-    std::unique_ptr<PostProcessorPipeline> point_light_pipeline;
-    std::unique_ptr<PostProcessorPipeline> spot_light_pipeline;
-};
-
-RadiancePipeline::DirectionalRadiancePipelineImpl::DirectionalRadiancePipelineImpl(
-    HdrColorPipelineOutput *radiance_output, DescriptorSetAllocator *desc_set_allocator,
-    VulkanContext *context) {
-    sun_light_pipeline = std::make_unique<PostProcessorPipeline>(
-        kFragmentShaderFilePathRadianceSunLight,
-        /*input_image_count=*/LightInputsPipelineOutput::ColorOutputCount + 1,
-        /*push_constant_size=*/sizeof(SunLightParameters), radiance_output, desc_set_allocator,
-        context);
-
-    point_light_pipeline = std::make_unique<PostProcessorPipeline>(
-        kFragmentShaderFilePathRadiancePointLight,
-        /*input_image_count=*/LightInputsPipelineOutput::ColorOutputCount + 1,
-        /*push_constant_size=*/sizeof(PointLightParameters), radiance_output, desc_set_allocator,
-        context);
-
-    spot_light_pipeline = std::make_unique<PostProcessorPipeline>(
-        kFragmentShaderFilePathRadianceSpotLight,
-        /*input_image_count=*/LightInputsPipelineOutput::ColorOutputCount + 1,
-        /*push_constant_size=*/sizeof(SpotLightParameters), radiance_output, desc_set_allocator,
-        context);
-}
-
-RadiancePipeline::DirectionalRadiancePipelineImpl::~DirectionalRadiancePipelineImpl() {}
-
-RadiancePipeline::RadiancePipeline(DescriptorSetAllocator *desc_set_allocator,
-                                   VulkanContext *context)
-    : desc_set_allocator_(desc_set_allocator), context_(context), current_output_(nullptr) {}
-
-RadiancePipeline::~RadiancePipeline() {}
-
-void RadiancePipeline::Run(LightSourceInstance const &instance,
-                           LightInputsPipelineOutput const &light_inputs,
-                           frustum const &light_inputs_frustum, GpuPromise const &promise,
-                           HdrColorPipelineOutput *output) {
-    if (output != current_output_) {
-        pimpl_ = std::make_unique<DirectionalRadiancePipelineImpl>(output, desc_set_allocator_,
-                                                                   context_);
-        current_output_ = output;
-    }
+void DoComputeRadiance(LightSourceInstance const &instance, frustum const &view_projection,
+                       PipelineStage *light_inputs, PipelineStage *shadow_map,
+                       PipelineStage *cleared_radiance_map,
+                       DescriptorSetAllocator *desc_set_allocator, VulkanContext *context,
+                       PipelineStage *target) {
+    CachedPipelineInterface *pipeline;
+    std::unique_ptr<PostProcessorConfiguratorInterface> configurator;
 
     switch (instance.light_source.model_case()) {
     case LightSource::ModelCase::kSunLight: {
-        SunLightPostProcessorConfigurator configurator(instance.light_source.sun_light(),
-                                                       light_inputs);
-        pimpl_->sun_light_pipeline->Run(configurator, promise);
+        pipeline = target->WithPipeline(
+            kSunLightPipeline,
+            [desc_set_allocator, context](PipelineOutputInterface *radiance_output) {
+                return std::make_unique<PostProcessorPipeline>(
+                    kSunLightPipeline, kFragmentShaderFilePathRadianceSunLight,
+                    /*input_image_count=*/LightInputsColorOutput::LightInputsColorOutputCount + 1,
+                    /*push_constant_size=*/sizeof(SunLightParameters), radiance_output,
+                    desc_set_allocator, context);
+            });
+
+        configurator = std::make_unique<SunLightPostProcessorConfigurator>(
+            instance.light_source.sun_light(), *light_inputs->Output());
         break;
     }
     case LightSource::ModelCase::kPointLight: {
-        PointLightPostProcessorConfigurator configurator(instance.light_source.point_light(),
-                                                         light_inputs, light_inputs_frustum);
-        pimpl_->point_light_pipeline->Run(configurator, promise);
+        pipeline = target->WithPipeline(
+            kPointLightPipeline,
+            [desc_set_allocator, context](PipelineOutputInterface *radiance_output) {
+                return std::make_unique<PostProcessorPipeline>(
+                    kPointLightPipeline, kFragmentShaderFilePathRadiancePointLight,
+                    /*input_image_count=*/LightInputsColorOutput::LightInputsColorOutputCount + 1,
+                    /*push_constant_size=*/sizeof(PointLightParameters), radiance_output,
+                    desc_set_allocator, context);
+            });
+
+        configurator = std::make_unique<PointLightPostProcessorConfigurator>(
+            instance.light_source.point_light(), *light_inputs->Output(), view_projection);
         break;
     }
     case LightSource::ModelCase::kSpotLight: {
-        SpotLightPostProcessorConfigurator configurator(instance.light_source.spot_light(),
-                                                        light_inputs, light_inputs_frustum);
-        pimpl_->spot_light_pipeline->Run(configurator, promise);
+        pipeline = target->WithPipeline(
+            kSpotLightPipeline,
+            [desc_set_allocator, context](PipelineOutputInterface *radiance_output) {
+                return std::make_unique<PostProcessorPipeline>(
+                    kSpotLightPipeline, kFragmentShaderFilePathRadianceSpotLight,
+                    /*input_image_count=*/LightInputsColorOutput::LightInputsColorOutputCount + 1,
+                    /*push_constant_size=*/sizeof(SpotLightParameters), radiance_output,
+                    desc_set_allocator, context);
+            });
+
+        configurator = std::make_unique<SpotLightPostProcessorConfigurator>(
+            instance.light_source.spot_light(), *light_inputs->Output(), view_projection);
         break;
     }
     default: {
         assert(false);
     }
     }
+
+    target->Schedule(
+        pipeline, std::move(configurator),
+        /*parents=*/std::vector<PipelineStage *>{light_inputs, shadow_map, cleared_radiance_map});
 }
 
 } // namespace e8

@@ -21,6 +21,7 @@
 #include <memory>
 
 #include "common/device.h"
+#include "renderer/output/pipeline_stage.h"
 #include "renderer/pipeline/light_inputs.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/transfer/descriptor_set.h"
@@ -28,39 +29,18 @@
 namespace e8 {
 
 /**
- * @brief The LightInputsVisualizerPipeline class A post processing graphics pipeline for
- * visualizing a rendered depth map.
+ * @brief DoVisualizeLightInputs A post processing graphics pipeline for visualizing a rendered
+ * lighting parameters (light inputs) map.
+ *
+ * @param input_to_visualize Selects the input to be visualized.
+ * @param light_inputs The light inputs map to be visualized.
+ * @param desc_set_allocator Descriptor set allocator.
+ * @param context Contextual Vulkan handles.
+ * @param target The target stage which stores a map of lighting parameters (light inputs).
  */
-class LightInputsVisualizerPipeline {
-  public:
-    /**
-     * @brief LightInputsVisualizerPipeline Constructs a post processing graphics pipeline for
-     * visualizing a rendered light inputs map.
-     */
-    LightInputsVisualizerPipeline(DescriptorSetAllocator *desc_set_allocator,
-                                  VulkanContext *context);
-
-    ~LightInputsVisualizerPipeline();
-
-    /**
-     * @brief Run Runs the light inputs visualizer graphics pipeline. The pipeline can only be run
-     * when the previous run was finished (indicated by the output's barrier).
-     *
-     * @param input_to_visualize Selects the input to be visualized.
-     * @param light_inputs The light inputs map to be visualized.
-     * @param output An object for storing the depth map image in grayscale.
-     */
-    void Run(LightInputsRendererParameters::InputType input_to_visualize,
-             LightInputsPipelineOutput const &light_inputs, PipelineOutputInterface *output);
-
-  private:
-    struct LightInputsVisualizerPipelineImpl;
-
-    DescriptorSetAllocator *desc_set_allocator_;
-    VulkanContext *context_;
-    PipelineOutputInterface *current_output_;
-    std::unique_ptr<LightInputsVisualizerPipelineImpl> pimpl_;
-};
+void DoVisualizeLightInputs(LightInputsRendererParameters::InputType input_to_visualize,
+                            PipelineStage *light_inputs, DescriptorSetAllocator *desc_set_allocator,
+                            VulkanContext *context, PipelineStage *target);
 
 } // namespace e8
 

@@ -119,50 +119,9 @@ VkCommandBuffer StartRenderPass(RenderPass const &render_pass, FrameBuffer const
     return cmds;
 }
 
-RenderPassPromise::RenderPassPromise() {}
-
-RenderPassPromise::RenderPassPromise(RenderPassPromise &&other) { *this = std::move(other); }
-
-RenderPassPromise::~RenderPassPromise() {}
-
-RenderPassPromise &RenderPassPromise::operator=(RenderPassPromise &&other) {
-    std::swap(cpu, other.cpu);
-    std::swap(gpu, other.gpu);
-    return *this;
-}
-
-RenderPassPromise FinishRenderPass(VkCommandBuffer cmds, GpuPromise const &prerequisites,
-                                   VulkanContext *context) {
-    // Finalizes the render pass and command buffers.
-    vkCmdEndRenderPass(cmds);
-    assert(VK_SUCCESS == vkEndCommandBuffer(cmds));
-
-    // For render pass synchronization.
-    RenderPassPromise promise;
-    promise.gpu = std::make_unique<GpuPromise>(cmds, context);
-    promise.cpu = std::make_unique<CpuPromise>(context);
-
-    // Submit command buffers.
-    VkSubmitInfo submit{};
-    submit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    submit.pWaitSemaphores = &prerequisites.signal;
-    submit.waitSemaphoreCount = 1;
-    submit.pWaitDstStageMask = &wait_stage;
-    submit.pSignalSemaphores = &promise.gpu->signal;
-    submit.signalSemaphoreCount = 1;
-    submit.pCommandBuffers = &cmds;
-    submit.commandBufferCount = 1;
-
-    assert(VK_SUCCESS ==
-           vkQueueSubmit(context->graphics_queue, /*submitCount=*/1, &submit, promise.cpu->signal));
-
-    return promise;
-}
-
-Fulfillment FinishRenderPass2(VkCommandBuffer cmds, unsigned completion_signal_count,
-                              std::vector<GpuPromise *> const &prerequisites,
-                              VulkanContext *context) {
+Fulfillment FinishRenderPass(VkCommandBuffer cmds, unsigned completion_signal_count,
+                             std::vector<GpuPromise *> const &prerequisites,
+                             VulkanContext *context) {
     // Finalizes the render pass and command buffers.
     vkCmdEndRenderPass(cmds);
     assert(VK_SUCCESS == vkEndCommandBuffer(cmds));

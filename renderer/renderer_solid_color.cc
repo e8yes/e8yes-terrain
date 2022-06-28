@@ -34,21 +34,21 @@
 namespace e8 {
 
 struct SolidColorRenderer::SolidColorRendererImpl {
-    SolidColorRendererImpl(std::unique_ptr<PipelineStage> &&color_map_stage);
+    SolidColorRendererImpl(std::unique_ptr<PipelineStage> &&final_color_image);
     ~SolidColorRendererImpl();
 
-    std::unique_ptr<PipelineStage> color_map_stage;
+    std::unique_ptr<PipelineStage> final_color_image;
 };
 
 SolidColorRenderer::SolidColorRendererImpl::SolidColorRendererImpl(
-    std::unique_ptr<PipelineStage> &&color_map_stage)
-    : color_map_stage(std::move(color_map_stage)) {}
+    std::unique_ptr<PipelineStage> &&final_color_image)
+    : final_color_image(std::move(final_color_image)) {}
 
 SolidColorRenderer::SolidColorRendererImpl::~SolidColorRendererImpl() {}
 
 SolidColorRenderer::SolidColorRenderer(VulkanContext *context)
     : RendererInterface(0, context),
-      pimpl_(std::make_unique<SolidColorRendererImpl>(RendererInterface::ColorMapStage())) {}
+      pimpl_(std::make_unique<SolidColorRendererImpl>(RendererInterface::FinalColorImageStage())) {}
 
 SolidColorRenderer::~SolidColorRenderer() {}
 
@@ -56,8 +56,8 @@ void SolidColorRenderer::DrawFrame(Scene *scene, ResourceAccessor * /*resource_a
     Scene::ReadAccess read_access = scene->GainReadAccess();
 
     PipelineStage *first_stage = this->DoFirstStage();
-    DoFillColor(scene->background_color, context, first_stage, pimpl_->color_map_stage.get());
-    PipelineStage *final_stage = this->DoFinalStage(first_stage, pimpl_->color_map_stage.get());
+    DoFillColor(scene->background_color, context, first_stage, pimpl_->final_color_image.get());
+    PipelineStage *final_stage = this->DoFinalStage(first_stage, pimpl_->final_color_image.get());
 
     final_stage->Fulfill(context);
 }

@@ -27,33 +27,6 @@
 namespace e8 {
 
 /**
- * @brief The SolidColorPipeline class A graphics pipeline for filling the color output with a solid
- * color.
- */
-class SolidColorPipeline {
-  public:
-    /**
-     * @brief SolidColorPipeline Constructs a graphics pipeline for filling the color output with a
-     * solid color.
-     */
-    SolidColorPipeline(VulkanContext *context);
-    ~SolidColorPipeline();
-
-    /**
-     * @brief Run Runs the solid color graphics pipeline. The pipeline can only be run when the
-     * previous run was finished (indicated by the output's barrier).
-     *
-     * @param color The color value to fill into the output.
-     * @param prerequisites Dependent tasks.
-     * @param output The output to be filled with solid color.
-     */
-    void Run(vec3 const &color, GpuPromise const &prerequisites, PipelineOutputInterface *output);
-
-  private:
-    VulkanContext *context_;
-};
-
-/**
  * @brief DoFillColor Fills the target with the specified color. Note, it's an asynchronous
  * function.
  *
@@ -62,8 +35,8 @@ class SolidColorPipeline {
  * @param first_stage The frame's first stage.
  * @param target The target to be filled.
  */
-void DoFillColor(vec3 const &color, VulkanContext *context,
-                 PipelineStage *first_stage, PipelineStage *target);
+void DoFillColor(vec3 const &color, VulkanContext *context, PipelineStage *first_stage,
+                 PipelineStage *target);
 
 } // namespace e8
 

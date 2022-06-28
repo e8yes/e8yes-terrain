@@ -23,8 +23,7 @@
 
 #include "common/device.h"
 #include "renderer/basic/projection.h"
-#include "renderer/output/common_output.h"
-#include "renderer/pipeline/light_inputs.h"
+#include "renderer/output/pipeline_stage.h"
 #include "renderer/query/light_source.h"
 #include "renderer/transfer/descriptor_set.h"
 
@@ -36,24 +35,35 @@ namespace e8 {
  */
 class DirectIlluminator {
   public:
-    DirectIlluminator(DescriptorSetAllocator *desc_set_alloc, VulkanContext *context);
+    /**
+     * @brief DirectIlluminator Constructs a direct illuminator with specified resolution.
+     *
+     * @param width The width of the produced radiance map.
+     * @param height The height of the produced radiance map.
+     * @param context Contextual Vulkan handles.
+     */
+    DirectIlluminator(unsigned width, unsigned height, VulkanContext *context);
     ~DirectIlluminator();
 
     /**
-     * @brief Run Computes the direct illumination from a list of light sources
-     * on a map of lighting parameters.
+     * @brief DoComputeDirectIllumination Computes the direct illumination from a list of light
+     * sources on a map of lighting parameters. Note, it doesn't use the lighting parameter stage
+     * when there isn't any light.
      *
      * @param light_sources Light sources to compute direct illumination for.
-     * @param parameter_map Lighting parameters mapped to the screen.
      * @param parameter_projection The perspective projection setup which generated the parameter
+     * @param parameter_map Lighting parameters mapped to the screen.
      * map.
-     * @param radiance_map Direct illumination result. Note, the radiance map is cleared to black
-     * prior to the direct illumination computation.
+     * @param first_stage The frame's first stage.
+     * @param desc_set_alloc Descriptor set allocator.
+     * @return The direct illumination result. Note, the radiance map is cleared to black prior to
+     * the direct illumination computation.
      */
-    void Run(std::vector<LightSourceInstance> const &light_sources,
-             LightInputsPipelineOutput const &parameter_map,
-             PerspectiveProjection const &parameter_projection,
-             HdrColorPipelineOutput *radiance_map);
+    PipelineStage *
+    DoComputeDirectIllumination(std::vector<LightSourceInstance> const &light_sources,
+                                PerspectiveProjection const &parameter_projection,
+                                PipelineStage *parameter_map, PipelineStage *first_stage,
+                                DescriptorSetAllocator *desc_set_alloc);
 
   private:
     struct DirectIlluminatorImpl;
