@@ -62,7 +62,7 @@ void CpuPromise::Wait() {
                                          /*timeout=*/std::numeric_limits<uint64_t>::max()));
 }
 
-GpuPromise::GpuPromise(VulkanContext *context) : cmds(VK_NULL_HANDLE), context_(context) {
+GpuPromise::GpuPromise(VulkanContext *context) : context_(context) {
     VkSemaphoreCreateInfo semaphore_info{};
     semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -70,28 +70,13 @@ GpuPromise::GpuPromise(VulkanContext *context) : cmds(VK_NULL_HANDLE), context_(
                                            /*pAllocator=*/nullptr, &signal));
 }
 
-GpuPromise::GpuPromise(VkCommandBuffer cmds, VulkanContext *context)
-    : cmds(cmds), context_(context) {
-    VkSemaphoreCreateInfo semaphore_info{};
-    semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-
-    assert(VK_SUCCESS == vkCreateSemaphore(context->device, &semaphore_info,
-                                           /*pAllocator=*/nullptr, &signal));
-}
-
-GpuPromise::GpuPromise(GpuPromise &&other)
-    : cmds(VK_NULL_HANDLE), signal(VK_NULL_HANDLE), context_(nullptr) {
+GpuPromise::GpuPromise(GpuPromise &&other) : signal(VK_NULL_HANDLE), context_(nullptr) {
     *this = std::move(other);
 }
 
 GpuPromise::~GpuPromise() {
     if (signal != VK_NULL_HANDLE) {
         vkDestroySemaphore(context_->device, signal, /*pAllocator=*/nullptr);
-    }
-
-    if (cmds != VK_NULL_HANDLE) {
-        vkFreeCommandBuffers(context_->device, context_->command_pool, /*commandBufferCount=*/1,
-                             &cmds);
     }
 }
 

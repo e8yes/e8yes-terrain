@@ -45,7 +45,7 @@ struct CpuPromise {
     CpuPromise &operator=(CpuPromise &&other);
 
     /**
-     * @brief Wait
+     * @brief Wait Waits for the promise to be signaled (resolved).
      */
     void Wait();
 
@@ -68,16 +68,12 @@ struct GpuPromise {
      * @param task_cmds Optional. The task's GPU commands.
      * @param context Contextual Vulkan handles.
      */
-    GpuPromise(VulkanContext *context);
-    GpuPromise(VkCommandBuffer cmds, VulkanContext *context);
+    explicit GpuPromise(VulkanContext *context);
     GpuPromise(GpuPromise const &) = delete;
     GpuPromise(GpuPromise &&other);
     ~GpuPromise();
 
     GpuPromise &operator=(GpuPromise &&other);
-
-    //
-    VkCommandBuffer cmds;
 
     // Task's signal.
     VkSemaphore signal;
