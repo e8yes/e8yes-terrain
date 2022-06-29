@@ -66,7 +66,7 @@ PipelineStage *DirectIlluminator::DoComputeDirectIllumination(
         return pimpl_->cleared_radiance_map.get();
     }
 
-    for (auto instance : light_sources) {
+    for (auto const &instance : light_sources) {
         DoComputeRadiance(instance, parameter_projection.Frustum(), parameter_map,
                           /*shadow_map=*/nullptr, pimpl_->cleared_radiance_map.get(),
                           desc_set_alloc, pimpl_->context, pimpl_->filled_radiance_map.get());
