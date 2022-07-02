@@ -97,7 +97,7 @@ void SaveGeometryProto(GeometryProto const &geometry_proto, bool temporary, Reso
 
     // Writes out the metadata for this geometry resource.
     ResourceTable::Metadata metadata;
-    metadata.set_file_name(GeometryFileName(geometry_proto));
+    metadata.set_file_name(GeometryFileName(geometry_proto).string());
     metadata.set_resource_size(geometry_proto.ByteSizeLong());
     metadata.set_temporary(temporary);
 

@@ -111,7 +111,7 @@ std::unique_ptr<ResourceTable> LoadResourceTable(std::filesystem::path const &ba
         return nullptr;
     }
 
-    table->set_current_base_path(base_path);
+    table->set_current_base_path(base_path.string());
 
     return table;
 }

@@ -99,7 +99,7 @@ void SaveMaterialProto(MaterialProto const &material_proto, bool temporary, Reso
 
     // Writes out the metadata for this material resource.
     ResourceTable::Metadata metadata;
-    metadata.set_file_name(MaterialFileName(material_proto));
+    metadata.set_file_name(MaterialFileName(material_proto).string());
     metadata.set_resource_size(MaterialSize(material_proto));
     metadata.set_temporary(temporary);
 

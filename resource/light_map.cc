@@ -89,7 +89,7 @@ void SaveLightMapProto(LightMapProto const &light_map_proto, bool temporary, Res
 
     // Writes out the metadata for this light map resource.
     ResourceTable::Metadata metadata;
-    metadata.set_file_name(LightMapFileName(light_map_proto));
+    metadata.set_file_name(LightMapFileName(light_map_proto).string());
     metadata.set_resource_size(LightMapSize(light_map_proto));
     metadata.set_temporary(temporary);
 
