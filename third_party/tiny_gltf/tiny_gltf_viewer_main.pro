@@ -1,11 +1,12 @@
 CONFIG -= qt
+CONFIG += console
 CONFIG += c++17
 
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 
 QMAKE_CXXFLAGS += -std=c++17
 QMAKE_CXXFLAGS_RELEASE -= -O2
-QMAKE_CXXFLAGS_RELEASE += -O3 -flto -march=native -g
+QMAKE_CXXFLAGS_RELEASE += -O3 -flto -march=native
 QMAKE_LFLAGS_RELEASE -= -Wl,-O1
 QMAKE_LFLAGS_RELEASE += -O3 -flto -march=native
 
@@ -35,7 +36,16 @@ else:unix: LIBS += -L$$OUT_PWD/../stb_image/ -lstb_image
 INCLUDEPATH += $$PWD/../stb_image
 DEPENDPATH += $$PWD/../stb_image
 
-LIBS += -lglfw
-LIBS += -lGLEW
-LIBS += -lGLU
-LIBS += -lGL
+win32 {
+    LIBS += -lglfw3
+    LIBS += -lglew32
+    LIBS += -lglu32
+    LIBS += -lopengl32
+}
+
+unix {
+    LIBS += -lglfw
+    LIBS += -lGLEW
+    LIBS += -lGLU
+    LIBS += -lGL
+}

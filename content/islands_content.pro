@@ -10,7 +10,7 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 QMAKE_CXXFLAGS += -std=c++17
 QMAKE_CXXFLAGS += -DBOOST_LOG_DYN_LINK
 QMAKE_CXXFLAGS_RELEASE -= -O2
-QMAKE_CXXFLAGS_RELEASE += -O3 -flto -march=native -g
+QMAKE_CXXFLAGS_RELEASE += -O3 -flto -march=native
 QMAKE_LFLAGS_RELEASE -= -Wl,-O1
 QMAKE_LFLAGS_RELEASE += -O3 -flto -march=native
 
@@ -92,6 +92,10 @@ else:unix: LIBS += -L$$OUT_PWD/../third_party/uuid/ -luuid4
 
 INCLUDEPATH += $$PWD/../third_party/uuid
 DEPENDPATH += $$PWD/../third_party/uuid
+
+win32 {
+    LIBS += -lboost_log-mt
+}
 
 unix:!macx {
     LIBS += -lboost_log

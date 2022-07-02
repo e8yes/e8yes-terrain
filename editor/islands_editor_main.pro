@@ -9,7 +9,7 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 QMAKE_CXXFLAGS += -std=c++17
 QMAKE_CXXFLAGS += -DBOOST_LOG_DYN_LINK
 QMAKE_CXXFLAGS_RELEASE -= -O2
-QMAKE_CXXFLAGS_RELEASE += -O3 -flto -march=native -g
+QMAKE_CXXFLAGS_RELEASE += -O3 -flto -march=native
 QMAKE_LFLAGS_RELEASE -= -Wl,-O1
 QMAKE_LFLAGS_RELEASE += -O3 -flto -march=native
 
@@ -34,14 +34,14 @@ SOURCES += \
     editor.cc \
     environment/component_ambient.cc \
     environment/component_camera.cc \
+    main.cc \
     object/component_scene_object_gltf.cc \
     procedural/component_procedural_plane.cc \
     project/component_project_closer.cc \
     project/component_project_creator.cc \
     project/component_project_loader.cc \
     project/component_project_saver.cc \
-    scene/component_scene_view.cc \
-    main.cc
+    scene/component_scene_view.cc
 
 HEADERS += \
     basic/component_editor_portal_switcher.h \
@@ -122,24 +122,24 @@ INCLUDEPATH += $$PWD/../common
 DEPENDPATH += $$PWD/../common
 
 # Third party VMA.
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../third_party/vma/release/ -lislands_common
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../third_party/vma/debug/ -lislands_common
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../third_party/vma/release/ -lvma
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../third_party/vma/debug/ -lvma
 else:unix: LIBS += -L$$OUT_PWD/../third_party/vma/ -lvma
 
 INCLUDEPATH += $$PWD/../third_party/vma
 DEPENDPATH += $$PWD/../third_party/vma
 
 # Third party UUID.
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../third_party/uuid/release/ -lislands_common
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../third_party/uuid/debug/ -lislands_common
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../third_party/uuid/release/ -luuid4
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../third_party/uuid/debug/ -luuid4
 else:unix: LIBS += -L$$OUT_PWD/../third_party/uuid/ -luuid4
 
 INCLUDEPATH += $$PWD/../third_party/uuid
 DEPENDPATH += $$PWD/../third_party/uuid
 
 # Third party Tiny glTF.
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../third_party/tiny_gltf/release/ -lislands_common
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../third_party/tiny_gltf/debug/ -lislands_common
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../third_party/tiny_gltf/release/ -ltiny_gltf
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../third_party/tiny_gltf/debug/ -ltiny_gltf
 else:unix: LIBS += -L$$OUT_PWD/../third_party/tiny_gltf/ -ltiny_gltf
 
 INCLUDEPATH += $$PWD/../third_party/tiny_gltf
@@ -152,6 +152,10 @@ else:unix: LIBS += -L$$OUT_PWD/../third_party/stb_image/ -lstb_image
 
 INCLUDEPATH += $$PWD/../third_party/stb_image
 DEPENDPATH += $$PWD/../third_party/stb_image
+
+win32 {
+    LIBS += -lboost_log-mt
+}
 
 unix:!macx {
     LIBS += -lboost_log
