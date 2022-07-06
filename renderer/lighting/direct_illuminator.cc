@@ -16,6 +16,7 @@
  */
 
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 #include "common/device.h"
@@ -23,12 +24,20 @@
 #include "renderer/lighting/direct_illuminator.h"
 #include "renderer/output/common_output.h"
 #include "renderer/output/pipeline_stage.h"
+#include "renderer/pipeline/depth_map.h"
 #include "renderer/pipeline/solid_color.h"
 #include "renderer/postprocessor/radiance.h"
 #include "renderer/query/light_source.h"
 #include "renderer/transfer/descriptor_set.h"
 
 namespace e8 {
+namespace {
+
+unsigned kSpotLightShadowMapWidth = 512;
+unsigned kSpotLightShadowMapHeight = 512;
+unsigned kMaxSpotLightShadowMaps = 1;
+
+} // namespace
 
 struct DirectIlluminator::DirectIlluminatorImpl {
     DirectIlluminatorImpl(unsigned width, unsigned height, VulkanContext *context);
@@ -37,6 +46,7 @@ struct DirectIlluminator::DirectIlluminatorImpl {
     VulkanContext *context;
     std::unique_ptr<PipelineStage> cleared_radiance_map;
     std::unique_ptr<PipelineStage> filled_radiance_map;
+    std::vector<std::unique_ptr<PipelineStage>> spot_light_shadow_maps;
 };
 
 DirectIlluminator::DirectIlluminatorImpl::DirectIlluminatorImpl(unsigned width, unsigned height,
@@ -46,6 +56,12 @@ DirectIlluminator::DirectIlluminatorImpl::DirectIlluminatorImpl(unsigned width, 
                                                            /*with_depth_buffer=*/false, context);
     cleared_radiance_map = std::make_unique<PipelineStage>(output);
     filled_radiance_map = std::make_unique<PipelineStage>(output);
+
+    for (unsigned i = 0; i < kMaxSpotLightShadowMaps; ++i) {
+        std::unique_ptr<PipelineStage> spot_light_shadow_map =
+            CreateDepthMapStage(kSpotLightShadowMapWidth, kSpotLightShadowMapHeight, context);
+        spot_light_shadow_maps.push_back(std::move(spot_light_shadow_map));
+    }
 }
 
 DirectIlluminator::DirectIlluminatorImpl::~DirectIlluminatorImpl() {}
@@ -67,8 +83,9 @@ PipelineStage *DirectIlluminator::DoComputeDirectIllumination(
     }
 
     for (auto const &instance : light_sources) {
+        std::vector<PipelineStage *> shadow_maps;
         DoComputeRadiance(instance, parameter_projection.Frustum(), parameter_map,
-                          /*shadow_map=*/nullptr, pimpl_->cleared_radiance_map.get(),
+                          /*shadow_map=*/shadow_maps, pimpl_->cleared_radiance_map.get(),
                           desc_set_alloc, pimpl_->context, pimpl_->filled_radiance_map.get());
     }
 

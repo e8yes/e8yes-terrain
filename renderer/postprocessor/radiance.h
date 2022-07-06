@@ -35,7 +35,8 @@ namespace e8 {
  * @param instance The light source to compute direct radiance for.
  * @param view_projection The frustum in which the light inputs are rendered.
  * @param light_inputs Lighting parameters mapped to the screen.
- * @param shadow_map Optional. A depth map rendered from the light source's perspective. When it is
+ * @param shadow_maps Optional. An array of exponentiated depth maps rendered from the light
+ * source's perspective. Each depth map corresponds to one of the light source's region. When it is
  * specified, this function computes the radiance the occlusion factor. Otherwise, the radiance
  * penetrates all objects.
  * @param cleared_radiance_map A zeroed-out radiance map.
@@ -44,7 +45,7 @@ namespace e8 {
  * @param target The target stage which stores the radiance map in an HDR color image.
  */
 void DoComputeRadiance(LightSourceInstance const &instance, frustum const &view_projection,
-                       PipelineStage *light_inputs, PipelineStage *shadow_map,
+                       PipelineStage *light_inputs, std::vector<PipelineStage *> const &shadow_maps,
                        PipelineStage *cleared_radiance_map,
                        DescriptorSetAllocator *desc_set_allocator, VulkanContext *context,
                        PipelineStage *target);

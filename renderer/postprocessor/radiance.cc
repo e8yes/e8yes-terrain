@@ -204,7 +204,7 @@ void SpotLightPostProcessorConfigurator::PushConstants(std::vector<uint8_t> *pus
 } // namespace
 
 void DoComputeRadiance(LightSourceInstance const &instance, frustum const &view_projection,
-                       PipelineStage *light_inputs, PipelineStage *shadow_map,
+                       PipelineStage *light_inputs, std::vector<PipelineStage *> const &shadow_maps,
                        PipelineStage *cleared_radiance_map,
                        DescriptorSetAllocator *desc_set_allocator, VulkanContext *context,
                        PipelineStage *target) {
@@ -262,9 +262,12 @@ void DoComputeRadiance(LightSourceInstance const &instance, frustum const &view_
     }
     }
 
-    target->Schedule(
-        pipeline, std::move(configurator),
-        /*parents=*/std::vector<PipelineStage *>{light_inputs, shadow_map, cleared_radiance_map});
+    std::vector<PipelineStage *> depending_parents{light_inputs, cleared_radiance_map};
+    for (auto shadow_map : shadow_maps) {
+        depending_parents.push_back(shadow_map);
+    }
+
+    target->Schedule(pipeline, std::move(configurator), depending_parents);
 }
 
 } // namespace e8
