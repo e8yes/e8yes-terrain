@@ -15,12 +15,12 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <google/protobuf/repeated_field.h>
 #include <algorithm>
 #include <cassert>
 #include <filesystem>
 #include <fstream>
 #include <functional>
-#include <google/protobuf/repeated_field.h>
 #include <map>
 #include <memory>
 #include <shared_mutex>
@@ -45,8 +45,8 @@ namespace {
 
 constexpr char const *kSceneFileName = "scene.spb";
 
-std::map<ProceduralObjectId, std::unique_ptr<ProceduralObjectInterface>>
-ToProceduralObjects(google::protobuf::RepeatedPtrField<ProceduralObjectProto> const &protos) {
+std::map<ProceduralObjectId, std::unique_ptr<ProceduralObjectInterface>> ToProceduralObjects(
+    google::protobuf::RepeatedPtrField<ProceduralObjectProto> const &protos) {
     std::map<ProceduralObjectId, std::unique_ptr<ProceduralObjectInterface>> procedural_objects;
     for (auto const &proto : protos) {
         procedural_objects.insert(std::make_pair(proto.id(), ToProceduralObject(proto)));
@@ -54,8 +54,8 @@ ToProceduralObjects(google::protobuf::RepeatedPtrField<ProceduralObjectProto> co
     return procedural_objects;
 }
 
-std::map<SceneObjectId, SceneObject>
-ToSceneObjects(google::protobuf::RepeatedPtrField<SceneObjectProto> const &protos) {
+std::map<SceneObjectId, SceneObject> ToSceneObjects(
+    google::protobuf::RepeatedPtrField<SceneObjectProto> const &protos) {
     std::map<SceneObjectId, SceneObject> scene_objects;
     for (auto const &proto : protos) {
         scene_objects.insert(std::make_pair(proto.id(), SceneObject(proto)));
@@ -73,8 +73,8 @@ google::protobuf::RepeatedPtrField<ProceduralObjectProto> ToProceduralObjectProt
     return protos;
 }
 
-google::protobuf::RepeatedPtrField<SceneObjectProto>
-ToSceneObjectProtos(std::map<SceneObjectId, SceneObject> const &scene_objects) {
+google::protobuf::RepeatedPtrField<SceneObjectProto> ToSceneObjectProtos(
+    std::map<SceneObjectId, SceneObject> const &scene_objects) {
     google::protobuf::RepeatedPtrField<SceneObjectProto> protos;
     for (auto const &[_, scene_object] : scene_objects) {
         *protos.Add() = scene_object.ToProto();
@@ -121,7 +121,7 @@ void CollectSceneEntityToStructure(SceneObject const &scene_object, bool add,
     }
 }
 
-} // namespace
+}  // namespace
 
 Scene::ReadAccess::ReadAccess(std::shared_mutex *mu) : mu_(mu) { mu_->lock_shared(); }
 
@@ -137,7 +137,11 @@ Scene::ReadAccess::~ReadAccess() {
     }
 }
 
-Scene::WriteAccess::WriteAccess(std::shared_mutex *mu) : mu_(mu) { mu_->lock(); }
+Scene::WriteAccess::WriteAccess(std::shared_mutex *mu, SceneEntityStructureInterface *structure)
+    : mu_(mu) {
+    mu_->lock();
+    structure->InvalidateQueryCache();
+}
 
 Scene::WriteAccess::WriteAccess(WriteAccess &&other) {
     mu_ = other.mu_;
@@ -179,24 +183,24 @@ Scene::~Scene() {}
 
 void Scene::CreateSceneEntityStructure() {
     switch (structure_type) {
-    case SceneProto::LINEAR: {
-        entity_structure_ = std::make_unique<LinearSceneEntityStructure>();
-        break;
-    }
-    case SceneProto::OCTREE: {
-        // TODO: Creates an octree scene entity container once it's implemented.
-        assert(false);
-        break;
-    }
-    default: {
-        assert(false);
-    }
+        case SceneProto::LINEAR: {
+            entity_structure_ = std::make_unique<LinearSceneEntityStructure>();
+            break;
+        }
+        case SceneProto::OCTREE: {
+            // TODO: Creates an octree scene entity container once it's implemented.
+            assert(false);
+            break;
+        }
+        default: {
+            assert(false);
+        }
     }
 }
 
 Scene::ReadAccess Scene::GainReadAccess() { return ReadAccess(&mu_); }
 
-Scene::WriteAccess Scene::GainWriteAccess() { return WriteAccess(&mu_); }
+Scene::WriteAccess Scene::GainWriteAccess() { return WriteAccess(&mu_, entity_structure_.get()); }
 
 SceneEntityStructureInterface *Scene::SceneEntityStructure() { return entity_structure_.get(); }
 
@@ -281,4 +285,4 @@ bool SaveScene(Scene const &scene, std::filesystem::path const &base_path) {
     return true;
 }
 
-} // namespace e8
+}  // namespace e8

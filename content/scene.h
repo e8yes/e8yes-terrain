@@ -43,19 +43,19 @@ using SceneId = Uuid;
  * isn't thread-safe, but it provides locking device to enable safe concurrent resource access.
  */
 class Scene {
-  public:
+   public:
     /**
      * @brief The ReadAccess class Created by calling GainReadAccess(). Note, the access right is
      * valid throughout the life of the ReadAccess object.
      */
     class ReadAccess {
-      public:
+       public:
         ReadAccess(std::shared_mutex *mu);
         ReadAccess(ReadAccess &&other);
         ReadAccess(ReadAccess const &) = delete;
         ~ReadAccess();
 
-      private:
+       private:
         std::shared_mutex *mu_;
     };
 
@@ -64,13 +64,13 @@ class Scene {
      * valid throughout the life of the WriteAccess object.
      */
     class WriteAccess {
-      public:
-        WriteAccess(std::shared_mutex *mu);
+       public:
+        WriteAccess(std::shared_mutex *mu, SceneEntityStructureInterface *structure);
         WriteAccess(WriteAccess &&other);
         WriteAccess(WriteAccess const &) = delete;
         ~WriteAccess();
 
-      private:
+       private:
         std::shared_mutex *mu_;
     };
 
@@ -150,7 +150,7 @@ class Scene {
      */
     SceneProto ToProto() const;
 
-  public:
+   public:
     // Id of the scene.
     SceneId id;
 
@@ -166,7 +166,7 @@ class Scene {
     // The scene's main camera.
     Camera camera;
 
-  private:
+   private:
     void CreateDefaultCamera();
     void CreateSceneEntityStructure();
 
@@ -189,6 +189,6 @@ std::unique_ptr<Scene> LoadScene(std::filesystem::path const &base_path,
  */
 bool SaveScene(Scene const &scene, std::filesystem::path const &base_path);
 
-} // namespace e8
+}  // namespace e8
 
-#endif // ISLANDS_RENDERER_SCENE_H
+#endif  // ISLANDS_RENDERER_SCENE_H

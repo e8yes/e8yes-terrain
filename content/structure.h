@@ -30,7 +30,7 @@ namespace e8 {
  * support efficient addition, removal and querying.
  */
 class SceneEntityStructureInterface {
-  public:
+   public:
     SceneEntityStructureInterface();
     virtual ~SceneEntityStructureInterface();
 
@@ -73,9 +73,15 @@ class SceneEntityStructureInterface {
      * @param query_fn See above for its definition.
      * @return An array of entities selected.
      */
-    virtual std::vector<SceneEntity const *> QueryEntities(QueryFn query_fn) const = 0;
+    virtual std::vector<SceneEntity const *> QueryEntities(QueryFn query_fn) = 0;
+
+    /**
+     * @brief InvalidateQueryCache Informs the QueryEntities() function to not use the current
+     * query cache, if there is any.
+     */
+    virtual void InvalidateQueryCache() = 0;
 };
 
-} // namespace e8
+}  // namespace e8
 
-#endif // ISLANDS_CONTENT_STRUCTURE_H
+#endif  // ISLANDS_CONTENT_STRUCTURE_H

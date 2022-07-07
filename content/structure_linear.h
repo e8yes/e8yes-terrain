@@ -30,7 +30,7 @@ namespace e8 {
  * @brief The LinearSceneEntityContainer class A linear (flat) scene entity container structure.
  */
 class LinearSceneEntityStructure : public SceneEntityStructureInterface {
-  public:
+   public:
     /**
      * @brief LinearScene Constructs a empty linear scene.
      */
@@ -62,12 +62,14 @@ class LinearSceneEntityStructure : public SceneEntityStructureInterface {
      * @brief QueryEntities Querying entity requires O(n) time, where n is the number of entity in
      * the scene.
      */
-    std::vector<SceneEntity const *> QueryEntities(QueryFn query_fn) const override;
+    std::vector<SceneEntity const *> QueryEntities(QueryFn query_fn) override;
 
-  private:
+    void InvalidateQueryCache() override;
+
+   private:
     std::vector<SceneEntity const *> entities_;
 };
 
-} // namespace e8
+}  // namespace e8
 
-#endif // ISLANDS_CONTENT_STRUCTURE_LINEAR_H
+#endif  // ISLANDS_CONTENT_STRUCTURE_LINEAR_H
