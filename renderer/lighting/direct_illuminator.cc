@@ -37,31 +37,50 @@ unsigned kSpotLightShadowMapWidth = 512;
 unsigned kSpotLightShadowMapHeight = 512;
 unsigned kMaxSpotLightShadowMaps = 1;
 
-} // namespace
+struct ShadowMapCache {
+    ShadowMapCache(VulkanContext *context);
+    ~ShadowMapCache();
+
+    std::vector<std::unique_ptr<PipelineStage>> spot_light_shadow_maps;
+};
+
+ShadowMapCache::ShadowMapCache(VulkanContext *context) {
+    for (unsigned i = 0; i < kMaxSpotLightShadowMaps; ++i) {
+        std::unique_ptr<PipelineStage> spot_light_shadow_map =
+            CreateDepthMapStage(kSpotLightShadowMapWidth, kSpotLightShadowMapHeight, context);
+        spot_light_shadow_maps.push_back(std::move(spot_light_shadow_map));
+    }
+}
+
+ShadowMapCache::~ShadowMapCache() {}
+
+void DoGenerateShadowMaps(
+    std::vector<LightSourceInstance> const &light_sources, VulkanContext *context,
+    std::unordered_map<LightSourceInstance const *, std::vector<PipelineStage *>>
+        *light_source_shadow_maps,
+    ShadowMapCache *cache) {}
+
+}  // namespace
 
 struct DirectIlluminator::DirectIlluminatorImpl {
     DirectIlluminatorImpl(unsigned width, unsigned height, VulkanContext *context);
     ~DirectIlluminatorImpl();
 
     VulkanContext *context;
+
     std::unique_ptr<PipelineStage> cleared_radiance_map;
     std::unique_ptr<PipelineStage> filled_radiance_map;
-    std::vector<std::unique_ptr<PipelineStage>> spot_light_shadow_maps;
+
+    ShadowMapCache shadow_map_cache;
 };
 
 DirectIlluminator::DirectIlluminatorImpl::DirectIlluminatorImpl(unsigned width, unsigned height,
                                                                 VulkanContext *context)
-    : context(context) {
+    : context(context), shadow_map_cache(context) {
     auto output = std::make_shared<HdrColorPipelineOutput>(width, height,
                                                            /*with_depth_buffer=*/false, context);
     cleared_radiance_map = std::make_unique<PipelineStage>(output);
     filled_radiance_map = std::make_unique<PipelineStage>(output);
-
-    for (unsigned i = 0; i < kMaxSpotLightShadowMaps; ++i) {
-        std::unique_ptr<PipelineStage> spot_light_shadow_map =
-            CreateDepthMapStage(kSpotLightShadowMapWidth, kSpotLightShadowMapHeight, context);
-        spot_light_shadow_maps.push_back(std::move(spot_light_shadow_map));
-    }
 }
 
 DirectIlluminator::DirectIlluminatorImpl::~DirectIlluminatorImpl() {}
@@ -82,8 +101,18 @@ PipelineStage *DirectIlluminator::DoComputeDirectIllumination(
         return pimpl_->cleared_radiance_map.get();
     }
 
+    std::unordered_map<LightSourceInstance const *, std::vector<PipelineStage *>>
+        light_source_shadow_maps;
+    DoGenerateShadowMaps(light_sources, pimpl_->context, &light_source_shadow_maps,
+                         &pimpl_->shadow_map_cache);
+
     for (auto const &instance : light_sources) {
         std::vector<PipelineStage *> shadow_maps;
+        auto it = light_source_shadow_maps.find(&instance);
+        if (it != light_source_shadow_maps.end()) {
+            shadow_maps = it->second;
+        }
+
         DoComputeRadiance(instance, parameter_projection.Frustum(), parameter_map,
                           /*shadow_map=*/shadow_maps, pimpl_->cleared_radiance_map.get(),
                           desc_set_alloc, pimpl_->context, pimpl_->filled_radiance_map.get());
@@ -92,4 +121,4 @@ PipelineStage *DirectIlluminator::DoComputeDirectIllumination(
     return pimpl_->filled_radiance_map.get();
 }
 
-} // namespace e8
+}  // namespace e8
