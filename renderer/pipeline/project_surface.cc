@@ -15,13 +15,13 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vulkan/vulkan.h>
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <vector>
-#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "renderer/basic/attachment.h"
@@ -39,7 +39,7 @@
 #include "renderer/output/promise.h"
 #include "renderer/pass/configurator.h"
 #include "renderer/pass/rasterize.h"
-#include "renderer/pipeline/light_inputs.h"
+#include "renderer/pipeline/project_surface.h"
 #include "renderer/query/drawable_instance.h"
 #include "renderer/transfer/descriptor_set_texture.h"
 #include "renderer/transfer/texture_group.h"
@@ -49,36 +49,36 @@
 namespace e8 {
 namespace {
 
-PipelineKey const kLightInputsPipeline = "Light Inputs";
+PipelineKey const kProjectSurfacePipeline = "Project Surface Parameters";
 
 /**
- * @brief The LightInputsPipelineOutput class For storing a 32-bit RGBA color output containing the
- * geometry data as well as a 32-bit depth output.
+ * @brief The ProjectSurfacePipelineOutput class For storing a 32-bit RGBA color output containing
+ * the geometry data as well as a 32-bit depth output.
  */
-class LightInputsPipelineOutput : public PipelineOutputInterface {
-  public:
+class ProjectSurfacePipelineOutput : public PipelineOutputInterface {
+   public:
     /**
-     * @brief LightInputsPipelineOutput Constructs a light inputs map output with the specified
-     * dimension.
+     * @brief ProjectSurfacePipelineOutput Constructs surface parameter projection output with the
+     * specified dimension.
      *
-     * @param width The width of the light inputs map output.
-     * @param height The height of the light inputs map output.
+     * @param width The width of the surface projection output.
+     * @param height The height of the surface projection output.
      * @param context Contextual Vulkan handles.
      */
-    LightInputsPipelineOutput(unsigned width, unsigned height, VulkanContext *context);
-    ~LightInputsPipelineOutput();
+    ProjectSurfacePipelineOutput(unsigned width, unsigned height, VulkanContext *context);
+    ~ProjectSurfacePipelineOutput();
 
     FrameBuffer *GetFrameBuffer() const override;
     RenderPass const &GetRenderPass() const override;
     std::vector<FrameBufferAttachment const *> ColorAttachments() const override;
     FrameBufferAttachment const *DepthAttachment() const override;
 
-  private:
+   private:
     struct LightInputsPipelineOutputImpl;
     std::unique_ptr<LightInputsPipelineOutputImpl> pimpl_;
 };
 
-struct LightInputsPipelineOutput::LightInputsPipelineOutputImpl {
+struct ProjectSurfacePipelineOutput::LightInputsPipelineOutputImpl {
     LightInputsPipelineOutputImpl(unsigned width, unsigned height, VulkanContext *context);
     ~LightInputsPipelineOutputImpl();
 
@@ -91,7 +91,7 @@ struct LightInputsPipelineOutput::LightInputsPipelineOutputImpl {
     VulkanContext *context;
 };
 
-LightInputsPipelineOutput::LightInputsPipelineOutputImpl::LightInputsPipelineOutputImpl(
+ProjectSurfacePipelineOutput::LightInputsPipelineOutputImpl::LightInputsPipelineOutputImpl(
     unsigned width, unsigned height, VulkanContext *context) {
     normal_roughness_ = CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R16G16B16A16_SNORM,
                                               /*transfer_src=*/false, context);
@@ -109,27 +109,29 @@ LightInputsPipelineOutput::LightInputsPipelineOutputImpl::LightInputsPipelineOut
                           depth_attachment_->view, context);
 }
 
-LightInputsPipelineOutput::LightInputsPipelineOutputImpl::~LightInputsPipelineOutputImpl() {}
+ProjectSurfacePipelineOutput::LightInputsPipelineOutputImpl::~LightInputsPipelineOutputImpl() {}
 
-LightInputsPipelineOutput::LightInputsPipelineOutput(unsigned width, unsigned height,
-                                                     VulkanContext *context)
+ProjectSurfacePipelineOutput::ProjectSurfacePipelineOutput(unsigned width, unsigned height,
+                                                           VulkanContext *context)
     : PipelineOutputInterface(width, height),
       pimpl_(std::make_unique<LightInputsPipelineOutputImpl>(width, height, context)) {}
 
-LightInputsPipelineOutput::~LightInputsPipelineOutput() {}
+ProjectSurfacePipelineOutput::~ProjectSurfacePipelineOutput() {}
 
-FrameBuffer *LightInputsPipelineOutput::GetFrameBuffer() const {
+FrameBuffer *ProjectSurfacePipelineOutput::GetFrameBuffer() const {
     return pimpl_->frame_buffer_.get();
 }
 
-RenderPass const &LightInputsPipelineOutput::GetRenderPass() const { return *pimpl_->render_pass_; }
+RenderPass const &ProjectSurfacePipelineOutput::GetRenderPass() const {
+    return *pimpl_->render_pass_;
+}
 
-std::vector<FrameBufferAttachment const *> LightInputsPipelineOutput::ColorAttachments() const {
+std::vector<FrameBufferAttachment const *> ProjectSurfacePipelineOutput::ColorAttachments() const {
     return std::vector<FrameBufferAttachment const *>{pimpl_->normal_roughness_.get(),
                                                       pimpl_->albedo_metallic_.get()};
 }
 
-FrameBufferAttachment const *LightInputsPipelineOutput::DepthAttachment() const {
+FrameBufferAttachment const *ProjectSurfacePipelineOutput::DepthAttachment() const {
     return pimpl_->depth_attachment_.get();
 }
 
@@ -215,7 +217,7 @@ std::vector<VkDescriptorSetLayoutBinding> DescriptorSetBindings() {
  * variables.
  */
 class RenderPassConfigurator : public RenderPassConfiguratorInterface {
-  public:
+   public:
     RenderPassConfigurator(ProjectionInterface const &projection,
                            ImageSampler const &texture_sampler);
     ~RenderPassConfigurator();
@@ -224,7 +226,7 @@ class RenderPassConfigurator : public RenderPassConfiguratorInterface {
     std::vector<uint8_t> PushConstantOf(DrawableInstance const &drawable) const override;
     TextureSelector TexturesOf(DrawableInstance const &drawable) const override;
 
-  private:
+   private:
     ProjectionInterface const &projection_;
     ImageSampler const &texture_sampler_;
 };
@@ -239,8 +241,8 @@ bool RenderPassConfigurator::IncludeDrawable(DrawableInstance const &drawable) c
     return drawable.material != nullptr;
 }
 
-std::vector<uint8_t>
-RenderPassConfigurator::PushConstantOf(DrawableInstance const &drawable) const {
+std::vector<uint8_t> RenderPassConfigurator::PushConstantOf(
+    DrawableInstance const &drawable) const {
     std::vector<uint8_t> bytes(sizeof(PushConstants));
 
     PushConstants *push_constants = reinterpret_cast<PushConstants *>(bytes.data());
@@ -279,8 +281,11 @@ struct LightInputsPipelineArgument : public CachedPipelineArgumentsInterface {
                                 ProjectionInterface const &projection,
                                 TextureDescriptorSetCache *tex_desc_set_cache,
                                 GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram)
-        : drawables(drawables), projection(projection), tex_desc_set_cache(tex_desc_set_cache),
-          geo_vram(geo_vram), tex_vram(tex_vram) {}
+        : drawables(drawables),
+          projection(projection),
+          tex_desc_set_cache(tex_desc_set_cache),
+          geo_vram(geo_vram),
+          tex_vram(tex_vram) {}
 
     std::vector<DrawableInstance> const &drawables;
     ProjectionInterface const &projection;
@@ -290,12 +295,12 @@ struct LightInputsPipelineArgument : public CachedPipelineArgumentsInterface {
 };
 
 /**
- * @brief The LightInputsPipeline class For mapping the lighting parameters onto screen.
+ * @brief The ProjectSurfacePipeline class For mapping the lighting parameters onto screen.
  */
-class LightInputsPipeline : public CachedPipelineInterface {
-  public:
-    LightInputsPipeline(PipelineOutputInterface *output, VulkanContext *context);
-    ~LightInputsPipeline() override;
+class ProjectSurfacePipeline : public CachedPipelineInterface {
+   public:
+    ProjectSurfacePipeline(PipelineOutputInterface *output, VulkanContext *context);
+    ~ProjectSurfacePipeline() override;
 
     PipelineKey Key() const override;
 
@@ -304,7 +309,8 @@ class LightInputsPipeline : public CachedPipelineInterface {
                        unsigned completion_signal_count, PipelineOutputInterface *output) override;
 };
 
-LightInputsPipeline::LightInputsPipeline(PipelineOutputInterface *output, VulkanContext *context)
+ProjectSurfacePipeline::ProjectSurfacePipeline(PipelineOutputInterface *output,
+                                               VulkanContext *context)
     : CachedPipelineInterface(context) {
     uniform_layout_ = CreateShaderUniformLayout(
         PushConstantLayout(), /*per_frame_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
@@ -325,14 +331,14 @@ LightInputsPipeline::LightInputsPipeline(PipelineOutputInterface *output, Vulkan
     texture_sampler_ = CreateTextureSampler(context);
 }
 
-LightInputsPipeline::~LightInputsPipeline() {}
+ProjectSurfacePipeline::~ProjectSurfacePipeline() {}
 
-PipelineKey LightInputsPipeline::Key() const { return kLightInputsPipeline; }
+PipelineKey ProjectSurfacePipeline::Key() const { return kProjectSurfacePipeline; }
 
-Fulfillment LightInputsPipeline::Launch(CachedPipelineArgumentsInterface const &generic_args,
-                                        std::vector<GpuPromise *> const &prerequisites,
-                                        unsigned completion_signal_count,
-                                        PipelineOutputInterface *output) {
+Fulfillment ProjectSurfacePipeline::Launch(CachedPipelineArgumentsInterface const &generic_args,
+                                           std::vector<GpuPromise *> const &prerequisites,
+                                           unsigned completion_signal_count,
+                                           PipelineOutputInterface *output) {
     VkCommandBuffer cmds =
         StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), context_);
 
@@ -346,23 +352,22 @@ Fulfillment LightInputsPipeline::Launch(CachedPipelineArgumentsInterface const &
     return FinishRenderPass(cmds, completion_signal_count, prerequisites, context_);
 }
 
-} // namespace
+}  // namespace
 
-std::unique_ptr<PipelineStage> CreateLightInputsStage(unsigned width, unsigned height,
-                                                      VulkanContext *context) {
-    auto output = std::make_shared<LightInputsPipelineOutput>(width, height, context);
+std::unique_ptr<PipelineStage> CreateProjectSurfaceStage(unsigned width, unsigned height,
+                                                         VulkanContext *context) {
+    auto output = std::make_shared<ProjectSurfacePipelineOutput>(width, height, context);
     return std::make_unique<PipelineStage>(output);
 }
 
-void DoGenerateLightInputs(std::vector<DrawableInstance> const &drawables,
-                           ProjectionInterface const &projection,
-                           TextureDescriptorSetCache *tex_desc_set_cache,
-                           GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram,
-                           VulkanContext *context, PipelineStage *first_stage,
-                           PipelineStage *target) {
+void DoProjectSurface(std::vector<DrawableInstance> const &drawables,
+                      ProjectionInterface const &projection,
+                      TextureDescriptorSetCache *tex_desc_set_cache, GeometryVramTransfer *geo_vram,
+                      TextureVramTransfer *tex_vram, VulkanContext *context,
+                      PipelineStage *first_stage, PipelineStage *target) {
     CachedPipelineInterface *pipeline =
-        target->WithPipeline(kLightInputsPipeline, [context](PipelineOutputInterface *output) {
-            return std::make_unique<LightInputsPipeline>(output, context);
+        target->WithPipeline(kProjectSurfacePipeline, [context](PipelineOutputInterface *output) {
+            return std::make_unique<ProjectSurfacePipeline>(output, context);
         });
 
     auto args = std::make_unique<LightInputsPipelineArgument>(
@@ -371,4 +376,4 @@ void DoGenerateLightInputs(std::vector<DrawableInstance> const &drawables,
                      /*parents=*/std::vector<PipelineStage *>{first_stage});
 }
 
-} // namespace e8
+}  // namespace e8

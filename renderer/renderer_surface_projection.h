@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_LIGHT_INPUTS_H
-#define ISLANDS_RENDERER_LIGHT_INPUTS_H
+#ifndef ISLANDS_RENDERER_SURFACE_PROJECTION_H
+#define ISLANDS_RENDERER_SURFACE_PROJECTION_H
 
 #include <memory>
 
@@ -29,28 +29,28 @@
 namespace e8 {
 
 /**
- * @brief The LightInputsRenderer class It visualizes the selected light inputs using colors at the
- * scene's camera angle.
+ * @brief The SurfaceProjectionRenderer class It visualizes the selected surface parameter
+ * (screen-space) as a color image.
  */
-class LightInputsRenderer : public RendererInterface {
-  public:
+class SurfaceProjectionRenderer : public RendererInterface {
+   public:
     /**
-     * @brief LightInputsRenderer Constructs a light inputs renderer.
+     * @brief SurfaceProjectionRenderer Constructs a surface projection renderer.
      *
      * @param context Contextual Vulkan handles.
      */
-    LightInputsRenderer(VulkanContext *context);
-    ~LightInputsRenderer();
+    SurfaceProjectionRenderer(VulkanContext *context);
+    ~SurfaceProjectionRenderer();
 
     void DrawFrame(Scene *scene, ResourceAccessor *resource_accessor) override;
 
     void ApplyConfiguration(RendererConfiguration const &config) override;
 
-  private:
-    class LightInputsRendererImpl;
-    std::unique_ptr<LightInputsRendererImpl> pimpl_;
+   private:
+    class SurfaceProjectionRendererImpl;
+    std::unique_ptr<SurfaceProjectionRendererImpl> pimpl_;
 };
 
-} // namespace e8
+}  // namespace e8
 
-#endif // ISLANDS_RENDERER_LIGHT_INPUTS_H
+#endif  // ISLANDS_RENDERER_SURFACE_PROJECTION_H

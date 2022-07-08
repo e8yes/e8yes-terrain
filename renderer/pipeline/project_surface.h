@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_PIPELINE_LIGHT_INPUTS_H
-#define ISLANDS_RENDERER_PIPELINE_LIGHT_INPUTS_H
+#ifndef ISLANDS_RENDERER_PIPELINE_PROJECT_SURFACE_H
+#define ISLANDS_RENDERER_PIPELINE_PROJECT_SURFACE_H
 
 #include <memory>
 
@@ -31,9 +31,10 @@
 namespace e8 {
 
 /**
- * @brief The LightInputsColorOutput enum Index to the light input parameter images.
+ * @brief The SurfaceProjectionColorOutput enum Index to the surface parameter images (color
+ * attachments).
  */
-enum LightInputsColorOutput {
+enum SurfaceProjectionColorOutput {
     // The image which stores the normal vector and the roughness factor.
     LICO_NORMAL_ROUGHNESS,
 
@@ -45,21 +46,22 @@ enum LightInputsColorOutput {
 };
 
 /**
- * @brief CreateLightInputsOutput Creates a light inputs pipeline stage with two 32-bit parameter
- * maps and a 32-bit depth map output in the specified dimension.
+ * @brief CreateProjectSurfaceStage Creates a surface projection pipeline stage with two 32-bit
+ * parameter maps and a 32-bit depth map output in the specified dimension. See the above
+ * SurfaceProjectionColorOutput enum for what information each parameter map contains.
  *
  * @param width The width of the light parameter map output.
  * @param height The width of the light parameter map output.
  * @param context Contextual Vulkan handles.
  * @return The light input stage.
  */
-std::unique_ptr<PipelineStage> CreateLightInputsStage(unsigned width, unsigned height,
-                                                      VulkanContext *context);
+std::unique_ptr<PipelineStage> CreateProjectSurfaceStage(unsigned width, unsigned height,
+                                                         VulkanContext *context);
 
 /**
- * @brief DoGenerateLightInputs Schedules a graphics pipeline to generate a map of geometry
- * information. These information are essential for lighting computation. They are: normal vector,
- * roughness factor and depth.
+ * @brief DoProjectSurface Schedules a graphics pipeline to generate a map of geometry information.
+ * These information are essential for lighting computation. They are: normal vector, roughness
+ * factor, albedo, metallic factor and depth.
  *
  * @param drawables An array of drawables to be rendered onto the light inputs map.
  * @param projection Defines how drawables should be projected to the light inputs map.
@@ -71,13 +73,12 @@ std::unique_ptr<PipelineStage> CreateLightInputsStage(unsigned width, unsigned h
  * @param target The target stage which stores the rendered light inputs. It should be created using
  * CreateLightInputsStage().
  */
-void DoGenerateLightInputs(std::vector<DrawableInstance> const &drawables,
-                           ProjectionInterface const &projection,
-                           TextureDescriptorSetCache *tex_desc_set_cache,
-                           GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram,
-                           VulkanContext *context, PipelineStage *first_stage,
-                           PipelineStage *target);
+void DoProjectSurface(std::vector<DrawableInstance> const &drawables,
+                      ProjectionInterface const &projection,
+                      TextureDescriptorSetCache *tex_desc_set_cache, GeometryVramTransfer *geo_vram,
+                      TextureVramTransfer *tex_vram, VulkanContext *context,
+                      PipelineStage *first_stage, PipelineStage *target);
 
-} // namespace e8
+}  // namespace e8
 
-#endif // ISLANDS_RENDERER_PIPELINE_LIGHT_INPUTS_H
+#endif  // ISLANDS_RENDERER_PIPELINE_PROJECT_SURFACE_H

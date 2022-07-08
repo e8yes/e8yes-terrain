@@ -25,7 +25,7 @@
 #include "renderer/output/common_output.h"
 #include "renderer/output/pipeline_stage.h"
 #include "renderer/pipeline/depth_map.h"
-#include "renderer/pipeline/solid_color.h"
+#include "renderer/pipeline/fill_color.h"
 #include "renderer/postprocessor/radiance.h"
 #include "renderer/query/light_source.h"
 #include "renderer/transfer/descriptor_set.h"

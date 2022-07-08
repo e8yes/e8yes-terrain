@@ -17,10 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "renderer/pipeline/solid_color.h"
-
 #include <vulkan/vulkan.h>
-
 #include <vector>
 
 #include "common/device.h"
@@ -31,6 +28,7 @@
 #include "renderer/output/pipeline_stage.h"
 #include "renderer/output/promise.h"
 #include "renderer/pass/rasterize.h"
+#include "renderer/pipeline/fill_color.h"
 
 namespace e8 {
 namespace {
@@ -44,7 +42,7 @@ struct FillColorPipelineArguments : public CachedPipelineArgumentsInterface {
 };
 
 class FillColorPipeline : public CachedPipelineInterface {
-  public:
+   public:
     FillColorPipeline(VulkanContext *context);
     ~FillColorPipeline() override;
 
@@ -78,7 +76,7 @@ Fulfillment FillColorPipeline::Launch(CachedPipelineArgumentsInterface const &ge
     return FinishRenderPass(cmds, completion_signal_count, prerequisites, context_);
 }
 
-} // namespace
+}  // namespace
 
 void DoFillColor(vec3 const &color, VulkanContext *context, PipelineStage *first_stage,
                  PipelineStage *target) {
@@ -92,4 +90,4 @@ void DoFillColor(vec3 const &color, VulkanContext *context, PipelineStage *first
                      /*parents=*/std::vector<PipelineStage *>{first_stage});
 }
 
-} // namespace e8
+}  // namespace e8

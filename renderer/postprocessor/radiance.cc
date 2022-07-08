@@ -26,7 +26,7 @@
 #include "renderer/basic/shader.h"
 #include "renderer/output/pipeline_stage.h"
 #include "renderer/output/promise.h"
-#include "renderer/pipeline/light_inputs.h"
+#include "renderer/pipeline/project_surface.h"
 #include "renderer/postprocessor/post_processor.h"
 #include "renderer/postprocessor/radiance.h"
 #include "renderer/query/light_source.h"
@@ -59,13 +59,13 @@ RadiancePostProcessorConfigurator::RadiancePostProcessorConfigurator(
 RadiancePostProcessorConfigurator::~RadiancePostProcessorConfigurator() {}
 
 void RadiancePostProcessorConfigurator::InputImages(std::vector<VkImageView> *input_images) const {
-    input_images->at(LightInputsColorOutput::LICO_NORMAL_ROUGHNESS) =
-        light_inputs_.ColorAttachments()[LightInputsColorOutput::LICO_NORMAL_ROUGHNESS]->view;
+    input_images->at(SurfaceProjectionColorOutput::LICO_NORMAL_ROUGHNESS) =
+        light_inputs_.ColorAttachments()[SurfaceProjectionColorOutput::LICO_NORMAL_ROUGHNESS]->view;
 
-    input_images->at(LightInputsColorOutput::LICO_ALBEDO_METALLIC) =
-        light_inputs_.ColorAttachments()[LightInputsColorOutput::LICO_ALBEDO_METALLIC]->view;
+    input_images->at(SurfaceProjectionColorOutput::LICO_ALBEDO_METALLIC) =
+        light_inputs_.ColorAttachments()[SurfaceProjectionColorOutput::LICO_ALBEDO_METALLIC]->view;
 
-    input_images->at(LightInputsColorOutput::LightInputsColorOutputCount) =
+    input_images->at(SurfaceProjectionColorOutput::LightInputsColorOutputCount) =
         light_inputs_.DepthAttachment()->view;
 }
 
@@ -218,7 +218,7 @@ void DoComputeRadiance(LightSourceInstance const &instance, frustum const &view_
             [desc_set_allocator, context](PipelineOutputInterface *radiance_output) {
                 return std::make_unique<PostProcessorPipeline>(
                     kSunLightPipeline, kFragmentShaderFilePathRadianceSunLight,
-                    /*input_image_count=*/LightInputsColorOutput::LightInputsColorOutputCount + 1,
+                    /*input_image_count=*/SurfaceProjectionColorOutput::LightInputsColorOutputCount + 1,
                     /*push_constant_size=*/sizeof(SunLightParameters), radiance_output,
                     desc_set_allocator, context);
             });
@@ -233,7 +233,7 @@ void DoComputeRadiance(LightSourceInstance const &instance, frustum const &view_
             [desc_set_allocator, context](PipelineOutputInterface *radiance_output) {
                 return std::make_unique<PostProcessorPipeline>(
                     kPointLightPipeline, kFragmentShaderFilePathRadiancePointLight,
-                    /*input_image_count=*/LightInputsColorOutput::LightInputsColorOutputCount + 1,
+                    /*input_image_count=*/SurfaceProjectionColorOutput::LightInputsColorOutputCount + 1,
                     /*push_constant_size=*/sizeof(PointLightParameters), radiance_output,
                     desc_set_allocator, context);
             });
@@ -248,7 +248,7 @@ void DoComputeRadiance(LightSourceInstance const &instance, frustum const &view_
             [desc_set_allocator, context](PipelineOutputInterface *radiance_output) {
                 return std::make_unique<PostProcessorPipeline>(
                     kSpotLightPipeline, kFragmentShaderFilePathRadianceSpotLight,
-                    /*input_image_count=*/LightInputsColorOutput::LightInputsColorOutputCount + 1,
+                    /*input_image_count=*/SurfaceProjectionColorOutput::LightInputsColorOutputCount + 1,
                     /*push_constant_size=*/sizeof(SpotLightParameters), radiance_output,
                     desc_set_allocator, context);
             });

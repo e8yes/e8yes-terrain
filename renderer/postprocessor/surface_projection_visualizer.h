@@ -15,33 +15,34 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_PIPELINE_LIGHT_INPUTS_VISUALIZER_H
-#define ISLANDS_RENDERER_PIPELINE_LIGHT_INPUTS_VISUALIZER_H
+#ifndef ISLANDS_RENDERER_POSTPROCESSOR_SURFAEC_PROJECTION_VISUALIZER_H
+#define ISLANDS_RENDERER_POSTPROCESSOR_SURFAEC_PROJECTION_VISUALIZER_H
 
 #include <memory>
 
 #include "common/device.h"
 #include "renderer/output/pipeline_stage.h"
-#include "renderer/pipeline/light_inputs.h"
+#include "renderer/pipeline/project_surface.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/transfer/descriptor_set.h"
 
 namespace e8 {
 
 /**
- * @brief DoVisualizeLightInputs A post processing graphics pipeline for visualizing a rendered
- * lighting parameters (light inputs) map.
+ * @brief DoVisualizeSurfaceProjection A post processing graphics pipeline for visualizing a
+ * rendered surface parameter map.
  *
- * @param input_to_visualize Selects the input to be visualized.
- * @param light_inputs The light inputs map to be visualized.
+ * @param parameter_to_visualize Selects the parameter to be visualized.
+ * @param surface_projection The surface parameter maps to select parameter from.
  * @param desc_set_allocator Descriptor set allocator.
  * @param context Contextual Vulkan handles.
  * @param target The target stage which stores a map of lighting parameters (light inputs).
  */
-void DoVisualizeLightInputs(LightInputsRendererParameters::InputType input_to_visualize,
-                            PipelineStage *light_inputs, DescriptorSetAllocator *desc_set_allocator,
-                            VulkanContext *context, PipelineStage *target);
+void DoVisualizeSurfaceProjection(LightInputsRendererParameters::InputType parameter_to_visualize,
+                                  PipelineStage *surface_projection,
+                                  DescriptorSetAllocator *desc_set_allocator,
+                                  VulkanContext *context, PipelineStage *target);
 
-} // namespace e8
+}  // namespace e8
 
-#endif // ISLANDS_RENDERER_PIPELINE_LIGHT_INPUTS_VISUALIZER_H
+#endif  // ISLANDS_RENDERER_POSTPROCESSOR_SURFAEC_PROJECTION_VISUALIZER_H

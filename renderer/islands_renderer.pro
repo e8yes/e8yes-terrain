@@ -46,14 +46,14 @@ SOURCES += \
     pass/configurator.cc \
     pass/rasterize.cc \
     pipeline/depth_map.cc \
-    pipeline/light_inputs.cc \
-    pipeline/solid_color.cc \
+    pipeline/fill_color.cc \
+    pipeline/project_surface.cc \
     postprocessor/depth_map_visualizer.cc \
     postprocessor/exposure.cc \
     postprocessor/fxaa.cc \
-    postprocessor/light_inputs_visualizer.cc \
     postprocessor/post_processor.cc \
     postprocessor/radiance.cc \
+    postprocessor/surface_projection_visualizer.cc \
     postprocessor/tone_map.cc \
     proto/renderer.pb.cc \
     query/drawable_instance.cc \
@@ -61,9 +61,9 @@ SOURCES += \
     query/query_fn.cc \
     renderer.cc \
     renderer_depth.cc \
-    renderer_light_inputs.cc \
     renderer_radiance.cc \
     renderer_solid_color.cc \
+    renderer_surface_projection.cc \
     transfer/descriptor_set.cc \
     transfer/descriptor_set_texture.cc \
     transfer/texture_group.cc \
@@ -93,14 +93,14 @@ HEADERS += \
     pass/configurator.h \
     pass/rasterize.h \
     pipeline/depth_map.h \
-    pipeline/light_inputs.h \
-    pipeline/solid_color.h \
+    pipeline/fill_color.h \
+    pipeline/project_surface.h \
     postprocessor/depth_map_visualizer.h \
     postprocessor/exposure.h \
     postprocessor/fxaa.h \
-    postprocessor/light_inputs_visualizer.h \
     postprocessor/post_processor.h \
     postprocessor/radiance.h \
+    postprocessor/surface_projection_visualizer.h \
     postprocessor/tone_map.h \
     proto/renderer.pb.h \
     query/drawable_instance.h \
@@ -108,9 +108,9 @@ HEADERS += \
     query/query_fn.h \
     renderer.h \
     renderer_depth.h \
-    renderer_light_inputs.h \
     renderer_radiance.h \
     renderer_solid_color.h \
+    renderer_surface_projection.h \
     transfer/descriptor_set.h \
     transfer/descriptor_set_texture.h \
     transfer/texture_group.h \

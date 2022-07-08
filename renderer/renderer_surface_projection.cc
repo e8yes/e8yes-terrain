@@ -15,10 +15,10 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vulkan/vulkan.h>
 #include <algorithm>
 #include <memory>
 #include <vector>
-#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "content/common.h"
@@ -26,13 +26,13 @@
 #include "content/scene_entity.h"
 #include "renderer/basic/projection.h"
 #include "renderer/output/pipeline_stage.h"
-#include "renderer/pipeline/light_inputs.h"
-#include "renderer/postprocessor/light_inputs_visualizer.h"
+#include "renderer/pipeline/project_surface.h"
+#include "renderer/postprocessor/surface_projection_visualizer.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/query/drawable_instance.h"
 #include "renderer/query/query_fn.h"
 #include "renderer/renderer.h"
-#include "renderer/renderer_light_inputs.h"
+#include "renderer/renderer_surface_projection.h"
 #include "renderer/transfer/descriptor_set.h"
 #include "renderer/transfer/descriptor_set_texture.h"
 #include "renderer/transfer/vram_geometry.h"
@@ -41,11 +41,11 @@
 
 namespace e8 {
 
-class LightInputsRenderer::LightInputsRendererImpl {
-  public:
-    LightInputsRendererImpl(std::unique_ptr<PipelineStage> &&final_color_image,
-                            VulkanContext *context);
-    ~LightInputsRendererImpl();
+class SurfaceProjectionRenderer::SurfaceProjectionRendererImpl {
+   public:
+    SurfaceProjectionRendererImpl(std::unique_ptr<PipelineStage> &&final_color_image,
+                                  VulkanContext *context);
+    ~SurfaceProjectionRendererImpl();
 
     VulkanContext *context;
     DescriptorSetAllocator desc_set_alloc;
@@ -53,30 +53,34 @@ class LightInputsRenderer::LightInputsRendererImpl {
     GeometryVramTransfer geo_vram;
     TextureVramTransfer tex_vram;
 
-    std::unique_ptr<PipelineStage> light_inputs;
+    std::unique_ptr<PipelineStage> surface_projection;
     std::unique_ptr<PipelineStage> final_color_image;
 
     RendererConfiguration config;
 };
 
-LightInputsRenderer::LightInputsRendererImpl::LightInputsRendererImpl(
+SurfaceProjectionRenderer::SurfaceProjectionRendererImpl::SurfaceProjectionRendererImpl(
     std::unique_ptr<PipelineStage> &&final_color_image, VulkanContext *context)
-    : context(context), desc_set_alloc(context), tex_desc_set_cache(&desc_set_alloc),
-      geo_vram(context), tex_vram(context),
-      light_inputs(CreateLightInputsStage(context->swap_chain_image_extent.width,
-                                          context->swap_chain_image_extent.height, context)),
+    : context(context),
+      desc_set_alloc(context),
+      tex_desc_set_cache(&desc_set_alloc),
+      geo_vram(context),
+      tex_vram(context),
+      surface_projection(CreateProjectSurfaceStage(context->swap_chain_image_extent.width,
+                                                   context->swap_chain_image_extent.height,
+                                                   context)),
       final_color_image(std::move(final_color_image)) {}
 
-LightInputsRenderer::LightInputsRendererImpl::~LightInputsRendererImpl() {}
+SurfaceProjectionRenderer::SurfaceProjectionRendererImpl::~SurfaceProjectionRendererImpl() {}
 
-LightInputsRenderer::LightInputsRenderer(VulkanContext *context)
+SurfaceProjectionRenderer::SurfaceProjectionRenderer(VulkanContext *context)
     : RendererInterface(/*num_stages=*/1, context),
-      pimpl_(std::make_unique<LightInputsRendererImpl>(RendererInterface::FinalColorImageStage(),
-                                                       context)) {}
+      pimpl_(std::make_unique<SurfaceProjectionRendererImpl>(
+          RendererInterface::FinalColorImageStage(), context)) {}
 
-LightInputsRenderer::~LightInputsRenderer() {}
+SurfaceProjectionRenderer::~SurfaceProjectionRenderer() {}
 
-void LightInputsRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor) {
+void SurfaceProjectionRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor) {
     Scene::ReadAccess read_access = scene->GainReadAccess();
 
     PerspectiveProjection camera_projection(scene->camera);
@@ -92,19 +96,19 @@ void LightInputsRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_acc
                     resource_accessor);
 
     PipelineStage *first_stage = this->DoFirstStage();
-    DoGenerateLightInputs(drawables, camera_projection, &pimpl_->tex_desc_set_cache,
-                          &pimpl_->geo_vram, &pimpl_->tex_vram, pimpl_->context, first_stage,
-                          pimpl_->light_inputs.get());
-    DoVisualizeLightInputs(pimpl_->config.light_inputs_renderer_params().input_to_visualize(),
-                           pimpl_->light_inputs.get(), &pimpl_->desc_set_alloc, pimpl_->context,
-                           pimpl_->final_color_image.get());
+    DoProjectSurface(drawables, camera_projection, &pimpl_->tex_desc_set_cache, &pimpl_->geo_vram,
+                     &pimpl_->tex_vram, pimpl_->context, first_stage,
+                     pimpl_->surface_projection.get());
+    DoVisualizeSurfaceProjection(pimpl_->config.light_inputs_renderer_params().input_to_visualize(),
+                                 pimpl_->surface_projection.get(), &pimpl_->desc_set_alloc,
+                                 pimpl_->context, pimpl_->final_color_image.get());
     PipelineStage *final_stage = this->DoFinalStage(first_stage, pimpl_->final_color_image.get());
 
     final_stage->Fulfill(pimpl_->context);
 }
 
-void LightInputsRenderer::ApplyConfiguration(RendererConfiguration const &config) {
+void SurfaceProjectionRenderer::ApplyConfiguration(RendererConfiguration const &config) {
     pimpl_->config = config;
 }
 
-} // namespace e8
+}  // namespace e8

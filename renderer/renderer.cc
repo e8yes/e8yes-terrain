@@ -38,7 +38,7 @@
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/renderer.h"
 #include "renderer/renderer_depth.h"
-#include "renderer/renderer_light_inputs.h"
+#include "renderer/renderer_surface_projection.h"
 #include "renderer/renderer_radiance.h"
 #include "renderer/renderer_solid_color.h"
 
@@ -288,7 +288,7 @@ std::unique_ptr<RendererInterface> CreateRenderer(RendererType type, VulkanConte
         return std::make_unique<DepthRenderer>(context);
     }
     case RendererType::RT_LIGHT_INPUTS: {
-        return std::make_unique<LightInputsRenderer>(context);
+        return std::make_unique<SurfaceProjectionRenderer>(context);
     }
     case RendererType::RT_RADIANCE: {
         return std::make_unique<RadianceRenderer>(context);

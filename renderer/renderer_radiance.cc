@@ -24,8 +24,8 @@
 #include "content/scene.h"
 #include "renderer/lighting/direct_illuminator.h"
 #include "renderer/output/pipeline_stage.h"
-#include "renderer/pipeline/light_inputs.h"
-#include "renderer/pipeline/solid_color.h"
+#include "renderer/pipeline/project_surface.h"
+#include "renderer/pipeline/fill_color.h"
 #include "renderer/postprocessor/exposure.h"
 #include "renderer/postprocessor/fxaa.h"
 #include "renderer/postprocessor/radiance.h"
@@ -54,7 +54,7 @@ struct RadianceRenderer::RadianceRendererImpl {
     GeometryVramTransfer geo_vram;
     TextureVramTransfer tex_vram;
 
-    std::unique_ptr<PipelineStage> light_inputs;
+    std::unique_ptr<PipelineStage> surface_projection;
     DirectIlluminator direct_illuminator;
     std::unique_ptr<PipelineStage> log_luminance_map;
     std::unique_ptr<PipelineStage> exposure_value;
@@ -68,7 +68,7 @@ RadianceRenderer::RadianceRendererImpl::RadianceRendererImpl(
     std::unique_ptr<PipelineStage> &&final_color_image, VulkanContext *context)
     : context(context), desc_set_alloc(context), tex_desc_set_cache(&desc_set_alloc),
       geo_vram(context), tex_vram(context),
-      light_inputs(CreateLightInputsStage(context->swap_chain_image_extent.width,
+      surface_projection(CreateProjectSurfaceStage(context->swap_chain_image_extent.width,
                                           context->swap_chain_image_extent.height, context)),
       direct_illuminator(context->swap_chain_image_extent.width,
                          context->swap_chain_image_extent.height, context),
@@ -108,14 +108,14 @@ void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_access
 
     PipelineStage *first_stage = this->DoFirstStage();
 
-    DoGenerateLightInputs(drawables, camera_projection, &pimpl_->tex_desc_set_cache,
+    DoProjectSurface(drawables, camera_projection, &pimpl_->tex_desc_set_cache,
                           &pimpl_->geo_vram, &pimpl_->tex_vram, pimpl_->context, first_stage,
-                          pimpl_->light_inputs.get());
+                          pimpl_->surface_projection.get());
 
     std::vector<LightSourceInstance> light_sources =
         ToLightSources(scene_entities, camera_projection);
     PipelineStage *radiance_map = pimpl_->direct_illuminator.DoComputeDirectIllumination(
-        light_sources, camera_projection, pimpl_->light_inputs.get(), first_stage,
+        light_sources, camera_projection, pimpl_->surface_projection.get(), first_stage,
         &pimpl_->desc_set_alloc);
 
     DoEstimateExposure(radiance_map, &pimpl_->desc_set_alloc, pimpl_->context,
@@ -127,7 +127,7 @@ void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_access
 
     PipelineStage *final_stage = this->DoFinalStage(
         first_stage, pimpl_->final_color_image.get(),
-        /*dangling_stages=*/std::vector<PipelineStage *>{pimpl_->light_inputs.get()});
+        /*dangling_stages=*/std::vector<PipelineStage *>{pimpl_->surface_projection.get()});
 
     final_stage->Fulfill(pimpl_->context);
 }
