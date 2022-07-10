@@ -27,7 +27,7 @@ namespace {
 
 float const kNearClipDistance = 0.2f;
 
-} // namespace
+}  // namespace
 
 ProjectionInterface::ProjectionInterface() {}
 
@@ -53,6 +53,10 @@ mat44 PerspectiveProjection::ViewTransform() const { return view_transform_; }
 
 mat44 PerspectiveProjection::ProjectiveTransform() const { return frustum_.projective_transform(); }
 
+vec3 PerspectiveProjection::Location() const {
+    return vec3{view_transform_(0, 3), view_transform_(1, 3), view_transform_(2, 3)};
+}
+
 frustum const &PerspectiveProjection::Frustum() const { return frustum_; }
 
-} // namespace e8
+}  // namespace e8

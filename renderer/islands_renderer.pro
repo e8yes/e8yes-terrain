@@ -56,6 +56,7 @@ SOURCES += \
     postprocessor/surface_projection_visualizer.cc \
     postprocessor/tone_map.cc \
     proto/renderer.pb.cc \
+    query/collection.cc \
     query/drawable_instance.cc \
     query/light_source.cc \
     query/query_fn.cc \
@@ -103,6 +104,7 @@ HEADERS += \
     postprocessor/surface_projection_visualizer.h \
     postprocessor/tone_map.h \
     proto/renderer.pb.h \
+    query/collection.h \
     query/drawable_instance.h \
     query/light_source.h \
     query/query_fn.h \

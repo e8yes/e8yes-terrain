@@ -28,7 +28,7 @@ namespace e8 {
  * terms of homogeneous transformations.
  */
 class ProjectionInterface {
-  public:
+   public:
     ProjectionInterface();
     ~ProjectionInterface();
 
@@ -50,10 +50,10 @@ class ProjectionInterface {
  * transform of a perspective projection.
  */
 class PerspectiveProjection : public ProjectionInterface {
-  public:
+   public:
     /**
-     * @brief PerspectiveProjection Constructs a perspective transform by specifying its geometry
-     * parameters.
+     * @brief PerspectiveProjection Constructs a perspective projection by specifying geometry
+     * parameters of the projection frustum.
      *
      * @param near_clip The distance of the viewport at the direction from the pivot.
      * @param far_clip The farthest distance a geometry can be at and still gets rendered.
@@ -69,8 +69,7 @@ class PerspectiveProjection : public ProjectionInterface {
                           vec3 const &back);
 
     /**
-     * @brief PerspectiveProjection
-     * @param camera
+     * @brief PerspectiveProjection Constructs a perspective projection from camera parameters.
      */
     PerspectiveProjection(Camera const &camera);
 
@@ -81,15 +80,20 @@ class PerspectiveProjection : public ProjectionInterface {
     mat44 ProjectiveTransform() const override;
 
     /**
+     * @brief Location The 3d location of the tip of the projection frustum.
+     */
+    vec3 Location() const;
+
+    /**
      * @brief Frustum The frustum geometry of the perspective projection.
      */
     frustum const &Frustum() const;
 
-  private:
+   private:
     frustum frustum_;
     mat44 view_transform_;
 };
 
-} // namespace e8
+}  // namespace e8
 
-#endif // ISLANDS_RENDERER_PROJECTION_H
+#endif  // ISLANDS_RENDERER_PROJECTION_H

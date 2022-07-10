@@ -15,6 +15,7 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vulkan/vulkan.h>
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
@@ -22,10 +23,10 @@
 #include <memory>
 #include <utility>
 #include <vector>
-#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "common/tensor.h"
+#include "content/structure.h"
 #include "renderer/basic/attachment.h"
 #include "renderer/basic/fixed_function.h"
 #include "renderer/basic/frame_buffer.h"
@@ -38,6 +39,7 @@
 #include "renderer/basic/vertex_input.h"
 #include "renderer/output/cached_pipeline.h"
 #include "renderer/output/pipeline_output.h"
+#include "renderer/output/pipeline_stage.h"
 #include "renderer/output/promise.h"
 #include "renderer/pass/configurator.h"
 #include "renderer/pass/rasterize.h"
@@ -46,6 +48,7 @@
 #include "renderer/transfer/descriptor_set_texture.h"
 #include "renderer/transfer/vram_geometry.h"
 #include "renderer/transfer/vram_texture.h"
+#include "resource/accessor.h"
 
 namespace e8 {
 namespace {
@@ -57,7 +60,7 @@ PipelineKey kDepthMapPipeline = "DepthMap";
  * values are stored in 32-bit floats.
  */
 class DepthMapPipelineOutput : public PipelineOutputInterface {
-  public:
+   public:
     /**
      * @brief DepthMapPipelineOutput Constructs a depth map output with the specified dimension.
      *
@@ -73,7 +76,7 @@ class DepthMapPipelineOutput : public PipelineOutputInterface {
     std::vector<FrameBufferAttachment const *> ColorAttachments() const override;
     FrameBufferAttachment const *DepthAttachment() const override;
 
-  private:
+   private:
     struct DepthMapPipelineOutputImpl;
     std::unique_ptr<DepthMapPipelineOutputImpl> pimpl_;
 };
@@ -142,13 +145,13 @@ std::vector<VkVertexInputAttributeDescription> VertexShaderInputAttributes() {
 }
 
 class RenderPassConfigurator : public RenderPassConfiguratorInterface {
-  public:
+   public:
     RenderPassConfigurator(ProjectionInterface const &projection);
     ~RenderPassConfigurator();
 
     std::vector<uint8_t> PushConstantOf(DrawableInstance const &drawable) const override;
 
-  private:
+   private:
     ProjectionInterface const &projection_;
 };
 
@@ -157,8 +160,8 @@ RenderPassConfigurator::RenderPassConfigurator(ProjectionInterface const &projec
 
 RenderPassConfigurator::~RenderPassConfigurator() {}
 
-std::vector<uint8_t>
-RenderPassConfigurator::PushConstantOf(DrawableInstance const &drawable) const {
+std::vector<uint8_t> RenderPassConfigurator::PushConstantOf(
+    DrawableInstance const &drawable) const {
     std::vector<uint8_t> bytes(sizeof(PushConstant));
 
     PushConstant *push_constant = reinterpret_cast<PushConstant *>(bytes.data());
@@ -173,8 +176,11 @@ struct DepthMapPipelineArguments : public CachedPipelineArgumentsInterface {
                               ProjectionInterface const &projection,
                               TextureDescriptorSetCache *tex_desc_set_cache,
                               GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram)
-        : drawables(drawables), projection(projection), tex_desc_set_cache(tex_desc_set_cache),
-          geo_vram(geo_vram), tex_vram(tex_vram) {}
+        : drawables(drawables),
+          projection(projection),
+          tex_desc_set_cache(tex_desc_set_cache),
+          geo_vram(geo_vram),
+          tex_vram(tex_vram) {}
 
     std::vector<DrawableInstance> const &drawables;
     ProjectionInterface const &projection;
@@ -184,7 +190,7 @@ struct DepthMapPipelineArguments : public CachedPipelineArgumentsInterface {
 };
 
 class DepthMapPipeline : public CachedPipelineInterface {
-  public:
+   public:
     DepthMapPipeline(DepthMapPipelineOutput *output, VulkanContext *context);
     ~DepthMapPipeline() override;
 
@@ -234,7 +240,7 @@ Fulfillment DepthMapPipeline::Launch(CachedPipelineArgumentsInterface const &gen
     return FinishRenderPass(cmds, completion_signal_count, prerequisites, context_);
 }
 
-} // namespace
+}  // namespace
 
 std::unique_ptr<PipelineStage> CreateDepthMapStage(unsigned width, unsigned height,
                                                    VulkanContext *context) {
@@ -242,21 +248,26 @@ std::unique_ptr<PipelineStage> CreateDepthMapStage(unsigned width, unsigned heig
     return std::make_unique<PipelineStage>(output);
 }
 
-void DoDepthMapping(std::vector<DrawableInstance> const &drawables,
-                    ProjectionInterface const &projection,
+void DoDepthMapping(DrawableCollection *drawables, PerspectiveProjection const &projection,
                     TextureDescriptorSetCache *tex_desc_set_cache, GeometryVramTransfer *geo_vram,
                     TextureVramTransfer *tex_vram, VulkanContext *context,
                     PipelineStage *first_stage, PipelineStage *target) {
+    ResourceLoadingOption loading_option;
+    loading_option.load_geometry = true;
+
+    std::vector<DrawableInstance> observable_geometries =
+        drawables->ObservableGeometries(projection, loading_option);
+
     CachedPipelineInterface *pipeline =
         target->WithPipeline(kDepthMapPipeline, [context](PipelineOutputInterface *output) {
             return std::make_unique<DepthMapPipeline>(
                 dynamic_cast<DepthMapPipelineOutput *>(output), context);
         });
 
-    auto args = std::make_unique<DepthMapPipelineArguments>(drawables, projection,
+    auto args = std::make_unique<DepthMapPipelineArguments>(observable_geometries, projection,
                                                             tex_desc_set_cache, geo_vram, tex_vram);
     target->Schedule(pipeline, std::move(args),
                      /*parents=*/std::vector<PipelineStage *>{first_stage});
 }
 
-} // namespace e8
+}  // namespace e8

@@ -15,10 +15,10 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vulkan/vulkan.h>
 #include <algorithm>
 #include <memory>
 #include <vector>
-#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "content/common.h"
@@ -29,6 +29,7 @@
 #include "renderer/pipeline/depth_map.h"
 #include "renderer/postprocessor/depth_map_visualizer.h"
 #include "renderer/proto/renderer.pb.h"
+#include "renderer/query/collection.h"
 #include "renderer/query/drawable_instance.h"
 #include "renderer/query/query_fn.h"
 #include "renderer/renderer.h"
@@ -42,7 +43,7 @@
 namespace e8 {
 
 class DepthRenderer::DepthRendererImpl {
-  public:
+   public:
     DepthRendererImpl(std::unique_ptr<PipelineStage> &&visual_representation,
                       VulkanContext *context);
     ~DepthRendererImpl();
@@ -60,18 +61,20 @@ class DepthRenderer::DepthRendererImpl {
 
 DepthRenderer::DepthRendererImpl::DepthRendererImpl(
     std::unique_ptr<PipelineStage> &&visual_representation, VulkanContext *context)
-    : desc_set_alloc(context), tex_desc_set_cache(&desc_set_alloc), geo_vram(context),
+    : desc_set_alloc(context),
+      tex_desc_set_cache(&desc_set_alloc),
+      geo_vram(context),
       tex_vram(context),
       depth_map(CreateDepthMapStage(context->swap_chain_image_extent.width,
-                                    context->swap_chain_image_extent.height,
-                                    context)),
+                                    context->swap_chain_image_extent.height, context)),
       visual_representation(std::move(visual_representation)) {}
 
 DepthRenderer::DepthRendererImpl::~DepthRendererImpl() {}
 
 DepthRenderer::DepthRenderer(VulkanContext *context)
     : RendererInterface(/*num_stages=*/1, context),
-      pimpl_(std::make_unique<DepthRendererImpl>(RendererInterface::FinalColorImageStage(), context)) {}
+      pimpl_(std::make_unique<DepthRendererImpl>(RendererInterface::FinalColorImageStage(),
+                                                 context)) {}
 
 DepthRenderer::~DepthRenderer() {}
 
@@ -79,24 +82,17 @@ void DepthRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor)
     Scene::ReadAccess read_access = scene->GainReadAccess();
 
     PerspectiveProjection camera_projection(scene->camera);
-    std::vector<SceneEntity const *> scene_entities =
-        scene->SceneEntityStructure()->QueryEntities(QueryAllSceneEntities);
-
-    ResourceLoadingOption option;
-    option.load_geometry = true;
-
-    std::vector<DrawableInstance> drawables =
-        ToDrawables(scene_entities, /*viewer_location=*/ToVec3(scene->camera.position()), option,
-                    resource_accessor);
+    DrawableCollection drawables_collection(*scene->SceneEntityStructure(), resource_accessor);
 
     PipelineStage *first_stage = this->DoFirstStage();
-    DoDepthMapping(drawables, camera_projection, &pimpl_->tex_desc_set_cache, &pimpl_->geo_vram,
-                   &pimpl_->tex_vram, context, first_stage, pimpl_->depth_map.get());
+    DoDepthMapping(&drawables_collection, camera_projection, &pimpl_->tex_desc_set_cache,
+                   &pimpl_->geo_vram, &pimpl_->tex_vram, context, first_stage,
+                   pimpl_->depth_map.get());
     DoVisualizeDepthMap(pimpl_->config.depth_renderer_params().alpha(), camera_projection,
                         pimpl_->depth_map.get(), &pimpl_->desc_set_alloc, context,
                         pimpl_->visual_representation.get());
-    PipelineStage *final_stage = this->DoFinalStage(first_stage,
-                                                    pimpl_->visual_representation.get());
+    PipelineStage *final_stage =
+        this->DoFinalStage(first_stage, pimpl_->visual_representation.get());
 
     final_stage->Fulfill(context);
 }
@@ -105,4 +101,4 @@ void DepthRenderer::ApplyConfiguration(RendererConfiguration const &config) {
     pimpl_->config = config;
 }
 
-} // namespace e8
+}  // namespace e8

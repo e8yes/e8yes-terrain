@@ -22,12 +22,14 @@
 #include <vector>
 
 #include "common/device.h"
+#include "content/structure.h"
 #include "renderer/basic/projection.h"
 #include "renderer/output/pipeline_stage.h"
-#include "renderer/query/drawable_instance.h"
+#include "renderer/query/collection.h"
 #include "renderer/transfer/descriptor_set_texture.h"
 #include "renderer/transfer/vram_geometry.h"
 #include "renderer/transfer/vram_texture.h"
+#include "resource/accessor.h"
 
 namespace e8 {
 
@@ -46,7 +48,7 @@ std::unique_ptr<PipelineStage> CreateDepthMapStage(unsigned width, unsigned heig
 /**
  * @brief DoDepthMapping Schedules a graphics pipeline for rendering a depth map.
  *
- * @param drawables An array of drawables to be rendered onto the depth map.
+ * @param drawables A collection of drawables to project to screen space to find the nearest depth.
  * @param projection Defines how drawables should be projected to the depth map.
  * @param tex_desc_set_cache Texture descriptor cache.
  * @param geo_vram The geometry VRAM transferer.
@@ -56,12 +58,11 @@ std::unique_ptr<PipelineStage> CreateDepthMapStage(unsigned width, unsigned heig
  * @param target The target stage which stores the rendered depth map. It should be created using
  * CreateDepthMapStage().
  */
-void DoDepthMapping(std::vector<DrawableInstance> const &drawables,
-                    ProjectionInterface const &projection,
+void DoDepthMapping(DrawableCollection *drawables, PerspectiveProjection const &projection,
                     TextureDescriptorSetCache *tex_desc_set_cache, GeometryVramTransfer *geo_vram,
                     TextureVramTransfer *tex_vram, VulkanContext *context,
                     PipelineStage *first_stage, PipelineStage *target);
 
-} // namespace e8
+}  // namespace e8
 
-#endif // ISLANDS_RENDERER_PIPELINE_DEPTH_MAP_H
+#endif  // ISLANDS_RENDERER_PIPELINE_DEPTH_MAP_H
