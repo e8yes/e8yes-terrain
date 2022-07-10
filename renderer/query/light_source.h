@@ -21,10 +21,10 @@
 #include <optional>
 #include <vector>
 
+#include <common/tensor.h>
 #include "content/proto/light_source.pb.h"
 #include "content/scene_entity.h"
 #include "renderer/basic/projection.h"
-#include <common/tensor.h>
 
 namespace e8 {
 
@@ -77,6 +77,9 @@ struct SpotLightRegion {
  * parameters and metadata.
  */
 struct LightSourceInstance {
+    // Static unique ID assigned to this light source.
+    SceneEntityId id;
+
     // A light source defined in the view space.
     LightSource light_source;
 
@@ -95,10 +98,10 @@ struct LightSourceInstance {
  * @brief ToLightSources Extracts light sources from the scene entity list and transform them into
  * the view space.
  */
-std::vector<LightSourceInstance>
-ToLightSources(std::vector<SceneEntity const *> const &scene_entities,
-               ProjectionInterface const &camera_projection);
+std::vector<LightSourceInstance> ToLightSources(
+    std::vector<SceneEntity const *> const &scene_entities,
+    ProjectionInterface const &camera_projection);
 
-} // namespace e8
+}  // namespace e8
 
-#endif // ISLANDS_RENDERER_LIGHT_SOURCE_H
+#endif  // ISLANDS_RENDERER_LIGHT_SOURCE_H

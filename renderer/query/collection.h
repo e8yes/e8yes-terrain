@@ -47,7 +47,7 @@ class DrawableCollection {
 
     /**
      * @brief ObservableLightSources Returns a list of light sources that affect the observable
-     * geometries.
+     * geometries. Light sources are transformed to the view space defined by the projection.
      */
     std::vector<LightSourceInstance> ObservableLightSources(
         PerspectiveProjection const& projection);
