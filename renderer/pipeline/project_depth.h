@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_PIPELINE_DEPTH_MAP_H
-#define ISLANDS_RENDERER_PIPELINE_DEPTH_MAP_H
+#ifndef ISLANDS_RENDERER_PIPELINE_PROJECT_DEPTH_H
+#define ISLANDS_RENDERER_PIPELINE_PROJECT_DEPTH_H
 
 #include <memory>
 #include <vector>
@@ -34,19 +34,20 @@
 namespace e8 {
 
 /**
- * @brief CreateDepthMapStage Creates a depth map pipeline stage with a 32-bit depth-only output in
- * the specified dimension.
+ * @brief CreateProjectDepthStage Creates a depth projection pipeline stage with a 32-bit depth-only
+ * output in the specified dimension.
  *
  * @param width The width of the depth map output.
  * @param height The height of the depth map output.
  * @param context Contextual Vulkan handles.
  * @return A pipeline stage created with the depth map output.
  */
-std::unique_ptr<PipelineStage> CreateDepthMapStage(unsigned width, unsigned height,
-                                                   VulkanContext *context);
+std::unique_ptr<PipelineStage> CreateProjectDepthStage(unsigned width, unsigned height,
+                                                       VulkanContext *context);
 
 /**
- * @brief DoDepthMapping Schedules a graphics pipeline for rendering a depth map.
+ * @brief DoProjectDepth Schedules a graphics pipeline for rendering a depth map (A mapping of the
+ * cloest NDC depth value at each projected pixel).
  *
  * @param drawables A collection of drawables to project to screen space to find the nearest depth.
  * @param projection Defines how drawables should be projected to the depth map.
@@ -58,11 +59,11 @@ std::unique_ptr<PipelineStage> CreateDepthMapStage(unsigned width, unsigned heig
  * @param target The target stage which stores the rendered depth map. It should be created using
  * CreateDepthMapStage().
  */
-void DoDepthMapping(DrawableCollection *drawables, PerspectiveProjection const &projection,
+void DoProjectDepth(DrawableCollection *drawables, PerspectiveProjection const &projection,
                     TextureDescriptorSetCache *tex_desc_set_cache, GeometryVramTransfer *geo_vram,
                     TextureVramTransfer *tex_vram, VulkanContext *context,
                     PipelineStage *first_stage, PipelineStage *target);
 
 }  // namespace e8
 
-#endif  // ISLANDS_RENDERER_PIPELINE_DEPTH_MAP_H
+#endif  // ISLANDS_RENDERER_PIPELINE_PROJECT_DEPTH_H

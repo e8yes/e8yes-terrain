@@ -24,7 +24,7 @@
 #include "renderer/lighting/direct_illuminator.h"
 #include "renderer/output/common_output.h"
 #include "renderer/output/pipeline_stage.h"
-#include "renderer/pipeline/depth_map.h"
+#include "renderer/pipeline/project_depth.h"
 #include "renderer/pipeline/fill_color.h"
 #include "renderer/postprocessor/radiance.h"
 #include "renderer/query/light_source.h"
@@ -47,7 +47,7 @@ struct ShadowMapCache {
 ShadowMapCache::ShadowMapCache(VulkanContext *context) {
     for (unsigned i = 0; i < kMaxSpotLightShadowMaps; ++i) {
         std::unique_ptr<PipelineStage> spot_light_shadow_map =
-            CreateDepthMapStage(kSpotLightShadowMapWidth, kSpotLightShadowMapHeight, context);
+            CreateProjectDepthStage(kSpotLightShadowMapWidth, kSpotLightShadowMapHeight, context);
         spot_light_shadow_maps.push_back(std::move(spot_light_shadow_map));
     }
 }

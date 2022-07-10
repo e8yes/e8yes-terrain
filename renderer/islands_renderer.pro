@@ -45,10 +45,10 @@ SOURCES += \
     output/promise.cc \
     pass/configurator.cc \
     pass/rasterize.cc \
-    pipeline/depth_map.cc \
     pipeline/fill_color.cc \
+    pipeline/project_depth.cc \
     pipeline/project_surface.cc \
-    postprocessor/depth_map_visualizer.cc \
+    postprocessor/depth_projection_visualizer.cc \
     postprocessor/exposure.cc \
     postprocessor/fxaa.cc \
     postprocessor/post_processor.cc \
@@ -93,10 +93,10 @@ HEADERS += \
     output/promise.h \
     pass/configurator.h \
     pass/rasterize.h \
-    pipeline/depth_map.h \
     pipeline/fill_color.h \
+    pipeline/project_depth.h \
     pipeline/project_surface.h \
-    postprocessor/depth_map_visualizer.h \
+    postprocessor/depth_projection_visualizer.h \
     postprocessor/exposure.h \
     postprocessor/fxaa.h \
     postprocessor/post_processor.h \

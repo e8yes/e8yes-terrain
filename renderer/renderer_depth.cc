@@ -26,8 +26,8 @@
 #include "content/scene_entity.h"
 #include "renderer/basic/projection.h"
 #include "renderer/output/pipeline_stage.h"
-#include "renderer/pipeline/depth_map.h"
-#include "renderer/postprocessor/depth_map_visualizer.h"
+#include "renderer/pipeline/project_depth.h"
+#include "renderer/postprocessor/depth_projection_visualizer.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/query/collection.h"
 #include "renderer/query/drawable_instance.h"
@@ -53,7 +53,7 @@ class DepthRenderer::DepthRendererImpl {
     GeometryVramTransfer geo_vram;
     TextureVramTransfer tex_vram;
 
-    std::unique_ptr<PipelineStage> depth_map;
+    std::unique_ptr<PipelineStage> depth_projection;
     std::unique_ptr<PipelineStage> visual_representation;
 
     RendererConfiguration config;
@@ -65,7 +65,7 @@ DepthRenderer::DepthRendererImpl::DepthRendererImpl(
       tex_desc_set_cache(&desc_set_alloc),
       geo_vram(context),
       tex_vram(context),
-      depth_map(CreateDepthMapStage(context->swap_chain_image_extent.width,
+      depth_projection(CreateProjectDepthStage(context->swap_chain_image_extent.width,
                                     context->swap_chain_image_extent.height, context)),
       visual_representation(std::move(visual_representation)) {}
 
@@ -85,11 +85,11 @@ void DepthRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor)
     DrawableCollection drawables_collection(*scene->SceneEntityStructure(), resource_accessor);
 
     PipelineStage *first_stage = this->DoFirstStage();
-    DoDepthMapping(&drawables_collection, camera_projection, &pimpl_->tex_desc_set_cache,
+    DoProjectDepth(&drawables_collection, camera_projection, &pimpl_->tex_desc_set_cache,
                    &pimpl_->geo_vram, &pimpl_->tex_vram, context, first_stage,
-                   pimpl_->depth_map.get());
-    DoVisualizeDepthMap(pimpl_->config.depth_renderer_params().alpha(), camera_projection,
-                        pimpl_->depth_map.get(), &pimpl_->desc_set_alloc, context,
+                   pimpl_->depth_projection.get());
+    DoVisualizeDepthProjection(pimpl_->config.depth_renderer_params().alpha(), camera_projection,
+                        pimpl_->depth_projection.get(), &pimpl_->desc_set_alloc, context,
                         pimpl_->visual_representation.get());
     PipelineStage *final_stage =
         this->DoFinalStage(first_stage, pimpl_->visual_representation.get());

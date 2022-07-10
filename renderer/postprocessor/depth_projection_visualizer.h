@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DEPTH_MAP_VISUALIZER_H
-#define DEPTH_MAP_VISUALIZER_H
+#ifndef ISLANDS_RENDERER_POSTPROCESSOR_DEPTH_PROJECTION_VISUALIZER_H
+#define ISLANDS_RENDERER_POSTPROCESSOR_DEPTH_PROJECTION_VISUALIZER_H
 
 #include <memory>
 #include <optional>
@@ -29,7 +29,7 @@
 namespace e8 {
 
 /**
- * @brief DoVisualizeDepthMap Schedules a post processing graphics pipeline for visualizing a
+ * @brief DoVisualizeDepthProjection Schedules a post processing graphics pipeline for visualizing a
  * rendered depth map.
  *
  * @param alpha When alpha is zero, the depth map is visualized using the raw NDC value. When it is
@@ -41,10 +41,11 @@ namespace e8 {
  * @param context Contextual Vulkan handles.
  * @param target The target stage which stores the visualized depth map grayscale image.
  */
-void DoVisualizeDepthMap(float alpha, std::optional<PerspectiveProjection> projection,
-                         PipelineStage *depth_map_stage, DescriptorSetAllocator *desc_set_allocator,
-                         VulkanContext *context, PipelineStage *target);
+void DoVisualizeDepthProjection(float alpha, std::optional<PerspectiveProjection> projection,
+                                PipelineStage *depth_map_stage,
+                                DescriptorSetAllocator *desc_set_allocator, VulkanContext *context,
+                                PipelineStage *target);
 
-} // namespace e8
+}  // namespace e8
 
-#endif // DEPTH_MAP_VISUALIZER_H
+#endif  // ISLANDS_RENDERER_POSTPROCESSOR_DEPTH_PROJECTION_VISUALIZER_H
