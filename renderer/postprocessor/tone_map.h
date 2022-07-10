@@ -15,14 +15,14 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_TONE_MAP_H
-#define ISLANDS_RENDERER_TONE_MAP_H
+#ifndef ISLANDS_RENDERER_POSTPROCESSOR_TONE_MAP_H
+#define ISLANDS_RENDERER_POSTPROCESSOR_TONE_MAP_H
 
 #include <memory>
 
 #include "common/device.h"
 #include "renderer/output/pipeline_stage.h"
-#include "renderer/transfer/descriptor_set.h"
+#include "renderer/transfer/context.h"
 
 namespace e8 {
 
@@ -46,15 +46,13 @@ std::unique_ptr<PipelineStage> CreateLdrImageStage(unsigned width, unsigned heig
  * @param radiance_map The radiance values to be mapped.
  * @param exposure Optional. It only uses the ACES tone mapper when the exposure value is provided.
  * Otherwise, it simply clamps the radiance value into the [0, 1] range.
- * @param desc_set_allocator Descriptor set allocator.
- * @param context Contextual Vulkan handles.
+ * @param transfer_context Transfer context.
  * @param target The target stage which stores the tone mapped LDR color image. It should be created
  * through CreateLdrImageStage().
  */
 void DoToneMapping(PipelineStage *radiance_map, PipelineStage *exposure,
-                   DescriptorSetAllocator *desc_set_allocator, VulkanContext *context,
-                   PipelineStage *target);
+                   TransferContext *transfer_context, PipelineStage *target);
 
-} // namespace e8
+}  // namespace e8
 
-#endif // ISLANDS_RENDERER_TONE_MAP_H
+#endif  // ISLANDS_RENDERER_POSTPROCESSOR_TONE_MAP_H

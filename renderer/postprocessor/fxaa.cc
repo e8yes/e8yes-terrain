@@ -31,13 +31,13 @@ namespace {
 PipelineKey const &kFxaaPipeline = "FXAA";
 
 class FxaaPipelineConfigurator : public PostProcessorConfiguratorInterface {
-  public:
+   public:
     FxaaPipelineConfigurator(PipelineOutputInterface const &ldr_color_input);
     ~FxaaPipelineConfigurator() override;
 
     void InputImages(std::vector<VkImageView> *input_images) const override;
 
-  private:
+   private:
     PipelineOutputInterface const &ldr_color_input_;
 };
 
@@ -50,15 +50,14 @@ void FxaaPipelineConfigurator::InputImages(std::vector<VkImageView> *input_image
     input_images->at(0) = ldr_color_input_.ColorAttachments()[0]->view;
 }
 
-} // namespace
+}  // namespace
 
-void DoFxaa(PipelineStage *ldr_image, DescriptorSetAllocator *desc_set_allocator,
-            VulkanContext *context, PipelineStage *target) {
-    CachedPipelineInterface *pipeline = target->WithPipeline(
-        kFxaaPipeline, [desc_set_allocator, context](PipelineOutputInterface *aa_output) {
+void DoFxaa(PipelineStage *ldr_image, TransferContext *transfer_context, PipelineStage *target) {
+    CachedPipelineInterface *pipeline =
+        target->WithPipeline(kFxaaPipeline, [transfer_context](PipelineOutputInterface *aa_output) {
             return std::make_unique<PostProcessorPipeline>(
                 kFxaaPipeline, kFragmentShaderFilePathFxaa, /*input_image_count=*/1,
-                /*push_constant_size=*/0, aa_output, desc_set_allocator, context);
+                /*push_constant_size=*/0, aa_output, transfer_context);
         });
 
     auto configurator = std::make_unique<FxaaPipelineConfigurator>(*ldr_image->Output());
@@ -66,4 +65,4 @@ void DoFxaa(PipelineStage *ldr_image, DescriptorSetAllocator *desc_set_allocator
                      /*parents=*/std::vector<PipelineStage *>{ldr_image});
 }
 
-} // namespace e8
+}  // namespace e8

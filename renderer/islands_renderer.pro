@@ -65,6 +65,7 @@ SOURCES += \
     renderer_radiance.cc \
     renderer_solid_color.cc \
     renderer_surface_projection.cc \
+    transfer/context.cc \
     transfer/descriptor_set.cc \
     transfer/descriptor_set_texture.cc \
     transfer/texture_group.cc \
@@ -113,6 +114,7 @@ HEADERS += \
     renderer_radiance.h \
     renderer_solid_color.h \
     renderer_surface_projection.h \
+    transfer/context.h \
     transfer/descriptor_set.h \
     transfer/descriptor_set_texture.h \
     transfer/texture_group.h \

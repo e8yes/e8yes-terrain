@@ -15,16 +15,15 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_POSTPROCESSOR_SURFAEC_PROJECTION_VISUALIZER_H
-#define ISLANDS_RENDERER_POSTPROCESSOR_SURFAEC_PROJECTION_VISUALIZER_H
+#ifndef ISLANDS_RENDERER_POSTPROCESSOR_SURFACE_PROJECTION_VISUALIZER_H
+#define ISLANDS_RENDERER_POSTPROCESSOR_SURFACE_PROJECTION_VISUALIZER_H
 
 #include <memory>
 
-#include "common/device.h"
 #include "renderer/output/pipeline_stage.h"
 #include "renderer/pipeline/project_surface.h"
 #include "renderer/proto/renderer.pb.h"
-#include "renderer/transfer/descriptor_set.h"
+#include "renderer/transfer/context.h"
 
 namespace e8 {
 
@@ -32,17 +31,15 @@ namespace e8 {
  * @brief DoVisualizeSurfaceProjection A post processing graphics pipeline for visualizing a
  * rendered surface parameter map.
  *
- * @param parameter_to_visualize Selects the parameter to be visualized.
+ * @param parameter_to_visualize Selects the surface parameter to be visualized.
  * @param surface_projection The surface parameter maps to select parameter from.
- * @param desc_set_allocator Descriptor set allocator.
- * @param context Contextual Vulkan handles.
+ * @param transfer_context Transfer context.
  * @param target The target stage which stores a map of lighting parameters (light inputs).
  */
 void DoVisualizeSurfaceProjection(LightInputsRendererParameters::InputType parameter_to_visualize,
                                   PipelineStage *surface_projection,
-                                  DescriptorSetAllocator *desc_set_allocator,
-                                  VulkanContext *context, PipelineStage *target);
+                                  TransferContext *transfer_context, PipelineStage *target);
 
 }  // namespace e8
 
-#endif  // ISLANDS_RENDERER_POSTPROCESSOR_SURFAEC_PROJECTION_VISUALIZER_H
+#endif  // ISLANDS_RENDERER_POSTPROCESSOR_SURFACE_PROJECTION_VISUALIZER_H

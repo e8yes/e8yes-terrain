@@ -15,6 +15,7 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vulkan/vulkan.h>
 #include <array>
 #include <cassert>
 #include <cstdint>
@@ -22,7 +23,6 @@
 #include <memory>
 #include <unordered_set>
 #include <vector>
-#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "renderer/basic/frame_buffer.h"
@@ -34,11 +34,9 @@
 #include "renderer/pass/configurator.h"
 #include "renderer/pass/rasterize.h"
 #include "renderer/query/drawable_instance.h"
+#include "renderer/transfer/context.h"
 #include "renderer/transfer/descriptor_set.h"
-#include "renderer/transfer/descriptor_set_texture.h"
 #include "renderer/transfer/texture_group.h"
-#include "renderer/transfer/vram_geometry.h"
-#include "renderer/transfer/vram_texture.h"
 #include "resource/buffer_texture.h"
 #include "resource/common.h"
 #include "resource/geometry.h"
@@ -46,10 +44,9 @@
 namespace e8 {
 namespace {
 
-std::unordered_set<DrawableInstance const *>
-UploadResources(std::vector<DrawableInstance> const &drawables,
-                RenderPassConfiguratorInterface const &configurator, GeometryVramTransfer *geo_vram,
-                TextureVramTransfer *tex_vram) {
+std::unordered_set<DrawableInstance const *> UploadResources(
+    std::vector<DrawableInstance> const &drawables,
+    RenderPassConfiguratorInterface const &configurator, TransferContext *transfer_context) {
     std::unordered_set<DrawableInstance const *> excluded;
 
     std::vector<Geometry const *> geometries;
@@ -76,13 +73,13 @@ UploadResources(std::vector<DrawableInstance> const &drawables,
         texture_selector.AppendTo(&textures);
     }
 
-    geo_vram->Upload(geometries);
-    tex_vram->Upload(textures);
+    transfer_context->geometry_vram_transfer.Upload(geometries);
+    transfer_context->texture_vram_transfer.Upload(textures);
 
     return excluded;
 }
 
-} // namespace
+}  // namespace
 
 VkCommandBuffer StartRenderPass(RenderPass const &render_pass, FrameBuffer const &frame_buffer,
                                 VulkanContext *context) {
@@ -162,10 +159,9 @@ Fulfillment FinishRenderPass(VkCommandBuffer cmds, unsigned completion_signal_co
 void RenderDrawables(std::vector<DrawableInstance> const &drawables,
                      GraphicsPipeline const &pipeline, ShaderUniformLayout const &uniform_layout,
                      RenderPassConfiguratorInterface const &configurator,
-                     TextureDescriptorSetCache *tex_desc_set_cache, GeometryVramTransfer *geo_vram,
-                     TextureVramTransfer *tex_vram, VkCommandBuffer cmds) {
+                     TransferContext *transfer_context, VkCommandBuffer cmds) {
     std::unordered_set<DrawableInstance const *> excluded =
-        UploadResources(drawables, configurator, geo_vram, tex_vram);
+        UploadResources(drawables, configurator, transfer_context);
 
     // Sends drawable instances through the graphics pipeline.
     vkCmdBindPipeline(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline);
@@ -175,7 +171,8 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
         }
 
         // Fetches GPU geometry data.
-        GeometryVramTransfer::GpuGeometry gpu_geometry = geo_vram->Find(instance.geometry);
+        GeometryVramTransfer::GpuGeometry gpu_geometry =
+            transfer_context->geometry_vram_transfer.Find(instance.geometry);
         if (!gpu_geometry.Valid()) {
             continue;
         }
@@ -187,7 +184,8 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
         texture_group.id = texture_selector.id;
         texture_group.layout = uniform_layout.per_drawable_desc_set;
         texture_group.sampler = texture_selector.sampler;
-        texture_group.textures = tex_vram->Find(texture_selector.textures);
+        texture_group.textures =
+            transfer_context->texture_vram_transfer.Find(texture_selector.textures);
         texture_group.bindings = texture_selector.bindings;
 
         if (!texture_group.Valid()) {
@@ -196,7 +194,8 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
 
         // Prepares for the draw call.
         if (texture_group.id != kNullUuid) {
-            DescriptorSet *desc_set = tex_desc_set_cache->DescriptorSetFor(texture_group);
+            DescriptorSet *desc_set =
+                transfer_context->texture_descriptor_set_cache.DescriptorSetFor(texture_group);
             vkCmdBindDescriptorSets(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
                                     /*firstSet=*/DescriptorSetType::DST_PER_DRAWABLE,
                                     /*descriptorSetCount=*/1, &desc_set->descriptor_set,
@@ -235,4 +234,4 @@ void PostProcess(GraphicsPipeline const &pipeline, ShaderUniformLayout const &un
               /*firstInstance=*/0);
 }
 
-} // namespace e8
+}  // namespace e8

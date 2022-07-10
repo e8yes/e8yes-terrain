@@ -28,7 +28,7 @@
 #include "renderer/pipeline/project_depth.h"
 #include "renderer/postprocessor/radiance.h"
 #include "renderer/query/light_source.h"
-#include "renderer/transfer/descriptor_set.h"
+#include "renderer/transfer/context.h"
 
 namespace e8 {
 namespace {
@@ -55,7 +55,8 @@ ShadowMapCache::ShadowMapCache(VulkanContext *context) {
 ShadowMapCache::~ShadowMapCache() {}
 
 void DoGenerateShadowMaps(
-    std::vector<LightSourceInstance> const &light_sources, VulkanContext *context,
+    std::vector<LightSourceInstance> const &light_sources, DrawableCollection *drawable_collection,
+    TransferContext *transfer_context,
     std::unordered_map<LightSourceInstance const *, std::vector<PipelineStage *>>
         *light_source_shadow_maps,
     ShadowMapCache *cache) {}
@@ -66,8 +67,6 @@ struct DirectIlluminator::DirectIlluminatorImpl {
     DirectIlluminatorImpl(unsigned width, unsigned height, VulkanContext *context);
     ~DirectIlluminatorImpl();
 
-    VulkanContext *context;
-
     std::unique_ptr<PipelineStage> cleared_radiance_map;
     std::unique_ptr<PipelineStage> filled_radiance_map;
 
@@ -76,7 +75,7 @@ struct DirectIlluminator::DirectIlluminatorImpl {
 
 DirectIlluminator::DirectIlluminatorImpl::DirectIlluminatorImpl(unsigned width, unsigned height,
                                                                 VulkanContext *context)
-    : context(context), shadow_map_cache(context) {
+    : shadow_map_cache(context) {
     auto output = std::make_shared<HdrColorPipelineOutput>(width, height,
                                                            /*with_depth_buffer=*/false, context);
     cleared_radiance_map = std::make_unique<PipelineStage>(output);
@@ -93,8 +92,8 @@ DirectIlluminator::~DirectIlluminator() {}
 PipelineStage *DirectIlluminator::DoComputeDirectIllumination(
     DrawableCollection *drawable_collection, PipelineStage *surface_projection,
     PerspectiveProjection const &projection, PipelineStage *first_stage,
-    DescriptorSetAllocator *desc_set_alloc) {
-    DoFillColor(/*color=*/vec3{0.0f, 0.0f, 0.0f}, pimpl_->context, first_stage,
+    TransferContext *transfer_context) {
+    DoFillColor(/*color=*/vec3{0.0f, 0.0f, 0.0f}, transfer_context->vulkan_context, first_stage,
                 pimpl_->cleared_radiance_map.get());
 
     std::vector<LightSourceInstance> light_sources =
@@ -105,8 +104,8 @@ PipelineStage *DirectIlluminator::DoComputeDirectIllumination(
 
     std::unordered_map<LightSourceInstance const *, std::vector<PipelineStage *>>
         light_source_shadow_maps;
-    DoGenerateShadowMaps(light_sources, pimpl_->context, &light_source_shadow_maps,
-                         &pimpl_->shadow_map_cache);
+    DoGenerateShadowMaps(light_sources, drawable_collection, transfer_context,
+                         &light_source_shadow_maps, &pimpl_->shadow_map_cache);
 
     for (auto const &instance : light_sources) {
         std::vector<PipelineStage *> shadow_maps;
@@ -117,7 +116,7 @@ PipelineStage *DirectIlluminator::DoComputeDirectIllumination(
 
         DoComputeRadiance(instance, surface_projection, projection.Frustum(),
                           /*shadow_map=*/shadow_maps, pimpl_->cleared_radiance_map.get(),
-                          desc_set_alloc, pimpl_->context, pimpl_->filled_radiance_map.get());
+                          transfer_context, pimpl_->filled_radiance_map.get());
     }
 
     return pimpl_->filled_radiance_map.get();

@@ -15,28 +15,22 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_FXAA_H
-#define ISLANDS_RENDERER_FXAA_H
-
-#include <memory>
-
-#include "common/device.h"
-#include "renderer/output/pipeline_stage.h"
 #include "renderer/transfer/context.h"
+#include "common/device.h"
+#include "renderer/transfer/descriptor_set.h"
+#include "renderer/transfer/descriptor_set_texture.h"
+#include "renderer/transfer/vram_geometry.h"
+#include "renderer/transfer/vram_texture.h"
 
 namespace e8 {
 
-/**
- * @brief DoFxaa Reduces edge aliasing artifact through a post processing technique devised by
- * Timothy Lottes.
- *
- * @param ldr_image An LDR RGB image where the alpha channel is populated with the color's
- * luminance value.
- * @param transfer_context Transfer context.
- * @param target The target stage which stores the anti-aliased LDR color image.
- */
-void DoFxaa(PipelineStage *ldr_image, TransferContext *transfer_context, PipelineStage *target);
+TransferContext::TransferContext(VulkanContext* context)
+    : vulkan_context(context),
+      descriptor_set_allocator(context),
+      texture_descriptor_set_cache(&descriptor_set_allocator),
+      geometry_vram_transfer(context),
+      texture_vram_transfer(context) {}
+
+TransferContext::~TransferContext() {}
 
 }  // namespace e8
-
-#endif  // ISLANDS_RENDERER_FXAA_H

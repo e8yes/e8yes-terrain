@@ -15,9 +15,9 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vulkan/vulkan.h>
 #include <memory>
 #include <vector>
-#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "renderer/basic/sampler.h"
@@ -28,7 +28,7 @@
 #include "renderer/postprocessor/exposure.h"
 #include "renderer/postprocessor/post_processor.h"
 #include "renderer/postprocessor/tone_map.h"
-#include "renderer/transfer/descriptor_set.h"
+#include "renderer/transfer/context.h"
 
 namespace e8 {
 namespace {
@@ -37,14 +37,14 @@ PipelineKey const kClampedLinearToneMapPipeline = "Clamped Linear Tone Map";
 PipelineKey const kAcesToneMapPipeline = "ACES Tone Map";
 
 class ToneMapPostProcessorConfigurator : public PostProcessorConfiguratorInterface {
-  public:
+   public:
     ToneMapPostProcessorConfigurator(PipelineStage const &radiance_map_stage,
                                      PipelineStage *exposure_stage);
     ~ToneMapPostProcessorConfigurator() override;
 
     void InputImages(std::vector<VkImageView> *input_images) const override;
 
-  private:
+   private:
     PipelineOutputInterface const &radiance_;
     PipelineOutputInterface const *exposure_;
 };
@@ -69,7 +69,7 @@ void ToneMapPostProcessorConfigurator::InputImages(std::vector<VkImageView> *inp
     }
 }
 
-} // namespace
+}  // namespace
 
 std::unique_ptr<PipelineStage> CreateLdrImageStage(unsigned width, unsigned height,
                                                    VulkanContext *context) {
@@ -79,26 +79,24 @@ std::unique_ptr<PipelineStage> CreateLdrImageStage(unsigned width, unsigned heig
 }
 
 void DoToneMapping(PipelineStage *radiance_map, PipelineStage *exposure,
-                   DescriptorSetAllocator *desc_set_allocator, VulkanContext *context,
-                   PipelineStage *target) {
+                   TransferContext *transfer_context, PipelineStage *target) {
     CachedPipelineInterface *pipeline;
 
     if (exposure != nullptr) {
         pipeline = target->WithPipeline(
-            kAcesToneMapPipeline,
-            [desc_set_allocator, context](PipelineOutputInterface *tone_map_output) {
+            kAcesToneMapPipeline, [transfer_context](PipelineOutputInterface *tone_map_output) {
                 return std::make_unique<PostProcessorPipeline>(
                     kAcesToneMapPipeline, kFragmentShaderFilePathHdrAces, /*input_image_count=*/2,
-                    /*push_constant_size=*/0, tone_map_output, desc_set_allocator, context);
+                    /*push_constant_size=*/0, tone_map_output, transfer_context);
             });
     } else {
         pipeline = target->WithPipeline(
             kClampedLinearToneMapPipeline,
-            [desc_set_allocator, context](PipelineOutputInterface *tone_map_output) {
+            [transfer_context](PipelineOutputInterface *tone_map_output) {
                 return std::make_unique<PostProcessorPipeline>(
                     kClampedLinearToneMapPipeline, kFragmentShaderFilePathHdrClamp,
                     /*input_image_count=*/1, /*push_constant_size=*/0, tone_map_output,
-                    desc_set_allocator, context);
+                    transfer_context);
             });
     }
 
@@ -107,4 +105,4 @@ void DoToneMapping(PipelineStage *radiance_map, PipelineStage *exposure,
                      /*parents=*/std::vector<PipelineStage *>{radiance_map, exposure});
 }
 
-} // namespace e8
+}  // namespace e8

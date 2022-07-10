@@ -20,10 +20,9 @@
 
 #include <memory>
 
-#include "common/device.h"
 #include "renderer/output/pipeline_stage.h"
 #include "renderer/query/light_source.h"
-#include "renderer/transfer/descriptor_set.h"
+#include "renderer/transfer/context.h"
 
 namespace e8 {
 
@@ -40,14 +39,12 @@ namespace e8 {
  * specified, this function computes the radiance the occlusion factor. Otherwise, the radiance
  * penetrates all objects.
  * @param cleared_radiance_map A zeroed-out radiance map.
- * @param desc_set_allocator Descriptor set allocator.
- * @param context Contextual Vulkan handles.
+ * @param transfer_context Transfer context.
  * @param target The target stage which stores the radiance map in an HDR color image.
  */
 void DoComputeRadiance(LightSourceInstance const &instance, PipelineStage *projected_surface,
                        frustum const &projection, std::vector<PipelineStage *> const &shadow_maps,
-                       PipelineStage *cleared_radiance_map,
-                       DescriptorSetAllocator *desc_set_allocator, VulkanContext *context,
+                       PipelineStage *cleared_radiance_map, TransferContext *transfer_context,
                        PipelineStage *target);
 
 }  // namespace e8

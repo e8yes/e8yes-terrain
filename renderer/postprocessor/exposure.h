@@ -22,7 +22,7 @@
 
 #include "common/device.h"
 #include "renderer/output/pipeline_stage.h"
-#include "renderer/transfer/descriptor_set.h"
+#include "renderer/transfer/context.h"
 
 namespace e8 {
 
@@ -52,16 +52,14 @@ std::unique_ptr<PipelineStage> CreateExposureStage(VulkanContext *context);
  * specified radiance map into a logarithmic luminance map, then it computes the average of the
  * logarithmic luminance.
  *
- * @param radiance_map
- * @param desc_set_allocator Descriptor set allocator.
- * @param context
- * @param log_luminance_map
- * @param exposure
+ * @param radiance_map The raw radiance image to estimate exposure for.
+ * @param transfer_context Transfer context.
+ * @param log_luminance_map The target stage which stores the logarithmic luminance values.
+ * @param log_exposure The target stage which stares the logarithmic exposure value.
  */
-void DoEstimateExposure(PipelineStage *radiance_map, DescriptorSetAllocator *desc_set_allocator,
-                        VulkanContext *context, PipelineStage *log_luminance_map,
-                        PipelineStage *exposure);
+void DoEstimateExposure(PipelineStage *radiance_map, TransferContext *transfer_context,
+                        PipelineStage *log_luminance_map, PipelineStage *log_exposure);
 
-} // namespace e8
+}  // namespace e8
 
-#endif // ISLANDS_RENDERER_EXPOSURE_H
+#endif  // ISLANDS_RENDERER_EXPOSURE_H

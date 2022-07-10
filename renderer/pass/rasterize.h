@@ -18,11 +18,11 @@
 #ifndef ISLANDS_RENDERER_RASTERIZE_H
 #define ISLANDS_RENDERER_RASTERIZE_H
 
+#include <vulkan/vulkan.h>
 #include <array>
 #include <functional>
 #include <memory>
 #include <vector>
-#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "renderer/basic/frame_buffer.h"
@@ -33,11 +33,7 @@
 #include "renderer/output/promise.h"
 #include "renderer/pass/configurator.h"
 #include "renderer/query/drawable_instance.h"
-#include "renderer/transfer/descriptor_set.h"
-#include "renderer/transfer/descriptor_set_texture.h"
-#include "renderer/transfer/texture_group.h"
-#include "renderer/transfer/vram_geometry.h"
-#include "renderer/transfer/vram_texture.h"
+#include "renderer/transfer/context.h"
 #include "resource/buffer_texture.h"
 
 namespace e8 {
@@ -75,16 +71,13 @@ Fulfillment FinishRenderPass(VkCommandBuffer cmds, unsigned completion_signal_co
  * @param drawables The array of drawables to be rendered.
  * @param pipeline The graphics pipeline to use for the rendering.
  * @param configurator Specifies how to set up the rendering.
- * @param tex_desc_set_cache The texture descriptor set cache.
- * @param geo_vram The geometry VRAM transferer.
- * @param tex_vram The texture VRAM transferer.
+ * @param transfer_context Transfer context.
  * @param cmds The command buffer to which draw commands will be added.
  */
 void RenderDrawables(std::vector<DrawableInstance> const &drawables,
                      GraphicsPipeline const &pipeline, ShaderUniformLayout const &uniform_layout,
                      RenderPassConfiguratorInterface const &configurator,
-                     TextureDescriptorSetCache *tex_desc_set_cache, GeometryVramTransfer *geo_vram,
-                     TextureVramTransfer *tex_vram, VkCommandBuffer cmds);
+                     TransferContext *transfer_context, VkCommandBuffer cmds);
 
 // Represents a function which sets the value of uniform variables for post processing.
 using SetPostProcessorUniformsFn =
@@ -101,6 +94,6 @@ using SetPostProcessorUniformsFn =
 void PostProcess(GraphicsPipeline const &pipeline, ShaderUniformLayout const &uniform_layout,
                  SetPostProcessorUniformsFn const &set_uniforms_fn, VkCommandBuffer cmds);
 
-} // namespace e8
+}  // namespace e8
 
-#endif // ISLANDS_RENDERER_RASTERIZE_H
+#endif  // ISLANDS_RENDERER_RASTERIZE_H

@@ -15,6 +15,7 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vulkan/vulkan.h>
 #include <algorithm>
 #include <cstdint>
 #include <functional>
@@ -22,7 +23,6 @@
 #include <optional>
 #include <string>
 #include <vector>
-#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "renderer/output/pipeline_output.h"
@@ -49,8 +49,9 @@ VkDescriptorSetLayoutBinding PostProcessorViewportBinding() {
     return viewport_binding;
 }
 
-std::unique_ptr<ShaderUniformLayout>
-UniformLayout(unsigned input_image_count, unsigned push_constant_size, VulkanContext *context) {
+std::unique_ptr<ShaderUniformLayout> UniformLayout(unsigned input_image_count,
+                                                   unsigned push_constant_size,
+                                                   VulkanContext *context) {
     std::vector<VkDescriptorSetLayoutBinding> input_images_layouts(input_image_count);
 
     for (unsigned i = 0; i < input_image_count; ++i) {
@@ -129,7 +130,7 @@ void ConfigureCustomUniformVariables(PostProcessorConfiguratorInterface const &c
     }
 }
 
-} // namespace
+}  // namespace
 
 PostProcessorConfiguratorInterface::PostProcessorConfiguratorInterface() {}
 
@@ -144,8 +145,7 @@ void PostProcessorConfiguratorInterface::PushConstants(
 struct PostProcessorPipeline::PostProcessorPipelineImpl {
     PostProcessorPipelineImpl(PipelineKey key, unsigned input_image_count,
                               ShaderUniformLayout const &uniform_layout,
-                              PipelineOutputInterface *output,
-                              DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
+                              PipelineOutputInterface *output, TransferContext *transfer_context);
     ~PostProcessorPipelineImpl();
 
     PipelineKey key;
@@ -160,26 +160,26 @@ struct PostProcessorPipeline::PostProcessorPipelineImpl {
 
 PostProcessorPipeline::PostProcessorPipelineImpl::PostProcessorPipelineImpl(
     PipelineKey key, unsigned input_image_count, ShaderUniformLayout const &uniform_layout,
-    PipelineOutputInterface *output, DescriptorSetAllocator *desc_set_allocator,
-    VulkanContext *context)
+    PipelineOutputInterface *output, TransferContext *transfer_context)
     : key(key), past_input_images(input_image_count) {
     // Sets up the viewport dimension uniform variable.
-    viewport_dimension_desc_set = desc_set_allocator->Allocate(DescriptorType::DT_UNIFORM_BUFFER,
-                                                               uniform_layout.per_frame_desc_set);
+    viewport_dimension_desc_set = transfer_context->descriptor_set_allocator.Allocate(
+        DescriptorType::DT_UNIFORM_BUFFER, uniform_layout.per_frame_desc_set);
 
-    viewport_dimension_ubo = CreateUniformBuffer(/*size=*/sizeof(ViewportDimension), context);
+    viewport_dimension_ubo =
+        CreateUniformBuffer(/*size=*/sizeof(ViewportDimension), transfer_context->vulkan_context);
 
     ViewportDimension dimension;
     dimension.viewport_width = output->Width();
     dimension.viewport_height = output->Height();
 
     WriteUniformBufferDescriptor(&dimension, *viewport_dimension_ubo, *viewport_dimension_desc_set,
-                                 /*binding=*/0, context);
+                                 /*binding=*/0, transfer_context->vulkan_context);
 
     // Sets up the input image uniform variables.
-    input_images_desc_set = desc_set_allocator->Allocate(DescriptorType::DT_COMBINED_IMAGE_SAMPLER,
-                                                         uniform_layout.per_pass_desc_set);
-    input_image_sampler = CreateContinuousSampler(context);
+    input_images_desc_set = transfer_context->descriptor_set_allocator.Allocate(
+        DescriptorType::DT_COMBINED_IMAGE_SAMPLER, uniform_layout.per_pass_desc_set);
+    input_image_sampler = CreateContinuousSampler(transfer_context->vulkan_context);
 
     for (auto &past_input_image : past_input_images) {
         past_input_image = VK_NULL_HANDLE;
@@ -190,13 +190,13 @@ PostProcessorPipeline::PostProcessorPipelineImpl::~PostProcessorPipelineImpl() {
 
 PostProcessorPipeline::PostProcessorPipeline(
     PipelineKey const &key, std::string const &fragment_shader, unsigned input_image_count,
-    unsigned push_constant_size, PipelineOutputInterface *output,
-    DescriptorSetAllocator *desc_set_allocator, VulkanContext *context)
-    : CachedPipelineInterface(context) {
-    shader_stages_ =
-        CreateShaderStages(/*vertex_shader_file_path=*/kVertexShaderFilePathPostProcessor,
-                           /*fragment_shader_file_path=*/fragment_shader, context);
-    uniform_layout_ = UniformLayout(input_image_count, push_constant_size, context);
+    unsigned push_constant_size, PipelineOutputInterface *output, TransferContext *transfer_context)
+    : CachedPipelineInterface(transfer_context->vulkan_context) {
+    shader_stages_ = CreateShaderStages(
+        /*vertex_shader_file_path=*/kVertexShaderFilePathPostProcessor,
+        /*fragment_shader_file_path=*/fragment_shader, transfer_context->vulkan_context);
+    uniform_layout_ =
+        UniformLayout(input_image_count, push_constant_size, transfer_context->vulkan_context);
     vertex_inputs_ = CreateVertexInputState(
         /*input_attributes=*/std::vector<VkVertexInputAttributeDescription>());
     fixed_stage_config_ = CreateFixedStageConfig(/*polygon_mode=*/VK_POLYGON_MODE_FILL,
@@ -206,11 +206,12 @@ PostProcessorPipeline::PostProcessorPipeline(
 
     // Creates the post processing pipeline.
     pipeline_ = CreateGraphicsPipeline(output->GetRenderPass(), *shader_stages_, *uniform_layout_,
-                                       *vertex_inputs_, *fixed_stage_config_, context);
+                                       *vertex_inputs_, *fixed_stage_config_,
+                                       transfer_context->vulkan_context);
 
     // Sets up additional states for defining the uniform variables.
     pimpl_ = std::make_unique<PostProcessorPipelineImpl>(key, input_image_count, *uniform_layout_,
-                                                         output, desc_set_allocator, context);
+                                                         output, transfer_context);
 }
 
 PostProcessorPipeline::~PostProcessorPipeline() {}
@@ -241,4 +242,4 @@ Fulfillment PostProcessorPipeline::Launch(CachedPipelineArgumentsInterface const
     return FinishRenderPass(cmds, completion_signal_count, prerequisites, context_);
 }
 
-} // namespace e8
+}  // namespace e8

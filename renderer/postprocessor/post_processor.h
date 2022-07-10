@@ -18,19 +18,19 @@
 #ifndef ISLANDS_RENDERER_PIPELINE_POST_PROCESSOR_H
 #define ISLANDS_RENDERER_PIPELINE_POST_PROCESSOR_H
 
+#include <vulkan/vulkan.h>
 #include <cstdint>
 #include <functional>
 #include <memory>
 #include <string>
 #include <vector>
-#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "renderer/basic/uniform_layout.h"
 #include "renderer/output/cached_pipeline.h"
 #include "renderer/output/pipeline_output.h"
 #include "renderer/output/promise.h"
-#include "renderer/transfer/descriptor_set.h"
+#include "renderer/transfer/context.h"
 
 namespace e8 {
 
@@ -39,7 +39,7 @@ namespace e8 {
  * apply to the post processing pipeline.
  */
 class PostProcessorConfiguratorInterface : public CachedPipelineArgumentsInterface {
-  public:
+   public:
     PostProcessorConfiguratorInterface();
     virtual ~PostProcessorConfiguratorInterface();
 
@@ -63,7 +63,7 @@ class PostProcessorConfiguratorInterface : public CachedPipelineArgumentsInterfa
  * fully implemented concrete class.
  */
 class PostProcessorPipeline : public CachedPipelineInterface {
-  public:
+   public:
     /**
      * @brief PostProcessorPipeline Constructs a custom post processor.
      *
@@ -72,13 +72,11 @@ class PostProcessorPipeline : public CachedPipelineInterface {
      * @param input_image_count The number of input images the post processor requires.
      * @param push_constant_size The number of bytes the post processor's push constants requires.
      * @param output To receive output from the post processor.
-     * @param desc_set_allocator Descriptor set allocator.
-     * @param context Contextual Vulkan handles.
+     * @param transfer_context Transfer context.
      */
     PostProcessorPipeline(PipelineKey const &key, std::string const &fragment_shader,
                           unsigned input_image_count, unsigned push_constant_size,
-                          PipelineOutputInterface *output,
-                          DescriptorSetAllocator *desc_set_allocator, VulkanContext *context);
+                          PipelineOutputInterface *output, TransferContext *transfer_context);
     ~PostProcessorPipeline() override;
 
     PipelineKey Key() const override;
@@ -87,11 +85,11 @@ class PostProcessorPipeline : public CachedPipelineInterface {
                        std::vector<GpuPromise *> const &prerequisites,
                        unsigned completion_signal_count, PipelineOutputInterface *output) override;
 
-  private:
+   private:
     struct PostProcessorPipelineImpl;
     std::unique_ptr<PostProcessorPipelineImpl> pimpl_;
 };
 
-} // namespace e8
+}  // namespace e8
 
-#endif // ISLANDS_RENDERER_PIPELINE_POST_PROCESSOR_H
+#endif  // ISLANDS_RENDERER_PIPELINE_POST_PROCESSOR_H

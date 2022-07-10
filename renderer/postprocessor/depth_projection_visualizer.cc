@@ -27,7 +27,7 @@
 #include "renderer/output/pipeline_stage.h"
 #include "renderer/postprocessor/depth_projection_visualizer.h"
 #include "renderer/postprocessor/post_processor.h"
-#include "renderer/transfer/descriptor_set.h"
+#include "renderer/transfer/context.h"
 
 namespace e8 {
 namespace {
@@ -87,17 +87,15 @@ void DepthProjectionPostProcessorConfigurator::PushConstants(
 }  // namespace
 
 void DoVisualizeDepthProjection(float alpha, std::optional<PerspectiveProjection> projection,
-                                PipelineStage *depth_map_stage,
-                                DescriptorSetAllocator *desc_set_allocator, VulkanContext *context,
+                                PipelineStage *depth_map_stage, TransferContext *transfer_context,
                                 PipelineStage *target) {
     CachedPipelineInterface *pipeline = target->WithPipeline(
-        kDepthProjectionVisualizerPipeline,
-        [desc_set_allocator, context](PipelineOutputInterface *output) {
+        kDepthProjectionVisualizerPipeline, [transfer_context](PipelineOutputInterface *output) {
             return std::make_unique<PostProcessorPipeline>(
                 kDepthProjectionVisualizerPipeline, kFragmentShaderFilePathDepthMapVisualizer,
                 /*input_image_count=*/1,
                 /*push_constant_size=*/sizeof(DepthProjectionVisualizerParameters), output,
-                desc_set_allocator, context);
+                transfer_context);
         });
 
     auto configurator = std::make_unique<DepthProjectionPostProcessorConfigurator>(

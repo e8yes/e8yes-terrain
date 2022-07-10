@@ -20,7 +20,6 @@
 #include <optional>
 #include <vector>
 
-#include "common/device.h"
 #include "renderer/basic/shader.h"
 #include "renderer/basic/uniform_layout.h"
 #include "renderer/output/pipeline_output.h"
@@ -28,7 +27,7 @@
 #include "renderer/postprocessor/post_processor.h"
 #include "renderer/postprocessor/surface_projection_visualizer.h"
 #include "renderer/proto/renderer.pb.h"
-#include "renderer/transfer/descriptor_set.h"
+#include "renderer/transfer/context.h"
 
 namespace e8 {
 namespace {
@@ -84,23 +83,22 @@ void SurfaceProjectionVisualizerPostProcessorConfigurator::PushConstants(
 }  // namespace
 
 void DoVisualizeSurfaceProjection(LightInputsRendererParameters::InputType parameter_to_visualize,
-                                  PipelineStage *light_inputs,
-                                  DescriptorSetAllocator *desc_set_allocator,
-                                  VulkanContext *context, PipelineStage *target) {
+                                  PipelineStage *surface_projection,
+                                  TransferContext *transfer_context, PipelineStage *target) {
     CachedPipelineInterface *pipeline = target->WithPipeline(
         kSurfaceProjectionVisualizerPipeline,
-        [desc_set_allocator, context](PipelineOutputInterface *visualizer_output) {
+        [transfer_context](PipelineOutputInterface *visualizer_output) {
             return std::make_unique<PostProcessorPipeline>(
                 kSurfaceProjectionVisualizerPipeline, kFragmentShaderFilePathLightInputsVisualizer,
                 /*input_image_count=*/SurfaceProjectionColorOutput::LightInputsColorOutputCount,
                 /*push_constant_size=*/sizeof(SurfaceProjectionVisualizerParameters),
-                visualizer_output, desc_set_allocator, context);
+                visualizer_output, transfer_context);
         });
 
     auto configurator = std::make_unique<SurfaceProjectionVisualizerPostProcessorConfigurator>(
-        parameter_to_visualize, *light_inputs->Output());
+        parameter_to_visualize, *surface_projection->Output());
     target->Schedule(pipeline, std::move(configurator),
-                     /*parents=*/std::vector<PipelineStage *>{light_inputs});
+                     /*parents=*/std::vector<PipelineStage *>{surface_projection});
 }
 
 }  // namespace e8

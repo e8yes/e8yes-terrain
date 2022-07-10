@@ -26,9 +26,7 @@
 #include "renderer/basic/projection.h"
 #include "renderer/output/pipeline_stage.h"
 #include "renderer/query/collection.h"
-#include "renderer/transfer/descriptor_set_texture.h"
-#include "renderer/transfer/vram_geometry.h"
-#include "renderer/transfer/vram_texture.h"
+#include "renderer/transfer/context.h"
 #include "resource/accessor.h"
 
 namespace e8 {
@@ -52,18 +50,13 @@ std::unique_ptr<PipelineStage> CreateProjectDepthStage(unsigned width, unsigned 
  * @param drawable_collection A collection of drawables to project to screen space to find the
  * nearest depth.
  * @param projection Defines how drawables should be projected to the depth map.
- * @param tex_desc_set_cache Texture descriptor cache.
- * @param geo_vram The geometry VRAM transferer.
- * @param tex_vram The texture VRAM transferer.
- * @param context Contextual Vulkan handles.
+ * @param transfer_context Transfer context.
  * @param first_stage The frame's first stage.
  * @param target The target stage which stores the rendered depth map. It should be created using
  * CreateDepthMapStage().
  */
 void DoProjectDepth(DrawableCollection *drawable_collection,
-                    PerspectiveProjection const &projection,
-                    TextureDescriptorSetCache *tex_desc_set_cache, GeometryVramTransfer *geo_vram,
-                    TextureVramTransfer *tex_vram, VulkanContext *context,
+                    PerspectiveProjection const &projection, TransferContext *transfer_context,
                     PipelineStage *first_stage, PipelineStage *target);
 
 }  // namespace e8

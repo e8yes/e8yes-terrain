@@ -19,7 +19,6 @@
 #include <memory>
 #include <vector>
 
-#include "common/device.h"
 #include "common/tensor.h"
 #include "content/proto/light_source.pb.h"
 #include "renderer/basic/sampler.h"
@@ -209,8 +208,7 @@ void SpotLightPostProcessorConfigurator::PushConstants(std::vector<uint8_t> *pus
 
 void DoComputeRadiance(LightSourceInstance const &instance, PipelineStage *projected_surface,
                        frustum const &projection, std::vector<PipelineStage *> const &shadow_maps,
-                       PipelineStage *cleared_radiance_map,
-                       DescriptorSetAllocator *desc_set_allocator, VulkanContext *context,
+                       PipelineStage *cleared_radiance_map, TransferContext *transfer_context,
                        PipelineStage *target) {
     CachedPipelineInterface *pipeline;
     std::unique_ptr<PostProcessorConfiguratorInterface> configurator;
@@ -218,14 +216,13 @@ void DoComputeRadiance(LightSourceInstance const &instance, PipelineStage *proje
     switch (instance.light_source.model_case()) {
         case LightSource::ModelCase::kSunLight: {
             pipeline = target->WithPipeline(
-                kSunLightPipeline,
-                [desc_set_allocator, context](PipelineOutputInterface *radiance_output) {
+                kSunLightPipeline, [transfer_context](PipelineOutputInterface *radiance_output) {
                     return std::make_unique<PostProcessorPipeline>(
                         kSunLightPipeline, kFragmentShaderFilePathRadianceSunLight,
                         /*input_image_count=*/
                         SurfaceProjectionColorOutput::LightInputsColorOutputCount + 1,
                         /*push_constant_size=*/sizeof(SunLightParameters), radiance_output,
-                        desc_set_allocator, context);
+                        transfer_context);
                 });
 
             configurator = std::make_unique<SunLightPostProcessorConfigurator>(
@@ -234,14 +231,13 @@ void DoComputeRadiance(LightSourceInstance const &instance, PipelineStage *proje
         }
         case LightSource::ModelCase::kPointLight: {
             pipeline = target->WithPipeline(
-                kPointLightPipeline,
-                [desc_set_allocator, context](PipelineOutputInterface *radiance_output) {
+                kPointLightPipeline, [transfer_context](PipelineOutputInterface *radiance_output) {
                     return std::make_unique<PostProcessorPipeline>(
                         kPointLightPipeline, kFragmentShaderFilePathRadiancePointLight,
                         /*input_image_count=*/
                         SurfaceProjectionColorOutput::LightInputsColorOutputCount + 1,
                         /*push_constant_size=*/sizeof(PointLightParameters), radiance_output,
-                        desc_set_allocator, context);
+                        transfer_context);
                 });
 
             configurator = std::make_unique<PointLightPostProcessorConfigurator>(
@@ -250,14 +246,13 @@ void DoComputeRadiance(LightSourceInstance const &instance, PipelineStage *proje
         }
         case LightSource::ModelCase::kSpotLight: {
             pipeline = target->WithPipeline(
-                kSpotLightPipeline,
-                [desc_set_allocator, context](PipelineOutputInterface *radiance_output) {
+                kSpotLightPipeline, [transfer_context](PipelineOutputInterface *radiance_output) {
                     return std::make_unique<PostProcessorPipeline>(
                         kSpotLightPipeline, kFragmentShaderFilePathRadianceSpotLight,
                         /*input_image_count=*/
                         SurfaceProjectionColorOutput::LightInputsColorOutputCount + 1,
                         /*push_constant_size=*/sizeof(SpotLightParameters), radiance_output,
-                        desc_set_allocator, context);
+                        transfer_context);
                 });
 
             configurator = std::make_unique<SpotLightPostProcessorConfigurator>(

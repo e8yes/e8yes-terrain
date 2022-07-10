@@ -179,19 +179,12 @@ std::vector<uint8_t> RenderPassConfigurator::PushConstantOf(
 struct ProjectDepthPipelineArguments : public CachedPipelineArgumentsInterface {
     ProjectDepthPipelineArguments(std::vector<DrawableInstance> const &drawables,
                                   ProjectionInterface const &projection,
-                                  TextureDescriptorSetCache *tex_desc_set_cache,
-                                  GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram)
-        : drawables(drawables),
-          projection(projection),
-          tex_desc_set_cache(tex_desc_set_cache),
-          geo_vram(geo_vram),
-          tex_vram(tex_vram) {}
+                                  TransferContext *transfer_context)
+        : drawables(drawables), projection(projection), transfer_context(transfer_context) {}
 
     std::vector<DrawableInstance> const &drawables;
     ProjectionInterface const &projection;
-    TextureDescriptorSetCache *tex_desc_set_cache;
-    GeometryVramTransfer *geo_vram;
-    TextureVramTransfer *tex_vram;
+    TransferContext *transfer_context;
 };
 
 class ProjectDepthPipeline : public CachedPipelineInterface {
@@ -241,7 +234,7 @@ Fulfillment ProjectDepthPipeline::Launch(CachedPipelineArgumentsInterface const 
 
     RenderPassConfigurator configurator(args.projection);
     RenderDrawables(args.drawables, *pipeline_, *uniform_layout_, configurator,
-                    args.tex_desc_set_cache, args.geo_vram, args.tex_vram, cmds);
+                    args.transfer_context, cmds);
 
     return FinishRenderPass(cmds, completion_signal_count, prerequisites, context_);
 }
@@ -255,23 +248,23 @@ std::unique_ptr<PipelineStage> CreateProjectDepthStage(unsigned width, unsigned 
 }
 
 void DoProjectDepth(DrawableCollection *drawables, PerspectiveProjection const &projection,
-                    TextureDescriptorSetCache *tex_desc_set_cache, GeometryVramTransfer *geo_vram,
-                    TextureVramTransfer *tex_vram, VulkanContext *context,
-                    PipelineStage *first_stage, PipelineStage *target) {
+                    TransferContext *transfer_context, PipelineStage *first_stage,
+                    PipelineStage *target) {
     ResourceLoadingOption loading_option;
     loading_option.load_geometry = true;
 
     std::vector<DrawableInstance> observable_geometries =
         drawables->ObservableGeometries(projection, loading_option);
 
-    CachedPipelineInterface *pipeline =
-        target->WithPipeline(kProjectDepthPipeline, [context](PipelineOutputInterface *output) {
+    CachedPipelineInterface *pipeline = target->WithPipeline(
+        kProjectDepthPipeline, [transfer_context](PipelineOutputInterface *output) {
             return std::make_unique<ProjectDepthPipeline>(
-                dynamic_cast<ProjectDepthPipelineOutput *>(output), context);
+                dynamic_cast<ProjectDepthPipelineOutput *>(output),
+                transfer_context->vulkan_context);
         });
 
-    auto args = std::make_unique<ProjectDepthPipelineArguments>(
-        observable_geometries, projection, tex_desc_set_cache, geo_vram, tex_vram);
+    auto args = std::make_unique<ProjectDepthPipelineArguments>(observable_geometries, projection,
+                                                                transfer_context);
     target->Schedule(pipeline, std::move(args),
                      /*parents=*/std::vector<PipelineStage *>{first_stage});
 }

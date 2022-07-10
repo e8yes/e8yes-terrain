@@ -32,10 +32,7 @@
 #include "renderer/query/collection.h"
 #include "renderer/renderer.h"
 #include "renderer/renderer_depth.h"
-#include "renderer/transfer/descriptor_set.h"
-#include "renderer/transfer/descriptor_set_texture.h"
-#include "renderer/transfer/vram_geometry.h"
-#include "renderer/transfer/vram_texture.h"
+#include "renderer/transfer/context.h"
 #include "resource/accessor.h"
 
 namespace e8 {
@@ -46,10 +43,7 @@ class DepthRenderer::DepthRendererImpl {
                       VulkanContext *context);
     ~DepthRendererImpl();
 
-    DescriptorSetAllocator desc_set_alloc;
-    TextureDescriptorSetCache tex_desc_set_cache;
-    GeometryVramTransfer geo_vram;
-    TextureVramTransfer tex_vram;
+    TransferContext transfer_context;
 
     std::unique_ptr<PipelineStage> depth_projection;
     std::unique_ptr<PipelineStage> visual_representation;
@@ -59,10 +53,7 @@ class DepthRenderer::DepthRendererImpl {
 
 DepthRenderer::DepthRendererImpl::DepthRendererImpl(
     std::unique_ptr<PipelineStage> &&visual_representation, VulkanContext *context)
-    : desc_set_alloc(context),
-      tex_desc_set_cache(&desc_set_alloc),
-      geo_vram(context),
-      tex_vram(context),
+    : transfer_context(context),
       depth_projection(CreateProjectDepthStage(context->swap_chain_image_extent.width,
                                                context->swap_chain_image_extent.height, context)),
       visual_representation(std::move(visual_representation)) {}
@@ -79,15 +70,14 @@ DepthRenderer::~DepthRenderer() {}
 void DepthRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor) {
     Scene::ReadAccess read_access = scene->GainReadAccess();
 
-    PerspectiveProjection camera_projection(scene->camera);
+    PerspectiveProjection projection(scene->camera);
     DrawableCollection drawables_collection(*scene->SceneEntityStructure(), resource_accessor);
 
     PipelineStage *first_stage = this->DoFirstStage();
-    DoProjectDepth(&drawables_collection, camera_projection, &pimpl_->tex_desc_set_cache,
-                   &pimpl_->geo_vram, &pimpl_->tex_vram, context, first_stage,
+    DoProjectDepth(&drawables_collection, projection, &pimpl_->transfer_context, first_stage,
                    pimpl_->depth_projection.get());
-    DoVisualizeDepthProjection(pimpl_->config.depth_renderer_params().alpha(), camera_projection,
-                               pimpl_->depth_projection.get(), &pimpl_->desc_set_alloc, context,
+    DoVisualizeDepthProjection(pimpl_->config.depth_renderer_params().alpha(), projection,
+                               pimpl_->depth_projection.get(), &pimpl_->transfer_context,
                                pimpl_->visual_representation.get());
     PipelineStage *final_stage =
         this->DoFinalStage(first_stage, pimpl_->visual_representation.get());

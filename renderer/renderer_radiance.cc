@@ -34,9 +34,7 @@
 #include "renderer/query/collection.h"
 #include "renderer/renderer.h"
 #include "renderer/renderer_radiance.h"
-#include "renderer/transfer/descriptor_set.h"
-#include "renderer/transfer/vram_geometry.h"
-#include "renderer/transfer/vram_texture.h"
+#include "renderer/transfer/context.h"
 #include "resource/accessor.h"
 
 namespace e8 {
@@ -46,16 +44,12 @@ struct RadianceRenderer::RadianceRendererImpl {
                          VulkanContext *context);
     ~RadianceRendererImpl();
 
-    VulkanContext *context;
-    DescriptorSetAllocator desc_set_alloc;
-    TextureDescriptorSetCache tex_desc_set_cache;
-    GeometryVramTransfer geo_vram;
-    TextureVramTransfer tex_vram;
+    TransferContext transfer_context;
 
     std::unique_ptr<PipelineStage> surface_projection;
     DirectIlluminator direct_illuminator;
     std::unique_ptr<PipelineStage> log_luminance_map;
-    std::unique_ptr<PipelineStage> exposure_value;
+    std::unique_ptr<PipelineStage> log_exposure_value;
     std::unique_ptr<PipelineStage> ldr_image;
     std::unique_ptr<PipelineStage> final_color_image;
 
@@ -64,11 +58,7 @@ struct RadianceRenderer::RadianceRendererImpl {
 
 RadianceRenderer::RadianceRendererImpl::RadianceRendererImpl(
     std::unique_ptr<PipelineStage> &&final_color_image, VulkanContext *context)
-    : context(context),
-      desc_set_alloc(context),
-      tex_desc_set_cache(&desc_set_alloc),
-      geo_vram(context),
-      tex_vram(context),
+    : transfer_context(context),
       surface_projection(CreateProjectSurfaceStage(context->swap_chain_image_extent.width,
                                                    context->swap_chain_image_extent.height,
                                                    context)),
@@ -76,7 +66,7 @@ RadianceRenderer::RadianceRendererImpl::RadianceRendererImpl(
                          context->swap_chain_image_extent.height, context),
       log_luminance_map(CreateLogLuminaneStage(context->swap_chain_image_extent.width,
                                                context->swap_chain_image_extent.height, context)),
-      exposure_value(CreateExposureStage(context)),
+      log_exposure_value(CreateExposureStage(context)),
       ldr_image(CreateLdrImageStage(context->swap_chain_image_extent.width,
                                     context->swap_chain_image_extent.height, context)),
       final_color_image(std::move(final_color_image)) {}
@@ -98,25 +88,23 @@ void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_access
 
     PipelineStage *first_stage = this->DoFirstStage();
 
-    DoProjectSurface(&drawable_collection, projection, &pimpl_->tex_desc_set_cache,
-                     &pimpl_->geo_vram, &pimpl_->tex_vram, pimpl_->context, first_stage,
+    DoProjectSurface(&drawable_collection, projection, &pimpl_->transfer_context, first_stage,
                      pimpl_->surface_projection.get());
     PipelineStage *radiance_map = pimpl_->direct_illuminator.DoComputeDirectIllumination(
         &drawable_collection, pimpl_->surface_projection.get(), projection, first_stage,
-        &pimpl_->desc_set_alloc);
+        &pimpl_->transfer_context);
 
-    DoEstimateExposure(radiance_map, &pimpl_->desc_set_alloc, pimpl_->context,
-                       pimpl_->log_luminance_map.get(), pimpl_->exposure_value.get());
-    DoToneMapping(radiance_map, pimpl_->exposure_value.get(), &pimpl_->desc_set_alloc,
-                  pimpl_->context, pimpl_->ldr_image.get());
-    DoFxaa(pimpl_->ldr_image.get(), &pimpl_->desc_set_alloc, pimpl_->context,
-           pimpl_->final_color_image.get());
+    DoEstimateExposure(radiance_map, &pimpl_->transfer_context, pimpl_->log_luminance_map.get(),
+                       pimpl_->log_exposure_value.get());
+    DoToneMapping(radiance_map, pimpl_->log_exposure_value.get(), &pimpl_->transfer_context,
+                  pimpl_->ldr_image.get());
+    DoFxaa(pimpl_->ldr_image.get(), &pimpl_->transfer_context, pimpl_->final_color_image.get());
 
     PipelineStage *final_stage = this->DoFinalStage(
         first_stage, pimpl_->final_color_image.get(),
         /*dangling_stages=*/std::vector<PipelineStage *>{pimpl_->surface_projection.get()});
 
-    final_stage->Fulfill(pimpl_->context);
+    final_stage->Fulfill(pimpl_->transfer_context.vulkan_context);
 }
 
 void RadianceRenderer::ApplyConfiguration(RendererConfiguration const &config) {

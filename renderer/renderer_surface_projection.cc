@@ -32,10 +32,7 @@
 #include "renderer/query/collection.h"
 #include "renderer/renderer.h"
 #include "renderer/renderer_surface_projection.h"
-#include "renderer/transfer/descriptor_set.h"
-#include "renderer/transfer/descriptor_set_texture.h"
-#include "renderer/transfer/vram_geometry.h"
-#include "renderer/transfer/vram_texture.h"
+#include "renderer/transfer/context.h"
 #include "resource/accessor.h"
 
 namespace e8 {
@@ -46,11 +43,7 @@ class SurfaceProjectionRenderer::SurfaceProjectionRendererImpl {
                                   VulkanContext *context);
     ~SurfaceProjectionRendererImpl();
 
-    VulkanContext *context;
-    DescriptorSetAllocator desc_set_alloc;
-    TextureDescriptorSetCache tex_desc_set_cache;
-    GeometryVramTransfer geo_vram;
-    TextureVramTransfer tex_vram;
+    TransferContext transfer_context;
 
     std::unique_ptr<PipelineStage> surface_projection;
     std::unique_ptr<PipelineStage> final_color_image;
@@ -60,11 +53,7 @@ class SurfaceProjectionRenderer::SurfaceProjectionRendererImpl {
 
 SurfaceProjectionRenderer::SurfaceProjectionRendererImpl::SurfaceProjectionRendererImpl(
     std::unique_ptr<PipelineStage> &&final_color_image, VulkanContext *context)
-    : context(context),
-      desc_set_alloc(context),
-      tex_desc_set_cache(&desc_set_alloc),
-      geo_vram(context),
-      tex_vram(context),
+    : transfer_context(context),
       surface_projection(CreateProjectSurfaceStage(context->swap_chain_image_extent.width,
                                                    context->swap_chain_image_extent.height,
                                                    context)),
@@ -86,15 +75,14 @@ void SurfaceProjectionRenderer::DrawFrame(Scene *scene, ResourceAccessor *resour
     DrawableCollection drawable_collection(*scene->SceneEntityStructure(), resource_accessor);
 
     PipelineStage *first_stage = this->DoFirstStage();
-    DoProjectSurface(&drawable_collection, camera_projection, &pimpl_->tex_desc_set_cache,
-                     &pimpl_->geo_vram, &pimpl_->tex_vram, pimpl_->context, first_stage,
-                     pimpl_->surface_projection.get());
+    DoProjectSurface(&drawable_collection, camera_projection, &pimpl_->transfer_context,
+                     first_stage, pimpl_->surface_projection.get());
     DoVisualizeSurfaceProjection(pimpl_->config.light_inputs_renderer_params().input_to_visualize(),
-                                 pimpl_->surface_projection.get(), &pimpl_->desc_set_alloc,
-                                 pimpl_->context, pimpl_->final_color_image.get());
+                                 pimpl_->surface_projection.get(), &pimpl_->transfer_context,
+                                 pimpl_->final_color_image.get());
     PipelineStage *final_stage = this->DoFinalStage(first_stage, pimpl_->final_color_image.get());
 
-    final_stage->Fulfill(pimpl_->context);
+    final_stage->Fulfill(pimpl_->transfer_context.vulkan_context);
 }
 
 void SurfaceProjectionRenderer::ApplyConfiguration(RendererConfiguration const &config) {

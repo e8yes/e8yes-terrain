@@ -42,10 +42,7 @@
 #include "renderer/pipeline/project_surface.h"
 #include "renderer/query/collection.h"
 #include "renderer/query/drawable_instance.h"
-#include "renderer/transfer/descriptor_set_texture.h"
-#include "renderer/transfer/texture_group.h"
-#include "renderer/transfer/vram_geometry.h"
-#include "renderer/transfer/vram_texture.h"
+#include "renderer/transfer/context.h"
 
 namespace e8 {
 namespace {
@@ -280,19 +277,12 @@ TextureSelector RenderPassConfigurator::TexturesOf(DrawableInstance const &drawa
 struct LightInputsPipelineArgument : public CachedPipelineArgumentsInterface {
     LightInputsPipelineArgument(std::vector<DrawableInstance> const &drawables,
                                 ProjectionInterface const &projection,
-                                TextureDescriptorSetCache *tex_desc_set_cache,
-                                GeometryVramTransfer *geo_vram, TextureVramTransfer *tex_vram)
-        : drawables(drawables),
-          projection(projection),
-          tex_desc_set_cache(tex_desc_set_cache),
-          geo_vram(geo_vram),
-          tex_vram(tex_vram) {}
+                                TransferContext *transfer_context)
+        : drawables(drawables), projection(projection), transfer_context(transfer_context) {}
 
     std::vector<DrawableInstance> const &drawables;
     ProjectionInterface const &projection;
-    TextureDescriptorSetCache *tex_desc_set_cache;
-    GeometryVramTransfer *geo_vram;
-    TextureVramTransfer *tex_vram;
+    TransferContext *transfer_context;
 };
 
 /**
@@ -348,7 +338,7 @@ Fulfillment ProjectSurfacePipeline::Launch(CachedPipelineArgumentsInterface cons
 
     RenderPassConfigurator configurator(args.projection, *texture_sampler_);
     RenderDrawables(args.drawables, *pipeline_, *uniform_layout_, configurator,
-                    args.tex_desc_set_cache, args.geo_vram, args.tex_vram, cmds);
+                    args.transfer_context, cmds);
 
     return FinishRenderPass(cmds, completion_signal_count, prerequisites, context_);
 }
@@ -362,9 +352,7 @@ std::unique_ptr<PipelineStage> CreateProjectSurfaceStage(unsigned width, unsigne
 }
 
 void DoProjectSurface(DrawableCollection *drawable_collection,
-                      PerspectiveProjection const &projection,
-                      TextureDescriptorSetCache *tex_desc_set_cache, GeometryVramTransfer *geo_vram,
-                      TextureVramTransfer *tex_vram, VulkanContext *context,
+                      PerspectiveProjection const &projection, TransferContext *transfer_context,
                       PipelineStage *first_stage, PipelineStage *target) {
     ResourceLoadingOption loading_option;
     loading_option.load_geometry = true;
@@ -373,13 +361,14 @@ void DoProjectSurface(DrawableCollection *drawable_collection,
     std::vector<DrawableInstance> observable_geometries =
         drawable_collection->ObservableGeometries(projection, loading_option);
 
-    CachedPipelineInterface *pipeline =
-        target->WithPipeline(kProjectSurfacePipeline, [context](PipelineOutputInterface *output) {
-            return std::make_unique<ProjectSurfacePipeline>(output, context);
+    CachedPipelineInterface *pipeline = target->WithPipeline(
+        kProjectSurfacePipeline, [transfer_context](PipelineOutputInterface *output) {
+            return std::make_unique<ProjectSurfacePipeline>(output,
+                                                            transfer_context->vulkan_context);
         });
 
-    auto args = std::make_unique<LightInputsPipelineArgument>(
-        observable_geometries, projection, tex_desc_set_cache, geo_vram, tex_vram);
+    auto args = std::make_unique<LightInputsPipelineArgument>(observable_geometries, projection,
+                                                              transfer_context);
     target->Schedule(pipeline, std::move(args),
                      /*parents=*/std::vector<PipelineStage *>{first_stage});
 }

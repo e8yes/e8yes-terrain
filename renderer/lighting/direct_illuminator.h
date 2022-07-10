@@ -25,7 +25,7 @@
 #include "renderer/basic/projection.h"
 #include "renderer/output/pipeline_stage.h"
 #include "renderer/query/collection.h"
-#include "renderer/transfer/descriptor_set.h"
+#include "renderer/transfer/context.h"
 
 namespace e8 {
 
@@ -56,7 +56,7 @@ class DirectIlluminator {
      * @param projection The perspective projection setup which generated the surface parameter
      * map.
      * @param first_stage The frame's first stage.
-     * @param desc_set_alloc Descriptor set allocator.
+     * @param transfer_context Transfer context.
      * @return The direct illumination result. Note, the radiance map is cleared to black prior to
      * the direct illumination computation.
      */
@@ -64,7 +64,7 @@ class DirectIlluminator {
                                                PipelineStage *surface_projection,
                                                PerspectiveProjection const &projection,
                                                PipelineStage *first_stage,
-                                               DescriptorSetAllocator *desc_set_alloc);
+                                               TransferContext *transfer_context);
 
    private:
     struct DirectIlluminatorImpl;
