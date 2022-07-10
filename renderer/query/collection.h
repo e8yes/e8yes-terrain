@@ -23,6 +23,7 @@
 #include "content/structure.h"
 #include "renderer/basic/projection.h"
 #include "renderer/query/drawable_instance.h"
+#include "renderer/query/light_source.h"
 #include "resource/accessor.h"
 
 namespace e8 {
@@ -43,6 +44,13 @@ class DrawableCollection {
     std::vector<DrawableInstance> ObservableGeometries(
         PerspectiveProjection const& projection,
         ResourceLoadingOption const& loading_option = ResourceLoadingOption());
+
+    /**
+     * @brief ObservableLightSources Returns a list of light sources that affect the observable
+     * geometries.
+     */
+    std::vector<LightSourceInstance> ObservableLightSources(
+        PerspectiveProjection const& projection);
 
    private:
     SceneEntityStructureInterface const& entities_;

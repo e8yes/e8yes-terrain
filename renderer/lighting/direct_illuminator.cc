@@ -24,8 +24,8 @@
 #include "renderer/lighting/direct_illuminator.h"
 #include "renderer/output/common_output.h"
 #include "renderer/output/pipeline_stage.h"
-#include "renderer/pipeline/project_depth.h"
 #include "renderer/pipeline/fill_color.h"
+#include "renderer/pipeline/project_depth.h"
 #include "renderer/postprocessor/radiance.h"
 #include "renderer/query/light_source.h"
 #include "renderer/transfer/descriptor_set.h"
@@ -91,12 +91,14 @@ DirectIlluminator::DirectIlluminator(unsigned width, unsigned height, VulkanCont
 DirectIlluminator::~DirectIlluminator() {}
 
 PipelineStage *DirectIlluminator::DoComputeDirectIllumination(
-    std::vector<LightSourceInstance> const &light_sources,
-    PerspectiveProjection const &parameter_projection, PipelineStage *parameter_map,
-    PipelineStage *first_stage, DescriptorSetAllocator *desc_set_alloc) {
+    DrawableCollection *drawable_collection, PipelineStage *surface_projection,
+    PerspectiveProjection const &projection, PipelineStage *first_stage,
+    DescriptorSetAllocator *desc_set_alloc) {
     DoFillColor(/*color=*/vec3{0.0f, 0.0f, 0.0f}, pimpl_->context, first_stage,
                 pimpl_->cleared_radiance_map.get());
 
+    std::vector<LightSourceInstance> light_sources =
+        drawable_collection->ObservableLightSources(projection);
     if (light_sources.empty()) {
         return pimpl_->cleared_radiance_map.get();
     }
@@ -113,7 +115,7 @@ PipelineStage *DirectIlluminator::DoComputeDirectIllumination(
             shadow_maps = it->second;
         }
 
-        DoComputeRadiance(instance, parameter_projection.Frustum(), parameter_map,
+        DoComputeRadiance(instance, surface_projection, projection.Frustum(),
                           /*shadow_map=*/shadow_maps, pimpl_->cleared_radiance_map.get(),
                           desc_set_alloc, pimpl_->context, pimpl_->filled_radiance_map.get());
     }

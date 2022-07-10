@@ -29,8 +29,7 @@
 #include "renderer/pipeline/project_surface.h"
 #include "renderer/postprocessor/surface_projection_visualizer.h"
 #include "renderer/proto/renderer.pb.h"
-#include "renderer/query/drawable_instance.h"
-#include "renderer/query/query_fn.h"
+#include "renderer/query/collection.h"
 #include "renderer/renderer.h"
 #include "renderer/renderer_surface_projection.h"
 #include "renderer/transfer/descriptor_set.h"
@@ -84,20 +83,11 @@ void SurfaceProjectionRenderer::DrawFrame(Scene *scene, ResourceAccessor *resour
     Scene::ReadAccess read_access = scene->GainReadAccess();
 
     PerspectiveProjection camera_projection(scene->camera);
-    std::vector<SceneEntity const *> scene_entities =
-        scene->SceneEntityStructure()->QueryEntities(QueryAllSceneEntities);
-
-    ResourceLoadingOption option;
-    option.load_geometry = true;
-    option.load_material = true;
-
-    std::vector<DrawableInstance> drawables =
-        ToDrawables(scene_entities, /*viewer_location=*/ToVec3(scene->camera.position()), option,
-                    resource_accessor);
+    DrawableCollection drawable_collection(*scene->SceneEntityStructure(), resource_accessor);
 
     PipelineStage *first_stage = this->DoFirstStage();
-    DoProjectSurface(drawables, camera_projection, &pimpl_->tex_desc_set_cache, &pimpl_->geo_vram,
-                     &pimpl_->tex_vram, pimpl_->context, first_stage,
+    DoProjectSurface(&drawable_collection, camera_projection, &pimpl_->tex_desc_set_cache,
+                     &pimpl_->geo_vram, &pimpl_->tex_vram, pimpl_->context, first_stage,
                      pimpl_->surface_projection.get());
     DoVisualizeSurfaceProjection(pimpl_->config.light_inputs_renderer_params().input_to_visualize(),
                                  pimpl_->surface_projection.get(), &pimpl_->desc_set_alloc,

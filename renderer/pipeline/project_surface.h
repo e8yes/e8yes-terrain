@@ -23,7 +23,7 @@
 #include "common/device.h"
 #include "renderer/basic/projection.h"
 #include "renderer/output/pipeline_stage.h"
-#include "renderer/query/drawable_instance.h"
+#include "renderer/query/collection.h"
 #include "renderer/transfer/descriptor_set_texture.h"
 #include "renderer/transfer/vram_geometry.h"
 #include "renderer/transfer/vram_texture.h"
@@ -63,8 +63,9 @@ std::unique_ptr<PipelineStage> CreateProjectSurfaceStage(unsigned width, unsigne
  * These information are essential for lighting computation. They are: normal vector, roughness
  * factor, albedo, metallic factor and depth.
  *
- * @param drawables An array of drawables to be rendered onto the light inputs map.
- * @param projection Defines how drawables should be projected to the light inputs map.
+ * @param drawable_collection A collection of drawables to project to screen space to encode surface
+ * information.
+ * @param projection Defines how drawables should be projected to the light parameter map.
  * @param tex_desc_set_cache Texture descriptor cache.
  * @param geo_vram The geometry VRAM transferer.
  * @param tex_vram The texture VRAM transferer.
@@ -73,8 +74,8 @@ std::unique_ptr<PipelineStage> CreateProjectSurfaceStage(unsigned width, unsigne
  * @param target The target stage which stores the rendered light inputs. It should be created using
  * CreateLightInputsStage().
  */
-void DoProjectSurface(std::vector<DrawableInstance> const &drawables,
-                      ProjectionInterface const &projection,
+void DoProjectSurface(DrawableCollection *drawable_collection,
+                      PerspectiveProjection const &projection,
                       TextureDescriptorSetCache *tex_desc_set_cache, GeometryVramTransfer *geo_vram,
                       TextureVramTransfer *tex_vram, VulkanContext *context,
                       PipelineStage *first_stage, PipelineStage *target);

@@ -30,8 +30,6 @@
 #include "renderer/postprocessor/depth_projection_visualizer.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/query/collection.h"
-#include "renderer/query/drawable_instance.h"
-#include "renderer/query/query_fn.h"
 #include "renderer/renderer.h"
 #include "renderer/renderer_depth.h"
 #include "renderer/transfer/descriptor_set.h"
@@ -66,7 +64,7 @@ DepthRenderer::DepthRendererImpl::DepthRendererImpl(
       geo_vram(context),
       tex_vram(context),
       depth_projection(CreateProjectDepthStage(context->swap_chain_image_extent.width,
-                                    context->swap_chain_image_extent.height, context)),
+                                               context->swap_chain_image_extent.height, context)),
       visual_representation(std::move(visual_representation)) {}
 
 DepthRenderer::DepthRendererImpl::~DepthRendererImpl() {}
@@ -89,8 +87,8 @@ void DepthRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor)
                    &pimpl_->geo_vram, &pimpl_->tex_vram, context, first_stage,
                    pimpl_->depth_projection.get());
     DoVisualizeDepthProjection(pimpl_->config.depth_renderer_params().alpha(), camera_projection,
-                        pimpl_->depth_projection.get(), &pimpl_->desc_set_alloc, context,
-                        pimpl_->visual_representation.get());
+                               pimpl_->depth_projection.get(), &pimpl_->desc_set_alloc, context,
+                               pimpl_->visual_representation.get());
     PipelineStage *final_stage =
         this->DoFinalStage(first_stage, pimpl_->visual_representation.get());
 

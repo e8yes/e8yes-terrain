@@ -24,7 +24,7 @@
 #include "common/device.h"
 #include "renderer/basic/projection.h"
 #include "renderer/output/pipeline_stage.h"
-#include "renderer/query/light_source.h"
+#include "renderer/query/collection.h"
 #include "renderer/transfer/descriptor_set.h"
 
 namespace e8 {
@@ -34,7 +34,7 @@ namespace e8 {
  * on a map of lighting parameters.
  */
 class DirectIlluminator {
-  public:
+   public:
     /**
      * @brief DirectIlluminator Constructs a direct illuminator with specified resolution.
      *
@@ -50,27 +50,28 @@ class DirectIlluminator {
      * sources on a map of lighting parameters. Note, it doesn't use the lighting parameter stage
      * when there isn't any light.
      *
-     * @param light_sources Light sources to compute direct illumination for.
-     * @param parameter_projection The perspective projection setup which generated the parameter
-     * @param parameter_map Lighting parameters mapped to the screen.
+     * @param drawable_collection Light sources and geometries for which direct illumination needs
+     * to be resolved.
+     * @param surface_projection Lighting parameters projected to the screen.
+     * @param projection The perspective projection setup which generated the surface parameter
      * map.
      * @param first_stage The frame's first stage.
      * @param desc_set_alloc Descriptor set allocator.
      * @return The direct illumination result. Note, the radiance map is cleared to black prior to
      * the direct illumination computation.
      */
-    PipelineStage *
-    DoComputeDirectIllumination(std::vector<LightSourceInstance> const &light_sources,
-                                PerspectiveProjection const &parameter_projection,
-                                PipelineStage *parameter_map, PipelineStage *first_stage,
-                                DescriptorSetAllocator *desc_set_alloc);
+    PipelineStage *DoComputeDirectIllumination(DrawableCollection *drawable_collection,
+                                               PipelineStage *surface_projection,
+                                               PerspectiveProjection const &projection,
+                                               PipelineStage *first_stage,
+                                               DescriptorSetAllocator *desc_set_alloc);
 
-  private:
+   private:
     struct DirectIlluminatorImpl;
 
     std::unique_ptr<DirectIlluminatorImpl> pimpl_;
 };
 
-} // namespace e8
+}  // namespace e8
 
-#endif // ISLANDS_RENDERER_DIRECT_ILLUMINATOR_H
+#endif  // ISLANDS_RENDERER_DIRECT_ILLUMINATOR_H

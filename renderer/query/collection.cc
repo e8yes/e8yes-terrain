@@ -42,4 +42,10 @@ std::vector<DrawableInstance> DrawableCollection::ObservableGeometries(
                        resource_accessor_);
 }
 
+std::vector<LightSourceInstance> DrawableCollection::ObservableLightSources(
+    PerspectiveProjection const& projection) {
+    std::vector<SceneEntity const*> scene_entities = entities_.QueryEntities(QueryAllSceneEntities);
+    return ToLightSources(scene_entities, projection);
+}
+
 }  // namespace e8

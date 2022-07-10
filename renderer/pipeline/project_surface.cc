@@ -40,6 +40,7 @@
 #include "renderer/pass/configurator.h"
 #include "renderer/pass/rasterize.h"
 #include "renderer/pipeline/project_surface.h"
+#include "renderer/query/collection.h"
 #include "renderer/query/drawable_instance.h"
 #include "renderer/transfer/descriptor_set_texture.h"
 #include "renderer/transfer/texture_group.h"
@@ -360,18 +361,25 @@ std::unique_ptr<PipelineStage> CreateProjectSurfaceStage(unsigned width, unsigne
     return std::make_unique<PipelineStage>(output);
 }
 
-void DoProjectSurface(std::vector<DrawableInstance> const &drawables,
-                      ProjectionInterface const &projection,
+void DoProjectSurface(DrawableCollection *drawable_collection,
+                      PerspectiveProjection const &projection,
                       TextureDescriptorSetCache *tex_desc_set_cache, GeometryVramTransfer *geo_vram,
                       TextureVramTransfer *tex_vram, VulkanContext *context,
                       PipelineStage *first_stage, PipelineStage *target) {
+    ResourceLoadingOption loading_option;
+    loading_option.load_geometry = true;
+    loading_option.load_material = true;
+
+    std::vector<DrawableInstance> observable_geometries =
+        drawable_collection->ObservableGeometries(projection, loading_option);
+
     CachedPipelineInterface *pipeline =
         target->WithPipeline(kProjectSurfacePipeline, [context](PipelineOutputInterface *output) {
             return std::make_unique<ProjectSurfacePipeline>(output, context);
         });
 
     auto args = std::make_unique<LightInputsPipelineArgument>(
-        drawables, projection, tex_desc_set_cache, geo_vram, tex_vram);
+        observable_geometries, projection, tex_desc_set_cache, geo_vram, tex_vram);
     target->Schedule(pipeline, std::move(args),
                      /*parents=*/std::vector<PipelineStage *>{first_stage});
 }

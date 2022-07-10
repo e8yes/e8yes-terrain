@@ -24,16 +24,14 @@
 #include "content/scene.h"
 #include "renderer/lighting/direct_illuminator.h"
 #include "renderer/output/pipeline_stage.h"
-#include "renderer/pipeline/project_surface.h"
 #include "renderer/pipeline/fill_color.h"
+#include "renderer/pipeline/project_surface.h"
 #include "renderer/postprocessor/exposure.h"
 #include "renderer/postprocessor/fxaa.h"
 #include "renderer/postprocessor/radiance.h"
 #include "renderer/postprocessor/tone_map.h"
 #include "renderer/proto/renderer.pb.h"
-#include "renderer/query/drawable_instance.h"
-#include "renderer/query/light_source.h"
-#include "renderer/query/query_fn.h"
+#include "renderer/query/collection.h"
 #include "renderer/renderer.h"
 #include "renderer/renderer_radiance.h"
 #include "renderer/transfer/descriptor_set.h"
@@ -66,10 +64,14 @@ struct RadianceRenderer::RadianceRendererImpl {
 
 RadianceRenderer::RadianceRendererImpl::RadianceRendererImpl(
     std::unique_ptr<PipelineStage> &&final_color_image, VulkanContext *context)
-    : context(context), desc_set_alloc(context), tex_desc_set_cache(&desc_set_alloc),
-      geo_vram(context), tex_vram(context),
+    : context(context),
+      desc_set_alloc(context),
+      tex_desc_set_cache(&desc_set_alloc),
+      geo_vram(context),
+      tex_vram(context),
       surface_projection(CreateProjectSurfaceStage(context->swap_chain_image_extent.width,
-                                          context->swap_chain_image_extent.height, context)),
+                                                   context->swap_chain_image_extent.height,
+                                                   context)),
       direct_illuminator(context->swap_chain_image_extent.width,
                          context->swap_chain_image_extent.height, context),
       log_luminance_map(CreateLogLuminaneStage(context->swap_chain_image_extent.width,
@@ -91,31 +93,16 @@ RadianceRenderer::~RadianceRenderer() {}
 void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor) {
     Scene::ReadAccess read_access = scene->GainReadAccess();
 
-    std::vector<SceneEntity const *> scene_entities =
-        scene->SceneEntityStructure()->QueryEntities(QueryAllSceneEntities);
-
-    // Loads drawables to the host memory.
-    ResourceLoadingOption option;
-    option.load_geometry = true;
-    option.load_material = true;
-
-    std::vector<DrawableInstance> drawables =
-        ToDrawables(scene_entities, /*viewer_location=*/ToVec3(scene->camera.position()), option,
-                    resource_accessor);
-
-    // Render passes.
-    PerspectiveProjection camera_projection(scene->camera);
+    PerspectiveProjection projection(scene->camera);
+    DrawableCollection drawable_collection(*scene->SceneEntityStructure(), resource_accessor);
 
     PipelineStage *first_stage = this->DoFirstStage();
 
-    DoProjectSurface(drawables, camera_projection, &pimpl_->tex_desc_set_cache,
-                          &pimpl_->geo_vram, &pimpl_->tex_vram, pimpl_->context, first_stage,
-                          pimpl_->surface_projection.get());
-
-    std::vector<LightSourceInstance> light_sources =
-        ToLightSources(scene_entities, camera_projection);
+    DoProjectSurface(&drawable_collection, projection, &pimpl_->tex_desc_set_cache,
+                     &pimpl_->geo_vram, &pimpl_->tex_vram, pimpl_->context, first_stage,
+                     pimpl_->surface_projection.get());
     PipelineStage *radiance_map = pimpl_->direct_illuminator.DoComputeDirectIllumination(
-        light_sources, camera_projection, pimpl_->surface_projection.get(), first_stage,
+        &drawable_collection, pimpl_->surface_projection.get(), projection, first_stage,
         &pimpl_->desc_set_alloc);
 
     DoEstimateExposure(radiance_map, &pimpl_->desc_set_alloc, pimpl_->context,
@@ -136,4 +123,4 @@ void RadianceRenderer::ApplyConfiguration(RendererConfiguration const &config) {
     pimpl_->config = config;
 }
 
-} // namespace e8
+}  // namespace e8

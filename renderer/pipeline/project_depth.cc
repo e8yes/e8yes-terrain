@@ -44,6 +44,7 @@
 #include "renderer/pass/configurator.h"
 #include "renderer/pass/rasterize.h"
 #include "renderer/pipeline/project_depth.h"
+#include "renderer/query/collection.h"
 #include "renderer/query/drawable_instance.h"
 #include "renderer/transfer/descriptor_set_texture.h"
 #include "renderer/transfer/vram_geometry.h"

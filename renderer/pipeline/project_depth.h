@@ -49,7 +49,8 @@ std::unique_ptr<PipelineStage> CreateProjectDepthStage(unsigned width, unsigned 
  * @brief DoProjectDepth Schedules a graphics pipeline for rendering a depth map (A mapping of the
  * cloest NDC depth value at each projected pixel).
  *
- * @param drawables A collection of drawables to project to screen space to find the nearest depth.
+ * @param drawable_collection A collection of drawables to project to screen space to find the
+ * nearest depth.
  * @param projection Defines how drawables should be projected to the depth map.
  * @param tex_desc_set_cache Texture descriptor cache.
  * @param geo_vram The geometry VRAM transferer.
@@ -59,7 +60,8 @@ std::unique_ptr<PipelineStage> CreateProjectDepthStage(unsigned width, unsigned 
  * @param target The target stage which stores the rendered depth map. It should be created using
  * CreateDepthMapStage().
  */
-void DoProjectDepth(DrawableCollection *drawables, PerspectiveProjection const &projection,
+void DoProjectDepth(DrawableCollection *drawable_collection,
+                    PerspectiveProjection const &projection,
                     TextureDescriptorSetCache *tex_desc_set_cache, GeometryVramTransfer *geo_vram,
                     TextureVramTransfer *tex_vram, VulkanContext *context,
                     PipelineStage *first_stage, PipelineStage *target);
