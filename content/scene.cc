@@ -137,11 +137,7 @@ Scene::ReadAccess::~ReadAccess() {
     }
 }
 
-Scene::WriteAccess::WriteAccess(std::shared_mutex *mu, SceneEntityStructureInterface *structure)
-    : mu_(mu) {
-    mu_->lock();
-    structure->InvalidateQueryCache();
-}
+Scene::WriteAccess::WriteAccess(std::shared_mutex *mu) : mu_(mu) { mu_->lock(); }
 
 Scene::WriteAccess::WriteAccess(WriteAccess &&other) {
     mu_ = other.mu_;
@@ -200,7 +196,7 @@ void Scene::CreateSceneEntityStructure() {
 
 Scene::ReadAccess Scene::GainReadAccess() { return ReadAccess(&mu_); }
 
-Scene::WriteAccess Scene::GainWriteAccess() { return WriteAccess(&mu_, entity_structure_.get()); }
+Scene::WriteAccess Scene::GainWriteAccess() { return WriteAccess(&mu_); }
 
 SceneEntityStructureInterface *Scene::SceneEntityStructure() { return entity_structure_.get(); }
 

@@ -65,7 +65,7 @@ class Scene {
      */
     class WriteAccess {
        public:
-        WriteAccess(std::shared_mutex *mu, SceneEntityStructureInterface *structure);
+        WriteAccess(std::shared_mutex *mu);
         WriteAccess(WriteAccess &&other);
         WriteAccess(WriteAccess const &) = delete;
         ~WriteAccess();

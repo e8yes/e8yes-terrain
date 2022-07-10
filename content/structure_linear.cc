@@ -45,7 +45,7 @@ void LinearSceneEntityStructure::Update(SceneEntity const * /*entity*/) {}
 
 void LinearSceneEntityStructure::Optimize() {}
 
-std::vector<SceneEntity const *> LinearSceneEntityStructure::QueryEntities(QueryFn query_fn) {
+std::vector<SceneEntity const *> LinearSceneEntityStructure::QueryEntities(QueryFn query_fn) const {
     std::vector<SceneEntity const *> result;
 
     for (auto const &entity : entities_) {
@@ -56,7 +56,5 @@ std::vector<SceneEntity const *> LinearSceneEntityStructure::QueryEntities(Query
 
     return result;
 }
-
-void LinearSceneEntityStructure::InvalidateQueryCache() {}
 
 }  // namespace e8
