@@ -32,31 +32,33 @@ namespace e8 {
  * @brief The DrawableCollection class A logical collection of all drawables.
  */
 class DrawableCollection {
-   public:
-    DrawableCollection(SceneEntityStructureInterface const& entities,
-                       ResourceAccessor* resource_accessor);
+  public:
+    DrawableCollection(SceneEntityStructureInterface const &entities,
+                       ResourceAccessor *resource_accessor);
     ~DrawableCollection();
 
     /**
      * @brief ObservableGeometries Returns a list of geometry drawables that can be observed in the
-     * given perspective projection.
+     * given perspective projection. TODO: Returns a cached reference instead of copyiny the query
+     * result to a new array.
      */
-    std::vector<DrawableInstance> ObservableGeometries(
-        PerspectiveProjection const& projection,
-        ResourceLoadingOption const& loading_option = ResourceLoadingOption());
+    std::vector<DrawableInstance>
+    ObservableGeometries(PerspectiveProjection const &projection,
+                         ResourceLoadingOption const &loading_option = ResourceLoadingOption());
 
     /**
      * @brief ObservableLightSources Returns a list of light sources that affect the observable
-     * geometries. Light sources are transformed to the view space defined by the projection.
+     * geometries. Light sources are transformed to the view space defined by the projection. TODO:
+     * Returns a cached reference instead of copyiny the query result to a new array.
      */
-    std::vector<LightSourceInstance> ObservableLightSources(
-        PerspectiveProjection const& projection);
+    std::vector<LightSourceInstance>
+    ObservableLightSources(PerspectiveProjection const &projection);
 
-   private:
-    SceneEntityStructureInterface const& entities_;
-    ResourceAccessor* resource_accessor_;
+  private:
+    SceneEntityStructureInterface const &entities_;
+    ResourceAccessor *resource_accessor_;
 };
 
-}  // namespace e8
+} // namespace e8
 
-#endif  // ISLANDS_RENDERER_QUERY_COLLECTION_H
+#endif // ISLANDS_RENDERER_QUERY_COLLECTION_H

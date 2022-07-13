@@ -15,13 +15,13 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vulkan/vulkan.h>
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <vector>
+#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "renderer/basic/attachment.h"
@@ -54,7 +54,7 @@ PipelineKey const kProjectSurfacePipeline = "Project Surface Parameters";
  * the geometry data as well as a 32-bit depth output.
  */
 class ProjectSurfacePipelineOutput : public PipelineOutputInterface {
-   public:
+  public:
     /**
      * @brief ProjectSurfacePipelineOutput Constructs surface parameter projection output with the
      * specified dimension.
@@ -71,7 +71,7 @@ class ProjectSurfacePipelineOutput : public PipelineOutputInterface {
     std::vector<FrameBufferAttachment const *> ColorAttachments() const override;
     FrameBufferAttachment const *DepthAttachment() const override;
 
-   private:
+  private:
     struct LightInputsPipelineOutputImpl;
     std::unique_ptr<LightInputsPipelineOutputImpl> pimpl_;
 };
@@ -215,7 +215,7 @@ std::vector<VkDescriptorSetLayoutBinding> DescriptorSetBindings() {
  * variables.
  */
 class RenderPassConfigurator : public RenderPassConfiguratorInterface {
-   public:
+  public:
     RenderPassConfigurator(ProjectionInterface const &projection,
                            ImageSampler const &texture_sampler);
     ~RenderPassConfigurator();
@@ -224,7 +224,7 @@ class RenderPassConfigurator : public RenderPassConfiguratorInterface {
     std::vector<uint8_t> PushConstantOf(DrawableInstance const &drawable) const override;
     TextureSelector TexturesOf(DrawableInstance const &drawable) const override;
 
-   private:
+  private:
     ProjectionInterface const &projection_;
     ImageSampler const &texture_sampler_;
 };
@@ -239,8 +239,8 @@ bool RenderPassConfigurator::IncludeDrawable(DrawableInstance const &drawable) c
     return drawable.material != nullptr;
 }
 
-std::vector<uint8_t> RenderPassConfigurator::PushConstantOf(
-    DrawableInstance const &drawable) const {
+std::vector<uint8_t>
+RenderPassConfigurator::PushConstantOf(DrawableInstance const &drawable) const {
     std::vector<uint8_t> bytes(sizeof(PushConstants));
 
     PushConstants *push_constants = reinterpret_cast<PushConstants *>(bytes.data());
@@ -280,7 +280,7 @@ struct LightInputsPipelineArgument : public CachedPipelineArgumentsInterface {
                                 TransferContext *transfer_context)
         : drawables(drawables), projection(projection), transfer_context(transfer_context) {}
 
-    std::vector<DrawableInstance> const &drawables;
+    std::vector<DrawableInstance> drawables;
     ProjectionInterface const &projection;
     TransferContext *transfer_context;
 };
@@ -289,7 +289,7 @@ struct LightInputsPipelineArgument : public CachedPipelineArgumentsInterface {
  * @brief The ProjectSurfacePipeline class For mapping the lighting parameters onto screen.
  */
 class ProjectSurfacePipeline : public CachedPipelineInterface {
-   public:
+  public:
     ProjectSurfacePipeline(PipelineOutputInterface *output, VulkanContext *context);
     ~ProjectSurfacePipeline() override;
 
@@ -343,7 +343,7 @@ Fulfillment ProjectSurfacePipeline::Launch(CachedPipelineArgumentsInterface cons
     return FinishRenderPass(cmds, completion_signal_count, prerequisites, context_);
 }
 
-}  // namespace
+} // namespace
 
 std::unique_ptr<PipelineStage> CreateProjectSurfaceStage(unsigned width, unsigned height,
                                                          VulkanContext *context) {
@@ -373,4 +373,4 @@ void DoProjectSurface(DrawableCollection *drawable_collection,
                      /*parents=*/std::vector<PipelineStage *>{first_stage});
 }
 
-}  // namespace e8
+} // namespace e8

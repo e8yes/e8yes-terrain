@@ -15,7 +15,6 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vulkan/vulkan.h>
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
@@ -23,6 +22,7 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "common/tensor.h"
@@ -61,7 +61,7 @@ PipelineKey kProjectDepthPipeline = "Project Depth";
  * values are stored in 32-bit floats.
  */
 class ProjectDepthPipelineOutput : public PipelineOutputInterface {
-   public:
+  public:
     /**
      * @brief ProjectDepthPipelineOutput Constructs a depth map output with the specified dimension.
      *
@@ -77,7 +77,7 @@ class ProjectDepthPipelineOutput : public PipelineOutputInterface {
     std::vector<FrameBufferAttachment const *> ColorAttachments() const override;
     FrameBufferAttachment const *DepthAttachment() const override;
 
-   private:
+  private:
     struct DepthMapPipelineOutputImpl;
     std::unique_ptr<DepthMapPipelineOutputImpl> pimpl_;
 };
@@ -150,13 +150,13 @@ std::vector<VkVertexInputAttributeDescription> VertexShaderInputAttributes() {
 }
 
 class RenderPassConfigurator : public RenderPassConfiguratorInterface {
-   public:
+  public:
     RenderPassConfigurator(ProjectionInterface const &projection);
     ~RenderPassConfigurator();
 
     std::vector<uint8_t> PushConstantOf(DrawableInstance const &drawable) const override;
 
-   private:
+  private:
     ProjectionInterface const &projection_;
 };
 
@@ -165,8 +165,8 @@ RenderPassConfigurator::RenderPassConfigurator(ProjectionInterface const &projec
 
 RenderPassConfigurator::~RenderPassConfigurator() {}
 
-std::vector<uint8_t> RenderPassConfigurator::PushConstantOf(
-    DrawableInstance const &drawable) const {
+std::vector<uint8_t>
+RenderPassConfigurator::PushConstantOf(DrawableInstance const &drawable) const {
     std::vector<uint8_t> bytes(sizeof(PushConstant));
 
     PushConstant *push_constant = reinterpret_cast<PushConstant *>(bytes.data());
@@ -182,13 +182,13 @@ struct ProjectDepthPipelineArguments : public CachedPipelineArgumentsInterface {
                                   TransferContext *transfer_context)
         : drawables(drawables), projection(projection), transfer_context(transfer_context) {}
 
-    std::vector<DrawableInstance> const &drawables;
+    std::vector<DrawableInstance> drawables;
     ProjectionInterface const &projection;
     TransferContext *transfer_context;
 };
 
 class ProjectDepthPipeline : public CachedPipelineInterface {
-   public:
+  public:
     ProjectDepthPipeline(ProjectDepthPipelineOutput *output, VulkanContext *context);
     ~ProjectDepthPipeline() override;
 
@@ -239,7 +239,7 @@ Fulfillment ProjectDepthPipeline::Launch(CachedPipelineArgumentsInterface const 
     return FinishRenderPass(cmds, completion_signal_count, prerequisites, context_);
 }
 
-}  // namespace
+} // namespace
 
 std::unique_ptr<PipelineStage> CreateProjectDepthStage(unsigned width, unsigned height,
                                                        VulkanContext *context) {
@@ -269,4 +269,4 @@ void DoProjectDepth(DrawableCollection *drawables, PerspectiveProjection const &
                      /*parents=*/std::vector<PipelineStage *>{first_stage});
 }
 
-}  // namespace e8
+} // namespace e8

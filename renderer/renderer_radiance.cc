@@ -86,6 +86,7 @@ void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_access
     PerspectiveProjection projection(scene->camera);
     DrawableCollection drawable_collection(*scene->SceneEntityStructure(), resource_accessor);
 
+    // Render passes.
     PipelineStage *first_stage = this->DoFirstStage();
 
     DoProjectSurface(&drawable_collection, projection, &pimpl_->transfer_context, first_stage,
@@ -111,4 +112,4 @@ void RadianceRenderer::ApplyConfiguration(RendererConfiguration const &config) {
     pimpl_->config = config;
 }
 
-}  // namespace e8
+} // namespace e8
