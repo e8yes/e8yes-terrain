@@ -18,11 +18,11 @@
 #ifndef ISLANDS_RENDERER_SHADER_H
 #define ISLANDS_RENDERER_SHADER_H
 
+#include <vulkan/vulkan.h>
 #include <memory>
 #include <optional>
 #include <string>
 #include <vector>
-#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 
@@ -33,6 +33,8 @@ constexpr char const *kVertexShaderFilePathDepthMap = "./depth.vert.spv";
 constexpr char const *kVertexShaderFilePathLightInputs = "./light_inputs.vert.spv";
 constexpr char const *kVertexShaderFilePathPostProcessor = "./post_processor.vert.spv";
 
+constexpr char const *kFragmentShaderFilePathDepthMapLinearizerPerspective =
+    "./depth_linearizer_perspective.frag.spv";
 constexpr char const *kFragmentShaderFilePathDepthMapVisualizer = "./depth_visualizer.frag.spv";
 constexpr char const *kFragmentShaderFilePathFxaa = "./fxaa.frag.spv";
 constexpr char const *kFragmentShaderFilePathHdrAces = "./hdr_aces.frag.spv";
@@ -80,11 +82,10 @@ struct ShaderStages {
  * @param context Contextual Vulkan handles.
  * @return A valid unique pointer to the ShaderStages structure.
  */
-std::unique_ptr<ShaderStages>
-CreateShaderStages(std::string const &vertex_shader_file_path,
-                   std::optional<std::string> const &fragment_shader_file_path,
-                   VulkanContext *context);
+std::unique_ptr<ShaderStages> CreateShaderStages(
+    std::string const &vertex_shader_file_path,
+    std::optional<std::string> const &fragment_shader_file_path, VulkanContext *context);
 
-} // namespace e8
+}  // namespace e8
 
-#endif // ISLANDS_RENDERER_SHADER_H
+#endif  // ISLANDS_RENDERER_SHADER_H
