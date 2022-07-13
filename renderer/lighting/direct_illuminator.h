@@ -52,7 +52,7 @@ class DirectIlluminator {
      *
      * @param drawable_collection Light sources and geometries for which direct illumination needs
      * to be resolved.
-     * @param surface_projection Lighting parameters projected to the screen.
+     * @param projected_surface Lighting parameters projected to the screen.
      * @param projection The perspective projection setup which generated the surface parameter
      * map.
      * @param first_stage The frame's first stage.
@@ -61,7 +61,7 @@ class DirectIlluminator {
      * the direct illumination computation.
      */
     PipelineStage *DoComputeDirectIllumination(DrawableCollection *drawable_collection,
-                                               PipelineStage *surface_projection,
+                                               PipelineStage *projected_surface,
                                                PerspectiveProjection const &projection,
                                                PipelineStage *first_stage,
                                                TransferContext *transfer_context);

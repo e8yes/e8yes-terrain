@@ -65,11 +65,13 @@ struct PointLightRegion {
  * @brief The SpotLightRegion struct
  */
 struct SpotLightRegion {
+    SpotLightRegion(LightSourceLod lod, PerspectiveProjection projection);
+
     // Details level that should be used on the spot light.
     LightSourceLod lod;
 
     // The region which encloses the spot light's direct illumination.
-    frustum f;
+    PerspectiveProjection projection;
 };
 
 /**

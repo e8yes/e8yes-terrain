@@ -51,6 +51,7 @@ SOURCES += \
     postprocessor/depth_projection_visualizer.cc \
     postprocessor/exposure.cc \
     postprocessor/fxaa.cc \
+    postprocessor/gaussian_blur.cc \
     postprocessor/post_processor.cc \
     postprocessor/radiance.cc \
     postprocessor/surface_projection_visualizer.cc \
@@ -100,6 +101,7 @@ HEADERS += \
     postprocessor/depth_projection_visualizer.h \
     postprocessor/exposure.h \
     postprocessor/fxaa.h \
+    postprocessor/gaussian_blur.h \
     postprocessor/post_processor.h \
     postprocessor/radiance.h \
     postprocessor/surface_projection_visualizer.h \
@@ -158,3 +160,6 @@ unix {
     target.path = /usr/lib
 }
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    shader/depth_linearizer_perspective.frag
