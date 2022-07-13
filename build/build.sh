@@ -16,13 +16,14 @@ protoc --cpp_out=../renderer/proto \
        `find ../renderer/proto -name "*.proto"`
 
 # Shader code compilation.
-find ../renderer/shader -type f -name *.vert -exec glslc {} -o {}.spv \;
-find ../renderer/shader -type f -name *.frag -exec glslc {} -o {}.spv \;
+find ../renderer/shader -type f -name "*.vert" -exec glslc {} -o {}.spv \;
+find ../renderer/shader -type f -name "*.frag" -exec glslc {} -o {}.spv \;
 mv ../renderer/shader/*.spv ./bin
 
 # C++ code compilation.
 qmake ../e8islands.pro
-make -j `nproc`
+make
 
-find . -name *.so* -not -path "./bin/*" -exec cp -P {} bin/ \;
-find . -type f -executable -not -path "./bin/*" -name *main -exec cp -f {} bin/ \;
+find . -name "*.so*" -not -path "./bin/*" -exec cp -P {} bin/ \;
+find . -name "*.dylib*" -not -path "./bin/*" -exec cp -P {} bin/ \;
+find . -type f -not -path "./bin/*" -name "*main" -exec cp -f {} bin/ \;
