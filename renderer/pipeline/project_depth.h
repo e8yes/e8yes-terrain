@@ -45,19 +45,22 @@ std::unique_ptr<PipelineStage> CreateProjectDepthStage(unsigned width, unsigned 
 
 /**
  * @brief DoProjectDepth Schedules a graphics pipeline for rendering a depth map (A mapping of the
- * cloest NDC depth value at each projected pixel).
+ * cloest NDC and linear (optional) depth value at each projected pixel).
  *
  * @param drawable_collection A collection of drawables to project to screen space to find the
  * nearest depth.
  * @param projection Defines how drawables should be projected to the depth map.
  * @param transfer_context Transfer context.
  * @param first_stage The frame's first stage.
- * @param target The target stage which stores the rendered depth map. It should be created using
- * CreateDepthMapStage().
+ * @param projected_ndc_depth The target stage which stores the rendered NDC depth map. It should be
+ * created using CreateDepthMapStage().
+ * @param projected_linear_depth Optional. The target stage which stores the rendered linear depth
+ * map. It should be created using CreateDepthMapStage().
  */
 void DoProjectDepth(DrawableCollection *drawable_collection,
                     PerspectiveProjection const &projection, TransferContext *transfer_context,
-                    PipelineStage *first_stage, PipelineStage *target);
+                    PipelineStage *first_stage, PipelineStage *projected_ndc_depth,
+                    PipelineStage *projected_linear_depth = nullptr);
 
 }  // namespace e8
 

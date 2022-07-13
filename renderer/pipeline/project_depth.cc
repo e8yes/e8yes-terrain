@@ -15,6 +15,7 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vulkan/vulkan.h>
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
@@ -22,7 +23,6 @@
 #include <memory>
 #include <utility>
 #include <vector>
-#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "common/tensor.h"
@@ -44,6 +44,7 @@
 #include "renderer/pass/configurator.h"
 #include "renderer/pass/rasterize.h"
 #include "renderer/pipeline/project_depth.h"
+#include "renderer/postprocessor/post_processor.h"
 #include "renderer/query/collection.h"
 #include "renderer/query/drawable_instance.h"
 #include "renderer/transfer/descriptor_set_texture.h"
@@ -54,14 +55,15 @@
 namespace e8 {
 namespace {
 
-PipelineKey kProjectDepthPipeline = "Project Depth";
+PipelineKey const kProjectDepthPipeline = "Project Depth";
+PipelineKey const kLinearizeDepthPipeline = "Linearize Depth";
 
 /**
  * @brief The ProjectDepthPipelineOutput class For storing, depth-only rendering output. The depth
  * values are stored in 32-bit floats.
  */
 class ProjectDepthPipelineOutput : public PipelineOutputInterface {
-  public:
+   public:
     /**
      * @brief ProjectDepthPipelineOutput Constructs a depth map output with the specified dimension.
      *
@@ -77,7 +79,7 @@ class ProjectDepthPipelineOutput : public PipelineOutputInterface {
     std::vector<FrameBufferAttachment const *> ColorAttachments() const override;
     FrameBufferAttachment const *DepthAttachment() const override;
 
-  private:
+   private:
     struct DepthMapPipelineOutputImpl;
     std::unique_ptr<DepthMapPipelineOutputImpl> pimpl_;
 };
@@ -150,13 +152,13 @@ std::vector<VkVertexInputAttributeDescription> VertexShaderInputAttributes() {
 }
 
 class RenderPassConfigurator : public RenderPassConfiguratorInterface {
-  public:
+   public:
     RenderPassConfigurator(ProjectionInterface const &projection);
     ~RenderPassConfigurator();
 
     std::vector<uint8_t> PushConstantOf(DrawableInstance const &drawable) const override;
 
-  private:
+   private:
     ProjectionInterface const &projection_;
 };
 
@@ -165,8 +167,8 @@ RenderPassConfigurator::RenderPassConfigurator(ProjectionInterface const &projec
 
 RenderPassConfigurator::~RenderPassConfigurator() {}
 
-std::vector<uint8_t>
-RenderPassConfigurator::PushConstantOf(DrawableInstance const &drawable) const {
+std::vector<uint8_t> RenderPassConfigurator::PushConstantOf(
+    DrawableInstance const &drawable) const {
     std::vector<uint8_t> bytes(sizeof(PushConstant));
 
     PushConstant *push_constant = reinterpret_cast<PushConstant *>(bytes.data());
@@ -188,7 +190,7 @@ struct ProjectDepthPipelineArguments : public CachedPipelineArgumentsInterface {
 };
 
 class ProjectDepthPipeline : public CachedPipelineInterface {
-  public:
+   public:
     ProjectDepthPipeline(ProjectDepthPipelineOutput *output, VulkanContext *context);
     ~ProjectDepthPipeline() override;
 
@@ -239,7 +241,44 @@ Fulfillment ProjectDepthPipeline::Launch(CachedPipelineArgumentsInterface const 
     return FinishRenderPass(cmds, completion_signal_count, prerequisites, context_);
 }
 
-} // namespace
+struct LinearizeDepthPipelineParameters {
+    float z_near;
+    float z_far;
+};
+
+class LinearizeDepthPipelineConfigurator : public PostProcessorConfiguratorInterface {
+   public:
+    LinearizeDepthPipelineConfigurator(PerspectiveProjection const &projection,
+                                       PipelineOutputInterface const &depth_map);
+    ~LinearizeDepthPipelineConfigurator();
+
+    void InputImages(std::vector<VkImageView> *input_images) const override;
+    void PushConstants(std::vector<uint8_t> *push_constants) const override;
+
+   private:
+    PerspectiveProjection const projection_;
+    PipelineOutputInterface const &depth_map_;
+};
+
+LinearizeDepthPipelineConfigurator::LinearizeDepthPipelineConfigurator(
+    PerspectiveProjection const &projection, PipelineOutputInterface const &depth_map)
+    : projection_(projection), depth_map_(depth_map) {}
+
+LinearizeDepthPipelineConfigurator::~LinearizeDepthPipelineConfigurator() {}
+
+void LinearizeDepthPipelineConfigurator::InputImages(std::vector<VkImageView> *input_images) const {
+    input_images->at(0) = depth_map_.DepthAttachment()->view;
+}
+
+void LinearizeDepthPipelineConfigurator::PushConstants(std::vector<uint8_t> *push_constants) const {
+    LinearizeDepthPipelineParameters *parameters =
+        reinterpret_cast<LinearizeDepthPipelineParameters *>(push_constants->data());
+
+    parameters->z_near = projection_.Frustum().z_near;
+    parameters->z_far = projection_.Frustum().z_far;
+}
+
+}  // namespace
 
 std::unique_ptr<PipelineStage> CreateProjectDepthStage(unsigned width, unsigned height,
                                                        VulkanContext *context) {
@@ -249,14 +288,14 @@ std::unique_ptr<PipelineStage> CreateProjectDepthStage(unsigned width, unsigned 
 
 void DoProjectDepth(DrawableCollection *drawables, PerspectiveProjection const &projection,
                     TransferContext *transfer_context, PipelineStage *first_stage,
-                    PipelineStage *target) {
+                    PipelineStage *projected_ndc_depth, PipelineStage *projected_linear_depth) {
     ResourceLoadingOption loading_option;
     loading_option.load_geometry = true;
 
     std::vector<DrawableInstance> observable_geometries =
         drawables->ObservableGeometries(projection, loading_option);
 
-    CachedPipelineInterface *pipeline = target->WithPipeline(
+    CachedPipelineInterface *project_depth_pipeline = projected_ndc_depth->WithPipeline(
         kProjectDepthPipeline, [transfer_context](PipelineOutputInterface *output) {
             return std::make_unique<ProjectDepthPipeline>(
                 dynamic_cast<ProjectDepthPipelineOutput *>(output),
@@ -265,8 +304,26 @@ void DoProjectDepth(DrawableCollection *drawables, PerspectiveProjection const &
 
     auto args = std::make_unique<ProjectDepthPipelineArguments>(observable_geometries, projection,
                                                                 transfer_context);
-    target->Schedule(pipeline, std::move(args),
-                     /*parents=*/std::vector<PipelineStage *>{first_stage});
+    projected_ndc_depth->Schedule(project_depth_pipeline, std::move(args),
+                                  /*parents=*/std::vector<PipelineStage *>{first_stage});
+
+    if (projected_linear_depth == nullptr) {
+        return;
+    }
+
+    CachedPipelineInterface *linearize_depth_pipeline = projected_linear_depth->WithPipeline(
+        kLinearizeDepthPipeline, [transfer_context](PipelineOutputInterface *linear_depth_output) {
+            return std::make_unique<PostProcessorPipeline>(
+                kLinearizeDepthPipeline, kFragmentShaderFilePathDepthMapLinearizerPerspective,
+                /*input_image_count=*/1,
+                /*push_constant_size=*/sizeof(LinearizeDepthPipelineParameters),
+                linear_depth_output, transfer_context);
+        });
+
+    auto configurator = std::make_unique<LinearizeDepthPipelineConfigurator>(
+        projection, *projected_ndc_depth->Output());
+    projected_linear_depth->Schedule(linearize_depth_pipeline, std::move(configurator),
+                                     /*parents=*/std::vector<PipelineStage *>{projected_ndc_depth});
 }
 
-} // namespace e8
+}  // namespace e8
