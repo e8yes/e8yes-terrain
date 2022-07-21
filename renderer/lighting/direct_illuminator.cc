@@ -49,7 +49,7 @@ struct ShadowMapCollection {
 };
 
 class ShadowMapCache {
-   public:
+  public:
     ShadowMapCache();
     ~ShadowMapCache();
 
@@ -57,7 +57,7 @@ class ShadowMapCache {
     ShadowMapCollection *Allocate(LightSourceInstance const &light_source);
     std::vector<PipelineStage *> Fetch(SceneEntityId light_id) const;
 
-   private:
+  private:
     std::unordered_map<SceneEntityId, std::unique_ptr<ShadowMapCollection>> shadow_maps_;
 };
 
@@ -110,7 +110,7 @@ std::vector<PipelineStage *> ShadowMapCache::Fetch(SceneEntityId light_id) const
     return result;
 }
 
-void DoGenerateSpotLightShadowMap(SpotLightRegion const &spot_light_region,
+void DoGenerateSpotLightShadowMap(SpotLightVolume const &spot_light_region,
                                   DrawableCollection *drawable_collection,
                                   PipelineStage *first_stage, TransferContext *transfer_context,
                                   ShadowMapCollection *shadow_maps) {
@@ -153,16 +153,17 @@ void DoGenerateShadowMaps(std::vector<LightSourceInstance> const &light_sources,
             continue;
         }
 
-        if (light_source.spot_light_region.has_value()) {
-            DoGenerateSpotLightShadowMap(*light_source.spot_light_region, drawable_collection,
-                                         first_stage, transfer_context, allocated_shadow_maps);
+        if (light_source.light_volume.spot_light_region.has_value()) {
+            DoGenerateSpotLightShadowMap(*light_source.light_volume.spot_light_region,
+                                         drawable_collection, first_stage, transfer_context,
+                                         allocated_shadow_maps);
         } else {
             // TODO: Generates shadow map for point lights and sun lights.
         }
     }
 }
 
-}  // namespace
+} // namespace
 
 struct DirectIlluminator::DirectIlluminatorImpl {
     DirectIlluminatorImpl(unsigned width, unsigned height, VulkanContext *context);
@@ -216,4 +217,4 @@ PipelineStage *DirectIlluminator::DoComputeDirectIllumination(
     return pimpl_->filled_radiance_map.get();
 }
 
-}  // namespace e8
+} // namespace e8
