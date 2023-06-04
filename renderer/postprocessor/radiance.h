@@ -35,9 +35,9 @@ namespace e8 {
  * @param projected_surface Lighting parameters mapped to the screen.
  * @param projection The frustum in which the light inputs are rendered.
  * @param shadow_maps Optional. An array of exponentiated depth maps rendered from the light
- * source's perspective. Each depth map corresponds to one of the light source's region. When it is
- * specified, this function computes the radiance the occlusion factor. Otherwise, the radiance
- * penetrates all objects.
+ * source's perspective. Each depth map corresponds to one of the light source's region
+ * (see LightVolume). When it is specified, this function computes the radiance based on the
+ * occlusion factor. Otherwise, the radiance penetrates all objects.
  * @param cleared_radiance_map A zeroed-out radiance map.
  * @param transfer_context Transfer context.
  * @param target The target stage which stores the radiance map in an HDR color image.
@@ -47,6 +47,6 @@ void DoComputeRadiance(LightSourceInstance const &instance, PipelineStage *proje
                        PipelineStage *cleared_radiance_map, TransferContext *transfer_context,
                        PipelineStage *target);
 
-}  // namespace e8
+} // namespace e8
 
-#endif  // ISLANDS_RENDERER_RADIANCE_PIPELINE_H
+#endif // ISLANDS_RENDERER_RADIANCE_PIPELINE_H
