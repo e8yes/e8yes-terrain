@@ -30,7 +30,6 @@
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
-#include "content/scene.h"
 #include "renderer/output/cached_pipeline.h"
 #include "renderer/output/common_output.h"
 #include "renderer/output/pipeline_stage.h"
@@ -38,9 +37,9 @@
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/renderer.h"
 #include "renderer/renderer_depth.h"
-#include "renderer/renderer_surface_projection.h"
 #include "renderer/renderer_radiance.h"
 #include "renderer/renderer_solid_color.h"
+#include "renderer/renderer_surface_projection.h"
 
 namespace e8 {
 namespace {
@@ -65,13 +64,10 @@ class AcquireImagePipeline : public CachedPipelineInterface {
     Fulfillment Launch(CachedPipelineArgumentsInterface const &generic_args,
                        std::vector<GpuPromise *> const &prerequisites,
                        unsigned completion_signal_count, PipelineOutputInterface *output) override;
-
-  private:
-    GpuPromise acquire_image_promise_;
 };
 
 AcquireImagePipeline::AcquireImagePipeline(VulkanContext *context)
-    : CachedPipelineInterface(context), acquire_image_promise_(context) {}
+    : CachedPipelineInterface(context) {}
 
 AcquireImagePipeline::~AcquireImagePipeline() {}
 
@@ -85,11 +81,14 @@ Fulfillment AcquireImagePipeline::Launch(CachedPipelineArgumentsInterface const 
     assert(output != nullptr);
 
     // Waits for v-sync.
+    auto acquisition_signal = std::make_unique<CpuPromise>(context_);
     unsigned swap_chain_image_index;
     assert(VK_SUCCESS == vkAcquireNextImageKHR(context_->device, context_->swap_chain,
                                                /*timeout=*/std::numeric_limits<uint64_t>::max(),
-                                               acquire_image_promise_.signal,
-                                               /*fence=*/nullptr, &swap_chain_image_index));
+                                               /*semaphore=*/VK_NULL_HANDLE,
+                                               /*fence=*/acquisition_signal->signal,
+                                               &swap_chain_image_index));
+    acquisition_signal->Wait();
     static_cast<SwapChainPipelineOutput *>(output)->SetSwapChainImageIndex(swap_chain_image_index);
 
     // Dispatches signals to all child stages.
@@ -104,10 +103,6 @@ Fulfillment AcquireImagePipeline::Launch(CachedPipelineArgumentsInterface const 
 
     VkSubmitInfo submit{};
     submit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT;
-    submit.pWaitDstStageMask = &wait_stage;
-    submit.pWaitSemaphores = &acquire_image_promise_.signal;
-    submit.waitSemaphoreCount = 1;
     submit.pSignalSemaphores = signals.data();
     submit.signalSemaphoreCount = signals.size();
 
