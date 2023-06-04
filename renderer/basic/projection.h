@@ -28,9 +28,9 @@ namespace e8 {
  * terms of homogeneous transformations.
  */
 class ProjectionInterface {
-   public:
+  public:
     ProjectionInterface();
-    ~ProjectionInterface();
+    virtual ~ProjectionInterface();
 
     /**
      * @brief ViewTransform Transforms world space coordinates to view space coordinates, where they
@@ -50,7 +50,7 @@ class ProjectionInterface {
  * transform of a perspective projection.
  */
 class PerspectiveProjection : public ProjectionInterface {
-   public:
+  public:
     /**
      * @brief PerspectiveProjection Constructs a perspective projection by specifying geometry
      * parameters of the projection frustum.
@@ -89,11 +89,11 @@ class PerspectiveProjection : public ProjectionInterface {
      */
     frustum const &Frustum() const;
 
-   private:
+  private:
     frustum frustum_;
     mat44 view_transform_;
 };
 
-}  // namespace e8
+} // namespace e8
 
-#endif  // ISLANDS_RENDERER_PROJECTION_H
+#endif // ISLANDS_RENDERER_PROJECTION_H
