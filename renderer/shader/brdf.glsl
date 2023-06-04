@@ -15,6 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef BRDF_GLSL
+#define BRDF_GLSL
 
 const float M_PI = 3.1415926535897932384626433832795;
 const float INV_M_PI = 1.0f/M_PI;
@@ -71,3 +73,5 @@ vec3 FresnelMix(vec3 r0, float cos_h_i, vec3 diffuse, float specular) {
     vec3 f = SchlickFresnel(r0, cos_h_i);
     return mix(diffuse, vec3(specular), f);
 }
+
+#endif // BRDF_GLSL
