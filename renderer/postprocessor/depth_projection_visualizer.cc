@@ -15,10 +15,10 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vulkan/vulkan.h>
 #include <memory>
 #include <optional>
 #include <vector>
+#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "renderer/basic/shader.h"
@@ -41,7 +41,7 @@ struct DepthProjectionVisualizerParameters {
 };
 
 class DepthProjectionPostProcessorConfigurator : public PostProcessorConfiguratorInterface {
-   public:
+  public:
     DepthProjectionPostProcessorConfigurator(float alpha,
                                              std::optional<PerspectiveProjection> projection,
                                              PipelineOutputInterface const &depth_map);
@@ -50,7 +50,7 @@ class DepthProjectionPostProcessorConfigurator : public PostProcessorConfigurato
     void InputImages(std::vector<VkImageView> *input_images) const override;
     void PushConstants(std::vector<uint8_t> *push_constants) const override;
 
-   private:
+  private:
     float const alpha_;
     std::optional<PerspectiveProjection> const projection_;
     PipelineOutputInterface const &depth_map_;
@@ -84,7 +84,7 @@ void DepthProjectionPostProcessorConfigurator::PushConstants(
     }
 }
 
-}  // namespace
+} // namespace
 
 void DoVisualizeDepthProjection(float alpha, std::optional<PerspectiveProjection> projection,
                                 PipelineStage *depth_map_stage, TransferContext *transfer_context,
@@ -104,4 +104,4 @@ void DoVisualizeDepthProjection(float alpha, std::optional<PerspectiveProjection
                      /*parents=*/std::vector<PipelineStage *>{depth_map_stage});
 }
 
-}  // namespace e8
+} // namespace e8

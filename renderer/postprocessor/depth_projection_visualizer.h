@@ -28,14 +28,15 @@
 namespace e8 {
 
 /**
- * @brief DoVisualizeDepthProjection Schedules a post processing graphics pipeline for visualizing a
+ * @brief DoVisualizeDepthProjection Schedules a post processing graphics pipeline to visualize a
  * rendered depth map.
  *
  * @param alpha When alpha is zero, the depth map is visualized using the raw NDC value. When it is
  * set to one, the value is corrected to display the true depth.
  * @param projection The projection used to create the depth map. If alpha is non-zero, this
  * argument is required in order to get the correct result.
- * @param depth_map_stage The depth map to be visualized.
+ * @param depth_map_stage The depth map to be visualized. The depth information is assumed to be
+ * stored in the depth attachment.
  * @param transfer_context Transfer context.
  * @param target The target stage which stores the visualized depth map grayscale image.
  */
@@ -43,6 +44,6 @@ void DoVisualizeDepthProjection(float alpha, std::optional<PerspectiveProjection
                                 PipelineStage *depth_map_stage, TransferContext *transfer_context,
                                 PipelineStage *target);
 
-}  // namespace e8
+} // namespace e8
 
-#endif  // ISLANDS_RENDERER_POSTPROCESSOR_DEPTH_PROJECTION_VISUALIZER_H
+#endif // ISLANDS_RENDERER_POSTPROCESSOR_DEPTH_PROJECTION_VISUALIZER_H
