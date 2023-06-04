@@ -152,7 +152,7 @@ Fulfillment PipelineStage::LaunchSchedule(CachedPipelineInterface *pipeline,
 
     for (auto const &dependent_parent : schedule.dependent_parents) {
         std::vector<GpuPromise *> parent_promises =
-            dependent_parent.parent->LaunchSchedulesFor(dependent_parent.child_id);
+            dependent_parent.parent->LaunchSchedulesAs(dependent_parent.child_id);
 
         for (auto &parent_promise : parent_promises) {
             prerequisites.emplace_back(std::move(parent_promise));
@@ -163,7 +163,7 @@ Fulfillment PipelineStage::LaunchSchedule(CachedPipelineInterface *pipeline,
     return pipeline->Launch(*schedule.args, prerequisites, child_count, output);
 }
 
-std::vector<GpuPromise *> PipelineStage::LaunchSchedulesFor(std::optional<ChildId> child_id) {
+std::vector<GpuPromise *> PipelineStage::LaunchSchedulesAs(std::optional<ChildId> child_id) {
     if (!pimpl_->fulfillment_cache.empty()) {
         return ToGpuPromiseReference(child_id, &pimpl_->fulfillment_cache);
     }
@@ -240,7 +240,7 @@ PipelineOutputInterface const *PipelineStage::Output() const { return pimpl_->ou
 PipelineOutputInterface *PipelineStage::Output() { return pimpl_->output.get(); }
 
 void PipelineStage::Fulfill(VulkanContext *context) {
-    this->LaunchSchedulesFor(/*child_id=*/std::nullopt);
+    this->LaunchSchedulesAs(/*child_id=*/std::nullopt);
 
     for (auto parent : this->UniqueParents()) {
         WaitForStageCompletion(parent->pimpl_->fulfillment_cache, context);

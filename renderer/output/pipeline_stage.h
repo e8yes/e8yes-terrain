@@ -108,7 +108,7 @@ class PipelineStage {
     Fulfillment LaunchSchedule(CachedPipelineInterface *pipeline, PipelineSchedule const &schedule,
                                unsigned child_count, PipelineOutputInterface *output);
 
-    std::vector<GpuPromise *> LaunchSchedulesFor(std::optional<ChildId> child_id);
+    std::vector<GpuPromise *> LaunchSchedulesAs(std::optional<ChildId> child_id);
 
     void Reset();
 
