@@ -18,6 +18,7 @@
 #ifndef ISLANDS_CONTENT_STRUCTURE_H
 #define ISLANDS_CONTENT_STRUCTURE_H
 
+#include <functional>
 #include <vector>
 
 #include "common/tensor.h"
@@ -30,7 +31,7 @@ namespace e8 {
  * support efficient addition, removal and querying.
  */
 class SceneEntityStructureInterface {
-   public:
+  public:
     SceneEntityStructureInterface();
     virtual ~SceneEntityStructureInterface();
 
@@ -76,6 +77,6 @@ class SceneEntityStructureInterface {
     virtual std::vector<SceneEntity const *> QueryEntities(QueryFn query_fn) const = 0;
 };
 
-}  // namespace e8
+} // namespace e8
 
-#endif  // ISLANDS_CONTENT_STRUCTURE_H
+#endif // ISLANDS_CONTENT_STRUCTURE_H
