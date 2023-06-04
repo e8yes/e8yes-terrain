@@ -15,10 +15,10 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vulkan/vulkan.h>
 #include <algorithm>
 #include <memory>
 #include <vector>
+#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "content/common.h"
@@ -38,7 +38,7 @@
 namespace e8 {
 
 class DepthRenderer::DepthRendererImpl {
-   public:
+  public:
     DepthRendererImpl(std::unique_ptr<PipelineStage> &&visual_representation,
                       VulkanContext *context);
     ~DepthRendererImpl();
@@ -54,8 +54,9 @@ class DepthRenderer::DepthRendererImpl {
 DepthRenderer::DepthRendererImpl::DepthRendererImpl(
     std::unique_ptr<PipelineStage> &&visual_representation, VulkanContext *context)
     : transfer_context(context),
-      depth_projection(CreateProjectDepthStage(context->swap_chain_image_extent.width,
-                                               context->swap_chain_image_extent.height, context)),
+      depth_projection(CreateProjectNdcDepthStage(context->swap_chain_image_extent.width,
+                                                  context->swap_chain_image_extent.height,
+                                                  context)),
       visual_representation(std::move(visual_representation)) {}
 
 DepthRenderer::DepthRendererImpl::~DepthRendererImpl() {}
@@ -89,4 +90,4 @@ void DepthRenderer::ApplyConfiguration(RendererConfiguration const &config) {
     pimpl_->config = config;
 }
 
-}  // namespace e8
+} // namespace e8
