@@ -105,6 +105,24 @@ class LdrColorPipelineOutput : public PipelineOutputInterface {
     std::unique_ptr<LdrColorPipelineOutputImpl> pimpl_;
 };
 
+/**
+ * @brief The FloatPipelineOutput class Stores 32-bit floating point values.
+ */
+class FloatPipelineOutput : public PipelineOutputInterface {
+  public:
+    FloatPipelineOutput(unsigned width, unsigned height, VulkanContext *context);
+    ~FloatPipelineOutput();
+
+    FrameBuffer *GetFrameBuffer() const override;
+    RenderPass const &GetRenderPass() const override;
+    std::vector<FrameBufferAttachment const *> ColorAttachments() const override;
+    FrameBufferAttachment const *DepthAttachment() const override;
+
+  private:
+    struct FloatPipelineOutputImpl;
+    std::unique_ptr<FloatPipelineOutputImpl> pimpl_;
+};
+
 } // namespace e8
 
 #endif // ISLANDS_RENDERER_COMMON_OUTPUT_H

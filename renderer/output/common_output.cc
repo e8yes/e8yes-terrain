@@ -239,4 +239,45 @@ FrameBufferAttachment const *LdrColorPipelineOutput::DepthAttachment() const {
     return pimpl_->depth_attachment.get();
 }
 
+struct FloatPipelineOutput::FloatPipelineOutputImpl {
+    FloatPipelineOutputImpl(unsigned width, unsigned height, VulkanContext *context);
+    ~FloatPipelineOutputImpl();
+
+    std::unique_ptr<FrameBufferAttachment> color_attachment;
+    std::unique_ptr<RenderPass> render_pass;
+    std::unique_ptr<FrameBuffer> frame_buffer;
+
+    VulkanContext *context;
+};
+
+FloatPipelineOutput::FloatPipelineOutputImpl::FloatPipelineOutputImpl(unsigned width,
+                                                                      unsigned height,
+                                                                      VulkanContext *context) {
+    color_attachment = CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R32_SFLOAT,
+                                             /*transfer_src=*/false, context);
+    render_pass = CreateRenderPass(std::vector<VkAttachmentDescription>{color_attachment->desc},
+                                   /*depth_attachment_desc=*/std::nullopt, context);
+    frame_buffer = CreateFrameBuffer(*render_pass, width, height,
+                                     std::vector<VkImageView>{color_attachment->view},
+                                     /*depth_attachment=*/std::nullopt, context);
+}
+
+FloatPipelineOutput::FloatPipelineOutputImpl::~FloatPipelineOutputImpl() {}
+
+FloatPipelineOutput::FloatPipelineOutput(unsigned width, unsigned height, VulkanContext *context)
+    : PipelineOutputInterface(width, height),
+      pimpl_(std::make_unique<FloatPipelineOutputImpl>(width, height, context)) {}
+
+FloatPipelineOutput::~FloatPipelineOutput() {}
+
+FrameBuffer *FloatPipelineOutput::GetFrameBuffer() const { return pimpl_->frame_buffer.get(); }
+
+RenderPass const &FloatPipelineOutput::GetRenderPass() const { return *pimpl_->render_pass; }
+
+std::vector<FrameBufferAttachment const *> FloatPipelineOutput::ColorAttachments() const {
+    return std::vector<FrameBufferAttachment const *>{pimpl_->color_attachment.get()};
+}
+
+FrameBufferAttachment const *FloatPipelineOutput::DepthAttachment() const { return nullptr; }
+
 } // namespace e8
