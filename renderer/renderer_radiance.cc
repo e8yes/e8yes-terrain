@@ -24,11 +24,9 @@
 #include "content/scene.h"
 #include "renderer/lighting/direct_illuminator.h"
 #include "renderer/output/pipeline_stage.h"
-#include "renderer/pipeline/fill_color.h"
 #include "renderer/pipeline/project_surface.h"
 #include "renderer/postprocessor/exposure.h"
 #include "renderer/postprocessor/fxaa.h"
-#include "renderer/postprocessor/radiance.h"
 #include "renderer/postprocessor/tone_map.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/query/collection.h"
@@ -101,11 +99,14 @@ void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_access
                   pimpl_->ldr_image.get());
     DoFxaa(pimpl_->ldr_image.get(), &pimpl_->transfer_context, pimpl_->final_color_image.get());
 
-    PipelineStage *final_stage = this->DoFinalStage(
-        first_stage, pimpl_->final_color_image.get(),
-        /*dangling_stages=*/std::vector<PipelineStage *>{pimpl_->surface_projection.get()});
+    PipelineStage *final_stage =
+        this->DoFinalStage(first_stage, pimpl_->final_color_image.get(),
+                           /*dangling_stages=*/
+                           std::vector<PipelineStage *>{pimpl_->surface_projection.get()});
 
+    this->BeginStage(1, "FULFILL");
     final_stage->Fulfill(pimpl_->transfer_context.vulkan_context);
+    this->EndStage(1);
 }
 
 void RadianceRenderer::ApplyConfiguration(RendererConfiguration const &config) {
