@@ -50,6 +50,7 @@ SOURCES += \
     pipeline/project_surface.cc \
     postprocessor/depth_projection_visualizer.cc \
     postprocessor/exposure.cc \
+    postprocessor/float_map_visualizer.cc \
     postprocessor/fxaa.cc \
     postprocessor/gaussian_blur.cc \
     postprocessor/post_processor.cc \
@@ -100,6 +101,7 @@ HEADERS += \
     pipeline/project_surface.h \
     postprocessor/depth_projection_visualizer.h \
     postprocessor/exposure.h \
+    postprocessor/float_map_visualizer.h \
     postprocessor/fxaa.h \
     postprocessor/gaussian_blur.h \
     postprocessor/post_processor.h \
@@ -161,5 +163,3 @@ unix {
 }
 !isEmpty(target.path): INSTALLS += target
 
-DISTFILES += \
-    shader/depth_linearizer_perspective.frag
