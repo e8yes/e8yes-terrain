@@ -30,7 +30,7 @@
 #include "renderer/basic/render_pass.h"
 #include "renderer/basic/uniform_layout.h"
 #include "renderer/dag/promise.h"
-#include "renderer/query/drawable_instance.h"
+#include "renderer/drawable/drawable_instance.h"
 #include "renderer/render_pass/configurator.h"
 #include "renderer/render_pass/rasterize.h"
 #include "renderer/transfer/context.h"

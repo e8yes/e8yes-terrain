@@ -21,7 +21,7 @@
 #include <memory>
 
 #include "renderer/dag/dag_operation.h"
-#include "renderer/query/light_source.h"
+#include "renderer/drawable/light_source.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {

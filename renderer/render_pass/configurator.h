@@ -21,7 +21,7 @@
 #include <cstdint>
 #include <vector>
 
-#include "renderer/query/drawable_instance.h"
+#include "renderer/drawable/drawable_instance.h"
 #include "renderer/transfer/texture_group.h"
 
 namespace e8 {

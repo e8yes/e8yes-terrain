@@ -22,8 +22,8 @@
 
 #include "content/structure.h"
 #include "renderer/basic/projection.h"
-#include "renderer/query/drawable_instance.h"
-#include "renderer/query/light_source.h"
+#include "renderer/drawable/drawable_instance.h"
+#include "renderer/drawable/light_source.h"
 #include "resource/accessor.h"
 
 namespace e8 {

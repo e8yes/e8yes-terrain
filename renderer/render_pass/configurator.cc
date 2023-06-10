@@ -18,7 +18,7 @@
 #include <cstdint>
 #include <vector>
 
-#include "renderer/query/drawable_instance.h"
+#include "renderer/drawable/drawable_instance.h"
 #include "renderer/render_pass/configurator.h"
 #include "renderer/transfer/texture_group.h"
 #include "resource/common.h"

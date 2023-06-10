@@ -23,7 +23,7 @@
 #include "content/proto/light_source.pb.h"
 #include "content/scene_entity.h"
 #include "renderer/basic/projection.h"
-#include "renderer/query/light_source.h"
+#include "renderer/drawable/light_source.h"
 #include "resource/common.h"
 
 namespace e8 {

@@ -19,7 +19,7 @@
 
 #include "common/tensor.h"
 #include "content/scene_entity.h"
-#include "renderer/query/drawable_instance.h"
+#include "renderer/drawable/drawable_instance.h"
 #include "resource/accessor.h"
 #include "resource/common.h"
 #include "resource/geometry.h"

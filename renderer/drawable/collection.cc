@@ -20,9 +20,9 @@
 
 #include "content/structure.h"
 #include "renderer/basic/projection.h"
-#include "renderer/query/collection.h"
-#include "renderer/query/drawable_instance.h"
-#include "renderer/query/query_fn.h"
+#include "renderer/drawable/collection.h"
+#include "renderer/drawable/drawable_instance.h"
+#include "renderer/drawable/query_fn.h"
 #include "resource/accessor.h"
 
 namespace e8 {

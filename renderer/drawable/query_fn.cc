@@ -15,7 +15,7 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "renderer/query/query_fn.h"
+#include "renderer/drawable/query_fn.h"
 #include "common/tensor.h"
 
 namespace e8 {

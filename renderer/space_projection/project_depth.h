@@ -24,7 +24,7 @@
 #include "common/device.h"
 #include "renderer/basic/projection.h"
 #include "renderer/dag/dag_operation.h"
-#include "renderer/query/collection.h"
+#include "renderer/drawable/collection.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {

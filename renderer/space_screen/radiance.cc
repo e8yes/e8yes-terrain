@@ -23,7 +23,7 @@
 #include "content/proto/light_source.pb.h"
 #include "renderer/basic/shader.h"
 #include "renderer/dag/dag_operation.h"
-#include "renderer/query/light_source.h"
+#include "renderer/drawable/light_source.h"
 #include "renderer/space_projection/project_surface.h"
 #include "renderer/space_screen/radiance.h"
 #include "renderer/space_screen/screen_space_processor.h"

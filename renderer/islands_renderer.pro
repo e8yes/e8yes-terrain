@@ -58,10 +58,10 @@ SOURCES += \
     space_screen/surface_projection_visualizer.cc \
     space_screen/tone_map.cc \
     proto/renderer.pb.cc \
-    query/collection.cc \
-    query/drawable_instance.cc \
-    query/light_source.cc \
-    query/query_fn.cc \
+    drawable/collection.cc \
+    drawable/drawable_instance.cc \
+    drawable/light_source.cc \
+    drawable/query_fn.cc \
     renderer.cc \
     renderer_depth.cc \
     renderer_radiance.cc \
@@ -109,10 +109,10 @@ HEADERS += \
     space_screen/surface_projection_visualizer.h \
     space_screen/tone_map.h \
     proto/renderer.pb.h \
-    query/collection.h \
-    query/drawable_instance.h \
-    query/light_source.h \
-    query/query_fn.h \
+    drawable/collection.h \
+    drawable/drawable_instance.h \
+    drawable/light_source.h \
+    drawable/query_fn.h \
     renderer.h \
     renderer_depth.h \
     renderer_radiance.h \
