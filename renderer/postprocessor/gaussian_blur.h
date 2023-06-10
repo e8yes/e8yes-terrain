@@ -26,14 +26,42 @@
 
 namespace e8 {
 
-void CreateGaussianBlurStages(unsigned width, unsigned height, VulkanContext* context,
-                              std::unique_ptr<PipelineStage>* h_blurred,
-                              std::unique_ptr<PipelineStage>* hv_blurred);
+/**
+ * @brief The GaussianBlurLevel enum Available gaussian blurring kernel sizes.
+ */
+enum GaussianBlurLevel {
+    GBL_1X1,
+    GBL_3X3,
+    GBL_5X5,
+};
 
-void DoGaussianBlur(PipelineStage* image, unsigned blur_kernel_size,
-                    TransferContext* transfer_context, PipelineStage* h_blurred,
-                    PipelineStage* hv_blurred);
+/**
+ * @brief CreateGaussianBlurStages Creates a pair of separated Gaussian blurring post-processor
+ * stages with 32-bit floating point outputs in the specified dimension.
+ *
+ * @param width The width of the Gaussian blurred float map output.
+ * @param height The height of the Gaussian blurred float map output.
+ * @param context Contextual Vulkan handles.
+ * @param h_blurred The horizontally blurred temporary output.
+ * @param hv_blurred The final output with both horizontal and vertical blurring.
+ */
+void CreateGaussianBlurStages(unsigned width, unsigned height, VulkanContext *context,
+                              std::unique_ptr<PipelineStage> *h_blurred,
+                              std::unique_ptr<PipelineStage> *hv_blurred);
 
-}  // namespace e8
+/**
+ * @brief DoGaussianBlur Schedules a post processing graphics pipeline to Gaussian blur a float map.
+ *
+ * @param image The floating point image to be blurred.
+ * @param blur_level The size of the Gaussian blurring kernel.
+ * @param transfer_context Transfer context.
+ * @param h_blurred The horizontally blurred temporary output.
+ * @param hv_blurred The final output with both horizontal and vertical blurring.
+ */
+void DoGaussianBlur(PipelineStage *image, GaussianBlurLevel blur_level,
+                    TransferContext *transfer_context, PipelineStage *h_blurred,
+                    PipelineStage *hv_blurred);
 
-#endif  // ISLANDS_RENDERER_POSTPROCESSOR_SHADOW_MAP_H
+} // namespace e8
+
+#endif // ISLANDS_RENDERER_POSTPROCESSOR_SHADOW_MAP_H
