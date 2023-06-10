@@ -24,7 +24,7 @@
 #include "content/scene.h"
 #include "renderer/lighting/direct_illuminator.h"
 #include "renderer/dag/dag_operation.h"
-#include "renderer/pipeline/project_surface.h"
+#include "renderer/projection_space/project_surface.h"
 #include "renderer/postprocessor/exposure.h"
 #include "renderer/postprocessor/fxaa.h"
 #include "renderer/postprocessor/tone_map.h"

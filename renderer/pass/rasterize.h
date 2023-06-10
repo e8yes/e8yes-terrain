@@ -18,23 +18,21 @@
 #ifndef ISLANDS_RENDERER_RASTERIZE_H
 #define ISLANDS_RENDERER_RASTERIZE_H
 
-#include <vulkan/vulkan.h>
 #include <array>
 #include <functional>
 #include <memory>
 #include <vector>
+#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "renderer/basic/frame_buffer.h"
 #include "renderer/basic/pipeline.h"
 #include "renderer/basic/render_pass.h"
 #include "renderer/basic/uniform_layout.h"
-#include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/dag/promise.h"
 #include "renderer/pass/configurator.h"
 #include "renderer/query/drawable_instance.h"
 #include "renderer/transfer/context.h"
-#include "resource/buffer_texture.h"
 
 namespace e8 {
 
@@ -94,6 +92,6 @@ using SetPostProcessorUniformsFn =
 void PostProcess(GraphicsPipeline const &pipeline, ShaderUniformLayout const &uniform_layout,
                  SetPostProcessorUniformsFn const &set_uniforms_fn, VkCommandBuffer cmds);
 
-}  // namespace e8
+} // namespace e8
 
-#endif  // ISLANDS_RENDERER_RASTERIZE_H
+#endif // ISLANDS_RENDERER_RASTERIZE_H

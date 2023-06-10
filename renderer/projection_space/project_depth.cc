@@ -43,7 +43,7 @@
 #include "renderer/dag/promise.h"
 #include "renderer/pass/configurator.h"
 #include "renderer/pass/rasterize.h"
-#include "renderer/pipeline/project_depth.h"
+#include "renderer/projection_space/project_depth.h"
 #include "renderer/postprocessor/post_processor.h"
 #include "renderer/query/collection.h"
 #include "renderer/query/drawable_instance.h"

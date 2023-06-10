@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_PIPELINE_PROJECT_SURFACE_H
-#define ISLANDS_RENDERER_PIPELINE_PROJECT_SURFACE_H
+#ifndef ISLANDS_RENDERER_PIPELINE_PROJECTION_SPACE_PROJECT_SURFACE_H
+#define ISLANDS_RENDERER_PIPELINE_PROJECTION_SPACE_PROJECT_SURFACE_H
 
 #include <memory>
 
@@ -54,7 +54,7 @@ enum SurfaceProjectionColorOutput {
  * @return The light input stage.
  */
 std::unique_ptr<DagOperation> CreateProjectSurfaceStage(unsigned width, unsigned height,
-                                                         VulkanContext *context);
+                                                        VulkanContext *context);
 
 /**
  * @brief DoProjectSurface Schedules a graphics pipeline to generate a map of geometry information.
@@ -73,6 +73,6 @@ void DoProjectSurface(DrawableCollection *drawable_collection,
                       PerspectiveProjection const &projection, TransferContext *transfer_context,
                       DagOperation *first_stage, DagOperation *target);
 
-}  // namespace e8
+} // namespace e8
 
-#endif  // ISLANDS_RENDERER_PIPELINE_PROJECT_SURFACE_H
+#endif // ISLANDS_RENDERER_PIPELINE_PROJECTION_SPACE_PROJECT_SURFACE_H

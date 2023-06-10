@@ -21,7 +21,7 @@
 #include <memory>
 
 #include "renderer/dag/dag_operation.h"
-#include "renderer/pipeline/project_surface.h"
+#include "renderer/projection_space/project_surface.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/transfer/context.h"
 

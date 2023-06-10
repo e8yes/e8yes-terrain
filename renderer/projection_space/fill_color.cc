@@ -28,7 +28,7 @@
 #include "renderer/dag/dag_operation.h"
 #include "renderer/dag/promise.h"
 #include "renderer/pass/rasterize.h"
-#include "renderer/pipeline/fill_color.h"
+#include "renderer/projection_space/fill_color.h"
 
 namespace e8 {
 namespace {

@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_PIPELINE_PROJECT_DEPTH_H
-#define ISLANDS_RENDERER_PIPELINE_PROJECT_DEPTH_H
+#ifndef ISLANDS_RENDERER_PROJECTION_SPACE_PROJECT_DEPTH_H
+#define ISLANDS_RENDERER_PROJECTION_SPACE_PROJECT_DEPTH_H
 
 #include <memory>
 #include <vector>
@@ -39,7 +39,7 @@ namespace e8 {
  * @return A pipeline stage created with the depth map output.
  */
 std::unique_ptr<DagOperation> CreateProjectNdcDepthStage(unsigned width, unsigned height,
-                                                          VulkanContext *context);
+                                                         VulkanContext *context);
 
 /**
  * @brief CreateLinearizeDepthStage Creates a linear depth projection pipeline stage with a 32-bit
@@ -51,7 +51,7 @@ std::unique_ptr<DagOperation> CreateProjectNdcDepthStage(unsigned width, unsigne
  * @return A pipeline stage created with the depth map output.
  */
 std::unique_ptr<DagOperation> CreateProjectLinearDepthStage(unsigned width, unsigned height,
-                                                             VulkanContext *context);
+                                                            VulkanContext *context);
 
 /**
  * @brief DoProjectDepth Schedules a graphics pipeline for rendering a depth map (A mapping of the
@@ -74,4 +74,4 @@ void DoProjectDepth(DrawableCollection *drawable_collection,
 
 } // namespace e8
 
-#endif // ISLANDS_RENDERER_PIPELINE_PROJECT_DEPTH_H
+#endif // ISLANDS_RENDERER_PROJECTION_SPACE_PROJECT_DEPTH_H
