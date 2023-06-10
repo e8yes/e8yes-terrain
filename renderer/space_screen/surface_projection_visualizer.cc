@@ -15,18 +15,17 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vulkan/vulkan.h>
 #include <memory>
 #include <optional>
 #include <vector>
+#include <vulkan/vulkan.h>
 
 #include "renderer/basic/shader.h"
-#include "renderer/basic/uniform_layout.h"
 #include "renderer/dag/graphics_pipeline_output.h"
-#include "renderer/space_projection/project_surface.h"
-#include "renderer/space_screen/post_processor.h"
-#include "renderer/space_screen/surface_projection_visualizer.h"
 #include "renderer/proto/renderer.pb.h"
+#include "renderer/space_projection/project_surface.h"
+#include "renderer/space_screen/screen_space_processor.h"
+#include "renderer/space_screen/surface_projection_visualizer.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {
@@ -39,8 +38,8 @@ struct SurfaceProjectionVisualizerParameters {
 };
 
 class SurfaceProjectionVisualizerPostProcessorConfigurator
-    : public PostProcessorConfiguratorInterface {
-   public:
+    : public ScreenSpaceConfiguratorInterface {
+  public:
     SurfaceProjectionVisualizerPostProcessorConfigurator(
         LightInputsRendererParameters::InputType parameter_to_visualize,
         GraphicsPipelineOutputInterface const &light_inputs);
@@ -49,7 +48,7 @@ class SurfaceProjectionVisualizerPostProcessorConfigurator
     void InputImages(std::vector<VkImageView> *input_images) const override;
     void PushConstants(std::vector<uint8_t> *push_constants) const override;
 
-   private:
+  private:
     LightInputsRendererParameters::InputType parameter_to_visualize_;
     GraphicsPipelineOutputInterface const &light_inputs_;
 };
@@ -80,7 +79,7 @@ void SurfaceProjectionVisualizerPostProcessorConfigurator::PushConstants(
     parameters->parameter_to_visualize = parameter_to_visualize_;
 }
 
-}  // namespace
+} // namespace
 
 void DoVisualizeSurfaceProjection(LightInputsRendererParameters::InputType parameter_to_visualize,
                                   DagOperation *surface_projection,
@@ -88,7 +87,7 @@ void DoVisualizeSurfaceProjection(LightInputsRendererParameters::InputType param
     GraphicsPipelineInterface *pipeline = target->WithPipeline(
         kSurfaceProjectionVisualizerPipeline,
         [transfer_context](GraphicsPipelineOutputInterface *visualizer_output) {
-            return std::make_unique<PostProcessorPipeline>(
+            return std::make_unique<ScreenSpaceProcessorPipeline>(
                 kSurfaceProjectionVisualizerPipeline, kFragmentShaderFilePathLightInputsVisualizer,
                 /*input_image_count=*/SurfaceProjectionColorOutput::LightInputsColorOutputCount,
                 /*push_constant_size=*/sizeof(SurfaceProjectionVisualizerParameters),
@@ -101,4 +100,4 @@ void DoVisualizeSurfaceProjection(LightInputsRendererParameters::InputType param
                      /*parents=*/std::vector<DagOperation *>{surface_projection});
 }
 
-}  // namespace e8
+} // namespace e8

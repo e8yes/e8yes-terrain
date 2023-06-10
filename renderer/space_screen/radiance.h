@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_RADIANCE_PIPELINE_H
-#define ISLANDS_RENDERER_RADIANCE_PIPELINE_H
+#ifndef ISLANDS_RENDERER_SPACE_SCREEN_RADIANCE_H
+#define ISLANDS_RENDERER_SPACE_SCREEN_RADIANCE_H
 
 #include <memory>
 
@@ -49,4 +49,4 @@ void DoComputeRadiance(LightSourceInstance const &instance, DagOperation *projec
 
 } // namespace e8
 
-#endif // ISLANDS_RENDERER_RADIANCE_PIPELINE_H
+#endif // ISLANDS_RENDERER_SPACE_SCREEN_RADIANCE_H

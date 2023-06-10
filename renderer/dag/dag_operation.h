@@ -106,8 +106,9 @@ class DagOperation {
 
     std::unordered_set<DagOperation *> UniqueParents();
 
-    Fulfillment LaunchSchedule(GraphicsPipelineInterface *pipeline, PipelineSchedule const &schedule,
-                               unsigned child_count, GraphicsPipelineOutputInterface *output);
+    Fulfillment LaunchSchedule(GraphicsPipelineInterface *pipeline,
+                               PipelineSchedule const &schedule, unsigned child_count,
+                               GraphicsPipelineOutputInterface *output);
 
     std::vector<GpuPromise *> LaunchSchedulesAs(std::optional<ChildId> child_id);
 

@@ -27,8 +27,8 @@
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
-#include "renderer/dag/graphics_pipeline.h"
 #include "renderer/dag/dag_operation.h"
+#include "renderer/dag/graphics_pipeline.h"
 #include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/dag/promise.h"
 
@@ -180,7 +180,7 @@ void DagOperation::Reset() {
 }
 
 GraphicsPipelineInterface *DagOperation::WithPipeline(PipelineKey const &key,
-                                                    CompilePipelineFn compile_fn) {
+                                                      CompilePipelineFn compile_fn) {
     auto it = pimpl_->pipelines.find(key);
     if (it != pimpl_->pipelines.end()) {
         return it->second.pipeline.get();

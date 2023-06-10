@@ -21,10 +21,10 @@
 #include <vulkan/vulkan.h>
 
 #include "renderer/basic/shader.h"
-#include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/dag/dag_operation.h"
+#include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/space_screen/float_map_visualizer.h"
-#include "renderer/space_screen/post_processor.h"
+#include "renderer/space_screen/screen_space_processor.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {
@@ -37,10 +37,10 @@ struct FloatMapVisualizerParameters {
     float max_value;
 };
 
-class FloatMapVisualizerConfigurator : public PostProcessorConfiguratorInterface {
+class FloatMapVisualizerConfigurator : public ScreenSpaceConfiguratorInterface {
   public:
-    FloatMapVisualizerConfigurator(GraphicsPipelineOutputInterface const &float_map, float min_value,
-                                   float max_value)
+    FloatMapVisualizerConfigurator(GraphicsPipelineOutputInterface const &float_map,
+                                   float min_value, float max_value)
         : float_map_(float_map), min_value_(min_value), max_value_(max_value) {}
 
     ~FloatMapVisualizerConfigurator() = default;
@@ -69,7 +69,7 @@ void DoVisualizeFloat(DagOperation *float_map_stage, float min_value, float max_
                       TransferContext *transfer_context, DagOperation *target) {
     GraphicsPipelineInterface *pipeline = target->WithPipeline(
         kFloatMapVisualizerPipeline, [transfer_context](GraphicsPipelineOutputInterface *output) {
-            return std::make_unique<PostProcessorPipeline>(
+            return std::make_unique<ScreenSpaceProcessorPipeline>(
                 kFloatMapVisualizerPipeline, kFragmentShaderFilePathFloatMapVisualizer,
                 /*input_image_count=*/1,
                 /*push_constant_size=*/sizeof(FloatMapVisualizerParameters), output,

@@ -24,7 +24,6 @@
 #include "renderer/transfer/texture_group.h"
 #include "renderer/transfer/vram.h"
 #include "resource/buffer_texture.h"
-#include "resource/common.h"
 
 namespace e8 {
 

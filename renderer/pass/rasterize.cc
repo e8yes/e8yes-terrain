@@ -15,7 +15,6 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vulkan/vulkan.h>
 #include <array>
 #include <cassert>
 #include <cstdint>
@@ -23,13 +22,13 @@
 #include <memory>
 #include <unordered_set>
 #include <vector>
+#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "renderer/basic/frame_buffer.h"
 #include "renderer/basic/pipeline.h"
 #include "renderer/basic/render_pass.h"
 #include "renderer/basic/uniform_layout.h"
-#include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/dag/promise.h"
 #include "renderer/pass/configurator.h"
 #include "renderer/pass/rasterize.h"
@@ -44,9 +43,10 @@
 namespace e8 {
 namespace {
 
-std::unordered_set<DrawableInstance const *> UploadResources(
-    std::vector<DrawableInstance> const &drawables,
-    RenderPassConfiguratorInterface const &configurator, TransferContext *transfer_context) {
+std::unordered_set<DrawableInstance const *>
+UploadResources(std::vector<DrawableInstance> const &drawables,
+                RenderPassConfiguratorInterface const &configurator,
+                TransferContext *transfer_context) {
     std::unordered_set<DrawableInstance const *> excluded;
 
     std::vector<Geometry const *> geometries;
@@ -79,7 +79,7 @@ std::unordered_set<DrawableInstance const *> UploadResources(
     return excluded;
 }
 
-}  // namespace
+} // namespace
 
 VkCommandBuffer StartRenderPass(RenderPass const &render_pass, FrameBuffer const &frame_buffer,
                                 VulkanContext *context) {
@@ -234,4 +234,4 @@ void PostProcess(GraphicsPipeline const &pipeline, ShaderUniformLayout const &un
               /*firstInstance=*/0);
 }
 
-}  // namespace e8
+} // namespace e8

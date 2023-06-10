@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_POSTPROCESSOR_FLOAT_MAP_VISUALIZER_H
-#define ISLANDS_RENDERER_POSTPROCESSOR_FLOAT_MAP_VISUALIZER_H
+#ifndef ISLANDS_RENDERER_SPACE_SCREEN_FLOAT_MAP_VISUALIZER_H
+#define ISLANDS_RENDERER_SPACE_SCREEN_FLOAT_MAP_VISUALIZER_H
 
 #include <memory>
 #include <optional>
@@ -27,8 +27,9 @@
 namespace e8 {
 
 /**
- * @brief DoVisualizeFloat Schedules a post processing graphics pipeline to visualize a float map.
- * It scales the float map into the [0, 1] range, so it can be displayed as a grayscale image.
+ * @brief DoVisualizeFloat Schedules a screen space processing graphics pipeline to visualize a
+ * float map. It scales the float map into the [0, 1] range, so it can be displayed as a grayscale
+ * image.
  *
  * @param float_map_stage The float map to be visualized. The floating point values are assumed to
  * be stored in the color attachment.
@@ -42,4 +43,4 @@ void DoVisualizeFloat(DagOperation *float_map_stage, float min_value, float max_
 
 } // namespace e8
 
-#endif // ISLANDS_RENDERER_POSTPROCESSOR_FLOAT_MAP_VISUALIZER_H
+#endif // ISLANDS_RENDERER_SPACE_SCREEN_FLOAT_MAP_VISUALIZER_H

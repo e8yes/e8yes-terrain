@@ -22,24 +22,23 @@
 
 #include "common/device.h"
 #include "content/scene.h"
-#include "renderer/lighting/direct_illuminator.h"
 #include "renderer/dag/dag_operation.h"
-#include "renderer/space_projection/project_surface.h"
-#include "renderer/space_screen/exposure.h"
-#include "renderer/space_screen/fxaa.h"
-#include "renderer/space_screen/tone_map.h"
+#include "renderer/lighting/direct_illuminator.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/query/collection.h"
 #include "renderer/renderer.h"
 #include "renderer/renderer_radiance.h"
+#include "renderer/space_projection/project_surface.h"
+#include "renderer/space_screen/exposure.h"
+#include "renderer/space_screen/fxaa.h"
+#include "renderer/space_screen/tone_map.h"
 #include "renderer/transfer/context.h"
 #include "resource/accessor.h"
 
 namespace e8 {
 
 struct RadianceRenderer::RadianceRendererImpl {
-    RadianceRendererImpl(std::unique_ptr<DagOperation> &&final_color_image,
-                         VulkanContext *context);
+    RadianceRendererImpl(std::unique_ptr<DagOperation> &&final_color_image, VulkanContext *context);
     ~RadianceRendererImpl();
 
     TransferContext transfer_context;

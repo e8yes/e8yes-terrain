@@ -24,11 +24,10 @@
 #include "common/tensor.h"
 #include "content/scene.h"
 #include "renderer/dag/dag_operation.h"
-#include "renderer/pass/rasterize.h"
-#include "renderer/space_screen/fill_color.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/renderer.h"
 #include "renderer/renderer_solid_color.h"
+#include "renderer/space_screen/fill_color.h"
 #include "resource/accessor.h"
 
 namespace e8 {

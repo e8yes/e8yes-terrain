@@ -15,7 +15,6 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vulkan/vulkan.h>
 #include <algorithm>
 #include <cstdint>
 #include <functional>
@@ -23,12 +22,13 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/dag/promise.h"
 #include "renderer/pass/rasterize.h"
-#include "renderer/space_screen/post_processor.h"
+#include "renderer/space_screen/screen_space_processor.h"
 #include "renderer/transfer/descriptor_set.h"
 
 namespace e8 {
@@ -49,9 +49,8 @@ VkDescriptorSetLayoutBinding PostProcessorViewportBinding() {
     return viewport_binding;
 }
 
-std::unique_ptr<ShaderUniformLayout> UniformLayout(unsigned input_image_count,
-                                                   unsigned push_constant_size,
-                                                   VulkanContext *context) {
+std::unique_ptr<ShaderUniformLayout>
+UniformLayout(unsigned input_image_count, unsigned push_constant_size, VulkanContext *context) {
     std::vector<VkDescriptorSetLayoutBinding> input_images_layouts(input_image_count);
 
     for (unsigned i = 0; i < input_image_count; ++i) {
@@ -92,7 +91,7 @@ void ConfigureViewportDimensionUniformVariable(ShaderUniformLayout const &unifor
                             /*pDynamicOffsets=*/nullptr);
 }
 
-void ConfigureCustomUniformVariables(PostProcessorConfiguratorInterface const &configurator,
+void ConfigureCustomUniformVariables(ScreenSpaceConfiguratorInterface const &configurator,
                                      ShaderUniformLayout const &uniform_layout,
                                      DescriptorSet const &input_images_desc_set,
                                      ImageSampler const &input_image_sampler,
@@ -130,22 +129,23 @@ void ConfigureCustomUniformVariables(PostProcessorConfiguratorInterface const &c
     }
 }
 
-}  // namespace
+} // namespace
 
-PostProcessorConfiguratorInterface::PostProcessorConfiguratorInterface() {}
+ScreenSpaceConfiguratorInterface::ScreenSpaceConfiguratorInterface() {}
 
-PostProcessorConfiguratorInterface::~PostProcessorConfiguratorInterface() {}
+ScreenSpaceConfiguratorInterface::~ScreenSpaceConfiguratorInterface() {}
 
-void PostProcessorConfiguratorInterface::InputImages(
+void ScreenSpaceConfiguratorInterface::InputImages(
     std::vector<VkImageView> * /*input_images*/) const {}
 
-void PostProcessorConfiguratorInterface::PushConstants(
+void ScreenSpaceConfiguratorInterface::PushConstants(
     std::vector<uint8_t> * /*push_constants*/) const {}
 
-struct PostProcessorPipeline::PostProcessorPipelineImpl {
+struct ScreenSpaceProcessorPipeline::PostProcessorPipelineImpl {
     PostProcessorPipelineImpl(PipelineKey key, unsigned input_image_count,
                               ShaderUniformLayout const &uniform_layout,
-                              GraphicsPipelineOutputInterface *output, TransferContext *transfer_context);
+                              GraphicsPipelineOutputInterface *output,
+                              TransferContext *transfer_context);
     ~PostProcessorPipelineImpl();
 
     PipelineKey key;
@@ -158,7 +158,7 @@ struct PostProcessorPipeline::PostProcessorPipelineImpl {
     std::vector<VkImageView> past_input_images;
 };
 
-PostProcessorPipeline::PostProcessorPipelineImpl::PostProcessorPipelineImpl(
+ScreenSpaceProcessorPipeline::PostProcessorPipelineImpl::PostProcessorPipelineImpl(
     PipelineKey key, unsigned input_image_count, ShaderUniformLayout const &uniform_layout,
     GraphicsPipelineOutputInterface *output, TransferContext *transfer_context)
     : key(key), past_input_images(input_image_count) {
@@ -186,11 +186,14 @@ PostProcessorPipeline::PostProcessorPipelineImpl::PostProcessorPipelineImpl(
     }
 }
 
-PostProcessorPipeline::PostProcessorPipelineImpl::~PostProcessorPipelineImpl() {}
+ScreenSpaceProcessorPipeline::PostProcessorPipelineImpl::~PostProcessorPipelineImpl() {}
 
-PostProcessorPipeline::PostProcessorPipeline(
-    PipelineKey const &key, std::string const &fragment_shader, unsigned input_image_count,
-    unsigned push_constant_size, GraphicsPipelineOutputInterface *output, TransferContext *transfer_context)
+ScreenSpaceProcessorPipeline::ScreenSpaceProcessorPipeline(PipelineKey const &key,
+                                                           std::string const &fragment_shader,
+                                                           unsigned input_image_count,
+                                                           unsigned push_constant_size,
+                                                           GraphicsPipelineOutputInterface *output,
+                                                           TransferContext *transfer_context)
     : GraphicsPipelineInterface(transfer_context->vulkan_context) {
     shader_stages_ = CreateShaderStages(
         /*vertex_shader_file_path=*/kVertexShaderFilePathPostProcessor,
@@ -204,7 +207,7 @@ PostProcessorPipeline::PostProcessorPipeline(
                                                  /*enable_depth_test=*/false, output->Width(),
                                                  output->Height(), /*color_attachment_count=*/1);
 
-    // Creates the post processing pipeline.
+    // Creates the screen space processing pipeline.
     pipeline_ = CreateGraphicsPipeline(output->GetRenderPass(), *shader_stages_, *uniform_layout_,
                                        *vertex_inputs_, *fixed_stage_config_,
                                        transfer_context->vulkan_context);
@@ -214,19 +217,20 @@ PostProcessorPipeline::PostProcessorPipeline(
                                                          output, transfer_context);
 }
 
-PostProcessorPipeline::~PostProcessorPipeline() {}
+ScreenSpaceProcessorPipeline::~ScreenSpaceProcessorPipeline() {}
 
-PipelineKey PostProcessorPipeline::Key() const { return pimpl_->key; }
+PipelineKey ScreenSpaceProcessorPipeline::Key() const { return pimpl_->key; }
 
-Fulfillment PostProcessorPipeline::Launch(GraphicsPipelineArgumentsInterface const &generic_args,
-                                          std::vector<GpuPromise *> const &prerequisites,
-                                          unsigned completion_signal_count,
-                                          GraphicsPipelineOutputInterface *output) {
+Fulfillment
+ScreenSpaceProcessorPipeline::Launch(GraphicsPipelineArgumentsInterface const &generic_args,
+                                     std::vector<GpuPromise *> const &prerequisites,
+                                     unsigned completion_signal_count,
+                                     GraphicsPipelineOutputInterface *output) {
     VkCommandBuffer cmds =
         StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), context_);
 
-    PostProcessorConfiguratorInterface const &configurator =
-        static_cast<PostProcessorConfiguratorInterface const &>(generic_args);
+    ScreenSpaceConfiguratorInterface const &configurator =
+        static_cast<ScreenSpaceConfiguratorInterface const &>(generic_args);
 
     PostProcess(
         *pipeline_, *uniform_layout_,
@@ -242,4 +246,4 @@ Fulfillment PostProcessorPipeline::Launch(GraphicsPipelineArgumentsInterface con
     return FinishRenderPass(cmds, completion_signal_count, prerequisites, context_);
 }
 
-}  // namespace e8
+} // namespace e8

@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_POSTPROCESSOR_TONE_MAP_H
-#define ISLANDS_RENDERER_POSTPROCESSOR_TONE_MAP_H
+#ifndef ISLANDS_RENDERER_SPACE_SCREEN_TONE_MAP_H
+#define ISLANDS_RENDERER_SPACE_SCREEN_TONE_MAP_H
 
 #include <memory>
 
@@ -36,11 +36,11 @@ namespace e8 {
  * @return An LDR image stage with a color image output.
  */
 std::unique_ptr<DagOperation> CreateLdrImageStage(unsigned width, unsigned height,
-                                                   VulkanContext *context);
+                                                  VulkanContext *context);
 
 /**
  * @brief DoToneMapping Maps radiance values to the displayable color range. Besides that, it also
- * attaches the luminance value to the alpha channel for potential post processing edge AA
+ * attaches the luminance value to the alpha channel for potential screen space processing edge AA
  * application.
  *
  * @param radiance_map The radiance values to be mapped.
@@ -53,6 +53,6 @@ std::unique_ptr<DagOperation> CreateLdrImageStage(unsigned width, unsigned heigh
 void DoToneMapping(DagOperation *radiance_map, DagOperation *exposure,
                    TransferContext *transfer_context, DagOperation *target);
 
-}  // namespace e8
+} // namespace e8
 
-#endif  // ISLANDS_RENDERER_POSTPROCESSOR_TONE_MAP_H
+#endif // ISLANDS_RENDERER_SPACE_SCREEN_TONE_MAP_H

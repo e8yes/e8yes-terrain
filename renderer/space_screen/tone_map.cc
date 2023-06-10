@@ -15,18 +15,16 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vulkan/vulkan.h>
 #include <memory>
 #include <vector>
+#include <vulkan/vulkan.h>
 
 #include "common/device.h"
-#include "renderer/basic/sampler.h"
 #include "renderer/basic/shader.h"
-#include "renderer/dag/graphics_pipeline_output_common.h"
-#include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/dag/dag_operation.h"
-#include "renderer/space_screen/exposure.h"
-#include "renderer/space_screen/post_processor.h"
+#include "renderer/dag/graphics_pipeline_output.h"
+#include "renderer/dag/graphics_pipeline_output_common.h"
+#include "renderer/space_screen/screen_space_processor.h"
 #include "renderer/space_screen/tone_map.h"
 #include "renderer/transfer/context.h"
 
@@ -36,15 +34,15 @@ namespace {
 PipelineKey const kClampedLinearToneMapPipeline = "Clamped Linear Tone Map";
 PipelineKey const kAcesToneMapPipeline = "ACES Tone Map";
 
-class ToneMapPostProcessorConfigurator : public PostProcessorConfiguratorInterface {
-   public:
+class ToneMapPostProcessorConfigurator : public ScreenSpaceConfiguratorInterface {
+  public:
     ToneMapPostProcessorConfigurator(DagOperation const &radiance_map_stage,
                                      DagOperation *exposure_stage);
     ~ToneMapPostProcessorConfigurator() override;
 
     void InputImages(std::vector<VkImageView> *input_images) const override;
 
-   private:
+  private:
     GraphicsPipelineOutputInterface const &radiance_;
     GraphicsPipelineOutputInterface const *exposure_;
 };
@@ -69,12 +67,12 @@ void ToneMapPostProcessorConfigurator::InputImages(std::vector<VkImageView> *inp
     }
 }
 
-}  // namespace
+} // namespace
 
 std::unique_ptr<DagOperation> CreateLdrImageStage(unsigned width, unsigned height,
-                                                   VulkanContext *context) {
+                                                  VulkanContext *context) {
     auto output = std::make_shared<LdrColorOutput>(width, height,
-                                                           /*with_depth_buffer=*/false, context);
+                                                   /*with_depth_buffer=*/false, context);
     return std::make_unique<DagOperation>(output);
 }
 
@@ -84,8 +82,9 @@ void DoToneMapping(DagOperation *radiance_map, DagOperation *exposure,
 
     if (exposure != nullptr) {
         pipeline = target->WithPipeline(
-            kAcesToneMapPipeline, [transfer_context](GraphicsPipelineOutputInterface *tone_map_output) {
-                return std::make_unique<PostProcessorPipeline>(
+            kAcesToneMapPipeline,
+            [transfer_context](GraphicsPipelineOutputInterface *tone_map_output) {
+                return std::make_unique<ScreenSpaceProcessorPipeline>(
                     kAcesToneMapPipeline, kFragmentShaderFilePathHdrAces, /*input_image_count=*/2,
                     /*push_constant_size=*/0, tone_map_output, transfer_context);
             });
@@ -93,7 +92,7 @@ void DoToneMapping(DagOperation *radiance_map, DagOperation *exposure,
         pipeline = target->WithPipeline(
             kClampedLinearToneMapPipeline,
             [transfer_context](GraphicsPipelineOutputInterface *tone_map_output) {
-                return std::make_unique<PostProcessorPipeline>(
+                return std::make_unique<ScreenSpaceProcessorPipeline>(
                     kClampedLinearToneMapPipeline, kFragmentShaderFilePathHdrClamp,
                     /*input_image_count=*/1, /*push_constant_size=*/0, tone_map_output,
                     transfer_context);
@@ -105,4 +104,4 @@ void DoToneMapping(DagOperation *radiance_map, DagOperation *exposure,
                      /*parents=*/std::vector<DagOperation *>{radiance_map, exposure});
 }
 
-}  // namespace e8
+} // namespace e8

@@ -77,15 +77,15 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
                      RenderPassConfiguratorInterface const &configurator,
                      TransferContext *transfer_context, VkCommandBuffer cmds);
 
-// Represents a function which sets the value of uniform variables for post processing.
+// Represents a function which sets the value of uniform variables for screen space processing.
 using SetPostProcessorUniformsFn =
     std::function<void(ShaderUniformLayout const &uniform_layout, VkCommandBuffer cmds)>;
 
 /**
  * @brief PostProcess Renders a quad that fills the pipeline output.
  *
- * @param pipeline The graphics pipeline to use for the post processing.
- * @param set_uniforms_fn A custom function to set uniform variables for the post processing
+ * @param pipeline The graphics pipeline to use for the screen space processing.
+ * @param set_uniforms_fn A custom function to set uniform variables for the screen space processing
  * fragment shader.
  * @param cmds The command buffer to which draw commands will be added.
  */

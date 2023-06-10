@@ -24,14 +24,14 @@
 #include "content/proto/light_source.pb.h"
 #include "content/scene_entity.h"
 #include "renderer/basic/projection.h"
-#include "renderer/lighting/direct_illuminator.h"
-#include "renderer/dag/graphics_pipeline_output_common.h"
 #include "renderer/dag/dag_operation.h"
-#include "renderer/space_screen/fill_color.h"
+#include "renderer/dag/graphics_pipeline_output_common.h"
+#include "renderer/lighting/direct_illuminator.h"
+#include "renderer/query/light_source.h"
 #include "renderer/space_projection/project_depth.h"
+#include "renderer/space_screen/fill_color.h"
 #include "renderer/space_screen/gaussian_blur.h"
 #include "renderer/space_screen/radiance.h"
-#include "renderer/query/light_source.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {
@@ -196,7 +196,7 @@ struct DirectIlluminator::DirectIlluminatorImpl {
 DirectIlluminator::DirectIlluminatorImpl::DirectIlluminatorImpl(unsigned width, unsigned height,
                                                                 VulkanContext *context) {
     auto output = std::make_shared<HdrColorOutput>(width, height,
-                                                           /*with_depth_buffer=*/false, context);
+                                                   /*with_depth_buffer=*/false, context);
     cleared_radiance_map = std::make_unique<DagOperation>(output);
     filled_radiance_map = std::make_unique<DagOperation>(output);
 }

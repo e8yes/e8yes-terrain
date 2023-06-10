@@ -33,7 +33,7 @@ namespace e8 {
  * (screen-space) as a color image.
  */
 class SurfaceProjectionRenderer : public RendererInterface {
-   public:
+  public:
     /**
      * @brief SurfaceProjectionRenderer Constructs a surface projection renderer.
      *
@@ -46,11 +46,11 @@ class SurfaceProjectionRenderer : public RendererInterface {
 
     void ApplyConfiguration(RendererConfiguration const &config) override;
 
-   private:
+  private:
     class SurfaceProjectionRendererImpl;
     std::unique_ptr<SurfaceProjectionRendererImpl> pimpl_;
 };
 
-}  // namespace e8
+} // namespace e8
 
-#endif  // ISLANDS_RENDERER_SURFACE_PROJECTION_H
+#endif // ISLANDS_RENDERER_SURFACE_PROJECTION_H

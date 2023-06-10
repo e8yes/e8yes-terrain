@@ -26,8 +26,8 @@
 
 #include "common/device.h"
 #include "content/scene.h"
-#include "renderer/dag/graphics_pipeline_output_common.h"
 #include "renderer/dag/dag_operation.h"
+#include "renderer/dag/graphics_pipeline_output_common.h"
 #include "renderer/proto/renderer.pb.h"
 #include "resource/accessor.h"
 

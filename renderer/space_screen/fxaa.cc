@@ -17,31 +17,30 @@
 
 #include <memory>
 
-#include "common/device.h"
 #include "renderer/basic/shader.h"
-#include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/dag/dag_operation.h"
+#include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/space_screen/fxaa.h"
-#include "renderer/space_screen/post_processor.h"
-#include "renderer/transfer/descriptor_set.h"
+#include "renderer/space_screen/screen_space_processor.h"
 
 namespace e8 {
 namespace {
 
 PipelineKey const &kFxaaPipeline = "FXAA";
 
-class FxaaPipelineConfigurator : public PostProcessorConfiguratorInterface {
-   public:
+class FxaaPipelineConfigurator : public ScreenSpaceConfiguratorInterface {
+  public:
     FxaaPipelineConfigurator(GraphicsPipelineOutputInterface const &ldr_color_input);
     ~FxaaPipelineConfigurator() override;
 
     void InputImages(std::vector<VkImageView> *input_images) const override;
 
-   private:
+  private:
     GraphicsPipelineOutputInterface const &ldr_color_input_;
 };
 
-FxaaPipelineConfigurator::FxaaPipelineConfigurator(GraphicsPipelineOutputInterface const &ldr_color_input)
+FxaaPipelineConfigurator::FxaaPipelineConfigurator(
+    GraphicsPipelineOutputInterface const &ldr_color_input)
     : ldr_color_input_(ldr_color_input) {}
 
 FxaaPipelineConfigurator::~FxaaPipelineConfigurator() {}
@@ -50,12 +49,12 @@ void FxaaPipelineConfigurator::InputImages(std::vector<VkImageView> *input_image
     input_images->at(0) = ldr_color_input_.ColorAttachments()[0]->view;
 }
 
-}  // namespace
+} // namespace
 
 void DoFxaa(DagOperation *ldr_image, TransferContext *transfer_context, DagOperation *target) {
-    GraphicsPipelineInterface *pipeline =
-        target->WithPipeline(kFxaaPipeline, [transfer_context](GraphicsPipelineOutputInterface *aa_output) {
-            return std::make_unique<PostProcessorPipeline>(
+    GraphicsPipelineInterface *pipeline = target->WithPipeline(
+        kFxaaPipeline, [transfer_context](GraphicsPipelineOutputInterface *aa_output) {
+            return std::make_unique<ScreenSpaceProcessorPipeline>(
                 kFxaaPipeline, kFragmentShaderFilePathFxaa, /*input_image_count=*/1,
                 /*push_constant_size=*/0, aa_output, transfer_context);
         });
@@ -65,4 +64,4 @@ void DoFxaa(DagOperation *ldr_image, TransferContext *transfer_context, DagOpera
                      /*parents=*/std::vector<DagOperation *>{ldr_image});
 }
 
-}  // namespace e8
+} // namespace e8

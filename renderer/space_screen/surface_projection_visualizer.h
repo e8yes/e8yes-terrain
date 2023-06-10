@@ -15,20 +15,19 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_POSTPROCESSOR_SURFACE_PROJECTION_VISUALIZER_H
-#define ISLANDS_RENDERER_POSTPROCESSOR_SURFACE_PROJECTION_VISUALIZER_H
+#ifndef ISLANDS_RENDERER_SPACE_SCREEN_SURFACE_PROJECTION_VISUALIZER_H
+#define ISLANDS_RENDERER_SPACE_SCREEN_SURFACE_PROJECTION_VISUALIZER_H
 
 #include <memory>
 
 #include "renderer/dag/dag_operation.h"
-#include "renderer/space_projection/project_surface.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {
 
 /**
- * @brief DoVisualizeSurfaceProjection A post processing graphics pipeline for visualizing a
+ * @brief DoVisualizeSurfaceProjection A screen space processing graphics pipeline for visualizing a
  * rendered surface parameter map.
  *
  * @param parameter_to_visualize Selects the surface parameter to be visualized.
@@ -40,6 +39,6 @@ void DoVisualizeSurfaceProjection(LightInputsRendererParameters::InputType param
                                   DagOperation *surface_projection,
                                   TransferContext *transfer_context, DagOperation *target);
 
-}  // namespace e8
+} // namespace e8
 
-#endif  // ISLANDS_RENDERER_POSTPROCESSOR_SURFACE_PROJECTION_VISUALIZER_H
+#endif // ISLANDS_RENDERER_SPACE_SCREEN_SURFACE_PROJECTION_VISUALIZER_H

@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_POSTPROCESSOR_DEPTH_PROJECTION_VISUALIZER_H
-#define ISLANDS_RENDERER_POSTPROCESSOR_DEPTH_PROJECTION_VISUALIZER_H
+#ifndef ISLANDS_RENDERER_SPACE_SCREEN_DEPTH_PROJECTION_VISUALIZER_H
+#define ISLANDS_RENDERER_SPACE_SCREEN_DEPTH_PROJECTION_VISUALIZER_H
 
 #include <memory>
 #include <optional>
@@ -28,8 +28,8 @@
 namespace e8 {
 
 /**
- * @brief DoVisualizeDepthProjection Schedules a post processing graphics pipeline to visualize a
- * rendered depth map.
+ * @brief DoVisualizeDepthProjection Schedules a screen space processing graphics pipeline to
+ * visualize a rendered depth map.
  *
  * @param alpha When alpha is zero, the depth map is visualized using the raw NDC value. When it is
  * set to one, the value is corrected to display the true depth.
@@ -46,4 +46,4 @@ void DoVisualizeDepthProjection(float alpha, std::optional<PerspectiveProjection
 
 } // namespace e8
 
-#endif // ISLANDS_RENDERER_POSTPROCESSOR_DEPTH_PROJECTION_VISUALIZER_H
+#endif // ISLANDS_RENDERER_SPACE_SCREEN_DEPTH_PROJECTION_VISUALIZER_H

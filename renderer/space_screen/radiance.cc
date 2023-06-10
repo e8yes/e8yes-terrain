@@ -21,15 +21,12 @@
 
 #include "common/tensor.h"
 #include "content/proto/light_source.pb.h"
-#include "renderer/basic/sampler.h"
 #include "renderer/basic/shader.h"
 #include "renderer/dag/dag_operation.h"
-#include "renderer/dag/promise.h"
-#include "renderer/space_projection/project_surface.h"
-#include "renderer/space_screen/post_processor.h"
-#include "renderer/space_screen/radiance.h"
 #include "renderer/query/light_source.h"
-#include "renderer/transfer/descriptor_set.h"
+#include "renderer/space_projection/project_surface.h"
+#include "renderer/space_screen/radiance.h"
+#include "renderer/space_screen/screen_space_processor.h"
 #include "resource/common.h"
 
 namespace e8 {
@@ -40,7 +37,7 @@ PipelineKey const kPointLightPipeline = "Point Light";
 PipelineKey const kSpotLightPipeline = "Spot Light";
 
 // Base class.
-class RadiancePostProcessorConfigurator : public PostProcessorConfiguratorInterface {
+class RadiancePostProcessorConfigurator : public ScreenSpaceConfiguratorInterface {
   public:
     RadiancePostProcessorConfigurator(GraphicsPipelineOutputInterface const &projected_surface);
     ~RadiancePostProcessorConfigurator() override;
@@ -209,13 +206,14 @@ void DoComputeRadiance(LightSourceInstance const &instance, DagOperation *projec
                        DagOperation *cleared_radiance_map, TransferContext *transfer_context,
                        DagOperation *target) {
     GraphicsPipelineInterface *pipeline;
-    std::unique_ptr<PostProcessorConfiguratorInterface> configurator;
+    std::unique_ptr<ScreenSpaceConfiguratorInterface> configurator;
 
     switch (instance.light_source.model_case()) {
     case LightSource::ModelCase::kSunLight: {
         pipeline = target->WithPipeline(
-            kSunLightPipeline, [transfer_context](GraphicsPipelineOutputInterface *radiance_output) {
-                return std::make_unique<PostProcessorPipeline>(
+            kSunLightPipeline,
+            [transfer_context](GraphicsPipelineOutputInterface *radiance_output) {
+                return std::make_unique<ScreenSpaceProcessorPipeline>(
                     kSunLightPipeline, kFragmentShaderFilePathRadianceSunLight,
                     /*input_image_count=*/
                     SurfaceProjectionColorOutput::LightInputsColorOutputCount + 1,
@@ -229,8 +227,9 @@ void DoComputeRadiance(LightSourceInstance const &instance, DagOperation *projec
     }
     case LightSource::ModelCase::kPointLight: {
         pipeline = target->WithPipeline(
-            kPointLightPipeline, [transfer_context](GraphicsPipelineOutputInterface *radiance_output) {
-                return std::make_unique<PostProcessorPipeline>(
+            kPointLightPipeline,
+            [transfer_context](GraphicsPipelineOutputInterface *radiance_output) {
+                return std::make_unique<ScreenSpaceProcessorPipeline>(
                     kPointLightPipeline, kFragmentShaderFilePathRadiancePointLight,
                     /*input_image_count=*/
                     SurfaceProjectionColorOutput::LightInputsColorOutputCount + 1,
@@ -244,8 +243,9 @@ void DoComputeRadiance(LightSourceInstance const &instance, DagOperation *projec
     }
     case LightSource::ModelCase::kSpotLight: {
         pipeline = target->WithPipeline(
-            kSpotLightPipeline, [transfer_context](GraphicsPipelineOutputInterface *radiance_output) {
-                return std::make_unique<PostProcessorPipeline>(
+            kSpotLightPipeline,
+            [transfer_context](GraphicsPipelineOutputInterface *radiance_output) {
+                return std::make_unique<ScreenSpaceProcessorPipeline>(
                     kSpotLightPipeline, kFragmentShaderFilePathRadianceSpotLight,
                     /*input_image_count=*/
                     SurfaceProjectionColorOutput::LightInputsColorOutputCount + 1,

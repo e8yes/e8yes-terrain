@@ -20,11 +20,11 @@
 #include <string>
 
 #include "common/device.h"
-#include "renderer/dag/graphics_pipeline.h"
 #include "renderer/dag/dag_operation.h"
+#include "renderer/dag/graphics_pipeline.h"
 #include "renderer/dag/graphics_pipeline_output_common.h"
 #include "renderer/space_screen/gaussian_blur.h"
-#include "renderer/space_screen/post_processor.h"
+#include "renderer/space_screen/screen_space_processor.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {
@@ -33,7 +33,7 @@ namespace {
 PipelineKey const kHorizontalGaussianBlurPipelinePrefix = "Horizontal Gaussian Blur";
 PipelineKey const kVerticalGaussianBlurPipelinePrefix = "Vertical Gaussian Blur";
 
-class GaussianBlurPipelineConfigurator : public PostProcessorConfiguratorInterface {
+class GaussianBlurPipelineConfigurator : public ScreenSpaceConfiguratorInterface {
   public:
     GaussianBlurPipelineConfigurator(GraphicsPipelineOutputInterface const &input);
     ~GaussianBlurPipelineConfigurator() override;
@@ -137,9 +137,9 @@ CreateGaussianBlurPipeline(bool horizontal, GaussianBlurLevel blur_level,
         shader = VerticalGaussianBlurShader(blur_level);
     }
 
-    return std::make_unique<PostProcessorPipeline>(pipeline_key, shader, /*input_image_count=*/1,
-                                                   /*push_constant_size=*/0, blurred_output,
-                                                   transfer_context);
+    return std::make_unique<ScreenSpaceProcessorPipeline>(
+        pipeline_key, shader, /*input_image_count=*/1,
+        /*push_constant_size=*/0, blurred_output, transfer_context);
 }
 
 } // namespace

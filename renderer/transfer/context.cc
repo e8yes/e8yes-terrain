@@ -24,13 +24,11 @@
 
 namespace e8 {
 
-TransferContext::TransferContext(VulkanContext* context)
-    : vulkan_context(context),
-      descriptor_set_allocator(context),
-      texture_descriptor_set_cache(&descriptor_set_allocator),
-      geometry_vram_transfer(context),
+TransferContext::TransferContext(VulkanContext *context)
+    : vulkan_context(context), descriptor_set_allocator(context),
+      texture_descriptor_set_cache(&descriptor_set_allocator), geometry_vram_transfer(context),
       texture_vram_transfer(context) {}
 
 TransferContext::~TransferContext() {}
 
-}  // namespace e8
+} // namespace e8

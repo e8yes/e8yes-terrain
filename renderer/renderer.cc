@@ -30,9 +30,9 @@
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/dag/graphics_pipeline.h"
 #include "renderer/dag/graphics_pipeline_output_common.h"
-#include "renderer/dag/dag_operation.h"
 #include "renderer/dag/promise.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/renderer.h"
@@ -63,7 +63,8 @@ class AcquireImagePipeline : public GraphicsPipelineInterface {
 
     Fulfillment Launch(GraphicsPipelineArgumentsInterface const &generic_args,
                        std::vector<GpuPromise *> const &prerequisites,
-                       unsigned completion_signal_count, GraphicsPipelineOutputInterface *output) override;
+                       unsigned completion_signal_count,
+                       GraphicsPipelineOutputInterface *output) override;
 };
 
 AcquireImagePipeline::AcquireImagePipeline(VulkanContext *context)
@@ -73,10 +74,11 @@ AcquireImagePipeline::~AcquireImagePipeline() {}
 
 PipelineKey AcquireImagePipeline::Key() const { return kAcquireImagePipeline; }
 
-Fulfillment AcquireImagePipeline::Launch(GraphicsPipelineArgumentsInterface const & /*generic_args*/,
-                                         std::vector<GpuPromise *> const &prerequisites,
-                                         unsigned completion_signal_count,
-                                         GraphicsPipelineOutputInterface *output) {
+Fulfillment
+AcquireImagePipeline::Launch(GraphicsPipelineArgumentsInterface const & /*generic_args*/,
+                             std::vector<GpuPromise *> const &prerequisites,
+                             unsigned completion_signal_count,
+                             GraphicsPipelineOutputInterface *output) {
     assert(prerequisites.empty());
     assert(output != nullptr);
 
@@ -130,7 +132,8 @@ class PresentImagePipeline : public GraphicsPipelineInterface {
 
     Fulfillment Launch(GraphicsPipelineArgumentsInterface const &generic_args,
                        std::vector<GpuPromise *> const &prerequisites,
-                       unsigned completion_signal_count, GraphicsPipelineOutputInterface *output) override;
+                       unsigned completion_signal_count,
+                       GraphicsPipelineOutputInterface *output) override;
 };
 
 PresentImagePipeline::PresentImagePipeline(VulkanContext *context)
@@ -180,8 +183,7 @@ RendererInterface::StagePerformance::~StagePerformance() {}
 
 RendererInterface::RendererInterface(unsigned num_stages, VulkanContext *context)
     : context(context), stage_performance_(num_stages + 2),
-      final_output_(
-          std::make_shared<SwapChainOutput>(/*with_depth_buffer=*/false, context)),
+      final_output_(std::make_shared<SwapChainOutput>(/*with_depth_buffer=*/false, context)),
       first_stage_(final_output_), final_stage_(/*output=*/nullptr),
       mu_(std::make_unique<std::mutex>()) {}
 
@@ -205,9 +207,9 @@ DagOperation *RendererInterface::DoFirstStage() {
     return &first_stage_;
 }
 
-DagOperation *
-RendererInterface::DoFinalStage(DagOperation *first_stage, DagOperation *final_color_image_stage,
-                                std::vector<DagOperation *> const &dangling_stages) {
+DagOperation *RendererInterface::DoFinalStage(DagOperation *first_stage,
+                                              DagOperation *final_color_image_stage,
+                                              std::vector<DagOperation *> const &dangling_stages) {
     GraphicsPipelineInterface *pipeline = final_stage_.WithPipeline(
         kPresentImagePipeline, [this](GraphicsPipelineOutputInterface * /*output*/) {
             return std::make_unique<PresentImagePipeline>(this->context);

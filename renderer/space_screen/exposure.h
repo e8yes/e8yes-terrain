@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_EXPOSURE_H
-#define ISLANDS_RENDERER_EXPOSURE_H
+#ifndef ISLANDS_RENDERER_SPACE_SCREEN_EXPOSURE_H
+#define ISLANDS_RENDERER_SPACE_SCREEN_EXPOSURE_H
 
 #include <memory>
 
@@ -36,7 +36,7 @@ namespace e8 {
  * @return A pipeline stage created with the 16-bit float image output.
  */
 std::unique_ptr<DagOperation> CreateLogLuminaneStage(unsigned width, unsigned height,
-                                                      VulkanContext *context);
+                                                     VulkanContext *context);
 
 /**
  * @brief CreateExposureStage Creates an exposure stage with a 1 by 1 16-bit float image output for
@@ -60,6 +60,6 @@ std::unique_ptr<DagOperation> CreateExposureStage(VulkanContext *context);
 void DoEstimateExposure(DagOperation *radiance_map, TransferContext *transfer_context,
                         DagOperation *log_luminance_map, DagOperation *log_exposure);
 
-}  // namespace e8
+} // namespace e8
 
-#endif  // ISLANDS_RENDERER_EXPOSURE_H
+#endif // ISLANDS_RENDERER_SPACE_SCREEN_EXPOSURE_H

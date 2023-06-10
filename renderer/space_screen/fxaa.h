@@ -15,20 +15,19 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_FXAA_H
-#define ISLANDS_RENDERER_FXAA_H
+#ifndef ISLANDS_RENDERER_SPACE_SCREEN_FXAA_H
+#define ISLANDS_RENDERER_SPACE_SCREEN_FXAA_H
 
 #include <memory>
 
-#include "common/device.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {
 
 /**
- * @brief DoFxaa Reduces edge aliasing artifact through a post processing technique devised by
- * Timothy Lottes.
+ * @brief DoFxaa Reduces edge aliasing artifact through a screen space processing technique devised
+ * by Timothy Lottes.
  *
  * @param ldr_image An LDR RGB image where the alpha channel is populated with the color's
  * luminance value.
@@ -37,6 +36,6 @@ namespace e8 {
  */
 void DoFxaa(DagOperation *ldr_image, TransferContext *transfer_context, DagOperation *target);
 
-}  // namespace e8
+} // namespace e8
 
-#endif  // ISLANDS_RENDERER_FXAA_H
+#endif // ISLANDS_RENDERER_SPACE_SCREEN_FXAA_H

@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_POSTPROCESSOR_SHADOW_MAP_H
-#define ISLANDS_RENDERER_POSTPROCESSOR_SHADOW_MAP_H
+#ifndef ISLANDS_RENDERER_SPACE_SCREEN_SHADOW_MAP_H
+#define ISLANDS_RENDERER_SPACE_SCREEN_SHADOW_MAP_H
 
 #include <memory>
 
@@ -50,7 +50,8 @@ void CreateGaussianBlurStages(unsigned width, unsigned height, VulkanContext *co
                               std::unique_ptr<DagOperation> *hv_blurred);
 
 /**
- * @brief DoGaussianBlur Schedules a post processing graphics pipeline to Gaussian blur a float map.
+ * @brief DoGaussianBlur Schedules a screen space processing graphics pipeline to Gaussian blur a
+ * float map.
  *
  * @param image The floating point image to be blurred.
  * @param blur_level The size of the Gaussian blurring kernel.
@@ -64,4 +65,4 @@ void DoGaussianBlur(DagOperation *image, GaussianBlurLevel blur_level,
 
 } // namespace e8
 
-#endif // ISLANDS_RENDERER_POSTPROCESSOR_SHADOW_MAP_H
+#endif // ISLANDS_RENDERER_SPACE_SCREEN_SHADOW_MAP_H

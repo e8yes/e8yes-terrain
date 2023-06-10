@@ -23,7 +23,7 @@
 #include "renderer/dag/dag_operation.h"
 #include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/space_screen/depth_projection_visualizer.h"
-#include "renderer/space_screen/post_processor.h"
+#include "renderer/space_screen/screen_space_processor.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {
@@ -37,7 +37,7 @@ struct DepthProjectionVisualizerParameters {
     float alpha;
 };
 
-class DepthProjectionPostProcessorConfigurator : public PostProcessorConfiguratorInterface {
+class DepthProjectionPostProcessorConfigurator : public ScreenSpaceConfiguratorInterface {
   public:
     DepthProjectionPostProcessorConfigurator(float alpha,
                                              std::optional<PerspectiveProjection> projection,
@@ -89,7 +89,7 @@ void DoVisualizeDepthProjection(float alpha, std::optional<PerspectiveProjection
     GraphicsPipelineInterface *pipeline = target->WithPipeline(
         kDepthProjectionVisualizerPipeline,
         [transfer_context](GraphicsPipelineOutputInterface *output) {
-            return std::make_unique<PostProcessorPipeline>(
+            return std::make_unique<ScreenSpaceProcessorPipeline>(
                 kDepthProjectionVisualizerPipeline, kFragmentShaderFilePathDepthMapVisualizer,
                 /*input_image_count=*/1,
                 /*push_constant_size=*/sizeof(DepthProjectionVisualizerParameters), output,

@@ -31,11 +31,11 @@ namespace e8 {
  * and the device.
  */
 struct TransferContext {
-    explicit TransferContext(VulkanContext* context);
+    explicit TransferContext(VulkanContext *context);
     ~TransferContext();
 
     // Not owned. Contextual Vulkan handles that the transfer objects below depend on.
-    VulkanContext* vulkan_context;
+    VulkanContext *vulkan_context;
 
     // A generic descriptor set allocator which allows arbitrary number of descriptor set
     // allocations.
@@ -53,6 +53,6 @@ struct TransferContext {
     TextureVramTransfer texture_vram_transfer;
 };
 
-}  // namespace e8
+} // namespace e8
 
-#endif  // ISLANDS_RENDERER_TRANSFER_CONTEXT_H
+#endif // ISLANDS_RENDERER_TRANSFER_CONTEXT_H

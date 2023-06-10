@@ -44,7 +44,7 @@
 #include "renderer/query/collection.h"
 #include "renderer/query/drawable_instance.h"
 #include "renderer/space_projection/project_depth.h"
-#include "renderer/space_screen/post_processor.h"
+#include "renderer/space_screen/screen_space_processor.h"
 
 namespace e8 {
 namespace {
@@ -239,7 +239,7 @@ struct LinearizeDepthPipelineParameters {
     float z_far;
 };
 
-class LinearizeDepthPipelineConfigurator final : public PostProcessorConfiguratorInterface {
+class LinearizeDepthPipelineConfigurator final : public ScreenSpaceConfiguratorInterface {
   public:
     LinearizeDepthPipelineConfigurator(PerspectiveProjection const &projection,
                                        GraphicsPipelineOutputInterface const &depth_map)
@@ -305,7 +305,7 @@ void DoProjectDepth(DrawableCollection *drawables, PerspectiveProjection const &
     GraphicsPipelineInterface *linearize_depth_pipeline = projected_linear_depth->WithPipeline(
         kLinearizeDepthPipeline,
         [transfer_context](GraphicsPipelineOutputInterface *linear_depth_output) {
-            return std::make_unique<PostProcessorPipeline>(
+            return std::make_unique<ScreenSpaceProcessorPipeline>(
                 kLinearizeDepthPipeline, kFragmentShaderFilePathDepthMapLinearizerPerspective,
                 /*input_image_count=*/1,
                 /*push_constant_size=*/sizeof(LinearizeDepthPipelineParameters),

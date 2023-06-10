@@ -53,8 +53,8 @@ SOURCES += \
     space_screen/float_map_visualizer.cc \
     space_screen/fxaa.cc \
     space_screen/gaussian_blur.cc \
-    space_screen/post_processor.cc \
     space_screen/radiance.cc \
+    space_screen/screen_space_processor.cc \
     space_screen/surface_projection_visualizer.cc \
     space_screen/tone_map.cc \
     proto/renderer.pb.cc \
@@ -104,8 +104,8 @@ HEADERS += \
     space_screen/float_map_visualizer.h \
     space_screen/fxaa.h \
     space_screen/gaussian_blur.h \
-    space_screen/post_processor.h \
     space_screen/radiance.h \
+    space_screen/screen_space_processor.h \
     space_screen/surface_projection_visualizer.h \
     space_screen/tone_map.h \
     proto/renderer.pb.h \
