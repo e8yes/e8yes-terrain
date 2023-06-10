@@ -76,7 +76,7 @@ LightSource ToViewSpace(LightSource const &light_source, mat44 const &view_model
 void ComputeSpotLightBasis(SpotLight const &spot_light, mat44 const &view_model, vec3 *right,
                            vec3 *down, vec3 *back) {
     // Constructs a basis in the spot light's local space.
-    *back = ToVec3(spot_light.direction());
+    *back = -ToVec3(spot_light.direction());
 
     vec3 priming_vector{0.0f, 0.0f, 1.0f};
     float cos_back_100 = back->inner(priming_vector);
