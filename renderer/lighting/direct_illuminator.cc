@@ -29,8 +29,8 @@
 #include "renderer/dag/dag_operation.h"
 #include "renderer/projection_space/fill_color.h"
 #include "renderer/projection_space/project_depth.h"
-#include "renderer/postprocessor/gaussian_blur.h"
-#include "renderer/postprocessor/radiance.h"
+#include "renderer/space_screen/gaussian_blur.h"
+#include "renderer/space_screen/radiance.h"
 #include "renderer/query/light_source.h"
 #include "renderer/transfer/context.h"
 

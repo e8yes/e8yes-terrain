@@ -31,8 +31,8 @@
 #include "renderer/dag/promise.h"
 #include "renderer/pass/configurator.h"
 #include "renderer/pass/rasterize.h"
-#include "renderer/postprocessor/exposure.h"
-#include "renderer/postprocessor/post_processor.h"
+#include "renderer/space_screen/exposure.h"
+#include "renderer/space_screen/post_processor.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {

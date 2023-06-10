@@ -21,8 +21,8 @@
 #include "renderer/basic/shader.h"
 #include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/dag/dag_operation.h"
-#include "renderer/postprocessor/fxaa.h"
-#include "renderer/postprocessor/post_processor.h"
+#include "renderer/space_screen/fxaa.h"
+#include "renderer/space_screen/post_processor.h"
 #include "renderer/transfer/descriptor_set.h"
 
 namespace e8 {

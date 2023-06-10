@@ -48,15 +48,15 @@ SOURCES += \
     projection_space/fill_color.cc \
     projection_space/project_depth.cc \
     projection_space/project_surface.cc \
-    postprocessor/depth_projection_visualizer.cc \
-    postprocessor/exposure.cc \
-    postprocessor/float_map_visualizer.cc \
-    postprocessor/fxaa.cc \
-    postprocessor/gaussian_blur.cc \
-    postprocessor/post_processor.cc \
-    postprocessor/radiance.cc \
-    postprocessor/surface_projection_visualizer.cc \
-    postprocessor/tone_map.cc \
+    space_screen/depth_projection_visualizer.cc \
+    space_screen/exposure.cc \
+    space_screen/float_map_visualizer.cc \
+    space_screen/fxaa.cc \
+    space_screen/gaussian_blur.cc \
+    space_screen/post_processor.cc \
+    space_screen/radiance.cc \
+    space_screen/surface_projection_visualizer.cc \
+    space_screen/tone_map.cc \
     proto/renderer.pb.cc \
     query/collection.cc \
     query/drawable_instance.cc \
@@ -99,15 +99,15 @@ HEADERS += \
     projection_space/fill_color.h \
     projection_space/project_depth.h \
     projection_space/project_surface.h \
-    postprocessor/depth_projection_visualizer.h \
-    postprocessor/exposure.h \
-    postprocessor/float_map_visualizer.h \
-    postprocessor/fxaa.h \
-    postprocessor/gaussian_blur.h \
-    postprocessor/post_processor.h \
-    postprocessor/radiance.h \
-    postprocessor/surface_projection_visualizer.h \
-    postprocessor/tone_map.h \
+    space_screen/depth_projection_visualizer.h \
+    space_screen/exposure.h \
+    space_screen/float_map_visualizer.h \
+    space_screen/fxaa.h \
+    space_screen/gaussian_blur.h \
+    space_screen/post_processor.h \
+    space_screen/radiance.h \
+    space_screen/surface_projection_visualizer.h \
+    space_screen/tone_map.h \
     proto/renderer.pb.h \
     query/collection.h \
     query/drawable_instance.h \

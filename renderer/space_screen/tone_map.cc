@@ -25,9 +25,9 @@
 #include "renderer/dag/graphics_pipeline_output_common.h"
 #include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/dag/dag_operation.h"
-#include "renderer/postprocessor/exposure.h"
-#include "renderer/postprocessor/post_processor.h"
-#include "renderer/postprocessor/tone_map.h"
+#include "renderer/space_screen/exposure.h"
+#include "renderer/space_screen/post_processor.h"
+#include "renderer/space_screen/tone_map.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {

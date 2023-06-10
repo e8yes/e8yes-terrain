@@ -20,13 +20,10 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
-#include "common/device.h"
-#include "renderer/basic/shader.h"
-#include "renderer/basic/uniform_layout.h"
-#include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/dag/dag_operation.h"
-#include "renderer/postprocessor/depth_projection_visualizer.h"
-#include "renderer/postprocessor/post_processor.h"
+#include "renderer/dag/graphics_pipeline_output.h"
+#include "renderer/space_screen/depth_projection_visualizer.h"
+#include "renderer/space_screen/post_processor.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {
@@ -90,7 +87,8 @@ void DoVisualizeDepthProjection(float alpha, std::optional<PerspectiveProjection
                                 DagOperation *depth_map_stage, TransferContext *transfer_context,
                                 DagOperation *target) {
     GraphicsPipelineInterface *pipeline = target->WithPipeline(
-        kDepthProjectionVisualizerPipeline, [transfer_context](GraphicsPipelineOutputInterface *output) {
+        kDepthProjectionVisualizerPipeline,
+        [transfer_context](GraphicsPipelineOutputInterface *output) {
             return std::make_unique<PostProcessorPipeline>(
                 kDepthProjectionVisualizerPipeline, kFragmentShaderFilePathDepthMapVisualizer,
                 /*input_image_count=*/1,

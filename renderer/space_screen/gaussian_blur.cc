@@ -23,8 +23,8 @@
 #include "renderer/dag/graphics_pipeline.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/dag/graphics_pipeline_output_common.h"
-#include "renderer/postprocessor/gaussian_blur.h"
-#include "renderer/postprocessor/post_processor.h"
+#include "renderer/space_screen/gaussian_blur.h"
+#include "renderer/space_screen/post_processor.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {

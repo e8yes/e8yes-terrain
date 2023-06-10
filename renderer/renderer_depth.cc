@@ -27,7 +27,7 @@
 #include "renderer/basic/projection.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/projection_space/project_depth.h"
-#include "renderer/postprocessor/depth_projection_visualizer.h"
+#include "renderer/space_screen/depth_projection_visualizer.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/query/collection.h"
 #include "renderer/renderer.h"

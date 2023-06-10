@@ -24,8 +24,8 @@
 #include "renderer/basic/uniform_layout.h"
 #include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/projection_space/project_surface.h"
-#include "renderer/postprocessor/post_processor.h"
-#include "renderer/postprocessor/surface_projection_visualizer.h"
+#include "renderer/space_screen/post_processor.h"
+#include "renderer/space_screen/surface_projection_visualizer.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/transfer/context.h"
 
