@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_CACHED_PIPELINE_H
-#define ISLANDS_RENDERER_CACHED_PIPELINE_H
+#ifndef ISLANDS_RENDERER_GRAPHICS_PIPELINE_H
+#define ISLANDS_RENDERER_GRAPHICS_PIPELINE_H
 
 #include <memory>
 #include <string>
@@ -24,14 +24,13 @@
 
 #include "common/device.h"
 #include "renderer/basic/fixed_function.h"
-#include "renderer/basic/frame_buffer.h"
 #include "renderer/basic/pipeline.h"
 #include "renderer/basic/sampler.h"
 #include "renderer/basic/shader.h"
 #include "renderer/basic/uniform_layout.h"
 #include "renderer/basic/vertex_input.h"
-#include "renderer/output/pipeline_output.h"
-#include "renderer/output/promise.h"
+#include "renderer/dag/graphics_pipeline_output.h"
+#include "renderer/dag/promise.h"
 
 namespace e8 {
 
@@ -39,22 +38,22 @@ namespace e8 {
 using PipelineKey = std::string;
 
 /**
- * @brief The CachedPipelineArgumentsInterface struct Generic arguments that pass to
- * CachedPipelineInterface::Launch().
+ * @brief The GraphicsPipelineArgumentsInterface struct Generic arguments that pass to
+ * GraphicsPipelineInterface::Launch().
  */
-struct CachedPipelineArgumentsInterface {
-    CachedPipelineArgumentsInterface();
-    virtual ~CachedPipelineArgumentsInterface();
+struct GraphicsPipelineArgumentsInterface {
+    GraphicsPipelineArgumentsInterface();
+    virtual ~GraphicsPipelineArgumentsInterface();
 };
 
 /**
- * @brief The CachedPipelineInterface class Encapsulates the common states and functionality of a
+ * @brief The GraphicsPipelineInterface class Encapsulates the common states and functionality of a
  * graphics pipeline.
  */
-class CachedPipelineInterface {
+class GraphicsPipelineInterface {
   public:
-    CachedPipelineInterface(VulkanContext *context);
-    virtual ~CachedPipelineInterface();
+    GraphicsPipelineInterface(VulkanContext *context);
+    virtual ~GraphicsPipelineInterface();
 
     /**
      * @brief Key A unique key assigned to this pipeline.
@@ -71,10 +70,10 @@ class CachedPipelineInterface {
      * @param output Stores the output of this pipeline.
      * @return The GPU operation's promised fulfillment.
      */
-    virtual Fulfillment Launch(CachedPipelineArgumentsInterface const &generic_args,
+    virtual Fulfillment Launch(GraphicsPipelineArgumentsInterface const &generic_args,
                                std::vector<GpuPromise *> const &prerequisites,
                                unsigned completion_signal_count,
-                               PipelineOutputInterface *output) = 0;
+                               GraphicsPipelineOutputInterface *output) = 0;
 
   protected:
     // Contextual Vulkan handles.
@@ -91,4 +90,4 @@ class CachedPipelineInterface {
 
 } // namespace e8
 
-#endif // ISLANDS_RENDERER_CACHED_PIPELINE_H
+#endif // ISLANDS_RENDERER_GRAPHICS_PIPELINE_H

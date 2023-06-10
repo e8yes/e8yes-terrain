@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_COMMON_OUTPUT_H
-#define ISLANDS_RENDERER_COMMON_OUTPUT_H
+#ifndef ISLANDS_RENDERER_GRAHPICS_PIPELINE_OUTPUT_COMMON_H
+#define ISLANDS_RENDERER_GRAHPICS_PIPELINE_OUTPUT_COMMON_H
 
 #include <memory>
 #include <vector>
@@ -25,14 +25,14 @@
 #include "renderer/basic/attachment.h"
 #include "renderer/basic/frame_buffer.h"
 #include "renderer/basic/render_pass.h"
-#include "renderer/output/pipeline_output.h"
+#include "renderer/dag/graphics_pipeline_output.h"
 
 namespace e8 {
 
 /**
- * @brief The SwapChainPipelineOutput class Stores the final rendering result.
+ * @brief The SwapChainOutput class Stores the final rendering result.
  */
-class SwapChainPipelineOutput : public PipelineOutputInterface {
+class SwapChainOutput final : public GraphicsPipelineOutputInterface {
   public:
     /**
      * @brief SwapChainPipelineOutput Constructs a swap chain output using the swap chain definition
@@ -41,8 +41,8 @@ class SwapChainPipelineOutput : public PipelineOutputInterface {
      * @param with_depth_buffer Specifiies if the output contains depth information.
      * @param context Contextual Vulkan handles.
      */
-    SwapChainPipelineOutput(bool with_depth_buffer, VulkanContext *context);
-    ~SwapChainPipelineOutput() override;
+    SwapChainOutput(bool with_depth_buffer, VulkanContext *context);
+    ~SwapChainOutput() override;
 
     FrameBuffer *GetFrameBuffer() const override;
     RenderPass const &GetRenderPass() const override;
@@ -63,18 +63,17 @@ class SwapChainPipelineOutput : public PipelineOutputInterface {
     void SetSwapChainImageIndex(unsigned swap_chain_image_index);
 
   private:
-    struct SwapChainPipelineOutputImpl;
-    std::unique_ptr<SwapChainPipelineOutputImpl> pimpl_;
+    struct SwapChainOutputImpl;
+    std::unique_ptr<SwapChainOutputImpl> pimpl_;
 };
 
 /**
- * @brief The HdrColorPipelineOutput class Stores unormalized HDR linear RGBA color values.
+ * @brief The HdrColorOutput class Stores unormalized HDR linear RGBA color values.
  */
-class HdrColorPipelineOutput : public PipelineOutputInterface {
+class HdrColorOutput final : public GraphicsPipelineOutputInterface {
   public:
-    HdrColorPipelineOutput(unsigned width, unsigned height, bool with_depth_buffer,
-                           VulkanContext *context);
-    ~HdrColorPipelineOutput() override;
+    HdrColorOutput(unsigned width, unsigned height, bool with_depth_buffer, VulkanContext *context);
+    ~HdrColorOutput() override;
 
     FrameBuffer *GetFrameBuffer() const override;
     RenderPass const &GetRenderPass() const override;
@@ -82,18 +81,17 @@ class HdrColorPipelineOutput : public PipelineOutputInterface {
     FrameBufferAttachment const *DepthAttachment() const override;
 
   private:
-    struct UnboundedColorPipelineOutputImpl;
-    std::unique_ptr<UnboundedColorPipelineOutputImpl> pimpl_;
+    struct HdrColorOutputImpl;
+    std::unique_ptr<HdrColorOutputImpl> pimpl_;
 };
 
 /**
- * @brief The LdrColorPipelineOutput class Stores LDR color values in sRGB color space.
+ * @brief The LdrColorOutput class Stores LDR color values in sRGB color space.
  */
-class LdrColorPipelineOutput : public PipelineOutputInterface {
+class LdrColorOutput final : public GraphicsPipelineOutputInterface {
   public:
-    LdrColorPipelineOutput(unsigned width, unsigned height, bool with_depth_buffer,
-                           VulkanContext *context);
-    ~LdrColorPipelineOutput() override;
+    LdrColorOutput(unsigned width, unsigned height, bool with_depth_buffer, VulkanContext *context);
+    ~LdrColorOutput() override;
 
     FrameBuffer *GetFrameBuffer() const override;
     RenderPass const &GetRenderPass() const override;
@@ -101,17 +99,17 @@ class LdrColorPipelineOutput : public PipelineOutputInterface {
     FrameBufferAttachment const *DepthAttachment() const override;
 
   private:
-    struct LdrColorPipelineOutputImpl;
-    std::unique_ptr<LdrColorPipelineOutputImpl> pimpl_;
+    struct LdrColorOutputImpl;
+    std::unique_ptr<LdrColorOutputImpl> pimpl_;
 };
 
 /**
- * @brief The FloatPipelineOutput class Stores 32-bit floating point values.
+ * @brief The FloatOutput class Stores 32-bit floating point values.
  */
-class FloatPipelineOutput : public PipelineOutputInterface {
+class FloatOutput final : public GraphicsPipelineOutputInterface {
   public:
-    FloatPipelineOutput(unsigned width, unsigned height, VulkanContext *context);
-    ~FloatPipelineOutput();
+    FloatOutput(unsigned width, unsigned height, VulkanContext *context);
+    ~FloatOutput() override;
 
     FrameBuffer *GetFrameBuffer() const override;
     RenderPass const &GetRenderPass() const override;
@@ -119,10 +117,10 @@ class FloatPipelineOutput : public PipelineOutputInterface {
     FrameBufferAttachment const *DepthAttachment() const override;
 
   private:
-    struct FloatPipelineOutputImpl;
-    std::unique_ptr<FloatPipelineOutputImpl> pimpl_;
+    struct FloatOutputImpl;
+    std::unique_ptr<FloatOutputImpl> pimpl_;
 };
 
 } // namespace e8
 
-#endif // ISLANDS_RENDERER_COMMON_OUTPUT_H
+#endif // ISLANDS_RENDERER_GRAHPICS_PIPELINE_OUTPUT_COMMON_H

@@ -25,7 +25,7 @@
 #include "content/scene.h"
 #include "content/scene_entity.h"
 #include "renderer/basic/projection.h"
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/pipeline/project_surface.h"
 #include "renderer/postprocessor/surface_projection_visualizer.h"
 #include "renderer/proto/renderer.pb.h"
@@ -39,20 +39,20 @@ namespace e8 {
 
 class SurfaceProjectionRenderer::SurfaceProjectionRendererImpl {
    public:
-    SurfaceProjectionRendererImpl(std::unique_ptr<PipelineStage> &&final_color_image,
+    SurfaceProjectionRendererImpl(std::unique_ptr<DagOperation> &&final_color_image,
                                   VulkanContext *context);
     ~SurfaceProjectionRendererImpl();
 
     TransferContext transfer_context;
 
-    std::unique_ptr<PipelineStage> surface_projection;
-    std::unique_ptr<PipelineStage> final_color_image;
+    std::unique_ptr<DagOperation> surface_projection;
+    std::unique_ptr<DagOperation> final_color_image;
 
     RendererConfiguration config;
 };
 
 SurfaceProjectionRenderer::SurfaceProjectionRendererImpl::SurfaceProjectionRendererImpl(
-    std::unique_ptr<PipelineStage> &&final_color_image, VulkanContext *context)
+    std::unique_ptr<DagOperation> &&final_color_image, VulkanContext *context)
     : transfer_context(context),
       surface_projection(CreateProjectSurfaceStage(context->swap_chain_image_extent.width,
                                                    context->swap_chain_image_extent.height,
@@ -74,13 +74,13 @@ void SurfaceProjectionRenderer::DrawFrame(Scene *scene, ResourceAccessor *resour
     PerspectiveProjection camera_projection(scene->camera);
     DrawableCollection drawable_collection(*scene->SceneEntityStructure(), resource_accessor);
 
-    PipelineStage *first_stage = this->DoFirstStage();
+    DagOperation *first_stage = this->DoFirstStage();
     DoProjectSurface(&drawable_collection, camera_projection, &pimpl_->transfer_context,
                      first_stage, pimpl_->surface_projection.get());
     DoVisualizeSurfaceProjection(pimpl_->config.light_inputs_renderer_params().input_to_visualize(),
                                  pimpl_->surface_projection.get(), &pimpl_->transfer_context,
                                  pimpl_->final_color_image.get());
-    PipelineStage *final_stage = this->DoFinalStage(first_stage, pimpl_->final_color_image.get());
+    DagOperation *final_stage = this->DoFinalStage(first_stage, pimpl_->final_color_image.get());
 
     final_stage->Fulfill(pimpl_->transfer_context.vulkan_context);
 }

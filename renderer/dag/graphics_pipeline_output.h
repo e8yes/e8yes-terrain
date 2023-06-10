@@ -15,28 +15,26 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_PIPELINE_OUTPUT_H
-#define ISLANDS_RENDERER_PIPELINE_OUTPUT_H
+#ifndef ISLANDS_RENDERER_GRAPHICS_PIPELINE_OUTPUT_H
+#define ISLANDS_RENDERER_GRAPHICS_PIPELINE_OUTPUT_H
 
 #include <memory>
 #include <vector>
 #include <vulkan/vulkan.h>
 
-#include "common/device.h"
 #include "renderer/basic/attachment.h"
 #include "renderer/basic/frame_buffer.h"
 #include "renderer/basic/render_pass.h"
-#include "renderer/output/promise.h"
 
 namespace e8 {
 
 /**
- * @brief The PipelineOutputInterface class Represents the output of a graphics pipeline.
+ * @brief The GraphicsPipelineOutputInterface class Represents the output of a graphics pipeline.
  */
-class PipelineOutputInterface {
+class GraphicsPipelineOutputInterface {
   public:
-    PipelineOutputInterface(unsigned width, unsigned height);
-    virtual ~PipelineOutputInterface();
+    GraphicsPipelineOutputInterface(unsigned width, unsigned height);
+    virtual ~GraphicsPipelineOutputInterface();
 
     /**
      * @brief GetFrameBuffer Returns the current frame buffer object.
@@ -78,4 +76,4 @@ class PipelineOutputInterface {
 
 } // namespace e8
 
-#endif // ISLANDS_RENDERER_PIPELINE_OUTPUT_H
+#endif // ISLANDS_RENDERER_GRAPHICS_PIPELINE_OUTPUT_H

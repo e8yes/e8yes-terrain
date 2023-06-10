@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_PIPELINE_STAGE_H
-#define ISLANDS_RENDERER_PIPELINE_STAGE_H
+#ifndef ISLANDS_RENDERER_DAG_OPERATION_H
+#define ISLANDS_RENDERER_DAG_OPERATION_H
 
 #include <functional>
 #include <memory>
@@ -27,29 +27,30 @@
 #include <vector>
 
 #include "common/device.h"
-#include "renderer/output/cached_pipeline.h"
-#include "renderer/output/pipeline_output.h"
-#include "renderer/output/promise.h"
+#include "renderer/dag/graphics_pipeline.h"
+#include "renderer/dag/graphics_pipeline_output.h"
+#include "renderer/dag/promise.h"
 
 namespace e8 {
 
 /**
- * @brief The PipelineStage class Encapsulates a set of mudular independent operations that can be
- * chained into a DAG compute graph.
+ * @brief The DagOperation class Each DAG operation is a node in a DAG compute graph. An operation
+ * serves as a container for a series of independent graphics pipelines. During fulfillment, all
+ * graphics pipelines are launched before moving on to child operations.
  */
-class PipelineStage {
+class DagOperation {
   public:
     // A graphics pipeline's construction is often paired with an output. This function standarized
     // the creation of a complete graphics pipeline.
-    using CompilePipelineFn =
-        std::function<std::unique_ptr<CachedPipelineInterface>(PipelineOutputInterface *output)>;
+    using CompilePipelineFn = std::function<std::unique_ptr<GraphicsPipelineInterface>(
+        GraphicsPipelineOutputInterface *output)>;
 
     /**
-     * @brief PipelineStage Constructs a pipeline stage attached with an optional output.
+     * @brief DagOperation Constructs a pipeline stage attached with an optional output.
      */
-    explicit PipelineStage(std::shared_ptr<PipelineOutputInterface> const &output);
-    PipelineStage(PipelineStage const &) = delete;
-    ~PipelineStage();
+    explicit DagOperation(std::shared_ptr<GraphicsPipelineOutputInterface> const &output);
+    DagOperation(DagOperation const &) = delete;
+    ~DagOperation();
 
     /**
      * @brief WithPipeline Adds a graphics pipeline to this stage if it hasn't been.
@@ -58,11 +59,11 @@ class PipelineStage {
      * @param compile_fn The pipeline's constructor.
      * @return The graphics pipeline associated with the key.
      */
-    CachedPipelineInterface *WithPipeline(PipelineKey const &key, CompilePipelineFn compile_fn);
+    GraphicsPipelineInterface *WithPipeline(PipelineKey const &key, CompilePipelineFn compile_fn);
 
     /**
      * @brief Schedule Schedules an added pipeline to be run with the specified parameters. The
-     * pipeline is guaranteed to have run after calling PipelineStage::Fulfill().
+     * pipeline is guaranteed to have run after calling DagOperation::Fulfill().
      *
      * @param pipeline The pipeline to be scheduled to run.
      * @param parents The stages where the pipeline depends. The elements in this array is nullable.
@@ -70,19 +71,19 @@ class PipelineStage {
      * @param instance_count The number of times to call on the pipeline with the same dependent
      * parents.
      */
-    void Schedule(CachedPipelineInterface const *pipeline,
-                  std::unique_ptr<CachedPipelineArgumentsInterface> &&args,
-                  std::vector<PipelineStage *> const &parents);
+    void Schedule(GraphicsPipelineInterface const *pipeline,
+                  std::unique_ptr<GraphicsPipelineArgumentsInterface> &&args,
+                  std::vector<DagOperation *> const &parents);
 
     /**
      * @brief Output The immutable output attached to this stage.
      */
-    PipelineOutputInterface const *Output() const;
+    GraphicsPipelineOutputInterface const *Output() const;
 
     /**
      * @brief Output The output attached to this stage.
      */
-    PipelineOutputInterface *Output();
+    GraphicsPipelineOutputInterface *Output();
 
     /**
      * @brief Fulfill Runs all schedules in this stage and those in the dependent parents, then it
@@ -97,24 +98,24 @@ class PipelineStage {
   private:
     using ChildId = unsigned;
 
-    struct PipelineStageImpl;
+    struct DagOperationImpl;
     struct ParentStage;
     struct PipelineSchedule;
     struct PipelineAndSchedules;
     ChildId AllocateChild();
 
-    std::unordered_set<PipelineStage *> UniqueParents();
+    std::unordered_set<DagOperation *> UniqueParents();
 
-    Fulfillment LaunchSchedule(CachedPipelineInterface *pipeline, PipelineSchedule const &schedule,
-                               unsigned child_count, PipelineOutputInterface *output);
+    Fulfillment LaunchSchedule(GraphicsPipelineInterface *pipeline, PipelineSchedule const &schedule,
+                               unsigned child_count, GraphicsPipelineOutputInterface *output);
 
     std::vector<GpuPromise *> LaunchSchedulesAs(std::optional<ChildId> child_id);
 
     void Reset();
 
-    std::unique_ptr<PipelineStageImpl> pimpl_;
+    std::unique_ptr<DagOperationImpl> pimpl_;
 };
 
 } // namespace e8
 
-#endif // ISLANDS_RENDERER_PIPELINE_STAGE_H
+#endif // ISLANDS_RENDERER_DAG_OPERATION_H

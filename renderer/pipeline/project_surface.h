@@ -22,7 +22,7 @@
 
 #include "common/device.h"
 #include "renderer/basic/projection.h"
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/query/collection.h"
 #include "renderer/transfer/context.h"
 
@@ -53,7 +53,7 @@ enum SurfaceProjectionColorOutput {
  * @param context Contextual Vulkan handles.
  * @return The light input stage.
  */
-std::unique_ptr<PipelineStage> CreateProjectSurfaceStage(unsigned width, unsigned height,
+std::unique_ptr<DagOperation> CreateProjectSurfaceStage(unsigned width, unsigned height,
                                                          VulkanContext *context);
 
 /**
@@ -71,7 +71,7 @@ std::unique_ptr<PipelineStage> CreateProjectSurfaceStage(unsigned width, unsigne
  */
 void DoProjectSurface(DrawableCollection *drawable_collection,
                       PerspectiveProjection const &projection, TransferContext *transfer_context,
-                      PipelineStage *first_stage, PipelineStage *target);
+                      DagOperation *first_stage, DagOperation *target);
 
 }  // namespace e8
 

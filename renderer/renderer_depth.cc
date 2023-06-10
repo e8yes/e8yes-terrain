@@ -25,7 +25,7 @@
 #include "content/scene.h"
 #include "content/scene_entity.h"
 #include "renderer/basic/projection.h"
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/pipeline/project_depth.h"
 #include "renderer/postprocessor/depth_projection_visualizer.h"
 #include "renderer/proto/renderer.pb.h"
@@ -39,20 +39,20 @@ namespace e8 {
 
 class DepthRenderer::DepthRendererImpl {
   public:
-    DepthRendererImpl(std::unique_ptr<PipelineStage> &&visual_representation,
+    DepthRendererImpl(std::unique_ptr<DagOperation> &&visual_representation,
                       VulkanContext *context);
     ~DepthRendererImpl();
 
     TransferContext transfer_context;
 
-    std::unique_ptr<PipelineStage> depth_projection;
-    std::unique_ptr<PipelineStage> visual_representation;
+    std::unique_ptr<DagOperation> depth_projection;
+    std::unique_ptr<DagOperation> visual_representation;
 
     RendererConfiguration config;
 };
 
 DepthRenderer::DepthRendererImpl::DepthRendererImpl(
-    std::unique_ptr<PipelineStage> &&visual_representation, VulkanContext *context)
+    std::unique_ptr<DagOperation> &&visual_representation, VulkanContext *context)
     : transfer_context(context),
       depth_projection(CreateProjectNdcDepthStage(context->swap_chain_image_extent.width,
                                                   context->swap_chain_image_extent.height,
@@ -74,13 +74,13 @@ void DepthRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor)
     PerspectiveProjection projection(scene->camera);
     DrawableCollection drawables_collection(*scene->SceneEntityStructure(), resource_accessor);
 
-    PipelineStage *first_stage = this->DoFirstStage();
+    DagOperation *first_stage = this->DoFirstStage();
     DoProjectDepth(&drawables_collection, projection, &pimpl_->transfer_context, first_stage,
                    pimpl_->depth_projection.get());
     DoVisualizeDepthProjection(pimpl_->config.depth_renderer_params().alpha(), projection,
                                pimpl_->depth_projection.get(), &pimpl_->transfer_context,
                                pimpl_->visual_representation.get());
-    PipelineStage *final_stage =
+    DagOperation *final_stage =
         this->DoFinalStage(first_stage, pimpl_->visual_representation.get());
 
     final_stage->Fulfill(context);

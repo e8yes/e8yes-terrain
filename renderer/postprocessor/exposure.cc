@@ -27,8 +27,8 @@
 #include "renderer/basic/mipmap.h"
 #include "renderer/basic/render_pass.h"
 #include "renderer/basic/shader.h"
-#include "renderer/output/pipeline_output.h"
-#include "renderer/output/promise.h"
+#include "renderer/dag/graphics_pipeline_output.h"
+#include "renderer/dag/promise.h"
 #include "renderer/pass/configurator.h"
 #include "renderer/pass/rasterize.h"
 #include "renderer/postprocessor/exposure.h"
@@ -47,7 +47,7 @@ using GpuAndCpuPromise = std::pair<std::unique_ptr<GpuPromise>, std::unique_ptr<
  * @brief The LogLuminanceOutput class Stores the logarithmic luminance value of each radiance
  * pixel.
  */
-class LogLuminancePipelineOutput : public PipelineOutputInterface {
+class LogLuminancePipelineOutput : public GraphicsPipelineOutputInterface {
    public:
     LogLuminancePipelineOutput(unsigned width, unsigned height, VulkanContext *context);
     ~LogLuminancePipelineOutput();
@@ -65,7 +65,7 @@ class LogLuminancePipelineOutput : public PipelineOutputInterface {
 
 LogLuminancePipelineOutput::LogLuminancePipelineOutput(unsigned width, unsigned height,
                                                        VulkanContext *context)
-    : PipelineOutputInterface(width, height) {
+    : GraphicsPipelineOutputInterface(width, height) {
     color_attachment_ = CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R16_SFLOAT,
                                               /*transfer_src=*/true, context);
     render_pass_ = CreateRenderPass(std::vector<VkAttachmentDescription>{color_attachment_->desc},
@@ -91,7 +91,7 @@ FrameBufferAttachment const *LogLuminancePipelineOutput::DepthAttachment() const
  * @brief The ExposureEstimationPipelineOutput class Stores the logarithmic lumiance average in a
  * 1x1 image as the exposure of the radiance map.
  */
-class ExposureEstimationPipelineOutput : public PipelineOutputInterface {
+class ExposureEstimationPipelineOutput : public GraphicsPipelineOutputInterface {
    public:
     explicit ExposureEstimationPipelineOutput(VulkanContext *context);
     ~ExposureEstimationPipelineOutput();
@@ -107,7 +107,7 @@ class ExposureEstimationPipelineOutput : public PipelineOutputInterface {
 };
 
 ExposureEstimationPipelineOutput::ExposureEstimationPipelineOutput(VulkanContext *context)
-    : PipelineOutputInterface(/*width=*/1, /*height=*/1) {
+    : GraphicsPipelineOutputInterface(/*width=*/1, /*height=*/1) {
     color_attachment_ = CreateStorageAttachment(/*width=*/1, /*height=*/1,
                                                 /*format=*/VK_FORMAT_R16_SFLOAT, context);
     render_pass_ = std::make_unique<RenderPass>(context);
@@ -134,16 +134,16 @@ FrameBufferAttachment const *ExposureEstimationPipelineOutput::DepthAttachment()
  */
 class LogLuminanceConfigurator : public PostProcessorConfiguratorInterface {
    public:
-    LogLuminanceConfigurator(PipelineOutputInterface const &radiance);
+    LogLuminanceConfigurator(GraphicsPipelineOutputInterface const &radiance);
     ~LogLuminanceConfigurator() override;
 
     void InputImages(std::vector<VkImageView> *input_images) const override;
 
    private:
-    PipelineOutputInterface const &radiance_;
+    GraphicsPipelineOutputInterface const &radiance_;
 };
 
-LogLuminanceConfigurator::LogLuminanceConfigurator(PipelineOutputInterface const &radiance)
+LogLuminanceConfigurator::LogLuminanceConfigurator(GraphicsPipelineOutputInterface const &radiance)
     : radiance_(radiance) {}
 
 LogLuminanceConfigurator::~LogLuminanceConfigurator() {}
@@ -155,26 +155,26 @@ void LogLuminanceConfigurator::InputImages(std::vector<VkImageView> *input_image
 /**
  * @brief The ComputeAveragePipelineArguments struct Arguments to the ComputeAveragePipeline.
  */
-struct ComputeAveragePipelineArguments : public CachedPipelineArgumentsInterface {
-    ComputeAveragePipelineArguments(PipelineOutputInterface const &log_luminance_map)
+struct ComputeAveragePipelineArguments : public GraphicsPipelineArgumentsInterface {
+    ComputeAveragePipelineArguments(GraphicsPipelineOutputInterface const &log_luminance_map)
         : log_luminance_map(log_luminance_map) {}
 
-    PipelineOutputInterface const &log_luminance_map;
+    GraphicsPipelineOutputInterface const &log_luminance_map;
 };
 
 /**
  * @brief The ComputeAveragePipeline class For computing the average value of log luminance map.
  */
-class ComputeAveragePipeline : public CachedPipelineInterface {
+class ComputeAveragePipeline : public GraphicsPipelineInterface {
    public:
     ComputeAveragePipeline(VulkanContext *context);
     ~ComputeAveragePipeline() override;
 
     PipelineKey Key() const override;
 
-    Fulfillment Launch(CachedPipelineArgumentsInterface const &generic_args,
+    Fulfillment Launch(GraphicsPipelineArgumentsInterface const &generic_args,
                        std::vector<GpuPromise *> const &prerequisites,
-                       unsigned completion_signal_count, PipelineOutputInterface *output) override;
+                       unsigned completion_signal_count, GraphicsPipelineOutputInterface *output) override;
 
    private:
     VkCommandBuffer AllocateCommandBuffer();
@@ -184,7 +184,7 @@ class ComputeAveragePipeline : public CachedPipelineInterface {
 };
 
 ComputeAveragePipeline::ComputeAveragePipeline(VulkanContext *context)
-    : CachedPipelineInterface(context) {}
+    : GraphicsPipelineInterface(context) {}
 
 ComputeAveragePipeline::~ComputeAveragePipeline() {}
 
@@ -246,10 +246,10 @@ Fulfillment ComputeAveragePipeline::SubmitCommandBuffer(
 
 PipelineKey ComputeAveragePipeline::Key() const { return kComputeAveragePipeline; }
 
-Fulfillment ComputeAveragePipeline::Launch(CachedPipelineArgumentsInterface const &generic_args,
+Fulfillment ComputeAveragePipeline::Launch(GraphicsPipelineArgumentsInterface const &generic_args,
                                            std::vector<GpuPromise *> const &prerequisites,
                                            unsigned completion_signal_count,
-                                           PipelineOutputInterface *exposure_output) {
+                                           GraphicsPipelineOutputInterface *exposure_output) {
     ComputeAveragePipelineArguments const &args =
         static_cast<ComputeAveragePipelineArguments const &>(generic_args);
 
@@ -264,40 +264,40 @@ Fulfillment ComputeAveragePipeline::Launch(CachedPipelineArgumentsInterface cons
 
 }  // namespace
 
-std::unique_ptr<PipelineStage> CreateLogLuminaneStage(unsigned width, unsigned height,
+std::unique_ptr<DagOperation> CreateLogLuminaneStage(unsigned width, unsigned height,
                                                       VulkanContext *context) {
     auto output = std::make_shared<LogLuminancePipelineOutput>(width, height, context);
-    return std::make_unique<PipelineStage>(output);
+    return std::make_unique<DagOperation>(output);
 }
 
-std::unique_ptr<PipelineStage> CreateExposureStage(VulkanContext *context) {
+std::unique_ptr<DagOperation> CreateExposureStage(VulkanContext *context) {
     auto output = std::make_shared<ExposureEstimationPipelineOutput>(context);
-    return std::make_unique<PipelineStage>(output);
+    return std::make_unique<DagOperation>(output);
 }
 
-void DoEstimateExposure(PipelineStage *radiance_map, TransferContext *transfer_context,
-                        PipelineStage *log_luminance_map, PipelineStage *log_exposure) {
-    CachedPipelineInterface *log_luminance_pipeline = log_luminance_map->WithPipeline(
+void DoEstimateExposure(DagOperation *radiance_map, TransferContext *transfer_context,
+                        DagOperation *log_luminance_map, DagOperation *log_exposure) {
+    GraphicsPipelineInterface *log_luminance_pipeline = log_luminance_map->WithPipeline(
         kLogarithmicLuminancePipeline,
-        [transfer_context](PipelineOutputInterface *log_luminance_output) {
+        [transfer_context](GraphicsPipelineOutputInterface *log_luminance_output) {
             return std::make_unique<PostProcessorPipeline>(
                 kLogarithmicLuminancePipeline, kFragmentShaderFilePathLogLuminance,
                 /*input_image_count=*/1, /*push_constant_size=*/0, log_luminance_output,
                 transfer_context);
         });
-    CachedPipelineInterface *compute_average_pipeline = log_exposure->WithPipeline(
-        kComputeAveragePipeline, [transfer_context](PipelineOutputInterface * /*exposure_output*/) {
+    GraphicsPipelineInterface *compute_average_pipeline = log_exposure->WithPipeline(
+        kComputeAveragePipeline, [transfer_context](GraphicsPipelineOutputInterface * /*exposure_output*/) {
             return std::make_unique<ComputeAveragePipeline>(transfer_context->vulkan_context);
         });
 
     auto configurator = std::make_unique<LogLuminanceConfigurator>(*radiance_map->Output());
     log_luminance_map->Schedule(log_luminance_pipeline, std::move(configurator),
-                                /*parents=*/std::vector<PipelineStage *>{radiance_map});
+                                /*parents=*/std::vector<DagOperation *>{radiance_map});
 
     auto compute_average_args =
         std::make_unique<ComputeAveragePipelineArguments>(*log_luminance_map->Output());
     log_exposure->Schedule(compute_average_pipeline, std::move(compute_average_args),
-                           /*parents=*/std::vector<PipelineStage *>{log_luminance_map});
+                           /*parents=*/std::vector<DagOperation *>{log_luminance_map});
 }
 
 }  // namespace e8

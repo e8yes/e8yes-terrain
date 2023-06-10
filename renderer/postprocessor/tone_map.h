@@ -21,7 +21,7 @@
 #include <memory>
 
 #include "common/device.h"
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {
@@ -35,7 +35,7 @@ namespace e8 {
  * @param context Contextual Vulkan handles.
  * @return An LDR image stage with a color image output.
  */
-std::unique_ptr<PipelineStage> CreateLdrImageStage(unsigned width, unsigned height,
+std::unique_ptr<DagOperation> CreateLdrImageStage(unsigned width, unsigned height,
                                                    VulkanContext *context);
 
 /**
@@ -50,8 +50,8 @@ std::unique_ptr<PipelineStage> CreateLdrImageStage(unsigned width, unsigned heig
  * @param target The target stage which stores the tone mapped LDR color image. It should be created
  * through CreateLdrImageStage().
  */
-void DoToneMapping(PipelineStage *radiance_map, PipelineStage *exposure,
-                   TransferContext *transfer_context, PipelineStage *target);
+void DoToneMapping(DagOperation *radiance_map, DagOperation *exposure,
+                   TransferContext *transfer_context, DagOperation *target);
 
 }  // namespace e8
 

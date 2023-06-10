@@ -25,8 +25,8 @@
 #include "content/scene_entity.h"
 #include "renderer/basic/projection.h"
 #include "renderer/lighting/direct_illuminator.h"
-#include "renderer/output/common_output.h"
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/graphics_pipeline_output_common.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/pipeline/fill_color.h"
 #include "renderer/pipeline/project_depth.h"
 #include "renderer/postprocessor/gaussian_blur.h"
@@ -42,10 +42,10 @@ unsigned kSpotLightShadowMapHeight = 512;
 GaussianBlurLevel kSpotLightBlurringKernelSize = GaussianBlurLevel::GBL_1X1;
 
 struct ShadowMapCollection {
-    std::vector<std::unique_ptr<PipelineStage>> projected_ndc_depth;
-    std::vector<std::unique_ptr<PipelineStage>> projected_linear_depth;
-    std::vector<std::unique_ptr<PipelineStage>> h_blurred;
-    std::vector<std::unique_ptr<PipelineStage>> hv_blurred;
+    std::vector<std::unique_ptr<DagOperation>> projected_ndc_depth;
+    std::vector<std::unique_ptr<DagOperation>> projected_linear_depth;
+    std::vector<std::unique_ptr<DagOperation>> h_blurred;
+    std::vector<std::unique_ptr<DagOperation>> hv_blurred;
 };
 
 class ShadowMapCache {
@@ -55,8 +55,8 @@ class ShadowMapCache {
 
     void EvictIfNotObservable(std::vector<LightSourceInstance> const &observable_light_sources);
     ShadowMapCollection *Allocate(LightSourceInstance const &light_source);
-    std::vector<PipelineStage *> Fetch(SceneEntityId light_id);
-    std::unordered_map<SceneEntityId, std::vector<PipelineStage *>> All();
+    std::vector<DagOperation *> Fetch(SceneEntityId light_id);
+    std::unordered_map<SceneEntityId, std::vector<DagOperation *>> All();
 
   private:
     std::unordered_map<SceneEntityId, std::unique_ptr<ShadowMapCollection>> shadow_maps_;
@@ -91,15 +91,15 @@ ShadowMapCollection *ShadowMapCache::Allocate(LightSourceInstance const &light_s
     return shadow_map_collection.get();
 }
 
-std::vector<PipelineStage *> ShadowMapCache::Fetch(SceneEntityId light_id) {
+std::vector<DagOperation *> ShadowMapCache::Fetch(SceneEntityId light_id) {
     auto it = shadow_maps_.find(light_id);
     if (it == shadow_maps_.end()) {
-        return std::vector<PipelineStage *>();
+        return std::vector<DagOperation *>();
     }
 
     auto const &[_, shadow_map_collection] = *it;
 
-    std::vector<PipelineStage *> result(shadow_map_collection->hv_blurred.size());
+    std::vector<DagOperation *> result(shadow_map_collection->hv_blurred.size());
     for (unsigned i = 0; i < shadow_map_collection->hv_blurred.size(); ++i) {
         result[i] = shadow_map_collection->hv_blurred[i].get();
     }
@@ -107,17 +107,17 @@ std::vector<PipelineStage *> ShadowMapCache::Fetch(SceneEntityId light_id) {
     return result;
 }
 
-std::unordered_map<SceneEntityId, std::vector<PipelineStage *>> ShadowMapCache::All() {
-    std::unordered_map<SceneEntityId, std::vector<PipelineStage *>> result;
+std::unordered_map<SceneEntityId, std::vector<DagOperation *>> ShadowMapCache::All() {
+    std::unordered_map<SceneEntityId, std::vector<DagOperation *>> result;
 
     for (auto &[id, shadow_map_collection] : shadow_maps_) {
         auto result_it =
             result
                 .insert(std::make_pair(
-                    id, std::vector<PipelineStage *>(shadow_map_collection->hv_blurred.size())))
+                    id, std::vector<DagOperation *>(shadow_map_collection->hv_blurred.size())))
                 .first;
 
-        std::vector<PipelineStage *> &shadow_maps = result_it->second;
+        std::vector<DagOperation *> &shadow_maps = result_it->second;
         for (unsigned i = 0; i < shadow_map_collection->hv_blurred.size(); ++i) {
             shadow_maps[i] = shadow_map_collection->hv_blurred[i].get();
         }
@@ -128,7 +128,7 @@ std::unordered_map<SceneEntityId, std::vector<PipelineStage *>> ShadowMapCache::
 
 void DoGenerateSpotLightShadowMap(SpotLightVolume const &spot_light_region,
                                   DrawableCollection *drawable_collection,
-                                  PipelineStage *first_stage, TransferContext *transfer_context,
+                                  DagOperation *first_stage, TransferContext *transfer_context,
                                   ShadowMapCollection *shadow_maps) {
     shadow_maps->projected_ndc_depth.clear();
     shadow_maps->projected_linear_depth.clear();
@@ -136,15 +136,15 @@ void DoGenerateSpotLightShadowMap(SpotLightVolume const &spot_light_region,
     shadow_maps->hv_blurred.clear();
 
     // Prepares stages.
-    std::unique_ptr<PipelineStage> projected_ndc_depth;
-    std::unique_ptr<PipelineStage> projected_linear_depth;
+    std::unique_ptr<DagOperation> projected_ndc_depth;
+    std::unique_ptr<DagOperation> projected_linear_depth;
     projected_ndc_depth = CreateProjectNdcDepthStage(
         kSpotLightShadowMapWidth, kSpotLightShadowMapHeight, transfer_context->vulkan_context);
     projected_linear_depth = CreateProjectLinearDepthStage(
         kSpotLightShadowMapWidth, kSpotLightShadowMapHeight, transfer_context->vulkan_context);
 
-    std::unique_ptr<PipelineStage> h_blurred;
-    std::unique_ptr<PipelineStage> hv_blurred;
+    std::unique_ptr<DagOperation> h_blurred;
+    std::unique_ptr<DagOperation> hv_blurred;
     CreateGaussianBlurStages(kSpotLightShadowMapWidth, kSpotLightShadowMapHeight,
                              transfer_context->vulkan_context, &h_blurred, &hv_blurred);
 
@@ -161,7 +161,7 @@ void DoGenerateSpotLightShadowMap(SpotLightVolume const &spot_light_region,
 }
 
 void DoGenerateShadowMaps(std::vector<LightSourceInstance> const &light_sources,
-                          DrawableCollection *drawable_collection, PipelineStage *first_stage,
+                          DrawableCollection *drawable_collection, DagOperation *first_stage,
                           TransferContext *transfer_context, ShadowMapCache *cache) {
     cache->EvictIfNotObservable(light_sources);
 
@@ -187,18 +187,18 @@ struct DirectIlluminator::DirectIlluminatorImpl {
     DirectIlluminatorImpl(unsigned width, unsigned height, VulkanContext *context);
     ~DirectIlluminatorImpl();
 
-    std::unique_ptr<PipelineStage> cleared_radiance_map;
-    std::unique_ptr<PipelineStage> filled_radiance_map;
+    std::unique_ptr<DagOperation> cleared_radiance_map;
+    std::unique_ptr<DagOperation> filled_radiance_map;
 
     ShadowMapCache shadow_map_cache;
 };
 
 DirectIlluminator::DirectIlluminatorImpl::DirectIlluminatorImpl(unsigned width, unsigned height,
                                                                 VulkanContext *context) {
-    auto output = std::make_shared<HdrColorPipelineOutput>(width, height,
+    auto output = std::make_shared<HdrColorOutput>(width, height,
                                                            /*with_depth_buffer=*/false, context);
-    cleared_radiance_map = std::make_unique<PipelineStage>(output);
-    filled_radiance_map = std::make_unique<PipelineStage>(output);
+    cleared_radiance_map = std::make_unique<DagOperation>(output);
+    filled_radiance_map = std::make_unique<DagOperation>(output);
 }
 
 DirectIlluminator::DirectIlluminatorImpl::~DirectIlluminatorImpl() {}
@@ -208,9 +208,9 @@ DirectIlluminator::DirectIlluminator(unsigned width, unsigned height, VulkanCont
 
 DirectIlluminator::~DirectIlluminator() {}
 
-PipelineStage *DirectIlluminator::DoComputeDirectIllumination(
-    DrawableCollection *drawable_collection, PipelineStage *projected_surface,
-    PerspectiveProjection const &projection, PipelineStage *first_stage,
+DagOperation *DirectIlluminator::DoComputeDirectIllumination(
+    DrawableCollection *drawable_collection, DagOperation *projected_surface,
+    PerspectiveProjection const &projection, DagOperation *first_stage,
     TransferContext *transfer_context) {
     DoFillColor(/*color=*/vec3{0.0f, 0.0f, 0.0f}, transfer_context->vulkan_context, first_stage,
                 pimpl_->cleared_radiance_map.get());
@@ -225,7 +225,7 @@ PipelineStage *DirectIlluminator::DoComputeDirectIllumination(
                          &pimpl_->shadow_map_cache);
 
     for (auto const &instance : light_sources) {
-        std::vector<PipelineStage *> shadow_maps = pimpl_->shadow_map_cache.Fetch(instance.id);
+        std::vector<DagOperation *> shadow_maps = pimpl_->shadow_map_cache.Fetch(instance.id);
 
         DoComputeRadiance(instance, projected_surface, projection.Frustum(), shadow_maps,
                           pimpl_->cleared_radiance_map.get(), transfer_context,
@@ -235,7 +235,7 @@ PipelineStage *DirectIlluminator::DoComputeDirectIllumination(
     return pimpl_->filled_radiance_map.get();
 }
 
-std::unordered_map<SceneEntityId, std::vector<PipelineStage *>>
+std::unordered_map<SceneEntityId, std::vector<DagOperation *>>
 DirectIlluminator::CachedShadowMaps() {
     return pimpl_->shadow_map_cache.All();
 }

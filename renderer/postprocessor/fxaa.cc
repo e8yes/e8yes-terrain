@@ -19,8 +19,8 @@
 
 #include "common/device.h"
 #include "renderer/basic/shader.h"
-#include "renderer/output/pipeline_output.h"
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/graphics_pipeline_output.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/postprocessor/fxaa.h"
 #include "renderer/postprocessor/post_processor.h"
 #include "renderer/transfer/descriptor_set.h"
@@ -32,16 +32,16 @@ PipelineKey const &kFxaaPipeline = "FXAA";
 
 class FxaaPipelineConfigurator : public PostProcessorConfiguratorInterface {
    public:
-    FxaaPipelineConfigurator(PipelineOutputInterface const &ldr_color_input);
+    FxaaPipelineConfigurator(GraphicsPipelineOutputInterface const &ldr_color_input);
     ~FxaaPipelineConfigurator() override;
 
     void InputImages(std::vector<VkImageView> *input_images) const override;
 
    private:
-    PipelineOutputInterface const &ldr_color_input_;
+    GraphicsPipelineOutputInterface const &ldr_color_input_;
 };
 
-FxaaPipelineConfigurator::FxaaPipelineConfigurator(PipelineOutputInterface const &ldr_color_input)
+FxaaPipelineConfigurator::FxaaPipelineConfigurator(GraphicsPipelineOutputInterface const &ldr_color_input)
     : ldr_color_input_(ldr_color_input) {}
 
 FxaaPipelineConfigurator::~FxaaPipelineConfigurator() {}
@@ -52,9 +52,9 @@ void FxaaPipelineConfigurator::InputImages(std::vector<VkImageView> *input_image
 
 }  // namespace
 
-void DoFxaa(PipelineStage *ldr_image, TransferContext *transfer_context, PipelineStage *target) {
-    CachedPipelineInterface *pipeline =
-        target->WithPipeline(kFxaaPipeline, [transfer_context](PipelineOutputInterface *aa_output) {
+void DoFxaa(DagOperation *ldr_image, TransferContext *transfer_context, DagOperation *target) {
+    GraphicsPipelineInterface *pipeline =
+        target->WithPipeline(kFxaaPipeline, [transfer_context](GraphicsPipelineOutputInterface *aa_output) {
             return std::make_unique<PostProcessorPipeline>(
                 kFxaaPipeline, kFragmentShaderFilePathFxaa, /*input_image_count=*/1,
                 /*push_constant_size=*/0, aa_output, transfer_context);
@@ -62,7 +62,7 @@ void DoFxaa(PipelineStage *ldr_image, TransferContext *transfer_context, Pipelin
 
     auto configurator = std::make_unique<FxaaPipelineConfigurator>(*ldr_image->Output());
     target->Schedule(pipeline, std::move(configurator),
-                     /*parents=*/std::vector<PipelineStage *>{ldr_image});
+                     /*parents=*/std::vector<DagOperation *>{ldr_image});
 }
 
 }  // namespace e8

@@ -23,7 +23,7 @@
 #include "common/device.h"
 #include "common/tensor.h"
 #include "content/scene.h"
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/pass/rasterize.h"
 #include "renderer/pipeline/fill_color.h"
 #include "renderer/proto/renderer.pb.h"
@@ -34,14 +34,14 @@
 namespace e8 {
 
 struct SolidColorRenderer::SolidColorRendererImpl {
-    SolidColorRendererImpl(std::unique_ptr<PipelineStage> &&final_color_image);
+    SolidColorRendererImpl(std::unique_ptr<DagOperation> &&final_color_image);
     ~SolidColorRendererImpl();
 
-    std::unique_ptr<PipelineStage> final_color_image;
+    std::unique_ptr<DagOperation> final_color_image;
 };
 
 SolidColorRenderer::SolidColorRendererImpl::SolidColorRendererImpl(
-    std::unique_ptr<PipelineStage> &&final_color_image)
+    std::unique_ptr<DagOperation> &&final_color_image)
     : final_color_image(std::move(final_color_image)) {}
 
 SolidColorRenderer::SolidColorRendererImpl::~SolidColorRendererImpl() {}
@@ -55,9 +55,9 @@ SolidColorRenderer::~SolidColorRenderer() {}
 void SolidColorRenderer::DrawFrame(Scene *scene, ResourceAccessor * /*resource_accessor*/) {
     Scene::ReadAccess read_access = scene->GainReadAccess();
 
-    PipelineStage *first_stage = this->DoFirstStage();
+    DagOperation *first_stage = this->DoFirstStage();
     DoFillColor(scene->background_color, context, first_stage, pimpl_->final_color_image.get());
-    PipelineStage *final_stage = this->DoFinalStage(first_stage, pimpl_->final_color_image.get());
+    DagOperation *final_stage = this->DoFinalStage(first_stage, pimpl_->final_color_image.get());
 
     final_stage->Fulfill(context);
 }

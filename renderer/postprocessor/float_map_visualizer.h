@@ -21,7 +21,7 @@
 #include <memory>
 #include <optional>
 
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {
@@ -37,8 +37,8 @@ namespace e8 {
  * @param transfer_context Transfer context.
  * @param target The target stage which stores the visualized grayscale image.
  */
-void DoVisualizeFloat(PipelineStage *float_map_stage, float min_value, float max_value,
-                      TransferContext *transfer_context, PipelineStage *target);
+void DoVisualizeFloat(DagOperation *float_map_stage, float min_value, float max_value,
+                      TransferContext *transfer_context, DagOperation *target);
 
 } // namespace e8
 

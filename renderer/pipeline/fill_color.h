@@ -22,7 +22,7 @@
 
 #include "common/device.h"
 #include "common/tensor.h"
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/dag_operation.h"
 
 namespace e8 {
 
@@ -35,8 +35,8 @@ namespace e8 {
  * @param first_stage The frame's first stage.
  * @param target The target to be filled.
  */
-void DoFillColor(vec3 const &color, VulkanContext *context, PipelineStage *first_stage,
-                 PipelineStage *target);
+void DoFillColor(vec3 const &color, VulkanContext *context, DagOperation *first_stage,
+                 DagOperation *target);
 
 }  // namespace e8
 

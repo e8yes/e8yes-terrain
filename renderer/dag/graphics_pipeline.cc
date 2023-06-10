@@ -15,29 +15,22 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <algorithm>
-#include <cassert>
-#include <limits>
+#include <functional>
 #include <memory>
+#include <string>
 #include <vector>
-#include <vulkan/vulkan.h>
 
 #include "common/device.h"
-#include "renderer/basic/attachment.h"
-#include "renderer/basic/frame_buffer.h"
-#include "renderer/basic/render_pass.h"
-#include "renderer/output/pipeline_output.h"
-#include "renderer/output/promise.h"
+#include "renderer/dag/graphics_pipeline.h"
 
 namespace e8 {
 
-PipelineOutputInterface::PipelineOutputInterface(unsigned width, unsigned height)
-    : width_(width), height_(height) {}
+GraphicsPipelineArgumentsInterface::GraphicsPipelineArgumentsInterface() {}
 
-PipelineOutputInterface::~PipelineOutputInterface() {}
+GraphicsPipelineArgumentsInterface::~GraphicsPipelineArgumentsInterface() {}
 
-unsigned PipelineOutputInterface::Width() const { return width_; }
+GraphicsPipelineInterface::GraphicsPipelineInterface(VulkanContext *context) : context_(context) {}
 
-unsigned PipelineOutputInterface::Height() const { return height_; }
+GraphicsPipelineInterface::~GraphicsPipelineInterface() {}
 
 } // namespace e8

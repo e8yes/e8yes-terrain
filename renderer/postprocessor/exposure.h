@@ -21,7 +21,7 @@
 #include <memory>
 
 #include "common/device.h"
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {
@@ -35,7 +35,7 @@ namespace e8 {
  * @param context Contextual Vulkan handles.
  * @return A pipeline stage created with the 16-bit float image output.
  */
-std::unique_ptr<PipelineStage> CreateLogLuminaneStage(unsigned width, unsigned height,
+std::unique_ptr<DagOperation> CreateLogLuminaneStage(unsigned width, unsigned height,
                                                       VulkanContext *context);
 
 /**
@@ -45,7 +45,7 @@ std::unique_ptr<PipelineStage> CreateLogLuminaneStage(unsigned width, unsigned h
  * @param context Contextual Vulkan handles.
  * @return A pipeline stage created with the 1 by 1 16-bit float image output.
  */
-std::unique_ptr<PipelineStage> CreateExposureStage(VulkanContext *context);
+std::unique_ptr<DagOperation> CreateExposureStage(VulkanContext *context);
 
 /**
  * @brief DoEstimateExposure Estimates the exposure of a radiance map. Precisely, it transforms the
@@ -57,8 +57,8 @@ std::unique_ptr<PipelineStage> CreateExposureStage(VulkanContext *context);
  * @param log_luminance_map The target stage which stores the logarithmic luminance values.
  * @param log_exposure The target stage which stares the logarithmic exposure value.
  */
-void DoEstimateExposure(PipelineStage *radiance_map, TransferContext *transfer_context,
-                        PipelineStage *log_luminance_map, PipelineStage *log_exposure);
+void DoEstimateExposure(DagOperation *radiance_map, TransferContext *transfer_context,
+                        DagOperation *log_luminance_map, DagOperation *log_exposure);
 
 }  // namespace e8
 

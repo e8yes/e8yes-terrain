@@ -15,31 +15,24 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <functional>
+#include <algorithm>
+#include <cassert>
+#include <limits>
 #include <memory>
-#include <string>
 #include <vector>
+#include <vulkan/vulkan.h>
 
-#include "common/device.h"
-#include "renderer/basic/fixed_function.h"
-#include "renderer/basic/frame_buffer.h"
-#include "renderer/basic/pipeline.h"
-#include "renderer/basic/sampler.h"
-#include "renderer/basic/shader.h"
-#include "renderer/basic/uniform_layout.h"
-#include "renderer/basic/vertex_input.h"
-#include "renderer/output/cached_pipeline.h"
-#include "renderer/output/pipeline_output.h"
-#include "renderer/output/promise.h"
+#include "renderer/dag/graphics_pipeline_output.h"
 
 namespace e8 {
 
-CachedPipelineArgumentsInterface::CachedPipelineArgumentsInterface() {}
+GraphicsPipelineOutputInterface::GraphicsPipelineOutputInterface(unsigned width, unsigned height)
+    : width_(width), height_(height) {}
 
-CachedPipelineArgumentsInterface::~CachedPipelineArgumentsInterface() {}
+GraphicsPipelineOutputInterface::~GraphicsPipelineOutputInterface() {}
 
-CachedPipelineInterface::CachedPipelineInterface(VulkanContext *context) : context_(context) {}
+unsigned GraphicsPipelineOutputInterface::Width() const { return width_; }
 
-CachedPipelineInterface::~CachedPipelineInterface() {}
+unsigned GraphicsPipelineOutputInterface::Height() const { return height_; }
 
 } // namespace e8

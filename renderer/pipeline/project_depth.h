@@ -23,7 +23,7 @@
 
 #include "common/device.h"
 #include "renderer/basic/projection.h"
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/query/collection.h"
 #include "renderer/transfer/context.h"
 
@@ -38,7 +38,7 @@ namespace e8 {
  * @param context Contextual Vulkan handles.
  * @return A pipeline stage created with the depth map output.
  */
-std::unique_ptr<PipelineStage> CreateProjectNdcDepthStage(unsigned width, unsigned height,
+std::unique_ptr<DagOperation> CreateProjectNdcDepthStage(unsigned width, unsigned height,
                                                           VulkanContext *context);
 
 /**
@@ -50,7 +50,7 @@ std::unique_ptr<PipelineStage> CreateProjectNdcDepthStage(unsigned width, unsign
  * @param context Contextual Vulkan handles.
  * @return A pipeline stage created with the depth map output.
  */
-std::unique_ptr<PipelineStage> CreateProjectLinearDepthStage(unsigned width, unsigned height,
+std::unique_ptr<DagOperation> CreateProjectLinearDepthStage(unsigned width, unsigned height,
                                                              VulkanContext *context);
 
 /**
@@ -69,8 +69,8 @@ std::unique_ptr<PipelineStage> CreateProjectLinearDepthStage(unsigned width, uns
  */
 void DoProjectDepth(DrawableCollection *drawable_collection,
                     PerspectiveProjection const &projection, TransferContext *transfer_context,
-                    PipelineStage *first_stage, PipelineStage *projected_ndc_depth,
-                    PipelineStage *projected_linear_depth = nullptr);
+                    DagOperation *first_stage, DagOperation *projected_ndc_depth,
+                    DagOperation *projected_linear_depth = nullptr);
 
 } // namespace e8
 

@@ -20,9 +20,9 @@
 #include <string>
 
 #include "common/device.h"
-#include "renderer/output/cached_pipeline.h"
-#include "renderer/output/common_output.h"
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/graphics_pipeline.h"
+#include "renderer/dag/dag_operation.h"
+#include "renderer/dag/graphics_pipeline_output_common.h"
 #include "renderer/postprocessor/gaussian_blur.h"
 #include "renderer/postprocessor/post_processor.h"
 #include "renderer/transfer/context.h"
@@ -35,17 +35,17 @@ PipelineKey const kVerticalGaussianBlurPipelinePrefix = "Vertical Gaussian Blur"
 
 class GaussianBlurPipelineConfigurator : public PostProcessorConfiguratorInterface {
   public:
-    GaussianBlurPipelineConfigurator(PipelineOutputInterface const &input);
+    GaussianBlurPipelineConfigurator(GraphicsPipelineOutputInterface const &input);
     ~GaussianBlurPipelineConfigurator() override;
 
     void InputImages(std::vector<VkImageView> *input_images) const override;
 
   private:
-    PipelineOutputInterface const &input_;
+    GraphicsPipelineOutputInterface const &input_;
 };
 
 GaussianBlurPipelineConfigurator::GaussianBlurPipelineConfigurator(
-    PipelineOutputInterface const &input)
+    GraphicsPipelineOutputInterface const &input)
     : input_(input) {}
 
 GaussianBlurPipelineConfigurator::~GaussianBlurPipelineConfigurator() {}
@@ -122,9 +122,9 @@ std::string VerticalGaussianBlurShader(GaussianBlurLevel blur_level) {
     }
 }
 
-std::unique_ptr<CachedPipelineInterface>
+std::unique_ptr<GraphicsPipelineInterface>
 CreateGaussianBlurPipeline(bool horizontal, GaussianBlurLevel blur_level,
-                           PipelineOutputInterface *blurred_output,
+                           GraphicsPipelineOutputInterface *blurred_output,
                            TransferContext *transfer_context) {
     PipelineKey pipeline_key;
     std::string shader;
@@ -145,39 +145,39 @@ CreateGaussianBlurPipeline(bool horizontal, GaussianBlurLevel blur_level,
 } // namespace
 
 void CreateGaussianBlurStages(unsigned width, unsigned height, VulkanContext *context,
-                              std::unique_ptr<PipelineStage> *h_blurred,
-                              std::unique_ptr<PipelineStage> *hv_blurred) {
-    auto h_blurred_output = std::make_shared<FloatPipelineOutput>(width, height, context);
-    auto hv_blurred_output = std::make_shared<FloatPipelineOutput>(width, height, context);
+                              std::unique_ptr<DagOperation> *h_blurred,
+                              std::unique_ptr<DagOperation> *hv_blurred) {
+    auto h_blurred_output = std::make_shared<FloatOutput>(width, height, context);
+    auto hv_blurred_output = std::make_shared<FloatOutput>(width, height, context);
 
-    *h_blurred = std::make_unique<PipelineStage>(h_blurred_output);
-    *hv_blurred = std::make_unique<PipelineStage>(hv_blurred_output);
+    *h_blurred = std::make_unique<DagOperation>(h_blurred_output);
+    *hv_blurred = std::make_unique<DagOperation>(hv_blurred_output);
 }
 
-void DoGaussianBlur(PipelineStage *image, GaussianBlurLevel blur_level,
-                    TransferContext *transfer_context, PipelineStage *h_blurred,
-                    PipelineStage *hv_blurred) {
-    CachedPipelineInterface *h_blur_pipeline = h_blurred->WithPipeline(
+void DoGaussianBlur(DagOperation *image, GaussianBlurLevel blur_level,
+                    TransferContext *transfer_context, DagOperation *h_blurred,
+                    DagOperation *hv_blurred) {
+    GraphicsPipelineInterface *h_blur_pipeline = h_blurred->WithPipeline(
         HorizontalGaussianBlurPipelineKey(blur_level),
-        [blur_level, transfer_context](PipelineOutputInterface *blurred_output) {
+        [blur_level, transfer_context](GraphicsPipelineOutputInterface *blurred_output) {
             return CreateGaussianBlurPipeline(/*horizontal=*/true, blur_level, blurred_output,
                                               transfer_context);
         });
-    CachedPipelineInterface *v_blur_pipeline = hv_blurred->WithPipeline(
+    GraphicsPipelineInterface *v_blur_pipeline = hv_blurred->WithPipeline(
         VerticalGaussianBlurPipelineKey(blur_level),
-        [blur_level, transfer_context](PipelineOutputInterface *blurred_output) {
+        [blur_level, transfer_context](GraphicsPipelineOutputInterface *blurred_output) {
             return CreateGaussianBlurPipeline(/*horizontal=*/false, blur_level, blurred_output,
                                               transfer_context);
         });
 
     auto h_blur_configurator = std::make_unique<GaussianBlurPipelineConfigurator>(*image->Output());
     h_blurred->Schedule(h_blur_pipeline, std::move(h_blur_configurator),
-                        /*parents=*/std::vector<PipelineStage *>{image});
+                        /*parents=*/std::vector<DagOperation *>{image});
 
     auto v_blur_configurator =
         std::make_unique<GaussianBlurPipelineConfigurator>(*h_blurred->Output());
     hv_blurred->Schedule(v_blur_pipeline, std::move(v_blur_configurator),
-                         /*parents=*/std::vector<PipelineStage *>{h_blurred});
+                         /*parents=*/std::vector<DagOperation *>{h_blurred});
 }
 
 } // namespace e8

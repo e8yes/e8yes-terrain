@@ -20,7 +20,7 @@
 
 #include <memory>
 
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/pipeline/project_surface.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/transfer/context.h"
@@ -37,8 +37,8 @@ namespace e8 {
  * @param target The target stage which stores a map of lighting parameters (light inputs).
  */
 void DoVisualizeSurfaceProjection(LightInputsRendererParameters::InputType parameter_to_visualize,
-                                  PipelineStage *surface_projection,
-                                  TransferContext *transfer_context, PipelineStage *target);
+                                  DagOperation *surface_projection,
+                                  TransferContext *transfer_context, DagOperation *target);
 
 }  // namespace e8
 

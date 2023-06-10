@@ -34,9 +34,9 @@
 #include "renderer/basic/shader.h"
 #include "renderer/basic/uniform_layout.h"
 #include "renderer/basic/vertex_input.h"
-#include "renderer/output/pipeline_output.h"
-#include "renderer/output/pipeline_stage.h"
-#include "renderer/output/promise.h"
+#include "renderer/dag/graphics_pipeline_output.h"
+#include "renderer/dag/dag_operation.h"
+#include "renderer/dag/promise.h"
 #include "renderer/pass/configurator.h"
 #include "renderer/pass/rasterize.h"
 #include "renderer/pipeline/project_surface.h"
@@ -53,7 +53,7 @@ PipelineKey const kProjectSurfacePipeline = "Project Surface Parameters";
  * @brief The ProjectSurfacePipelineOutput class For storing a 32-bit RGBA color output containing
  * the geometry data as well as a 32-bit depth output.
  */
-class ProjectSurfacePipelineOutput : public PipelineOutputInterface {
+class ProjectSurfacePipelineOutput : public GraphicsPipelineOutputInterface {
   public:
     /**
      * @brief ProjectSurfacePipelineOutput Constructs surface parameter projection output with the
@@ -111,7 +111,7 @@ ProjectSurfacePipelineOutput::LightInputsPipelineOutputImpl::~LightInputsPipelin
 
 ProjectSurfacePipelineOutput::ProjectSurfacePipelineOutput(unsigned width, unsigned height,
                                                            VulkanContext *context)
-    : PipelineOutputInterface(width, height),
+    : GraphicsPipelineOutputInterface(width, height),
       pimpl_(std::make_unique<LightInputsPipelineOutputImpl>(width, height, context)) {}
 
 ProjectSurfacePipelineOutput::~ProjectSurfacePipelineOutput() {}
@@ -274,7 +274,7 @@ TextureSelector RenderPassConfigurator::TexturesOf(DrawableInstance const &drawa
 /**
  * @brief The LightInputsPipelineArgument struct Arguments to the LightInputsPipeline.
  */
-struct LightInputsPipelineArgument : public CachedPipelineArgumentsInterface {
+struct LightInputsPipelineArgument : public GraphicsPipelineArgumentsInterface {
     LightInputsPipelineArgument(std::vector<DrawableInstance> const &drawables,
                                 ProjectionInterface const &projection,
                                 TransferContext *transfer_context)
@@ -288,21 +288,21 @@ struct LightInputsPipelineArgument : public CachedPipelineArgumentsInterface {
 /**
  * @brief The ProjectSurfacePipeline class For mapping the lighting parameters onto screen.
  */
-class ProjectSurfacePipeline : public CachedPipelineInterface {
+class ProjectSurfacePipeline : public GraphicsPipelineInterface {
   public:
-    ProjectSurfacePipeline(PipelineOutputInterface *output, VulkanContext *context);
+    ProjectSurfacePipeline(GraphicsPipelineOutputInterface *output, VulkanContext *context);
     ~ProjectSurfacePipeline() override;
 
     PipelineKey Key() const override;
 
-    Fulfillment Launch(CachedPipelineArgumentsInterface const &generic_args,
+    Fulfillment Launch(GraphicsPipelineArgumentsInterface const &generic_args,
                        std::vector<GpuPromise *> const &prerequisites,
-                       unsigned completion_signal_count, PipelineOutputInterface *output) override;
+                       unsigned completion_signal_count, GraphicsPipelineOutputInterface *output) override;
 };
 
-ProjectSurfacePipeline::ProjectSurfacePipeline(PipelineOutputInterface *output,
+ProjectSurfacePipeline::ProjectSurfacePipeline(GraphicsPipelineOutputInterface *output,
                                                VulkanContext *context)
-    : CachedPipelineInterface(context) {
+    : GraphicsPipelineInterface(context) {
     uniform_layout_ = CreateShaderUniformLayout(
         PushConstantLayout(), /*per_frame_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
         /*per_pass_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
@@ -326,10 +326,10 @@ ProjectSurfacePipeline::~ProjectSurfacePipeline() {}
 
 PipelineKey ProjectSurfacePipeline::Key() const { return kProjectSurfacePipeline; }
 
-Fulfillment ProjectSurfacePipeline::Launch(CachedPipelineArgumentsInterface const &generic_args,
+Fulfillment ProjectSurfacePipeline::Launch(GraphicsPipelineArgumentsInterface const &generic_args,
                                            std::vector<GpuPromise *> const &prerequisites,
                                            unsigned completion_signal_count,
-                                           PipelineOutputInterface *output) {
+                                           GraphicsPipelineOutputInterface *output) {
     VkCommandBuffer cmds =
         StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), context_);
 
@@ -345,15 +345,15 @@ Fulfillment ProjectSurfacePipeline::Launch(CachedPipelineArgumentsInterface cons
 
 } // namespace
 
-std::unique_ptr<PipelineStage> CreateProjectSurfaceStage(unsigned width, unsigned height,
+std::unique_ptr<DagOperation> CreateProjectSurfaceStage(unsigned width, unsigned height,
                                                          VulkanContext *context) {
     auto output = std::make_shared<ProjectSurfacePipelineOutput>(width, height, context);
-    return std::make_unique<PipelineStage>(output);
+    return std::make_unique<DagOperation>(output);
 }
 
 void DoProjectSurface(DrawableCollection *drawable_collection,
                       PerspectiveProjection const &projection, TransferContext *transfer_context,
-                      PipelineStage *first_stage, PipelineStage *target) {
+                      DagOperation *first_stage, DagOperation *target) {
     ResourceLoadingOption loading_option;
     loading_option.load_geometry = true;
     loading_option.load_material = true;
@@ -361,8 +361,8 @@ void DoProjectSurface(DrawableCollection *drawable_collection,
     std::vector<DrawableInstance> observable_geometries =
         drawable_collection->ObservableGeometries(projection, loading_option);
 
-    CachedPipelineInterface *pipeline = target->WithPipeline(
-        kProjectSurfacePipeline, [transfer_context](PipelineOutputInterface *output) {
+    GraphicsPipelineInterface *pipeline = target->WithPipeline(
+        kProjectSurfacePipeline, [transfer_context](GraphicsPipelineOutputInterface *output) {
             return std::make_unique<ProjectSurfacePipeline>(output,
                                                             transfer_context->vulkan_context);
         });
@@ -370,7 +370,7 @@ void DoProjectSurface(DrawableCollection *drawable_collection,
     auto args = std::make_unique<LightInputsPipelineArgument>(observable_geometries, projection,
                                                               transfer_context);
     target->Schedule(pipeline, std::move(args),
-                     /*parents=*/std::vector<PipelineStage *>{first_stage});
+                     /*parents=*/std::vector<DagOperation *>{first_stage});
 }
 
 } // namespace e8

@@ -23,8 +23,8 @@
 #include "common/device.h"
 #include "renderer/basic/shader.h"
 #include "renderer/basic/uniform_layout.h"
-#include "renderer/output/pipeline_output.h"
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/graphics_pipeline_output.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/postprocessor/depth_projection_visualizer.h"
 #include "renderer/postprocessor/post_processor.h"
 #include "renderer/transfer/context.h"
@@ -44,7 +44,7 @@ class DepthProjectionPostProcessorConfigurator : public PostProcessorConfigurato
   public:
     DepthProjectionPostProcessorConfigurator(float alpha,
                                              std::optional<PerspectiveProjection> projection,
-                                             PipelineOutputInterface const &depth_map);
+                                             GraphicsPipelineOutputInterface const &depth_map);
     ~DepthProjectionPostProcessorConfigurator() override;
 
     void InputImages(std::vector<VkImageView> *input_images) const override;
@@ -53,12 +53,12 @@ class DepthProjectionPostProcessorConfigurator : public PostProcessorConfigurato
   private:
     float const alpha_;
     std::optional<PerspectiveProjection> const projection_;
-    PipelineOutputInterface const &depth_map_;
+    GraphicsPipelineOutputInterface const &depth_map_;
 };
 
 DepthProjectionPostProcessorConfigurator::DepthProjectionPostProcessorConfigurator(
     float alpha, std::optional<PerspectiveProjection> projection,
-    PipelineOutputInterface const &depth_map)
+    GraphicsPipelineOutputInterface const &depth_map)
     : alpha_(alpha), projection_(projection), depth_map_(depth_map) {}
 
 DepthProjectionPostProcessorConfigurator::~DepthProjectionPostProcessorConfigurator() {}
@@ -87,10 +87,10 @@ void DepthProjectionPostProcessorConfigurator::PushConstants(
 } // namespace
 
 void DoVisualizeDepthProjection(float alpha, std::optional<PerspectiveProjection> projection,
-                                PipelineStage *depth_map_stage, TransferContext *transfer_context,
-                                PipelineStage *target) {
-    CachedPipelineInterface *pipeline = target->WithPipeline(
-        kDepthProjectionVisualizerPipeline, [transfer_context](PipelineOutputInterface *output) {
+                                DagOperation *depth_map_stage, TransferContext *transfer_context,
+                                DagOperation *target) {
+    GraphicsPipelineInterface *pipeline = target->WithPipeline(
+        kDepthProjectionVisualizerPipeline, [transfer_context](GraphicsPipelineOutputInterface *output) {
             return std::make_unique<PostProcessorPipeline>(
                 kDepthProjectionVisualizerPipeline, kFragmentShaderFilePathDepthMapVisualizer,
                 /*input_image_count=*/1,
@@ -101,7 +101,7 @@ void DoVisualizeDepthProjection(float alpha, std::optional<PerspectiveProjection
     auto configurator = std::make_unique<DepthProjectionPostProcessorConfigurator>(
         alpha, projection, *depth_map_stage->Output());
     target->Schedule(pipeline, std::move(configurator),
-                     /*parents=*/std::vector<PipelineStage *>{depth_map_stage});
+                     /*parents=*/std::vector<DagOperation *>{depth_map_stage});
 }
 
 } // namespace e8

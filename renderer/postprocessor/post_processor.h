@@ -27,9 +27,9 @@
 
 #include "common/device.h"
 #include "renderer/basic/uniform_layout.h"
-#include "renderer/output/cached_pipeline.h"
-#include "renderer/output/pipeline_output.h"
-#include "renderer/output/promise.h"
+#include "renderer/dag/graphics_pipeline.h"
+#include "renderer/dag/graphics_pipeline_output.h"
+#include "renderer/dag/promise.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {
@@ -38,7 +38,7 @@ namespace e8 {
  * @brief The PostProcessorConfiguratorInterface class For configuring what shader uniform setup to
  * apply to the post processing pipeline.
  */
-class PostProcessorConfiguratorInterface : public CachedPipelineArgumentsInterface {
+class PostProcessorConfiguratorInterface : public GraphicsPipelineArgumentsInterface {
    public:
     PostProcessorConfiguratorInterface();
     virtual ~PostProcessorConfiguratorInterface();
@@ -62,7 +62,7 @@ class PostProcessorConfiguratorInterface : public CachedPipelineArgumentsInterfa
  * PostProcessorConfiguratorInterface as the argument while scheduling. Note, it's a
  * fully implemented concrete class.
  */
-class PostProcessorPipeline : public CachedPipelineInterface {
+class PostProcessorPipeline : public GraphicsPipelineInterface {
    public:
     /**
      * @brief PostProcessorPipeline Constructs a custom post processor.
@@ -76,14 +76,14 @@ class PostProcessorPipeline : public CachedPipelineInterface {
      */
     PostProcessorPipeline(PipelineKey const &key, std::string const &fragment_shader,
                           unsigned input_image_count, unsigned push_constant_size,
-                          PipelineOutputInterface *output, TransferContext *transfer_context);
+                          GraphicsPipelineOutputInterface *output, TransferContext *transfer_context);
     ~PostProcessorPipeline() override;
 
     PipelineKey Key() const override;
 
-    Fulfillment Launch(CachedPipelineArgumentsInterface const &generic_args,
+    Fulfillment Launch(GraphicsPipelineArgumentsInterface const &generic_args,
                        std::vector<GpuPromise *> const &prerequisites,
-                       unsigned completion_signal_count, PipelineOutputInterface *output) override;
+                       unsigned completion_signal_count, GraphicsPipelineOutputInterface *output) override;
 
    private:
     struct PostProcessorPipelineImpl;

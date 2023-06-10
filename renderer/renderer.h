@@ -26,8 +26,8 @@
 
 #include "common/device.h"
 #include "content/scene.h"
-#include "renderer/output/common_output.h"
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/graphics_pipeline_output_common.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/proto/renderer.pb.h"
 #include "resource/accessor.h"
 
@@ -105,7 +105,7 @@ class RendererInterface {
      * @brief DoFirstStage Creates the first stage of the current frame. The first stage waits for
      * the v-sync.
      */
-    PipelineStage *DoFirstStage();
+    DagOperation *DoFirstStage();
 
     /**
      * @brief DoFinalStage Creates the final stage of the current frame. The final stage presents
@@ -117,15 +117,15 @@ class RendererInterface {
      * final_color_image_stage.
      * @return The final stage.
      */
-    PipelineStage *DoFinalStage(
-        PipelineStage *first_stage, PipelineStage *final_color_image_stage,
-        std::vector<PipelineStage *> const &dangling_stages = std::vector<PipelineStage *>());
+    DagOperation *DoFinalStage(
+        DagOperation *first_stage, DagOperation *final_color_image_stage,
+        std::vector<DagOperation *> const &dangling_stages = std::vector<DagOperation *>());
 
     /**
      * @brief FinalColorImageStage Creates a color map stage. A color map is an image which will be
      * presented as the final rendering result. It's also the last customizable pipeline stage.
      */
-    std::unique_ptr<PipelineStage> FinalColorImageStage() const;
+    std::unique_ptr<DagOperation> FinalColorImageStage() const;
 
     /**
      * @brief BeginStage Marks the beginning of a stage.
@@ -143,9 +143,9 @@ class RendererInterface {
 
   private:
     std::vector<StagePerformance> stage_performance_;
-    std::shared_ptr<SwapChainPipelineOutput> final_output_;
-    PipelineStage first_stage_;
-    PipelineStage final_stage_;
+    std::shared_ptr<SwapChainOutput> final_output_;
+    DagOperation first_stage_;
+    DagOperation final_stage_;
     std::unique_ptr<std::mutex> mu_;
 };
 

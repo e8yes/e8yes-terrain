@@ -23,9 +23,8 @@
 #include <vector>
 
 #include "common/device.h"
-#include "content/scene_entity.h"
 #include "renderer/basic/projection.h"
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/query/collection.h"
 #include "renderer/transfer/context.h"
 
@@ -62,16 +61,16 @@ class DirectIlluminator {
      * @return The direct illumination result. Note, the radiance map is cleared to black prior to
      * the direct illumination computation.
      */
-    PipelineStage *DoComputeDirectIllumination(DrawableCollection *drawable_collection,
-                                               PipelineStage *projected_surface,
-                                               PerspectiveProjection const &projection,
-                                               PipelineStage *first_stage,
-                                               TransferContext *transfer_context);
+    DagOperation *DoComputeDirectIllumination(DrawableCollection *drawable_collection,
+                                              DagOperation *projected_surface,
+                                              PerspectiveProjection const &projection,
+                                              DagOperation *first_stage,
+                                              TransferContext *transfer_context);
 
     /**
      * @brief CachedShadowMaps
      */
-    std::unordered_map<SceneEntityId, std::vector<PipelineStage *>> CachedShadowMaps();
+    std::unordered_map<SceneEntityId, std::vector<DagOperation *>> CachedShadowMaps();
 
   private:
     struct DirectIlluminatorImpl;

@@ -25,8 +25,8 @@
 #include <vector>
 
 #include "common/device.h"
-#include "renderer/output/pipeline_output.h"
-#include "renderer/output/promise.h"
+#include "renderer/dag/graphics_pipeline_output.h"
+#include "renderer/dag/promise.h"
 #include "renderer/pass/rasterize.h"
 #include "renderer/postprocessor/post_processor.h"
 #include "renderer/transfer/descriptor_set.h"
@@ -145,7 +145,7 @@ void PostProcessorConfiguratorInterface::PushConstants(
 struct PostProcessorPipeline::PostProcessorPipelineImpl {
     PostProcessorPipelineImpl(PipelineKey key, unsigned input_image_count,
                               ShaderUniformLayout const &uniform_layout,
-                              PipelineOutputInterface *output, TransferContext *transfer_context);
+                              GraphicsPipelineOutputInterface *output, TransferContext *transfer_context);
     ~PostProcessorPipelineImpl();
 
     PipelineKey key;
@@ -160,7 +160,7 @@ struct PostProcessorPipeline::PostProcessorPipelineImpl {
 
 PostProcessorPipeline::PostProcessorPipelineImpl::PostProcessorPipelineImpl(
     PipelineKey key, unsigned input_image_count, ShaderUniformLayout const &uniform_layout,
-    PipelineOutputInterface *output, TransferContext *transfer_context)
+    GraphicsPipelineOutputInterface *output, TransferContext *transfer_context)
     : key(key), past_input_images(input_image_count) {
     // Sets up the viewport dimension uniform variable.
     viewport_dimension_desc_set = transfer_context->descriptor_set_allocator.Allocate(
@@ -190,8 +190,8 @@ PostProcessorPipeline::PostProcessorPipelineImpl::~PostProcessorPipelineImpl() {
 
 PostProcessorPipeline::PostProcessorPipeline(
     PipelineKey const &key, std::string const &fragment_shader, unsigned input_image_count,
-    unsigned push_constant_size, PipelineOutputInterface *output, TransferContext *transfer_context)
-    : CachedPipelineInterface(transfer_context->vulkan_context) {
+    unsigned push_constant_size, GraphicsPipelineOutputInterface *output, TransferContext *transfer_context)
+    : GraphicsPipelineInterface(transfer_context->vulkan_context) {
     shader_stages_ = CreateShaderStages(
         /*vertex_shader_file_path=*/kVertexShaderFilePathPostProcessor,
         /*fragment_shader_file_path=*/fragment_shader, transfer_context->vulkan_context);
@@ -218,10 +218,10 @@ PostProcessorPipeline::~PostProcessorPipeline() {}
 
 PipelineKey PostProcessorPipeline::Key() const { return pimpl_->key; }
 
-Fulfillment PostProcessorPipeline::Launch(CachedPipelineArgumentsInterface const &generic_args,
+Fulfillment PostProcessorPipeline::Launch(GraphicsPipelineArgumentsInterface const &generic_args,
                                           std::vector<GpuPromise *> const &prerequisites,
                                           unsigned completion_signal_count,
-                                          PipelineOutputInterface *output) {
+                                          GraphicsPipelineOutputInterface *output) {
     VkCommandBuffer cmds =
         StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), context_);
 

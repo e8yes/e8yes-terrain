@@ -37,12 +37,12 @@ SOURCES += \
     basic/uniform_buffer.cc \
     basic/uniform_layout.cc \
     basic/vertex_input.cc \
+    dag/dag_operation.cc \
+    dag/graphics_pipeline.cc \
+    dag/graphics_pipeline_output.cc \
+    dag/graphics_pipeline_output_common.cc \
     lighting/direct_illuminator.cc \
-    output/cached_pipeline.cc \
-    output/common_output.cc \
-    output/pipeline_output.cc \
-    output/pipeline_stage.cc \
-    output/promise.cc \
+    dag/promise.cc \
     pass/configurator.cc \
     pass/rasterize.cc \
     pipeline/fill_color.cc \
@@ -88,12 +88,12 @@ HEADERS += \
     basic/uniform_buffer.h \
     basic/uniform_layout.h \
     basic/vertex_input.h \
+    dag/dag_operation.h \
+    dag/graphics_pipeline.h \
+    dag/graphics_pipeline_output.h \
+    dag/graphics_pipeline_output_common.h \
+    dag/promise.h \
     lighting/direct_illuminator.h \
-    output/cached_pipeline.h \
-    output/common_output.h \
-    output/pipeline_output.h \
-    output/pipeline_stage.h \
-    output/promise.h \
     pass/configurator.h \
     pass/rasterize.h \
     pipeline/fill_color.h \

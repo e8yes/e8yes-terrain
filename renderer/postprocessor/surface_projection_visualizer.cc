@@ -22,7 +22,7 @@
 
 #include "renderer/basic/shader.h"
 #include "renderer/basic/uniform_layout.h"
-#include "renderer/output/pipeline_output.h"
+#include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/pipeline/project_surface.h"
 #include "renderer/postprocessor/post_processor.h"
 #include "renderer/postprocessor/surface_projection_visualizer.h"
@@ -43,7 +43,7 @@ class SurfaceProjectionVisualizerPostProcessorConfigurator
    public:
     SurfaceProjectionVisualizerPostProcessorConfigurator(
         LightInputsRendererParameters::InputType parameter_to_visualize,
-        PipelineOutputInterface const &light_inputs);
+        GraphicsPipelineOutputInterface const &light_inputs);
     ~SurfaceProjectionVisualizerPostProcessorConfigurator() override;
 
     void InputImages(std::vector<VkImageView> *input_images) const override;
@@ -51,13 +51,13 @@ class SurfaceProjectionVisualizerPostProcessorConfigurator
 
    private:
     LightInputsRendererParameters::InputType parameter_to_visualize_;
-    PipelineOutputInterface const &light_inputs_;
+    GraphicsPipelineOutputInterface const &light_inputs_;
 };
 
 SurfaceProjectionVisualizerPostProcessorConfigurator::
     SurfaceProjectionVisualizerPostProcessorConfigurator(
         LightInputsRendererParameters::InputType parameter_to_visualize,
-        PipelineOutputInterface const &light_inputs)
+        GraphicsPipelineOutputInterface const &light_inputs)
     : parameter_to_visualize_(parameter_to_visualize), light_inputs_(light_inputs) {}
 
 SurfaceProjectionVisualizerPostProcessorConfigurator::
@@ -83,11 +83,11 @@ void SurfaceProjectionVisualizerPostProcessorConfigurator::PushConstants(
 }  // namespace
 
 void DoVisualizeSurfaceProjection(LightInputsRendererParameters::InputType parameter_to_visualize,
-                                  PipelineStage *surface_projection,
-                                  TransferContext *transfer_context, PipelineStage *target) {
-    CachedPipelineInterface *pipeline = target->WithPipeline(
+                                  DagOperation *surface_projection,
+                                  TransferContext *transfer_context, DagOperation *target) {
+    GraphicsPipelineInterface *pipeline = target->WithPipeline(
         kSurfaceProjectionVisualizerPipeline,
-        [transfer_context](PipelineOutputInterface *visualizer_output) {
+        [transfer_context](GraphicsPipelineOutputInterface *visualizer_output) {
             return std::make_unique<PostProcessorPipeline>(
                 kSurfaceProjectionVisualizerPipeline, kFragmentShaderFilePathLightInputsVisualizer,
                 /*input_image_count=*/SurfaceProjectionColorOutput::LightInputsColorOutputCount,
@@ -98,7 +98,7 @@ void DoVisualizeSurfaceProjection(LightInputsRendererParameters::InputType param
     auto configurator = std::make_unique<SurfaceProjectionVisualizerPostProcessorConfigurator>(
         parameter_to_visualize, *surface_projection->Output());
     target->Schedule(pipeline, std::move(configurator),
-                     /*parents=*/std::vector<PipelineStage *>{surface_projection});
+                     /*parents=*/std::vector<DagOperation *>{surface_projection});
 }
 
 }  // namespace e8

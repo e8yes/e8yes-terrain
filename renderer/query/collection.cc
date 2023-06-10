@@ -27,25 +27,45 @@
 
 namespace e8 {
 
-DrawableCollection::DrawableCollection(SceneEntityStructureInterface const& entities,
-                                       ResourceAccessor* resource_accessor)
+DrawableCollection::DrawableCollection(SceneEntityStructureInterface const &entities,
+                                       ResourceAccessor *resource_accessor)
     : entities_(entities), resource_accessor_(resource_accessor) {
     assert(resource_accessor != nullptr);
 }
 
 DrawableCollection::~DrawableCollection() {}
 
-std::vector<DrawableInstance> DrawableCollection::ObservableGeometries(
-    PerspectiveProjection const& projection, ResourceLoadingOption const& loading_option) {
-    std::vector<SceneEntity const*> scene_entities = entities_.QueryEntities(QueryAllSceneEntities);
+std::vector<DrawableInstance>
+DrawableCollection::ObservableGeometries(PerspectiveProjection const &projection,
+                                         ResourceLoadingOption const &loading_option) {
+    std::vector<SceneEntity const *> scene_entities =
+        entities_.QueryEntities(QueryAllSceneEntities);
     return ToDrawables(scene_entities, /*viewer_location=*/projection.Location(), loading_option,
                        resource_accessor_);
 }
 
-std::vector<LightSourceInstance> DrawableCollection::ObservableLightSources(
-    PerspectiveProjection const& projection) {
-    std::vector<SceneEntity const*> scene_entities = entities_.QueryEntities(QueryAllSceneEntities);
+std::vector<LightSourceInstance>
+DrawableCollection::ObservableLightSources(PerspectiveProjection const &projection) {
+    std::vector<SceneEntity const *> scene_entities =
+        entities_.QueryEntities(QueryAllSceneEntities);
+
+    SceneEntity light1("light1");
+    light1.id = 10;
+    SceneEntitySetTransform(mat44_identity(), &light1);
+
+    LightSource light_source1;
+    *light_source1.mutable_spot_light()->mutable_position() = ToProto(vec3{0, 0, 9});
+    *light_source1.mutable_spot_light()->mutable_direction() = ToProto(vec3{0, 0, -1});
+    *light_source1.mutable_spot_light()->mutable_intensity() =
+        ToProto(vec3{1.0f, 1.0f, 1.4f} * 100.0f);
+    light_source1.mutable_spot_light()->set_inner_cone_angle(90.0f);
+    light_source1.mutable_spot_light()->set_outer_cone_angle(120.0f);
+
+    light1.light_source = light_source1;
+
+    scene_entities.push_back(&light1);
+
     return ToLightSources(scene_entities, projection);
 }
 
-}  // namespace e8
+} // namespace e8

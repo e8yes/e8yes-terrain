@@ -22,7 +22,7 @@
 #include <optional>
 
 #include "renderer/basic/projection.h"
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {
@@ -41,8 +41,8 @@ namespace e8 {
  * @param target The target stage which stores the visualized depth map grayscale image.
  */
 void DoVisualizeDepthProjection(float alpha, std::optional<PerspectiveProjection> projection,
-                                PipelineStage *depth_map_stage, TransferContext *transfer_context,
-                                PipelineStage *target);
+                                DagOperation *depth_map_stage, TransferContext *transfer_context,
+                                DagOperation *target);
 
 } // namespace e8
 

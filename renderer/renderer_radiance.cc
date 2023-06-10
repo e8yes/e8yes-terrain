@@ -23,7 +23,7 @@
 #include "common/device.h"
 #include "content/scene.h"
 #include "renderer/lighting/direct_illuminator.h"
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/pipeline/project_surface.h"
 #include "renderer/postprocessor/exposure.h"
 #include "renderer/postprocessor/fxaa.h"
@@ -38,24 +38,24 @@
 namespace e8 {
 
 struct RadianceRenderer::RadianceRendererImpl {
-    RadianceRendererImpl(std::unique_ptr<PipelineStage> &&final_color_image,
+    RadianceRendererImpl(std::unique_ptr<DagOperation> &&final_color_image,
                          VulkanContext *context);
     ~RadianceRendererImpl();
 
     TransferContext transfer_context;
 
-    std::unique_ptr<PipelineStage> surface_projection;
+    std::unique_ptr<DagOperation> surface_projection;
     DirectIlluminator direct_illuminator;
-    std::unique_ptr<PipelineStage> log_luminance_map;
-    std::unique_ptr<PipelineStage> log_exposure_value;
-    std::unique_ptr<PipelineStage> ldr_image;
-    std::unique_ptr<PipelineStage> final_color_image;
+    std::unique_ptr<DagOperation> log_luminance_map;
+    std::unique_ptr<DagOperation> log_exposure_value;
+    std::unique_ptr<DagOperation> ldr_image;
+    std::unique_ptr<DagOperation> final_color_image;
 
     RendererConfiguration config;
 };
 
 RadianceRenderer::RadianceRendererImpl::RadianceRendererImpl(
-    std::unique_ptr<PipelineStage> &&final_color_image, VulkanContext *context)
+    std::unique_ptr<DagOperation> &&final_color_image, VulkanContext *context)
     : transfer_context(context),
       surface_projection(CreateProjectSurfaceStage(context->swap_chain_image_extent.width,
                                                    context->swap_chain_image_extent.height,
@@ -85,11 +85,11 @@ void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_access
     DrawableCollection drawable_collection(*scene->SceneEntityStructure(), resource_accessor);
 
     // Render passes.
-    PipelineStage *first_stage = this->DoFirstStage();
+    DagOperation *first_stage = this->DoFirstStage();
 
     DoProjectSurface(&drawable_collection, projection, &pimpl_->transfer_context, first_stage,
                      pimpl_->surface_projection.get());
-    PipelineStage *radiance_map = pimpl_->direct_illuminator.DoComputeDirectIllumination(
+    DagOperation *radiance_map = pimpl_->direct_illuminator.DoComputeDirectIllumination(
         &drawable_collection, pimpl_->surface_projection.get(), projection, first_stage,
         &pimpl_->transfer_context);
 
@@ -99,10 +99,10 @@ void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_access
                   pimpl_->ldr_image.get());
     DoFxaa(pimpl_->ldr_image.get(), &pimpl_->transfer_context, pimpl_->final_color_image.get());
 
-    PipelineStage *final_stage =
+    DagOperation *final_stage =
         this->DoFinalStage(first_stage, pimpl_->final_color_image.get(),
                            /*dangling_stages=*/
-                           std::vector<PipelineStage *>{pimpl_->surface_projection.get()});
+                           std::vector<DagOperation *>{pimpl_->surface_projection.get()});
 
     this->BeginStage(1, "FULFILL");
     final_stage->Fulfill(pimpl_->transfer_context.vulkan_context);

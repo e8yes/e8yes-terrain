@@ -21,7 +21,7 @@
 #include <memory>
 
 #include "common/device.h"
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {
@@ -35,7 +35,7 @@ namespace e8 {
  * @param transfer_context Transfer context.
  * @param target The target stage which stores the anti-aliased LDR color image.
  */
-void DoFxaa(PipelineStage *ldr_image, TransferContext *transfer_context, PipelineStage *target);
+void DoFxaa(DagOperation *ldr_image, TransferContext *transfer_context, DagOperation *target);
 
 }  // namespace e8
 

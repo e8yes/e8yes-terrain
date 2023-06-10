@@ -27,10 +27,10 @@
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
-#include "renderer/output/cached_pipeline.h"
-#include "renderer/output/pipeline_output.h"
-#include "renderer/output/pipeline_stage.h"
-#include "renderer/output/promise.h"
+#include "renderer/dag/graphics_pipeline.h"
+#include "renderer/dag/dag_operation.h"
+#include "renderer/dag/graphics_pipeline_output.h"
+#include "renderer/dag/promise.h"
 
 namespace e8 {
 namespace {
@@ -65,73 +65,59 @@ void WaitForStageCompletion(std::vector<Fulfillment> const &fulfillment_cache,
 
 } // namespace
 
-struct PipelineStage::ParentStage {
-    PipelineStage *parent;
+struct DagOperation::ParentStage {
+    DagOperation *parent;
     unsigned child_id;
 };
 
-struct PipelineStage::PipelineSchedule {
-    std::unique_ptr<CachedPipelineArgumentsInterface> args;
+struct DagOperation::PipelineSchedule {
+    std::unique_ptr<GraphicsPipelineArgumentsInterface> args;
     std::vector<ParentStage> dependent_parents;
 };
 
-struct PipelineStage::PipelineAndSchedules {
-    PipelineAndSchedules(std::unique_ptr<CachedPipelineInterface> &&pipeline);
+struct DagOperation::PipelineAndSchedules {
+    PipelineAndSchedules(std::unique_ptr<GraphicsPipelineInterface> &&pipeline)
+        : pipeline(std::move(pipeline)) {}
+
     PipelineAndSchedules(PipelineAndSchedules const &) = delete;
-    PipelineAndSchedules(PipelineAndSchedules &&other);
-    ~PipelineAndSchedules();
 
-    PipelineAndSchedules &operator=(PipelineAndSchedules &&other);
-    void ResetSchedules();
+    PipelineAndSchedules(PipelineAndSchedules &&other) { *this = std::move(other); }
 
-    std::unique_ptr<CachedPipelineInterface> pipeline;
+    ~PipelineAndSchedules() = default;
+
+    PipelineAndSchedules &operator=(PipelineAndSchedules &&other) {
+        std::swap(pipeline, other.pipeline);
+        std::swap(schedules, other.schedules);
+        return *this;
+    }
+
+    void ResetSchedules() { schedules.clear(); }
+
+    std::unique_ptr<GraphicsPipelineInterface> pipeline;
     std::vector<PipelineSchedule> schedules;
 };
 
-PipelineStage::PipelineAndSchedules::PipelineAndSchedules(
-    std::unique_ptr<CachedPipelineInterface> &&pipeline)
-    : pipeline(std::move(pipeline)) {}
+struct DagOperation::DagOperationImpl {
+    DagOperationImpl(std::shared_ptr<GraphicsPipelineOutputInterface> const &output)
+        : output(output), num_child_stages(0) {}
 
-PipelineStage::PipelineAndSchedules::~PipelineAndSchedules() {}
+    ~DagOperationImpl() = default;
 
-PipelineStage::PipelineAndSchedules::PipelineAndSchedules(PipelineAndSchedules &&other) {
-    *this = std::move(other);
-}
-
-PipelineStage::PipelineAndSchedules &
-PipelineStage::PipelineAndSchedules::operator=(PipelineAndSchedules &&other) {
-    std::swap(pipeline, other.pipeline);
-    std::swap(schedules, other.schedules);
-    return *this;
-}
-
-void PipelineStage::PipelineAndSchedules::ResetSchedules() { schedules.clear(); }
-
-struct PipelineStage::PipelineStageImpl {
-    PipelineStageImpl(std::shared_ptr<PipelineOutputInterface> const &output);
-    ~PipelineStageImpl();
-
-    std::shared_ptr<PipelineOutputInterface> output;
+    std::shared_ptr<GraphicsPipelineOutputInterface> output;
     std::unordered_map<PipelineKey, PipelineAndSchedules> pipelines;
     unsigned num_child_stages;
     std::vector<Fulfillment> fulfillment_cache;
 };
 
-PipelineStage::PipelineStageImpl::PipelineStageImpl(
-    std::shared_ptr<PipelineOutputInterface> const &output)
-    : output(output), num_child_stages(0) {}
+DagOperation::DagOperation(std::shared_ptr<GraphicsPipelineOutputInterface> const &output)
+    : pimpl_(std::make_unique<DagOperationImpl>(output)) {}
 
-PipelineStage::PipelineStageImpl::~PipelineStageImpl() {}
+DagOperation::~DagOperation() {}
 
-PipelineStage::PipelineStage(std::shared_ptr<PipelineOutputInterface> const &output)
-    : pimpl_(std::make_unique<PipelineStageImpl>(output)) {}
+DagOperation::ChildId DagOperation::AllocateChild() { return pimpl_->num_child_stages++; }
 
-PipelineStage::~PipelineStage() {}
-
-PipelineStage::ChildId PipelineStage::AllocateChild() { return pimpl_->num_child_stages++; }
-
-std::unordered_set<PipelineStage *> PipelineStage::UniqueParents() {
-    std::unordered_set<PipelineStage *> parents;
+std::unordered_set<DagOperation *> DagOperation::UniqueParents() {
+    std::unordered_set<DagOperation *> parents;
 
     for (auto const &[_, pipeline_and_schedules] : pimpl_->pipelines) {
         for (auto const &schedule : pipeline_and_schedules.schedules) {
@@ -144,9 +130,9 @@ std::unordered_set<PipelineStage *> PipelineStage::UniqueParents() {
     return parents;
 }
 
-Fulfillment PipelineStage::LaunchSchedule(CachedPipelineInterface *pipeline,
-                                          PipelineSchedule const &schedule, unsigned child_count,
-                                          PipelineOutputInterface *output) {
+Fulfillment DagOperation::LaunchSchedule(GraphicsPipelineInterface *pipeline,
+                                         PipelineSchedule const &schedule, unsigned child_count,
+                                         GraphicsPipelineOutputInterface *output) {
     // Runs the prerequisites parent stages.
     std::vector<GpuPromise *> prerequisites;
 
@@ -163,7 +149,7 @@ Fulfillment PipelineStage::LaunchSchedule(CachedPipelineInterface *pipeline,
     return pipeline->Launch(*schedule.args, prerequisites, child_count, output);
 }
 
-std::vector<GpuPromise *> PipelineStage::LaunchSchedulesAs(std::optional<ChildId> child_id) {
+std::vector<GpuPromise *> DagOperation::LaunchSchedulesAs(std::optional<ChildId> child_id) {
     if (!pimpl_->fulfillment_cache.empty()) {
         return ToGpuPromiseReference(child_id, &pimpl_->fulfillment_cache);
     }
@@ -180,7 +166,7 @@ std::vector<GpuPromise *> PipelineStage::LaunchSchedulesAs(std::optional<ChildId
     return ToGpuPromiseReference(child_id, &pimpl_->fulfillment_cache);
 }
 
-void PipelineStage::Reset() {
+void DagOperation::Reset() {
     for (auto parent : this->UniqueParents()) {
         parent->Reset();
     }
@@ -193,23 +179,23 @@ void PipelineStage::Reset() {
     pimpl_->num_child_stages = 0;
 }
 
-CachedPipelineInterface *PipelineStage::WithPipeline(PipelineKey const &key,
-                                                     CompilePipelineFn compile_fn) {
+GraphicsPipelineInterface *DagOperation::WithPipeline(PipelineKey const &key,
+                                                    CompilePipelineFn compile_fn) {
     auto it = pimpl_->pipelines.find(key);
     if (it != pimpl_->pipelines.end()) {
         return it->second.pipeline.get();
     }
 
-    std::unique_ptr<CachedPipelineInterface> pipeline = compile_fn(pimpl_->output.get());
+    std::unique_ptr<GraphicsPipelineInterface> pipeline = compile_fn(pimpl_->output.get());
     it = pimpl_->pipelines.insert(std::make_pair(key, PipelineAndSchedules(std::move(pipeline))))
              .first;
 
     return it->second.pipeline.get();
 }
 
-void PipelineStage::Schedule(CachedPipelineInterface const *pipeline,
-                             std::unique_ptr<CachedPipelineArgumentsInterface> &&args,
-                             std::vector<PipelineStage *> const &parents) {
+void DagOperation::Schedule(GraphicsPipelineInterface const *pipeline,
+                            std::unique_ptr<GraphicsPipelineArgumentsInterface> &&args,
+                            std::vector<DagOperation *> const &parents) {
     // Forms a schedule.
     PipelineSchedule schedule;
     schedule.args = std::move(args);
@@ -235,11 +221,11 @@ void PipelineStage::Schedule(CachedPipelineInterface const *pipeline,
     pipeline_and_schedules.schedules.emplace_back(std::move(schedule));
 }
 
-PipelineOutputInterface const *PipelineStage::Output() const { return pimpl_->output.get(); }
+GraphicsPipelineOutputInterface const *DagOperation::Output() const { return pimpl_->output.get(); }
 
-PipelineOutputInterface *PipelineStage::Output() { return pimpl_->output.get(); }
+GraphicsPipelineOutputInterface *DagOperation::Output() { return pimpl_->output.get(); }
 
-void PipelineStage::Fulfill(VulkanContext *context) {
+void DagOperation::Fulfill(VulkanContext *context) {
     this->LaunchSchedulesAs(/*child_id=*/std::nullopt);
 
     for (auto parent : this->UniqueParents()) {

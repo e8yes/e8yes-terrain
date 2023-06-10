@@ -30,10 +30,10 @@
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
-#include "renderer/output/cached_pipeline.h"
-#include "renderer/output/common_output.h"
-#include "renderer/output/pipeline_stage.h"
-#include "renderer/output/promise.h"
+#include "renderer/dag/graphics_pipeline.h"
+#include "renderer/dag/graphics_pipeline_output_common.h"
+#include "renderer/dag/dag_operation.h"
+#include "renderer/dag/promise.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/renderer.h"
 #include "renderer/renderer_depth.h"
@@ -54,29 +54,29 @@ PipelineKey const kPresentImagePipeline = "PresentImage";
 /**
  * @brief The AcquireImagePipeline class
  */
-class AcquireImagePipeline : public CachedPipelineInterface {
+class AcquireImagePipeline : public GraphicsPipelineInterface {
   public:
     explicit AcquireImagePipeline(VulkanContext *context);
     ~AcquireImagePipeline();
 
     PipelineKey Key() const override;
 
-    Fulfillment Launch(CachedPipelineArgumentsInterface const &generic_args,
+    Fulfillment Launch(GraphicsPipelineArgumentsInterface const &generic_args,
                        std::vector<GpuPromise *> const &prerequisites,
-                       unsigned completion_signal_count, PipelineOutputInterface *output) override;
+                       unsigned completion_signal_count, GraphicsPipelineOutputInterface *output) override;
 };
 
 AcquireImagePipeline::AcquireImagePipeline(VulkanContext *context)
-    : CachedPipelineInterface(context) {}
+    : GraphicsPipelineInterface(context) {}
 
 AcquireImagePipeline::~AcquireImagePipeline() {}
 
 PipelineKey AcquireImagePipeline::Key() const { return kAcquireImagePipeline; }
 
-Fulfillment AcquireImagePipeline::Launch(CachedPipelineArgumentsInterface const & /*generic_args*/,
+Fulfillment AcquireImagePipeline::Launch(GraphicsPipelineArgumentsInterface const & /*generic_args*/,
                                          std::vector<GpuPromise *> const &prerequisites,
                                          unsigned completion_signal_count,
-                                         PipelineOutputInterface *output) {
+                                         GraphicsPipelineOutputInterface *output) {
     assert(prerequisites.empty());
     assert(output != nullptr);
 
@@ -89,7 +89,7 @@ Fulfillment AcquireImagePipeline::Launch(CachedPipelineArgumentsInterface const 
                                                /*fence=*/acquisition_signal->signal,
                                                &swap_chain_image_index));
     acquisition_signal->Wait();
-    static_cast<SwapChainPipelineOutput *>(output)->SetSwapChainImageIndex(swap_chain_image_index);
+    static_cast<SwapChainOutput *>(output)->SetSwapChainImageIndex(swap_chain_image_index);
 
     // Dispatches signals to all child stages.
     Fulfillment fulfillment(/*cmds=*/VK_NULL_HANDLE, context_);
@@ -112,38 +112,38 @@ Fulfillment AcquireImagePipeline::Launch(CachedPipelineArgumentsInterface const 
     return fulfillment;
 }
 
-struct PresentImageArguments : public CachedPipelineArgumentsInterface {
-    PresentImageArguments(SwapChainPipelineOutput *output) : output(output) {}
+struct PresentImageArguments : public GraphicsPipelineArgumentsInterface {
+    PresentImageArguments(SwapChainOutput *output) : output(output) {}
 
-    SwapChainPipelineOutput *output;
+    SwapChainOutput *output;
 };
 
 /**
  * @brief The PresentImagePipeline class
  */
-class PresentImagePipeline : public CachedPipelineInterface {
+class PresentImagePipeline : public GraphicsPipelineInterface {
   public:
     PresentImagePipeline(VulkanContext *context);
     ~PresentImagePipeline();
 
     PipelineKey Key() const override;
 
-    Fulfillment Launch(CachedPipelineArgumentsInterface const &generic_args,
+    Fulfillment Launch(GraphicsPipelineArgumentsInterface const &generic_args,
                        std::vector<GpuPromise *> const &prerequisites,
-                       unsigned completion_signal_count, PipelineOutputInterface *output) override;
+                       unsigned completion_signal_count, GraphicsPipelineOutputInterface *output) override;
 };
 
 PresentImagePipeline::PresentImagePipeline(VulkanContext *context)
-    : CachedPipelineInterface(context) {}
+    : GraphicsPipelineInterface(context) {}
 
 PresentImagePipeline::~PresentImagePipeline() {}
 
 PipelineKey PresentImagePipeline::Key() const { return kPresentImagePipeline; }
 
-Fulfillment PresentImagePipeline::Launch(CachedPipelineArgumentsInterface const &generic_args,
+Fulfillment PresentImagePipeline::Launch(GraphicsPipelineArgumentsInterface const &generic_args,
                                          std::vector<GpuPromise *> const &prerequisites,
                                          unsigned completion_signal_count,
-                                         PipelineOutputInterface *output) {
+                                         GraphicsPipelineOutputInterface *output) {
     assert(completion_signal_count == 0);
     assert(!prerequisites.empty());
     assert(output == nullptr);
@@ -181,7 +181,7 @@ RendererInterface::StagePerformance::~StagePerformance() {}
 RendererInterface::RendererInterface(unsigned num_stages, VulkanContext *context)
     : context(context), stage_performance_(num_stages + 2),
       final_output_(
-          std::make_shared<SwapChainPipelineOutput>(/*with_depth_buffer=*/false, context)),
+          std::make_shared<SwapChainOutput>(/*with_depth_buffer=*/false, context)),
       first_stage_(final_output_), final_stage_(/*output=*/nullptr),
       mu_(std::make_unique<std::mutex>()) {}
 
@@ -192,31 +192,31 @@ std::vector<RendererInterface::StagePerformance> RendererInterface::GetPerforman
     return stage_performance_;
 }
 
-PipelineStage *RendererInterface::DoFirstStage() {
-    CachedPipelineInterface *pipeline = first_stage_.WithPipeline(
-        kAcquireImagePipeline, [this](PipelineOutputInterface * /*output*/) {
+DagOperation *RendererInterface::DoFirstStage() {
+    GraphicsPipelineInterface *pipeline = first_stage_.WithPipeline(
+        kAcquireImagePipeline, [this](GraphicsPipelineOutputInterface * /*output*/) {
             return std::make_unique<AcquireImagePipeline>(this->context);
         });
 
     first_stage_.Schedule(pipeline,
-                          /*args=*/std::make_unique<CachedPipelineArgumentsInterface>(),
-                          /*parents=*/std::vector<PipelineStage *>{});
+                          /*args=*/std::make_unique<GraphicsPipelineArgumentsInterface>(),
+                          /*parents=*/std::vector<DagOperation *>{});
 
     return &first_stage_;
 }
 
-PipelineStage *
-RendererInterface::DoFinalStage(PipelineStage *first_stage, PipelineStage *final_color_image_stage,
-                                std::vector<PipelineStage *> const &dangling_stages) {
-    CachedPipelineInterface *pipeline = final_stage_.WithPipeline(
-        kPresentImagePipeline, [this](PipelineOutputInterface * /*output*/) {
+DagOperation *
+RendererInterface::DoFinalStage(DagOperation *first_stage, DagOperation *final_color_image_stage,
+                                std::vector<DagOperation *> const &dangling_stages) {
+    GraphicsPipelineInterface *pipeline = final_stage_.WithPipeline(
+        kPresentImagePipeline, [this](GraphicsPipelineOutputInterface * /*output*/) {
             return std::make_unique<PresentImagePipeline>(this->context);
         });
 
     auto args = std::make_unique<PresentImageArguments>(
-        static_cast<SwapChainPipelineOutput *>(first_stage->Output()));
+        static_cast<SwapChainOutput *>(first_stage->Output()));
 
-    std::vector<PipelineStage *> dependent_parents{first_stage, final_color_image_stage};
+    std::vector<DagOperation *> dependent_parents{first_stage, final_color_image_stage};
     for (auto dangling_stage : dangling_stages) {
         dependent_parents.push_back(dangling_stage);
     }
@@ -226,8 +226,8 @@ RendererInterface::DoFinalStage(PipelineStage *first_stage, PipelineStage *final
     return &final_stage_;
 }
 
-std::unique_ptr<PipelineStage> RendererInterface::FinalColorImageStage() const {
-    return std::make_unique<PipelineStage>(final_output_);
+std::unique_ptr<DagOperation> RendererInterface::FinalColorImageStage() const {
+    return std::make_unique<DagOperation>(final_output_);
 }
 
 void RendererInterface::BeginStage(unsigned index, std::string const &name) {

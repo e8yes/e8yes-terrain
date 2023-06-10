@@ -21,8 +21,8 @@
 #include <vulkan/vulkan.h>
 
 #include "renderer/basic/shader.h"
-#include "renderer/output/pipeline_output.h"
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/graphics_pipeline_output.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/postprocessor/float_map_visualizer.h"
 #include "renderer/postprocessor/post_processor.h"
 #include "renderer/transfer/context.h"
@@ -39,7 +39,7 @@ struct FloatMapVisualizerParameters {
 
 class FloatMapVisualizerConfigurator : public PostProcessorConfiguratorInterface {
   public:
-    FloatMapVisualizerConfigurator(PipelineOutputInterface const &float_map, float min_value,
+    FloatMapVisualizerConfigurator(GraphicsPipelineOutputInterface const &float_map, float min_value,
                                    float max_value)
         : float_map_(float_map), min_value_(min_value), max_value_(max_value) {}
 
@@ -58,17 +58,17 @@ class FloatMapVisualizerConfigurator : public PostProcessorConfiguratorInterface
     }
 
   private:
-    PipelineOutputInterface const &float_map_;
+    GraphicsPipelineOutputInterface const &float_map_;
     float const min_value_;
     float const max_value_;
 };
 
 } // namespace
 
-void DoVisualizeFloat(PipelineStage *float_map_stage, float min_value, float max_value,
-                      TransferContext *transfer_context, PipelineStage *target) {
-    CachedPipelineInterface *pipeline = target->WithPipeline(
-        kFloatMapVisualizerPipeline, [transfer_context](PipelineOutputInterface *output) {
+void DoVisualizeFloat(DagOperation *float_map_stage, float min_value, float max_value,
+                      TransferContext *transfer_context, DagOperation *target) {
+    GraphicsPipelineInterface *pipeline = target->WithPipeline(
+        kFloatMapVisualizerPipeline, [transfer_context](GraphicsPipelineOutputInterface *output) {
             return std::make_unique<PostProcessorPipeline>(
                 kFloatMapVisualizerPipeline, kFragmentShaderFilePathFloatMapVisualizer,
                 /*input_image_count=*/1,
@@ -79,7 +79,7 @@ void DoVisualizeFloat(PipelineStage *float_map_stage, float min_value, float max
     auto configurator = std::make_unique<FloatMapVisualizerConfigurator>(*float_map_stage->Output(),
                                                                          min_value, max_value);
     target->Schedule(pipeline, std::move(configurator),
-                     /*parents=*/std::vector<PipelineStage *>{float_map_stage});
+                     /*parents=*/std::vector<DagOperation *>{float_map_stage});
 }
 
 } // namespace e8

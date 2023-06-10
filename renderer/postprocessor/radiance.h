@@ -20,7 +20,7 @@
 
 #include <memory>
 
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/query/light_source.h"
 #include "renderer/transfer/context.h"
 
@@ -42,10 +42,10 @@ namespace e8 {
  * @param transfer_context Transfer context.
  * @param target The target stage which stores the radiance map in an HDR color image.
  */
-void DoComputeRadiance(LightSourceInstance const &instance, PipelineStage *projected_surface,
-                       frustum const &projection, std::vector<PipelineStage *> const &shadow_maps,
-                       PipelineStage *cleared_radiance_map, TransferContext *transfer_context,
-                       PipelineStage *target);
+void DoComputeRadiance(LightSourceInstance const &instance, DagOperation *projected_surface,
+                       frustum const &projection, std::vector<DagOperation *> const &shadow_maps,
+                       DagOperation *cleared_radiance_map, TransferContext *transfer_context,
+                       DagOperation *target);
 
 } // namespace e8
 

@@ -22,9 +22,9 @@
 #include "common/device.h"
 #include "renderer/basic/sampler.h"
 #include "renderer/basic/shader.h"
-#include "renderer/output/common_output.h"
-#include "renderer/output/pipeline_output.h"
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/graphics_pipeline_output_common.h"
+#include "renderer/dag/graphics_pipeline_output.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/postprocessor/exposure.h"
 #include "renderer/postprocessor/post_processor.h"
 #include "renderer/postprocessor/tone_map.h"
@@ -38,19 +38,19 @@ PipelineKey const kAcesToneMapPipeline = "ACES Tone Map";
 
 class ToneMapPostProcessorConfigurator : public PostProcessorConfiguratorInterface {
    public:
-    ToneMapPostProcessorConfigurator(PipelineStage const &radiance_map_stage,
-                                     PipelineStage *exposure_stage);
+    ToneMapPostProcessorConfigurator(DagOperation const &radiance_map_stage,
+                                     DagOperation *exposure_stage);
     ~ToneMapPostProcessorConfigurator() override;
 
     void InputImages(std::vector<VkImageView> *input_images) const override;
 
    private:
-    PipelineOutputInterface const &radiance_;
-    PipelineOutputInterface const *exposure_;
+    GraphicsPipelineOutputInterface const &radiance_;
+    GraphicsPipelineOutputInterface const *exposure_;
 };
 
 ToneMapPostProcessorConfigurator::ToneMapPostProcessorConfigurator(
-    PipelineStage const &radiance_map_stage, PipelineStage *exposure_stage)
+    DagOperation const &radiance_map_stage, DagOperation *exposure_stage)
     : radiance_(*radiance_map_stage.Output()) {
     if (exposure_stage != nullptr) {
         exposure_ = exposure_stage->Output();
@@ -71,20 +71,20 @@ void ToneMapPostProcessorConfigurator::InputImages(std::vector<VkImageView> *inp
 
 }  // namespace
 
-std::unique_ptr<PipelineStage> CreateLdrImageStage(unsigned width, unsigned height,
+std::unique_ptr<DagOperation> CreateLdrImageStage(unsigned width, unsigned height,
                                                    VulkanContext *context) {
-    auto output = std::make_shared<LdrColorPipelineOutput>(width, height,
+    auto output = std::make_shared<LdrColorOutput>(width, height,
                                                            /*with_depth_buffer=*/false, context);
-    return std::make_unique<PipelineStage>(output);
+    return std::make_unique<DagOperation>(output);
 }
 
-void DoToneMapping(PipelineStage *radiance_map, PipelineStage *exposure,
-                   TransferContext *transfer_context, PipelineStage *target) {
-    CachedPipelineInterface *pipeline;
+void DoToneMapping(DagOperation *radiance_map, DagOperation *exposure,
+                   TransferContext *transfer_context, DagOperation *target) {
+    GraphicsPipelineInterface *pipeline;
 
     if (exposure != nullptr) {
         pipeline = target->WithPipeline(
-            kAcesToneMapPipeline, [transfer_context](PipelineOutputInterface *tone_map_output) {
+            kAcesToneMapPipeline, [transfer_context](GraphicsPipelineOutputInterface *tone_map_output) {
                 return std::make_unique<PostProcessorPipeline>(
                     kAcesToneMapPipeline, kFragmentShaderFilePathHdrAces, /*input_image_count=*/2,
                     /*push_constant_size=*/0, tone_map_output, transfer_context);
@@ -92,7 +92,7 @@ void DoToneMapping(PipelineStage *radiance_map, PipelineStage *exposure,
     } else {
         pipeline = target->WithPipeline(
             kClampedLinearToneMapPipeline,
-            [transfer_context](PipelineOutputInterface *tone_map_output) {
+            [transfer_context](GraphicsPipelineOutputInterface *tone_map_output) {
                 return std::make_unique<PostProcessorPipeline>(
                     kClampedLinearToneMapPipeline, kFragmentShaderFilePathHdrClamp,
                     /*input_image_count=*/1, /*push_constant_size=*/0, tone_map_output,
@@ -102,7 +102,7 @@ void DoToneMapping(PipelineStage *radiance_map, PipelineStage *exposure,
 
     auto configurator = std::make_unique<ToneMapPostProcessorConfigurator>(*radiance_map, exposure);
     target->Schedule(pipeline, std::move(configurator),
-                     /*parents=*/std::vector<PipelineStage *>{radiance_map, exposure});
+                     /*parents=*/std::vector<DagOperation *>{radiance_map, exposure});
 }
 
 }  // namespace e8

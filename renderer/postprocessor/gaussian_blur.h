@@ -21,7 +21,7 @@
 #include <memory>
 
 #include "common/device.h"
-#include "renderer/output/pipeline_stage.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {
@@ -46,8 +46,8 @@ enum GaussianBlurLevel {
  * @param hv_blurred The final output with both horizontal and vertical blurring.
  */
 void CreateGaussianBlurStages(unsigned width, unsigned height, VulkanContext *context,
-                              std::unique_ptr<PipelineStage> *h_blurred,
-                              std::unique_ptr<PipelineStage> *hv_blurred);
+                              std::unique_ptr<DagOperation> *h_blurred,
+                              std::unique_ptr<DagOperation> *hv_blurred);
 
 /**
  * @brief DoGaussianBlur Schedules a post processing graphics pipeline to Gaussian blur a float map.
@@ -58,9 +58,9 @@ void CreateGaussianBlurStages(unsigned width, unsigned height, VulkanContext *co
  * @param h_blurred The horizontally blurred temporary output.
  * @param hv_blurred The final output with both horizontal and vertical blurring.
  */
-void DoGaussianBlur(PipelineStage *image, GaussianBlurLevel blur_level,
-                    TransferContext *transfer_context, PipelineStage *h_blurred,
-                    PipelineStage *hv_blurred);
+void DoGaussianBlur(DagOperation *image, GaussianBlurLevel blur_level,
+                    TransferContext *transfer_context, DagOperation *h_blurred,
+                    DagOperation *hv_blurred);
 
 } // namespace e8
 
