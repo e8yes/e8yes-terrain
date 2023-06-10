@@ -45,9 +45,9 @@ SOURCES += \
     dag/promise.cc \
     pass/configurator.cc \
     pass/rasterize.cc \
-    projection_space/fill_color.cc \
-    projection_space/project_depth.cc \
-    projection_space/project_surface.cc \
+    space_projection/fill_color.cc \
+    space_projection/project_depth.cc \
+    space_projection/project_surface.cc \
     space_screen/depth_projection_visualizer.cc \
     space_screen/exposure.cc \
     space_screen/float_map_visualizer.cc \
@@ -96,9 +96,9 @@ HEADERS += \
     lighting/direct_illuminator.h \
     pass/configurator.h \
     pass/rasterize.h \
-    projection_space/fill_color.h \
-    projection_space/project_depth.h \
-    projection_space/project_surface.h \
+    space_projection/fill_color.h \
+    space_projection/project_depth.h \
+    space_projection/project_surface.h \
     space_screen/depth_projection_visualizer.h \
     space_screen/exposure.h \
     space_screen/float_map_visualizer.h \

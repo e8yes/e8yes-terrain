@@ -26,7 +26,7 @@
 #include "content/scene_entity.h"
 #include "renderer/basic/projection.h"
 #include "renderer/dag/dag_operation.h"
-#include "renderer/projection_space/project_surface.h"
+#include "renderer/space_projection/project_surface.h"
 #include "renderer/space_screen/surface_projection_visualizer.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/query/collection.h"

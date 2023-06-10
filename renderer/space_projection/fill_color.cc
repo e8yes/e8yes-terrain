@@ -17,32 +17,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vulkan/vulkan.h>
 #include <vector>
+#include <vulkan/vulkan.h>
 
 #include "common/device.h"
 #include "common/tensor.h"
 #include "renderer/basic/frame_buffer.h"
+#include "renderer/dag/dag_operation.h"
 #include "renderer/dag/graphics_pipeline.h"
 #include "renderer/dag/graphics_pipeline_output.h"
-#include "renderer/dag/dag_operation.h"
 #include "renderer/dag/promise.h"
 #include "renderer/pass/rasterize.h"
-#include "renderer/projection_space/fill_color.h"
+#include "renderer/space_projection/fill_color.h"
 
 namespace e8 {
 namespace {
 
 PipelineKey const kFillColorPipeline = "FillColor";
 
-struct FillColorPipelineArguments : public GraphicsPipelineArgumentsInterface {
-    FillColorPipelineArguments(vec3 const &color) : color(color) {}
+struct FillColorArguments : public GraphicsPipelineArgumentsInterface {
+    FillColorArguments(vec3 const &color) : color(color) {}
 
     vec3 color;
 };
 
 class FillColorPipeline : public GraphicsPipelineInterface {
-   public:
+  public:
     FillColorPipeline(VulkanContext *context);
     ~FillColorPipeline() override;
 
@@ -50,7 +50,8 @@ class FillColorPipeline : public GraphicsPipelineInterface {
 
     Fulfillment Launch(GraphicsPipelineArgumentsInterface const &generic_args,
                        std::vector<GpuPromise *> const &prerequisites,
-                       unsigned completion_signal_count, GraphicsPipelineOutputInterface *output) override;
+                       unsigned completion_signal_count,
+                       GraphicsPipelineOutputInterface *output) override;
 };
 
 FillColorPipeline::FillColorPipeline(VulkanContext *context) : GraphicsPipelineInterface(context) {}
@@ -63,8 +64,7 @@ Fulfillment FillColorPipeline::Launch(GraphicsPipelineArgumentsInterface const &
                                       std::vector<GpuPromise *> const &prerequisites,
                                       unsigned completion_signal_count,
                                       GraphicsPipelineOutputInterface *output) {
-    FillColorPipelineArguments const &args =
-        static_cast<FillColorPipelineArguments const &>(generic_args);
+    FillColorArguments const &args = static_cast<FillColorArguments const &>(generic_args);
 
     FrameBuffer *frame_buffer = output->GetFrameBuffer();
 
@@ -76,18 +76,18 @@ Fulfillment FillColorPipeline::Launch(GraphicsPipelineArgumentsInterface const &
     return FinishRenderPass(cmds, completion_signal_count, prerequisites, context_);
 }
 
-}  // namespace
+} // namespace
 
 void DoFillColor(vec3 const &color, VulkanContext *context, DagOperation *first_stage,
                  DagOperation *target) {
-    GraphicsPipelineInterface *pipeline =
-        target->WithPipeline(kFillColorPipeline, [context](GraphicsPipelineOutputInterface * /*output*/) {
+    GraphicsPipelineInterface *pipeline = target->WithPipeline(
+        kFillColorPipeline, [context](GraphicsPipelineOutputInterface * /*output*/) {
             return std::make_unique<FillColorPipeline>(context);
         });
 
-    auto args = std::make_unique<FillColorPipelineArguments>(color);
+    auto args = std::make_unique<FillColorArguments>(color);
     target->Schedule(pipeline, std::move(args),
                      /*parents=*/std::vector<DagOperation *>{first_stage});
 }
 
-}  // namespace e8
+} // namespace e8

@@ -25,7 +25,7 @@
 #include "renderer/basic/shader.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/dag/promise.h"
-#include "renderer/projection_space/project_surface.h"
+#include "renderer/space_projection/project_surface.h"
 #include "renderer/space_screen/post_processor.h"
 #include "renderer/space_screen/radiance.h"
 #include "renderer/query/light_source.h"

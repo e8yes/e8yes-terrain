@@ -23,7 +23,7 @@
 #include "renderer/basic/shader.h"
 #include "renderer/basic/uniform_layout.h"
 #include "renderer/dag/graphics_pipeline_output.h"
-#include "renderer/projection_space/project_surface.h"
+#include "renderer/space_projection/project_surface.h"
 #include "renderer/space_screen/post_processor.h"
 #include "renderer/space_screen/surface_projection_visualizer.h"
 #include "renderer/proto/renderer.pb.h"

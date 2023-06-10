@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_PROJECTION_SPACE_PROJECT_DEPTH_H
-#define ISLANDS_RENDERER_PROJECTION_SPACE_PROJECT_DEPTH_H
+#ifndef ISLANDS_RENDERER_SPACE_PROJECTION_PROJECT_DEPTH_H
+#define ISLANDS_RENDERER_SPACE_PROJECTION_PROJECT_DEPTH_H
 
 #include <memory>
 #include <vector>
@@ -74,4 +74,4 @@ void DoProjectDepth(DrawableCollection *drawable_collection,
 
 } // namespace e8
 
-#endif // ISLANDS_RENDERER_PROJECTION_SPACE_PROJECT_DEPTH_H
+#endif // ISLANDS_RENDERER_SPACE_PROJECTION_PROJECT_DEPTH_H

@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_PROJECTION_SPACE_FILL_COLOR_H
-#define ISLANDS_RENDERER_PROJECTION_SPACE_FILL_COLOR_H
+#ifndef ISLANDS_RENDERER_SPACE_PROJECTION_FILL_COLOR_H
+#define ISLANDS_RENDERER_SPACE_PROJECTION_FILL_COLOR_H
 
 #include <vector>
 
@@ -40,4 +40,4 @@ void DoFillColor(vec3 const &color, VulkanContext *context, DagOperation *first_
 
 } // namespace e8
 
-#endif // ISLANDS_RENDERER_PROJECTION_SPACE_FILL_COLOR_H
+#endif // ISLANDS_RENDERER_SPACE_PROJECTION_FILL_COLOR_H
