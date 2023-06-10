@@ -22,12 +22,10 @@
 #include <vector>
 
 #include "common/device.h"
-#include "content/structure.h"
 #include "renderer/basic/projection.h"
 #include "renderer/output/pipeline_stage.h"
 #include "renderer/query/collection.h"
 #include "renderer/transfer/context.h"
-#include "resource/accessor.h"
 
 namespace e8 {
 
@@ -40,8 +38,20 @@ namespace e8 {
  * @param context Contextual Vulkan handles.
  * @return A pipeline stage created with the depth map output.
  */
-std::unique_ptr<PipelineStage> CreateProjectDepthStage(unsigned width, unsigned height,
-                                                       VulkanContext *context);
+std::unique_ptr<PipelineStage> CreateProjectNdcDepthStage(unsigned width, unsigned height,
+                                                          VulkanContext *context);
+
+/**
+ * @brief CreateLinearizeDepthStage Creates a linear depth projection pipeline stage with a 32-bit
+ * floating point color output in the specified dimension. TODO: preserves the depth attachment.
+ *
+ * @param width The width of the depth map output.
+ * @param height The height of the depth map output.
+ * @param context Contextual Vulkan handles.
+ * @return A pipeline stage created with the depth map output.
+ */
+std::unique_ptr<PipelineStage> CreateProjectLinearDepthStage(unsigned width, unsigned height,
+                                                             VulkanContext *context);
 
 /**
  * @brief DoProjectDepth Schedules a graphics pipeline for rendering a depth map (A mapping of the
@@ -53,15 +63,15 @@ std::unique_ptr<PipelineStage> CreateProjectDepthStage(unsigned width, unsigned 
  * @param transfer_context Transfer context.
  * @param first_stage The frame's first stage.
  * @param projected_ndc_depth The target stage which stores the rendered NDC depth map. It should be
- * created using CreateDepthMapStage().
+ * created using CreateProjectNdcDepthStage().
  * @param projected_linear_depth Optional. The target stage which stores the rendered linear depth
- * map. It should be created using CreateDepthMapStage().
+ * map. It should be created using CreateProjectLinearDepthStage().
  */
 void DoProjectDepth(DrawableCollection *drawable_collection,
                     PerspectiveProjection const &projection, TransferContext *transfer_context,
                     PipelineStage *first_stage, PipelineStage *projected_ndc_depth,
                     PipelineStage *projected_linear_depth = nullptr);
 
-}  // namespace e8
+} // namespace e8
 
-#endif  // ISLANDS_RENDERER_PIPELINE_PROJECT_DEPTH_H
+#endif // ISLANDS_RENDERER_PIPELINE_PROJECT_DEPTH_H
