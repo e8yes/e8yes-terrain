@@ -39,7 +39,7 @@ namespace {
 
 unsigned kSpotLightShadowMapWidth = 512;
 unsigned kSpotLightShadowMapHeight = 512;
-unsigned kSpotLightBlurringKernelSize = 3;
+GaussianBlurLevel kSpotLightBlurringKernelSize = GaussianBlurLevel::GBL_1X1;
 
 struct ShadowMapCollection {
     std::vector<std::unique_ptr<PipelineStage>> projected_ndc_depth;
@@ -50,20 +50,17 @@ struct ShadowMapCollection {
 
 class ShadowMapCache {
   public:
-    ShadowMapCache();
-    ~ShadowMapCache();
+    ShadowMapCache() = default;
+    ~ShadowMapCache() = default;
 
     void EvictIfNotObservable(std::vector<LightSourceInstance> const &observable_light_sources);
     ShadowMapCollection *Allocate(LightSourceInstance const &light_source);
-    std::vector<PipelineStage *> Fetch(SceneEntityId light_id) const;
+    std::vector<PipelineStage *> Fetch(SceneEntityId light_id);
+    std::unordered_map<SceneEntityId, std::vector<PipelineStage *>> All();
 
   private:
     std::unordered_map<SceneEntityId, std::unique_ptr<ShadowMapCollection>> shadow_maps_;
 };
-
-ShadowMapCache::ShadowMapCache() {}
-
-ShadowMapCache::~ShadowMapCache() {}
 
 void ShadowMapCache::EvictIfNotObservable(
     std::vector<LightSourceInstance> const &observable_light_sources) {
@@ -94,7 +91,7 @@ ShadowMapCollection *ShadowMapCache::Allocate(LightSourceInstance const &light_s
     return shadow_map_collection.get();
 }
 
-std::vector<PipelineStage *> ShadowMapCache::Fetch(SceneEntityId light_id) const {
+std::vector<PipelineStage *> ShadowMapCache::Fetch(SceneEntityId light_id) {
     auto it = shadow_maps_.find(light_id);
     if (it == shadow_maps_.end()) {
         return std::vector<PipelineStage *>();
@@ -110,6 +107,25 @@ std::vector<PipelineStage *> ShadowMapCache::Fetch(SceneEntityId light_id) const
     return result;
 }
 
+std::unordered_map<SceneEntityId, std::vector<PipelineStage *>> ShadowMapCache::All() {
+    std::unordered_map<SceneEntityId, std::vector<PipelineStage *>> result;
+
+    for (auto &[id, shadow_map_collection] : shadow_maps_) {
+        auto result_it =
+            result
+                .insert(std::make_pair(
+                    id, std::vector<PipelineStage *>(shadow_map_collection->hv_blurred.size())))
+                .first;
+
+        std::vector<PipelineStage *> &shadow_maps = result_it->second;
+        for (unsigned i = 0; i < shadow_map_collection->hv_blurred.size(); ++i) {
+            shadow_maps[i] = shadow_map_collection->hv_blurred[i].get();
+        }
+    }
+
+    return result;
+}
+
 void DoGenerateSpotLightShadowMap(SpotLightVolume const &spot_light_region,
                                   DrawableCollection *drawable_collection,
                                   PipelineStage *first_stage, TransferContext *transfer_context,
@@ -119,11 +135,12 @@ void DoGenerateSpotLightShadowMap(SpotLightVolume const &spot_light_region,
     shadow_maps->h_blurred.clear();
     shadow_maps->hv_blurred.clear();
 
+    // Prepares stages.
     std::unique_ptr<PipelineStage> projected_ndc_depth;
     std::unique_ptr<PipelineStage> projected_linear_depth;
-    projected_ndc_depth = CreateProjectDepthStage(
+    projected_ndc_depth = CreateProjectNdcDepthStage(
         kSpotLightShadowMapWidth, kSpotLightShadowMapHeight, transfer_context->vulkan_context);
-    projected_linear_depth = CreateProjectDepthStage(
+    projected_linear_depth = CreateProjectLinearDepthStage(
         kSpotLightShadowMapWidth, kSpotLightShadowMapHeight, transfer_context->vulkan_context);
 
     std::unique_ptr<PipelineStage> h_blurred;
@@ -131,6 +148,7 @@ void DoGenerateSpotLightShadowMap(SpotLightVolume const &spot_light_region,
     CreateGaussianBlurStages(kSpotLightShadowMapWidth, kSpotLightShadowMapHeight,
                              transfer_context->vulkan_context, &h_blurred, &hv_blurred);
 
+    // Schedules the pipelines.
     DoProjectDepth(drawable_collection, spot_light_region.projection, transfer_context, first_stage,
                    projected_ndc_depth.get(), projected_linear_depth.get());
     DoGaussianBlur(projected_linear_depth.get(), kSpotLightBlurringKernelSize, transfer_context,
@@ -215,6 +233,11 @@ PipelineStage *DirectIlluminator::DoComputeDirectIllumination(
     }
 
     return pimpl_->filled_radiance_map.get();
+}
+
+std::unordered_map<SceneEntityId, std::vector<PipelineStage *>>
+DirectIlluminator::CachedShadowMaps() {
+    return pimpl_->shadow_map_cache.All();
 }
 
 } // namespace e8

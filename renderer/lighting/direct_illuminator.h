@@ -19,9 +19,11 @@
 #define ISLANDS_RENDERER_DIRECT_ILLUMINATOR_H
 
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 #include "common/device.h"
+#include "content/scene_entity.h"
 #include "renderer/basic/projection.h"
 #include "renderer/output/pipeline_stage.h"
 #include "renderer/query/collection.h"
@@ -34,7 +36,7 @@ namespace e8 {
  * on a map of lighting parameters.
  */
 class DirectIlluminator {
-   public:
+  public:
     /**
      * @brief DirectIlluminator Constructs a direct illuminator with specified resolution.
      *
@@ -66,12 +68,17 @@ class DirectIlluminator {
                                                PipelineStage *first_stage,
                                                TransferContext *transfer_context);
 
-   private:
+    /**
+     * @brief CachedShadowMaps
+     */
+    std::unordered_map<SceneEntityId, std::vector<PipelineStage *>> CachedShadowMaps();
+
+  private:
     struct DirectIlluminatorImpl;
 
     std::unique_ptr<DirectIlluminatorImpl> pimpl_;
 };
 
-}  // namespace e8
+} // namespace e8
 
-#endif  // ISLANDS_RENDERER_DIRECT_ILLUMINATOR_H
+#endif // ISLANDS_RENDERER_DIRECT_ILLUMINATOR_H
