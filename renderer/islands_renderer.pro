@@ -45,11 +45,11 @@ SOURCES += \
     dag/promise.cc \
     pass/configurator.cc \
     pass/rasterize.cc \
-    space_projection/fill_color.cc \
     space_projection/project_depth.cc \
     space_projection/project_surface.cc \
     space_screen/depth_projection_visualizer.cc \
     space_screen/exposure.cc \
+    space_screen/fill_color.cc \
     space_screen/float_map_visualizer.cc \
     space_screen/fxaa.cc \
     space_screen/gaussian_blur.cc \
@@ -96,11 +96,11 @@ HEADERS += \
     lighting/direct_illuminator.h \
     pass/configurator.h \
     pass/rasterize.h \
-    space_projection/fill_color.h \
     space_projection/project_depth.h \
     space_projection/project_surface.h \
     space_screen/depth_projection_visualizer.h \
     space_screen/exposure.h \
+    space_screen/fill_color.h \
     space_screen/float_map_visualizer.h \
     space_screen/fxaa.h \
     space_screen/gaussian_blur.h \

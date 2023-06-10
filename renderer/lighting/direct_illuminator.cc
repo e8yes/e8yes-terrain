@@ -27,7 +27,7 @@
 #include "renderer/lighting/direct_illuminator.h"
 #include "renderer/dag/graphics_pipeline_output_common.h"
 #include "renderer/dag/dag_operation.h"
-#include "renderer/space_projection/fill_color.h"
+#include "renderer/space_screen/fill_color.h"
 #include "renderer/space_projection/project_depth.h"
 #include "renderer/space_screen/gaussian_blur.h"
 #include "renderer/space_screen/radiance.h"
