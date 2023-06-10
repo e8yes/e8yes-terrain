@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_RASTERIZE_H
-#define ISLANDS_RENDERER_RASTERIZE_H
+#ifndef ISLANDS_RENDER_PASS_RASTERIZE_H
+#define ISLANDS_RENDER_PASS_RASTERIZE_H
 
 #include <array>
 #include <functional>
@@ -30,8 +30,8 @@
 #include "renderer/basic/render_pass.h"
 #include "renderer/basic/uniform_layout.h"
 #include "renderer/dag/promise.h"
-#include "renderer/pass/configurator.h"
 #include "renderer/query/drawable_instance.h"
+#include "renderer/render_pass/configurator.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {
@@ -94,4 +94,4 @@ void PostProcess(GraphicsPipeline const &pipeline, ShaderUniformLayout const &un
 
 } // namespace e8
 
-#endif // ISLANDS_RENDERER_RASTERIZE_H
+#endif // ISLANDS_RENDER_PASS_RASTERIZE_H

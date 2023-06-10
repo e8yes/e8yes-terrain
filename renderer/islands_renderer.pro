@@ -43,8 +43,8 @@ SOURCES += \
     dag/graphics_pipeline_output_common.cc \
     lighting/direct_illuminator.cc \
     dag/promise.cc \
-    pass/configurator.cc \
-    pass/rasterize.cc \
+    render_pass/configurator.cc \
+    render_pass/rasterize.cc \
     space_projection/project_depth.cc \
     space_projection/project_surface.cc \
     space_screen/depth_projection_visualizer.cc \
@@ -94,8 +94,8 @@ HEADERS += \
     dag/graphics_pipeline_output_common.h \
     dag/promise.h \
     lighting/direct_illuminator.h \
-    pass/configurator.h \
-    pass/rasterize.h \
+    render_pass/configurator.h \
+    render_pass/rasterize.h \
     space_projection/project_depth.h \
     space_projection/project_surface.h \
     space_screen/depth_projection_visualizer.h \

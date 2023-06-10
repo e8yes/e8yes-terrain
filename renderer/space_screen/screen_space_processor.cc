@@ -27,7 +27,7 @@
 #include "common/device.h"
 #include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/dag/promise.h"
-#include "renderer/pass/rasterize.h"
+#include "renderer/render_pass/rasterize.h"
 #include "renderer/space_screen/screen_space_processor.h"
 #include "renderer/transfer/descriptor_set.h"
 

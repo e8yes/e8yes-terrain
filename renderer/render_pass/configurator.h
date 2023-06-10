@@ -15,8 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_CONFIGURATOR_H
-#define ISLANDS_RENDERER_CONFIGURATOR_H
+#ifndef ISLANDS_RENDER_PASS_CONFIGURATOR_H
+#define ISLANDS_RENDER_PASS_CONFIGURATOR_H
 
 #include <cstdint>
 #include <vector>
@@ -53,4 +53,4 @@ class RenderPassConfiguratorInterface {
 
 } // namespace e8
 
-#endif // ISLANDS_RENDERER_CONFIGURATOR_H
+#endif // ISLANDS_RENDER_PASS_CONFIGURATOR_H

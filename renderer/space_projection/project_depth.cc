@@ -39,10 +39,10 @@
 #include "renderer/dag/graphics_pipeline.h"
 #include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/dag/promise.h"
-#include "renderer/pass/configurator.h"
-#include "renderer/pass/rasterize.h"
 #include "renderer/query/collection.h"
 #include "renderer/query/drawable_instance.h"
+#include "renderer/render_pass/configurator.h"
+#include "renderer/render_pass/rasterize.h"
 #include "renderer/space_projection/project_depth.h"
 #include "renderer/space_screen/screen_space_processor.h"
 
