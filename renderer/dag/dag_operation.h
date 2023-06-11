@@ -53,7 +53,7 @@ class DagOperation {
     ~DagOperation();
 
     /**
-     * @brief WithPipeline Adds a graphics pipeline to this stage if it hasn't been.
+     * @brief WithPipeline Adds a graphics pipeline to this DagOperation if it hasn't been.
      *
      * @param key A unique key which identifies the pipeline.
      * @param compile_fn The pipeline's constructor.
