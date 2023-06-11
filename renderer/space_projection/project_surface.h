@@ -20,8 +20,8 @@
 
 #include <memory>
 
-#include "common/device.h"
 #include "renderer/basic/projection.h"
+#include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/drawable/collection.h"
 #include "renderer/transfer/context.h"
@@ -44,19 +44,6 @@ enum SurfaceProjectionColorOutput {
 };
 
 /**
- * @brief CreateProjectSurfaceStage Creates a surface projection pipeline stage with two 32-bit
- * parameter maps and a 32-bit depth map output in the specified dimension. See the above
- * SurfaceProjectionColorOutput enum for what information each parameter map contains.
- *
- * @param width The width of the light parameter map output.
- * @param height The width of the light parameter map output.
- * @param context Contextual Vulkan handles.
- * @return The light input stage.
- */
-std::unique_ptr<DagOperation> CreateProjectSurfaceStage(unsigned width, unsigned height,
-                                                        VulkanContext *context);
-
-/**
  * @brief DoProjectSurface Schedules a graphics pipeline to generate a map of geometry information.
  * These information are essential for lighting computation. They are: normal vector, roughness
  * factor, albedo, metallic factor and depth.
@@ -64,14 +51,15 @@ std::unique_ptr<DagOperation> CreateProjectSurfaceStage(unsigned width, unsigned
  * @param drawable_collection A collection of drawables to project to screen space to encode surface
  * information.
  * @param projection Defines how drawables should be projected to the light parameter map.
+ * @param frame The frame's first stage.
  * @param transfer_context Transfer context.
- * @param first_stage The frame's first stage.
- * @param target The target stage which stores the rendered light inputs. It should be created using
- * CreateLightInputsStage().
+ * @param dag DAG context.
+ * @return The operation which stores the rendered light inputs.
  */
-void DoProjectSurface(DrawableCollection *drawable_collection,
-                      PerspectiveProjection const &projection, TransferContext *transfer_context,
-                      DagOperation *first_stage, DagOperation *target);
+DagOperationInstance DoProjectSurface(DrawableCollection *drawable_collection,
+                                      PerspectiveProjection const &projection,
+                                      DagOperationInstance const frame,
+                                      TransferContext *transfer_context, DagContext *dag);
 
 } // namespace e8
 

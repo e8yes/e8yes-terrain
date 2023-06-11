@@ -23,6 +23,7 @@
 #include "common/device.h"
 #include "content/scene.h"
 #include "renderer/basic/projection.h"
+#include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/drawable/collection.h"
 #include "renderer/proto/renderer.pb.h"
@@ -41,9 +42,9 @@ class SurfaceProjectionRenderer::SurfaceProjectionRendererImpl {
                                   VulkanContext *context);
     ~SurfaceProjectionRendererImpl();
 
+    DagContext dag_context;
     TransferContext transfer_context;
 
-    std::unique_ptr<DagOperation> surface_projection;
     std::unique_ptr<DagOperation> final_color_image;
 
     RendererConfiguration config;
@@ -51,10 +52,7 @@ class SurfaceProjectionRenderer::SurfaceProjectionRendererImpl {
 
 SurfaceProjectionRenderer::SurfaceProjectionRendererImpl::SurfaceProjectionRendererImpl(
     std::unique_ptr<DagOperation> &&final_color_image, VulkanContext *context)
-    : transfer_context(context),
-      surface_projection(CreateProjectSurfaceStage(context->swap_chain_image_extent.width,
-                                                   context->swap_chain_image_extent.height,
-                                                   context)),
+    : dag_context(context), transfer_context(context),
       final_color_image(std::move(final_color_image)) {}
 
 SurfaceProjectionRenderer::SurfaceProjectionRendererImpl::~SurfaceProjectionRendererImpl() {}
@@ -72,11 +70,14 @@ void SurfaceProjectionRenderer::DrawFrame(Scene *scene, ResourceAccessor *resour
     PerspectiveProjection camera_projection(scene->camera);
     DrawableCollection drawable_collection(*scene->SceneEntityStructure(), resource_accessor);
 
+    DagContext::Session session = pimpl_->dag_context.CreateSession();
+
     DagOperation *first_stage = this->DoFirstStage();
-    DoProjectSurface(&drawable_collection, camera_projection, &pimpl_->transfer_context,
-                     first_stage, pimpl_->surface_projection.get());
+    DagOperationInstance surface_projection =
+        DoProjectSurface(&drawable_collection, camera_projection, first_stage,
+                         &pimpl_->transfer_context, &pimpl_->dag_context);
     DoVisualizeSurfaceProjection(pimpl_->config.light_inputs_renderer_params().input_to_visualize(),
-                                 pimpl_->surface_projection.get(), &pimpl_->transfer_context,
+                                 surface_projection, &pimpl_->transfer_context,
                                  pimpl_->final_color_image.get());
     DagOperation *final_stage = this->DoFinalStage(first_stage, pimpl_->final_color_image.get());
 

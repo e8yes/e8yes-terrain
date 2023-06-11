@@ -105,6 +105,22 @@ class ProjectSurfaceOutput final : public GraphicsPipelineOutputInterface {
     std::unique_ptr<FrameBuffer> frame_buffer_;
 };
 
+/**
+ * @brief CreateProjectSurfaceStage Creates an empty DagOperation with two 32-bit parameter maps and
+ * a 32-bit depth map output in the specified dimension. See the SurfaceProjectionColorOutput enum
+ * for what information each parameter map contains.
+ *
+ * @param width The width of the light parameter map output.
+ * @param height The width of the light parameter map output.
+ * @param context Contextual Vulkan handles.
+ * @return The light input stage.
+ */
+std::unique_ptr<DagOperation> CreateProjectSurfaceOp(unsigned width, unsigned height,
+                                                     VulkanContext *context) {
+    auto output = std::make_shared<ProjectSurfaceOutput>(width, height, context);
+    return std::make_unique<DagOperation>(output);
+}
+
 struct PushConstants {
     mat44 view_model_trans;
     mat44 proj_view_model_trans;
@@ -300,21 +316,18 @@ class ProjectSurfacePipeline final : public GraphicsPipelineInterface {
 
 } // namespace
 
-std::unique_ptr<DagOperation> CreateProjectSurfaceStage(unsigned width, unsigned height,
-                                                        VulkanContext *context) {
-    auto output = std::make_shared<ProjectSurfaceOutput>(width, height, context);
-    return std::make_unique<DagOperation>(output);
-}
-
-void DoProjectSurface(DrawableCollection *drawable_collection,
-                      PerspectiveProjection const &projection, TransferContext *transfer_context,
-                      DagOperation *first_stage, DagOperation *target) {
-    ResourceLoadingOption loading_option;
-    loading_option.load_geometry = true;
-    loading_option.load_material = true;
-
-    std::vector<DrawableInstance> observable_geometries =
-        drawable_collection->ObservableGeometries(projection, loading_option);
+DagOperationInstance DoProjectSurface(DrawableCollection *drawable_collection,
+                                      PerspectiveProjection const &projection,
+                                      DagOperationInstance const frame,
+                                      TransferContext *transfer_context, DagContext *dag) {
+    unsigned frame_width = frame->Output()->Width();
+    unsigned frame_height = frame->Output()->Height();
+    DagContext::DagOperationKey target_key =
+        CreateDagOperationKey(kProjectSurfacePipeline, frame_width, frame_height);
+    DagOperationInstance target =
+        dag->WithOperation(target_key, [frame_width, frame_height](VulkanContext *context) {
+            return CreateProjectSurfaceOp(frame_width, frame_height, context);
+        });
 
     GraphicsPipelineInterface *pipeline = target->WithPipeline(
         kProjectSurfacePipeline, [transfer_context](GraphicsPipelineOutputInterface *output) {
@@ -322,10 +335,18 @@ void DoProjectSurface(DrawableCollection *drawable_collection,
                                                             transfer_context->vulkan_context);
         });
 
+    ResourceLoadingOption loading_option;
+    loading_option.load_geometry = true;
+    loading_option.load_material = true;
+    std::vector<DrawableInstance> observable_geometries =
+        drawable_collection->ObservableGeometries(projection, loading_option);
+
     auto args = std::make_unique<ProjectSurfaceArgument>(observable_geometries, projection,
                                                          transfer_context);
     target->Schedule(pipeline, std::move(args),
-                     /*parents=*/std::vector<DagOperation *>{first_stage});
+                     /*parents=*/std::vector<DagOperation *>{frame});
+
+    return target;
 }
 
 } // namespace e8
