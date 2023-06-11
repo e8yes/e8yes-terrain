@@ -37,6 +37,7 @@ SOURCES += \
     basic/uniform_buffer.cc \
     basic/uniform_layout.cc \
     basic/vertex_input.cc \
+    dag/dag_context.cc \
     dag/dag_operation.cc \
     dag/graphics_pipeline.cc \
     dag/graphics_pipeline_output.cc \
@@ -88,6 +89,7 @@ HEADERS += \
     basic/uniform_buffer.h \
     basic/uniform_layout.h \
     basic/vertex_input.h \
+    dag/dag_context.h \
     dag/dag_operation.h \
     dag/graphics_pipeline.h \
     dag/graphics_pipeline_output.h \

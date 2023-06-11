@@ -16,8 +16,15 @@
  */
 
 #include <cassert>
+#include <cstdint>
+#include <functional>
+#include <memory>
+#include <string>
+#include <unordered_map>
 
 #include "renderer/dag/dag_context.h"
+#include "renderer/dag/dag_operation.h"
+#include "renderer/dag/graphics_pipeline.h"
 
 namespace e8 {
 namespace {
@@ -26,7 +33,9 @@ uint64_t const kMaxSessionAndUsageCountDifference = 10;
 
 } // namespace
 
-DagContext::DagContext() : in_session_(false) {}
+DagContext::DagContext(VulkanContext *context) : context_(context), in_session_(false) {
+    assert(context != nullptr);
+}
 
 DagContext::Session::Session(DagContext *dag_context) : self_(dag_context) {
     ++self_->session_count_;
@@ -55,14 +64,14 @@ DagContext::Session::~Session() {
 
 DagContext::Session DagContext::CreateSession() { return Session(this); }
 
-DagOperation *DagContext::WithOperation(const DagOperationKey &key,
-                                        CreateDagOperationFn create_fn) {
+DagOperationInstance DagContext::WithOperation(DagOperationKey const &key,
+                                               CreateDagOperationFn create_fn) {
     assert(in_session_);
 
     auto it = dag_ops_.find(key);
     if (it == dag_ops_.end()) {
         DagOperationWithUsage dag_with_usage;
-        dag_with_usage.dag_op = create_fn();
+        dag_with_usage.dag_op = create_fn(context_);
 
         it = dag_ops_.insert(std::make_pair(key, std::move(dag_with_usage))).first;
     }
@@ -70,6 +79,12 @@ DagOperation *DagContext::WithOperation(const DagOperationKey &key,
     auto &[_, dag_with_usage] = *it;
     ++dag_with_usage.usage_count;
     return dag_with_usage.dag_op.get();
+}
+
+DagContext::DagOperationKey CreateDagOperationKey(PipelineKey const &key,
+                                                  unsigned const output_width,
+                                                  unsigned const output_height) {
+    return key + "_" + std::to_string(output_width) + "_" + std::to_string(output_height);
 }
 
 } // namespace e8

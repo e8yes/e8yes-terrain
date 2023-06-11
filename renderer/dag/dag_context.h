@@ -20,13 +20,13 @@
 
 #include <cstdint>
 #include <functional>
-#include <map>
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <unordered_set>
 
+#include "common/device.h"
 #include "renderer/dag/dag_operation.h"
+#include "renderer/dag/graphics_pipeline.h"
 
 namespace e8 {
 
@@ -38,11 +38,15 @@ namespace e8 {
  */
 class DagContext {
   public:
-    DagContext();
+    /**
+     * @brief DagContext Constructs a DAG graph under the specified Vulkan context.
+     */
+    DagContext(VulkanContext *context);
     ~DagContext() = default;
 
     using DagOperationKey = std::string;
-    using CreateDagOperationFn = std::function<std::unique_ptr<DagOperation>()>;
+    using CreateDagOperationFn =
+        std::function<std::unique_ptr<DagOperation>(VulkanContext *context)>;
 
     class Session {
       public:
@@ -68,7 +72,7 @@ class DagContext {
      * @param create_fn The DagOperation's constructor.
      * @return The DagOperation associated with the key. Always not none.
      */
-    DagOperation *WithOperation(const DagOperationKey &key, CreateDagOperationFn create_fn);
+    DagOperationInstance WithOperation(DagOperationKey const &key, CreateDagOperationFn create_fn);
 
   private:
     struct DagOperationWithUsage {
@@ -76,10 +80,20 @@ class DagContext {
         uint64_t usage_count = 0;
     };
 
+    VulkanContext *context_;
     std::unordered_map<DagOperationKey, DagOperationWithUsage> dag_ops_;
     uint64_t session_count_;
     bool in_session_;
 };
+
+/**
+ * @brief CreateDagOperationKey A common way to identify a DagOperation is through the triplet
+ * (graphics_pipeline_key, output_width, output_height). This utility function generates a unique
+ * key for a DagOperation deterministically by concatenating the triplet into a string.
+ */
+DagContext::DagOperationKey CreateDagOperationKey(PipelineKey const &key,
+                                                  unsigned const output_width,
+                                                  unsigned const output_height);
 
 } // namespace e8
 

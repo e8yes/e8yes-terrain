@@ -117,6 +117,10 @@ class DagOperation {
     std::unique_ptr<DagOperationImpl> pimpl_;
 };
 
+// The most common way to use a DagOperation is through its pointer while the its actual memory sits
+// in a global context.
+using DagOperationInstance = DagOperation *;
+
 } // namespace e8
 
 #endif // ISLANDS_RENDERER_DAG_OPERATION_H
