@@ -997,8 +997,14 @@ inline mat44 frustum::projective_transform() const {
     float delta_y = top + bottom;
     float delta_x = left + right;
 
-    return mat44({a / width, 0, 0, 0, 0, a / height, 0, 0, delta_x / width, delta_y / height,
-                  z_near / d, -1, 0, 0, z_near * z_far / d, 0});
+    return mat44({// Row 0
+                  a / width, 0, 0, 0,
+                  // Row 1
+                  0, a / height, 0, 0,
+                  // Row 2
+                  delta_x / width, delta_y / height, z_near / d, -1,
+                  // Row 3
+                  0, 0, z_near * z_far / d, 0});
 }
 
 inline float frustum::XUnprojectionConstant() const {
