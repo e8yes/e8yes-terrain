@@ -23,7 +23,9 @@
 #include "common/device.h"
 #include "common/tensor.h"
 #include "content/scene.h"
+#include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
+#include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/renderer.h"
 #include "renderer/renderer_solid_color.h"
@@ -33,30 +35,33 @@
 namespace e8 {
 
 struct SolidColorRenderer::SolidColorRendererImpl {
-    SolidColorRendererImpl(std::unique_ptr<DagOperation> &&final_color_image);
+    SolidColorRendererImpl(VulkanContext *context);
     ~SolidColorRendererImpl();
 
-    std::unique_ptr<DagOperation> final_color_image;
+    DagContext dag_context;
 };
 
-SolidColorRenderer::SolidColorRendererImpl::SolidColorRendererImpl(
-    std::unique_ptr<DagOperation> &&final_color_image)
-    : final_color_image(std::move(final_color_image)) {}
+SolidColorRenderer::SolidColorRendererImpl::SolidColorRendererImpl(VulkanContext *context)
+    : dag_context(context) {}
 
 SolidColorRenderer::SolidColorRendererImpl::~SolidColorRendererImpl() {}
 
 SolidColorRenderer::SolidColorRenderer(VulkanContext *context)
-    : RendererInterface(0, context),
-      pimpl_(std::make_unique<SolidColorRendererImpl>(RendererInterface::FinalColorImageStage())) {}
+    : RendererInterface(0, context), pimpl_(std::make_unique<SolidColorRendererImpl>(context)) {}
 
 SolidColorRenderer::~SolidColorRenderer() {}
 
 void SolidColorRenderer::DrawFrame(Scene *scene, ResourceAccessor * /*resource_accessor*/) {
     Scene::ReadAccess read_access = scene->GainReadAccess();
 
+    DagContext::Session session = pimpl_->dag_context.CreateSession();
+
     DagOperation *first_stage = this->DoFirstStage();
-    DoFillColor(scene->background_color, context, first_stage, pimpl_->final_color_image.get());
-    DagOperation *final_stage = this->DoFinalStage(first_stage, pimpl_->final_color_image.get());
+    std::shared_ptr<GraphicsPipelineOutputInterface> final_color_output =
+        RendererInterface::FinalColorImage();
+    DagOperationInstance filled_image = DoFillColor(
+        scene->background_color, first_stage, final_color_output, context, &pimpl_->dag_context);
+    DagOperation *final_stage = this->DoFinalStage(first_stage, filled_image);
 
     final_stage->Fulfill(context);
 }

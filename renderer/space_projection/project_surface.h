@@ -51,7 +51,7 @@ enum SurfaceProjectionColorOutput {
  * @param drawable_collection A collection of drawables to project to screen space to encode surface
  * information.
  * @param projection Defines how drawables should be projected to the light parameter map.
- * @param frame The frame's first stage.
+ * @param frame The frame's first operation.
  * @param transfer_context Transfer context.
  * @param dag DAG context.
  * @return The operation which stores the rendered light inputs.

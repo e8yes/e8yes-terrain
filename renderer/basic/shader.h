@@ -45,8 +45,7 @@ constexpr char const *kFragmentShaderFilePathBlurGaussianVertical3X3 =
     "./blur_gaussian_vertical_3x3.frag.spv";
 constexpr char const *kFragmentShaderFilePathBlurGaussianVertical5X5 =
     "./blur_gaussian_vertical_5x5.frag.spv";
-constexpr char const *kFragmentShaderFilePathDepthMapLinearizerPerspective =
-    "./depth_linearizer_perspective.frag.spv";
+constexpr char const *kFragmentShaderFilePathDepthMapLinear = "./depth_linear.frag.spv";
 constexpr char const *kFragmentShaderFilePathDepthMapVisualizer = "./depth_visualizer.frag.spv";
 constexpr char const *kFragmentShaderFilePathFloatMapVisualizer = "./float_visualizer.frag.spv";
 constexpr char const *kFragmentShaderFilePathFxaa = "./fxaa.frag.spv";

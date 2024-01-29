@@ -228,6 +228,10 @@ DagOperation *RendererInterface::DoFinalStage(DagOperation *first_stage,
     return &final_stage_;
 }
 
+std::shared_ptr<SwapChainOutput> RendererInterface::FinalColorImage() const {
+    return final_output_;
+}
+
 std::unique_ptr<DagOperation> RendererInterface::FinalColorImageStage() const {
     return std::make_unique<DagOperation>(final_output_);
 }

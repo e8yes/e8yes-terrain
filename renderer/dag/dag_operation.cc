@@ -232,6 +232,8 @@ void DagOperation::Fulfill(VulkanContext *context) {
         WaitForStageCompletion(parent->pimpl_->fulfillment_cache, context);
     }
 
+    vkDeviceWaitIdle(context->device);
+
     // Resets states for taking new schedules.
     this->Reset();
 }

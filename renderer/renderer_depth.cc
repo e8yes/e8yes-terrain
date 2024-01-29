@@ -23,7 +23,9 @@
 #include "common/device.h"
 #include "content/scene.h"
 #include "renderer/basic/projection.h"
+#include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
+#include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/drawable/collection.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/renderer.h"
@@ -37,49 +39,45 @@ namespace e8 {
 
 class DepthRenderer::DepthRendererImpl {
   public:
-    DepthRendererImpl(std::unique_ptr<DagOperation> &&visual_representation,
-                      VulkanContext *context);
+    DepthRendererImpl(VulkanContext *context);
     ~DepthRendererImpl();
 
+    DagContext dag_context;
     TransferContext transfer_context;
-
-    std::unique_ptr<DagOperation> depth_projection;
-    std::unique_ptr<DagOperation> visual_representation;
 
     RendererConfiguration config;
 };
 
-DepthRenderer::DepthRendererImpl::DepthRendererImpl(
-    std::unique_ptr<DagOperation> &&visual_representation, VulkanContext *context)
-    : transfer_context(context),
-      depth_projection(CreateProjectNdcDepthStage(context->swap_chain_image_extent.width,
-                                                  context->swap_chain_image_extent.height,
-                                                  context)),
-      visual_representation(std::move(visual_representation)) {}
+DepthRenderer::DepthRendererImpl::DepthRendererImpl(VulkanContext *context)
+    : dag_context(context), transfer_context(context) {}
 
 DepthRenderer::DepthRendererImpl::~DepthRendererImpl() {}
 
 DepthRenderer::DepthRenderer(VulkanContext *context)
     : RendererInterface(/*num_stages=*/1, context),
-      pimpl_(std::make_unique<DepthRendererImpl>(RendererInterface::FinalColorImageStage(),
-                                                 context)) {}
+      pimpl_(std::make_unique<DepthRendererImpl>(context)) {}
 
 DepthRenderer::~DepthRenderer() {}
 
 void DepthRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor) {
     Scene::ReadAccess read_access = scene->GainReadAccess();
-
     PerspectiveProjection projection(scene->camera);
     DrawableCollection drawables_collection(*scene->SceneEntityStructure(), resource_accessor);
 
+    DagContext::Session session = pimpl_->dag_context.CreateSession();
     DagOperation *first_stage = this->DoFirstStage();
-    DoProjectDepth(&drawables_collection, projection, &pimpl_->transfer_context, first_stage,
-                   pimpl_->depth_projection.get());
-    DoVisualizeDepthProjection(pimpl_->config.depth_renderer_params().alpha(), projection,
-                               pimpl_->depth_projection.get(), &pimpl_->transfer_context,
-                               pimpl_->visual_representation.get());
-    DagOperation *final_stage =
-        this->DoFinalStage(first_stage, pimpl_->visual_representation.get());
+
+    DagOperationInstance ndc_depth_map =
+        DoProjectNdcDepth(&drawables_collection, projection, first_stage, &pimpl_->transfer_context,
+                          &pimpl_->dag_context);
+
+    std::shared_ptr<GraphicsPipelineOutputInterface> final_color_output =
+        RendererInterface::FinalColorImage();
+    DagOperationInstance visualized_color_map = DoVisualizeDepthProjection(
+        pimpl_->config.depth_renderer_params().alpha(), projection, ndc_depth_map,
+        final_color_output, &pimpl_->transfer_context, &pimpl_->dag_context);
+
+    DagOperation *final_stage = this->DoFinalStage(first_stage, visualized_color_map);
 
     final_stage->Fulfill(context);
 }

@@ -18,25 +18,38 @@
 #ifndef ISLANDS_RENDERER_SPACE_PROJECTION_FILL_COLOR_H
 #define ISLANDS_RENDERER_SPACE_PROJECTION_FILL_COLOR_H
 
+#include <memory>
 #include <vector>
 
 #include "common/device.h"
 #include "common/tensor.h"
+#include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
+#include "renderer/dag/graphics_pipeline_output.h"
 
 namespace e8 {
 
 /**
- * @brief DoFillColor Fills the target with the specified color. Note, it's an asynchronous
- * function.
+ * @brief DoFillColor Creates a target image and fill it with the specified color.
  *
  * @param color The color to fill to the target.
- * * @param context Contextual Vulkan handles.
- * @param first_stage The frame's first stage.
- * @param target The target to be filled.
+ * @param hdr Whether to create an HDR target, or otherwise an LDR target.
+ * @param frame The frame's first stage.
+ * @param context Contextual Vulkan handles.
+ * @param dag DAG context.
+ * @return The operation which stores the image filled with the specified color.
  */
-void DoFillColor(vec3 const &color, VulkanContext *context, DagOperation *first_stage,
-                 DagOperation *target);
+DagOperationInstance DoFillColor(vec3 const &color, bool hdr, DagOperationInstance frame,
+                                 VulkanContext *context, DagContext *dag);
+
+/**
+ * @brief DoFillColor Like the function above, it fills an image with the specified color. However,
+ * it writes to the specified color image output instead of creating a new image.
+ */
+DagOperationInstance
+DoFillColor(vec3 const &color, DagOperationInstance frame,
+            std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output,
+            VulkanContext *context, DagContext *dag);
 
 } // namespace e8
 

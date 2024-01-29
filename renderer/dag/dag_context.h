@@ -75,6 +75,8 @@ class DagContext {
     DagOperationInstance WithOperation(DagOperationKey const &key, CreateDagOperationFn create_fn);
 
   private:
+    using AllocationCounter = unsigned;
+
     struct DagOperationWithUsage {
         std::unique_ptr<DagOperation> dag_op;
         uint64_t usage_count = 0;
@@ -82,6 +84,7 @@ class DagContext {
 
     VulkanContext *context_;
     std::unordered_map<DagOperationKey, DagOperationWithUsage> dag_ops_;
+    std::unordered_map<DagOperationKey, AllocationCounter> alloc_counters_;
     uint64_t session_count_;
     bool in_session_;
 };

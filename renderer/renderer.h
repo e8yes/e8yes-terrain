@@ -122,6 +122,12 @@ class RendererInterface {
         std::vector<DagOperation *> const &dangling_stages = std::vector<DagOperation *>());
 
     /**
+     * @brief FinalColorImage Returns the final color image output, which stores the final rendering
+     * result.
+     */
+    std::shared_ptr<SwapChainOutput> FinalColorImage() const;
+
+    /**
      * @brief FinalColorImageStage Creates a color map stage. A color map is an image which will be
      * presented as the final rendering result. It's also the last customizable pipeline stage.
      */

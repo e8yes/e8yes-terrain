@@ -45,7 +45,6 @@ struct RadianceRenderer::RadianceRendererImpl {
     DagContext dag_context;
     TransferContext transfer_context;
 
-    DirectIlluminator direct_illuminator;
     std::unique_ptr<DagOperation> log_luminance_map;
     std::unique_ptr<DagOperation> log_exposure_value;
     std::unique_ptr<DagOperation> ldr_image;
@@ -57,8 +56,6 @@ struct RadianceRenderer::RadianceRendererImpl {
 RadianceRenderer::RadianceRendererImpl::RadianceRendererImpl(
     std::unique_ptr<DagOperation> &&final_color_image, VulkanContext *context)
     : dag_context(context), transfer_context(context),
-      direct_illuminator(context->swap_chain_image_extent.width,
-                         context->swap_chain_image_extent.height, context),
       log_luminance_map(CreateLogLuminaneStage(context->swap_chain_image_extent.width,
                                                context->swap_chain_image_extent.height, context)),
       log_exposure_value(CreateExposureStage(context)),
@@ -87,9 +84,9 @@ void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_access
     DagOperationInstance projected_surface =
         DoProjectSurface(&drawable_collection, projection, first_stage, &pimpl_->transfer_context,
                          &pimpl_->dag_context);
-    DagOperationInstance radiance_map = pimpl_->direct_illuminator.DoComputeDirectIllumination(
-        &drawable_collection, projected_surface, projection, first_stage,
-        &pimpl_->transfer_context);
+    DagOperationInstance radiance_map =
+        DoComputeDirectIllumination(&drawable_collection, projected_surface, projection,
+                                    first_stage, &pimpl_->transfer_context, &pimpl_->dag_context);
 
     DoEstimateExposure(radiance_map, &pimpl_->transfer_context, pimpl_->log_luminance_map.get(),
                        pimpl_->log_exposure_value.get());

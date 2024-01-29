@@ -20,6 +20,8 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
+#include "renderer/basic/projection.h"
+#include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/space_screen/depth_projection_visualizer.h"
@@ -83,9 +85,18 @@ void DepthProjectionPostProcessorConfigurator::PushConstants(
 
 } // namespace
 
-void DoVisualizeDepthProjection(float alpha, std::optional<PerspectiveProjection> projection,
-                                DagOperation *depth_map_stage, TransferContext *transfer_context,
-                                DagOperation *target) {
+DagOperationInstance DoVisualizeDepthProjection(
+    float alpha, std::optional<PerspectiveProjection> projection,
+    DagOperationInstance ndc_depth_map,
+    std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output,
+    TransferContext *transfer_context, DagContext *dag) {
+    DagContext::DagOperationKey key =
+        CreateDagOperationKey(kDepthProjectionVisualizerPipeline, ndc_depth_map->Output()->Width(),
+                              ndc_depth_map->Output()->Height());
+    DagOperationInstance target = dag->WithOperation(key, [color_image_output](VulkanContext *) {
+        return std::make_unique<DagOperation>(color_image_output);
+    });
+
     GraphicsPipelineInterface *pipeline = target->WithPipeline(
         kDepthProjectionVisualizerPipeline,
         [transfer_context](GraphicsPipelineOutputInterface *output) {
@@ -97,9 +108,11 @@ void DoVisualizeDepthProjection(float alpha, std::optional<PerspectiveProjection
         });
 
     auto configurator = std::make_unique<DepthProjectionPostProcessorConfigurator>(
-        alpha, projection, *depth_map_stage->Output());
+        alpha, projection, *ndc_depth_map->Output());
     target->Schedule(pipeline, std::move(configurator),
-                     /*parents=*/std::vector<DagOperation *>{depth_map_stage});
+                     /*parents=*/std::vector<DagOperation *>{ndc_depth_map});
+
+    return target;
 }
 
 } // namespace e8

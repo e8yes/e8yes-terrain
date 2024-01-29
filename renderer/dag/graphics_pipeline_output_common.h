@@ -104,11 +104,12 @@ class LdrColorOutput final : public GraphicsPipelineOutputInterface {
 };
 
 /**
- * @brief The FloatOutput class Stores 32-bit floating point values.
+ * @brief The FloatOutput class Stores 32-bit floating point values. An optional 32-bit depth
+ * attachment can also be added.
  */
 class FloatOutput final : public GraphicsPipelineOutputInterface {
   public:
-    FloatOutput(unsigned width, unsigned height, VulkanContext *context);
+    FloatOutput(unsigned width, unsigned height, bool with_depth_buffer, VulkanContext *context);
     ~FloatOutput() override;
 
     FrameBuffer *GetFrameBuffer() const override;

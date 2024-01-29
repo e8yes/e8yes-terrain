@@ -23,9 +23,11 @@
 #include "common/device.h"
 #include "common/tensor.h"
 #include "renderer/basic/frame_buffer.h"
+#include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/dag/graphics_pipeline.h"
 #include "renderer/dag/graphics_pipeline_output.h"
+#include "renderer/dag/graphics_pipeline_output_common.h"
 #include "renderer/dag/promise.h"
 #include "renderer/render_pass/rasterize.h"
 #include "renderer/space_screen/fill_color.h"
@@ -76,18 +78,59 @@ Fulfillment FillColorPipeline::Launch(GraphicsPipelineArgumentsInterface const &
     return FinishRenderPass(cmds, completion_signal_count, prerequisites, context_);
 }
 
-} // namespace
+std::unique_ptr<DagOperation> CreateFillColorOp(unsigned width, unsigned height, bool hdr,
+                                                VulkanContext *context) {
+    std::shared_ptr<GraphicsPipelineOutputInterface> output;
+    if (hdr) {
+        output =
+            std::make_shared<HdrColorOutput>(width, height, /*with_depth_buffer=*/false, context);
+    } else {
+        output =
+            std::make_shared<LdrColorOutput>(width, height, /*with_depth_buffer=*/false, context);
+    }
 
-void DoFillColor(vec3 const &color, VulkanContext *context, DagOperation *first_stage,
-                 DagOperation *target) {
-    GraphicsPipelineInterface *pipeline = target->WithPipeline(
+    return std::make_unique<DagOperation>(output);
+}
+
+void ConfigureFillColorOp(vec3 const &color, DagOperationInstance frame, VulkanContext *context,
+                          DagOperationInstance filled_image) {
+    GraphicsPipelineInterface *pipeline = filled_image->WithPipeline(
         kFillColorPipeline, [context](GraphicsPipelineOutputInterface * /*output*/) {
             return std::make_unique<FillColorPipeline>(context);
         });
-
     auto args = std::make_unique<FillColorArguments>(color);
-    target->Schedule(pipeline, std::move(args),
-                     /*parents=*/std::vector<DagOperation *>{first_stage});
+    filled_image->Schedule(pipeline, std::move(args),
+                           /*parents=*/std::vector<DagOperation *>{frame});
+}
+
+} // namespace
+
+DagOperationInstance
+DoFillColor(vec3 const &color, DagOperationInstance frame,
+            std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output,
+            VulkanContext *context, DagContext *dag) {
+    DagContext::DagOperationKey key = CreateDagOperationKey(
+        kFillColorPipeline, frame->Output()->Width(), frame->Output()->Height());
+    DagOperationInstance filled_image =
+        dag->WithOperation(key, [color_image_output](VulkanContext *) {
+            return std::make_unique<DagOperation>(color_image_output);
+        });
+
+    ConfigureFillColorOp(color, frame, context, filled_image);
+    return filled_image;
+}
+
+DagOperationInstance DoFillColor(vec3 const &color, bool hdr, DagOperation *frame,
+                                 VulkanContext *context, DagContext *dag) {
+    DagContext::DagOperationKey key = CreateDagOperationKey(
+        kFillColorPipeline, frame->Output()->Width(), frame->Output()->Height());
+    DagOperationInstance filled_image = dag->WithOperation(key, [hdr,
+                                                                 frame](VulkanContext *context) {
+        return CreateFillColorOp(frame->Output()->Width(), frame->Output()->Height(), hdr, context);
+    });
+
+    ConfigureFillColorOp(color, frame, context, filled_image);
+    return filled_image;
 }
 
 } // namespace e8

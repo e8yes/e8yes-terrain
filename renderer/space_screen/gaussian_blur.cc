@@ -147,8 +147,10 @@ CreateGaussianBlurPipeline(bool horizontal, GaussianBlurLevel blur_level,
 void CreateGaussianBlurStages(unsigned width, unsigned height, VulkanContext *context,
                               std::unique_ptr<DagOperation> *h_blurred,
                               std::unique_ptr<DagOperation> *hv_blurred) {
-    auto h_blurred_output = std::make_shared<FloatOutput>(width, height, context);
-    auto hv_blurred_output = std::make_shared<FloatOutput>(width, height, context);
+    auto h_blurred_output =
+        std::make_shared<FloatOutput>(width, height, /*with_depth_buffer=*/false, context);
+    auto hv_blurred_output =
+        std::make_shared<FloatOutput>(width, height, /*with_depth_buffer=*/false, context);
 
     *h_blurred = std::make_unique<DagOperation>(h_blurred_output);
     *hv_blurred = std::make_unique<DagOperation>(hv_blurred_output);

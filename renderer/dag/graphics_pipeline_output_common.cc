@@ -217,28 +217,49 @@ FrameBufferAttachment const *LdrColorOutput::DepthAttachment() const {
 }
 
 struct FloatOutput::FloatOutputImpl {
-    FloatOutputImpl(unsigned width, unsigned height, VulkanContext *context) {
+    FloatOutputImpl(unsigned width, unsigned height, bool with_depth_buffer,
+                    VulkanContext *context) {
         color_attachment = CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R32_SFLOAT,
                                                  /*transfer_src=*/false, context);
-        render_pass = CreateRenderPass(std::vector<VkAttachmentDescription>{color_attachment->desc},
-                                       /*depth_attachment_desc=*/std::nullopt, context);
-        frame_buffer = CreateFrameBuffer(*render_pass, width, height,
-                                         std::vector<VkImageView>{color_attachment->view},
-                                         /*depth_attachment=*/std::nullopt, context);
+
+        if (with_depth_buffer) {
+            depth_attachment = CreateDepthAttachment(context->swap_chain_image_extent.width,
+                                                     context->swap_chain_image_extent.height,
+                                                     /*samplable=*/false, context);
+            render_pass = CreateRenderPass(
+                /*color_attachment_descs=*/std::vector<VkAttachmentDescription>{color_attachment
+                                                                                    ->desc},
+                /*depth_attachment_desc=*/depth_attachment->desc, context);
+            frame_buffer = CreateFrameBuffer(
+                *render_pass, width, height,
+                /*color_attachments=*/std::vector<VkImageView>{color_attachment->view},
+                /*depth_attachment=*/depth_attachment->view, context);
+        } else {
+            render_pass = CreateRenderPass(
+                /*color_attachment_descs=*/std::vector<VkAttachmentDescription>{color_attachment
+                                                                                    ->desc},
+                /*depth_attachment_desc=*/std::nullopt, context);
+            frame_buffer = CreateFrameBuffer(
+                *render_pass, width, height,
+                /*color_attachments=*/std::vector<VkImageView>{color_attachment->view},
+                /*depth_attachment=*/std::nullopt, context);
+        }
     }
 
     ~FloatOutputImpl() = default;
 
     std::unique_ptr<FrameBufferAttachment> color_attachment;
+    std::unique_ptr<FrameBufferAttachment> depth_attachment;
     std::unique_ptr<RenderPass> render_pass;
     std::unique_ptr<FrameBuffer> frame_buffer;
 
     VulkanContext *context;
 };
 
-FloatOutput::FloatOutput(unsigned width, unsigned height, VulkanContext *context)
+FloatOutput::FloatOutput(unsigned width, unsigned height, bool with_depth_buffer,
+                         VulkanContext *context)
     : GraphicsPipelineOutputInterface(width, height),
-      pimpl_(std::make_unique<FloatOutputImpl>(width, height, context)) {}
+      pimpl_(std::make_unique<FloatOutputImpl>(width, height, with_depth_buffer, context)) {}
 
 FloatOutput::~FloatOutput() {}
 
@@ -250,6 +271,8 @@ std::vector<FrameBufferAttachment const *> FloatOutput::ColorAttachments() const
     return std::vector<FrameBufferAttachment const *>{pimpl_->color_attachment.get()};
 }
 
-FrameBufferAttachment const *FloatOutput::DepthAttachment() const { return nullptr; }
+FrameBufferAttachment const *FloatOutput::DepthAttachment() const {
+    return pimpl_->depth_attachment.get();
+}
 
 } // namespace e8

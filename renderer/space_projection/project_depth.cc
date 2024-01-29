@@ -38,19 +38,19 @@
 #include "renderer/dag/dag_operation.h"
 #include "renderer/dag/graphics_pipeline.h"
 #include "renderer/dag/graphics_pipeline_output.h"
+#include "renderer/dag/graphics_pipeline_output_common.h"
 #include "renderer/dag/promise.h"
 #include "renderer/drawable/collection.h"
 #include "renderer/drawable/drawable_instance.h"
 #include "renderer/render_pass/configurator.h"
 #include "renderer/render_pass/rasterize.h"
 #include "renderer/space_projection/project_depth.h"
-#include "renderer/space_screen/screen_space_processor.h"
 
 namespace e8 {
 namespace {
 
 PipelineKey const kProjectDepthPipeline = "Project Depth";
-PipelineKey const kLinearizeDepthPipeline = "Linearize Depth";
+PipelineKey const kProjectLinearDepthPipeline = "Project Linear Depth";
 
 /**
  * @brief The ProjectDepthOutput class For storing, depth-only rendering output. The depth
@@ -97,41 +97,34 @@ class ProjectDepthOutput final : public GraphicsPipelineOutputInterface {
 };
 
 /**
- * @brief The LinearDepthOutput class For storing, floating point texture render output.
- * The linearized depth values are stored in 32-bit floats.
+ * @brief CreateProjectNdcDepthOp Creates a depth projection pipeline stage with a 32-bit depth-only
+ * output in the specified dimension.
+ *
+ * @param width The width of the depth map output.
+ * @param height The height of the depth map output.
+ * @param context Contextual Vulkan handles.
+ * @return A pipeline stage created with the depth map output.
  */
-class LinearDepthOutput final : public GraphicsPipelineOutputInterface {
-  public:
-    LinearDepthOutput(unsigned width, unsigned height, VulkanContext *context)
-        : GraphicsPipelineOutputInterface(width, height) {
-        fp_attachment_ = CreateColorAttachment(width, height, VkFormat::VK_FORMAT_R32_SFLOAT,
-                                               /*transfer_src=*/false, context);
-        render_pass_ = CreateRenderPass(
-            /*color_attachments=*/std::vector<VkAttachmentDescription>{fp_attachment_->desc},
-            /*depth_attachment_desc=*/std::nullopt, context);
-        frame_buffer_ =
-            CreateFrameBuffer(*render_pass_, width, height,
-                              /*color_attachments=*/std::vector<VkImageView>{fp_attachment_->view},
-                              /*depth_attachment=*/std::nullopt, context);
-    }
+std::unique_ptr<DagOperation> CreateProjectNdcDepthOp(unsigned width, unsigned height,
+                                                      VulkanContext *context) {
+    auto output = std::make_shared<ProjectDepthOutput>(width, height, context);
+    return std::make_unique<DagOperation>(output);
+}
 
-    ~LinearDepthOutput() = default;
-
-    FrameBuffer *GetFrameBuffer() const override { return frame_buffer_.get(); }
-
-    RenderPass const &GetRenderPass() const override { return *render_pass_; }
-
-    std::vector<FrameBufferAttachment const *> ColorAttachments() const override {
-        return std::vector<FrameBufferAttachment const *>{fp_attachment_.get()};
-    }
-
-    FrameBufferAttachment const *DepthAttachment() const override { return nullptr; }
-
-  private:
-    std::unique_ptr<FrameBufferAttachment> fp_attachment_;
-    std::unique_ptr<RenderPass> render_pass_;
-    std::unique_ptr<FrameBuffer> frame_buffer_;
-};
+/**
+ * @brief CreateProjectLinearDepthOp Creates a linear depth projection pipeline stage with a 32-bit
+ * floating point color output in the specified dimension. TODO: preserves the depth attachment.
+ *
+ * @param width The width of the depth map output.
+ * @param height The height of the depth map output.
+ * @param context Contextual Vulkan handles.
+ * @return A pipeline stage created with the depth map output.
+ */
+std::unique_ptr<DagOperation> CreateProjectLinearDepthOp(unsigned width, unsigned height,
+                                                         VulkanContext *context) {
+    auto output = std::make_shared<FloatOutput>(width, height, /*with_depth_buffer=*/true, context);
+    return std::make_unique<DagOperation>(output);
+}
 
 struct PushConstant {
     mat44 model_view_proj_trans;
@@ -234,88 +227,109 @@ class ProjectDepthPipeline final : public GraphicsPipelineInterface {
     }
 };
 
-struct LinearizeDepthPipelineParameters {
-    float z_near;
-    float z_far;
-};
-
-class LinearizeDepthPipelineConfigurator final : public ScreenSpaceConfiguratorInterface {
+class ProjectLinearDepthPipeline final : public GraphicsPipelineInterface {
   public:
-    LinearizeDepthPipelineConfigurator(PerspectiveProjection const &projection,
-                                       GraphicsPipelineOutputInterface const &depth_map)
-        : projection_(projection), depth_map_(depth_map) {}
+    ProjectLinearDepthPipeline(GraphicsPipelineOutputInterface *output, VulkanContext *context)
+        : GraphicsPipelineInterface(context) {
+        uniform_layout_ = CreateShaderUniformLayout(
+            PushConstantLayout(),
+            /*per_frame_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
+            /*per_pass_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
+            /*per_drawable_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(), context);
+        shader_stages_ = CreateShaderStages(
+            /*vertex_shader_file_path=*/kVertexShaderFilePathDepthMap,
+            /*fragment_shader_file_path=*/kFragmentShaderFilePathDepthMapLinear, context);
+        vertex_inputs_ = CreateVertexInputState(VertexShaderInputAttributes());
+        fixed_stage_config_ =
+            CreateFixedStageConfig(/*polygon_mode=*/VK_POLYGON_MODE_FILL,
+                                   /*cull_mode=*/VK_CULL_MODE_BACK_BIT,
+                                   /*enable_depth_test=*/true, output->Width(), output->Height(),
+                                   /*color_attachment_count=*/1);
 
-    ~LinearizeDepthPipelineConfigurator() = default;
-
-    void InputImages(std::vector<VkImageView> *input_images) const override {
-        input_images->at(0) = depth_map_.DepthAttachment()->view;
+        pipeline_ =
+            CreateGraphicsPipeline(output->GetRenderPass(), *shader_stages_, *uniform_layout_,
+                                   *vertex_inputs_, *fixed_stage_config_, context);
     }
 
-    void PushConstants(std::vector<uint8_t> *push_constants) const override {
-        LinearizeDepthPipelineParameters *parameters =
-            reinterpret_cast<LinearizeDepthPipelineParameters *>(push_constants->data());
+    ~ProjectLinearDepthPipeline() override = default;
 
-        parameters->z_near = projection_.Frustum().z_near;
-        parameters->z_far = projection_.Frustum().z_far;
+    PipelineKey Key() const override { return kProjectLinearDepthPipeline; }
+
+    Fulfillment Launch(GraphicsPipelineArgumentsInterface const &generic_args,
+                       std::vector<GpuPromise *> const &prerequisites,
+                       unsigned completion_signal_count,
+                       GraphicsPipelineOutputInterface *output) override {
+        ProjectDepthArguments const &args =
+            static_cast<ProjectDepthArguments const &>(generic_args);
+
+        VkCommandBuffer cmds =
+            StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), context_);
+
+        ProjectDepthConfigurator configurator(*args.projection);
+        RenderDrawables(args.drawables, *pipeline_, *uniform_layout_, configurator,
+                        args.transfer_context, cmds);
+
+        return FinishRenderPass(cmds, completion_signal_count, prerequisites, context_);
     }
-
-  private:
-    PerspectiveProjection const projection_;
-    GraphicsPipelineOutputInterface const &depth_map_;
 };
 
 } // namespace
 
-std::unique_ptr<DagOperation> CreateProjectNdcDepthStage(unsigned width, unsigned height,
-                                                         VulkanContext *context) {
-    auto output = std::make_shared<ProjectDepthOutput>(width, height, context);
-    return std::make_unique<DagOperation>(output);
-}
+DagOperationInstance DoProjectNdcDepth(DrawableCollection *drawable_collection,
+                                       PerspectiveProjection const &projection,
+                                       DagOperationInstance const frame, TransferContext *transfer,
+                                       DagContext *dag) {
+    unsigned width = frame->Output()->Width();
+    unsigned height = frame->Output()->Height();
+    DagContext::DagOperationKey key = CreateDagOperationKey(kProjectDepthPipeline, width, height);
+    DagOperationInstance projected_ndc_depth =
+        dag->WithOperation(key, [width, height](VulkanContext *context) {
+            return CreateProjectNdcDepthOp(width, height, context);
+        });
+    GraphicsPipelineInterface *project_depth_pipeline = projected_ndc_depth->WithPipeline(
+        kProjectDepthPipeline, [transfer](GraphicsPipelineOutputInterface *output) {
+            return std::make_unique<ProjectDepthPipeline>(
+                dynamic_cast<ProjectDepthOutput *>(output), transfer->vulkan_context);
+        });
 
-std::unique_ptr<DagOperation> CreateProjectLinearDepthStage(unsigned width, unsigned height,
-                                                            VulkanContext *context) {
-    auto output = std::make_shared<LinearDepthOutput>(width, height, context);
-    return std::make_unique<DagOperation>(output);
-}
-
-void DoProjectDepth(DrawableCollection *drawables, PerspectiveProjection const &projection,
-                    TransferContext *transfer_context, DagOperation *first_stage,
-                    DagOperation *projected_ndc_depth, DagOperation *projected_linear_depth) {
     ResourceLoadingOption loading_option;
     loading_option.load_geometry = true;
-
     std::vector<DrawableInstance> observable_geometries =
-        drawables->ObservableGeometries(projection, loading_option);
+        drawable_collection->ObservableGeometries(projection, loading_option);
 
-    GraphicsPipelineInterface *project_depth_pipeline = projected_ndc_depth->WithPipeline(
-        kProjectDepthPipeline, [transfer_context](GraphicsPipelineOutputInterface *output) {
-            return std::make_unique<ProjectDepthPipeline>(
-                dynamic_cast<ProjectDepthOutput *>(output), transfer_context->vulkan_context);
-        });
-
-    auto args = std::make_unique<ProjectDepthArguments>(observable_geometries, projection,
-                                                        transfer_context);
+    auto args =
+        std::make_unique<ProjectDepthArguments>(observable_geometries, projection, transfer);
     projected_ndc_depth->Schedule(project_depth_pipeline, std::move(args),
-                                  /*parents=*/std::vector<DagOperation *>{first_stage});
+                                  /*parents=*/std::vector<DagOperation *>{frame});
 
-    if (projected_linear_depth == nullptr) {
-        return;
-    }
+    return projected_ndc_depth;
+}
 
-    GraphicsPipelineInterface *linearize_depth_pipeline = projected_linear_depth->WithPipeline(
-        kLinearizeDepthPipeline,
-        [transfer_context](GraphicsPipelineOutputInterface *linear_depth_output) {
-            return std::make_unique<ScreenSpaceProcessorPipeline>(
-                kLinearizeDepthPipeline, kFragmentShaderFilePathDepthMapLinearizerPerspective,
-                /*input_image_count=*/1,
-                /*push_constant_size=*/sizeof(LinearizeDepthPipelineParameters),
-                linear_depth_output, transfer_context);
+DagOperationInstance DoProjectLinearDepth(DrawableCollection *drawable_collection,
+                                          PerspectiveProjection const &projection, unsigned width,
+                                          unsigned height, DagOperationInstance const dependent_op,
+                                          TransferContext *transfer, DagContext *dag) {
+    DagContext::DagOperationKey key = CreateDagOperationKey(kProjectDepthPipeline, width, height);
+    DagOperationInstance projected_linear_depth =
+        dag->WithOperation(key, [width, height](VulkanContext *context) {
+            return CreateProjectLinearDepthOp(width, height, context);
+        });
+    GraphicsPipelineInterface *project_linear_depth_pipeline = projected_linear_depth->WithPipeline(
+        kProjectLinearDepthPipeline, [transfer](GraphicsPipelineOutputInterface *output) {
+            return std::make_unique<ProjectLinearDepthPipeline>(output, transfer->vulkan_context);
         });
 
-    auto configurator = std::make_unique<LinearizeDepthPipelineConfigurator>(
-        projection, *projected_ndc_depth->Output());
-    projected_linear_depth->Schedule(linearize_depth_pipeline, std::move(configurator),
-                                     /*parents=*/std::vector<DagOperation *>{projected_ndc_depth});
+    ResourceLoadingOption loading_option;
+    loading_option.load_geometry = true;
+    std::vector<DrawableInstance> observable_geometries =
+        drawable_collection->ObservableGeometries(projection, loading_option);
+
+    auto args =
+        std::make_unique<ProjectDepthArguments>(observable_geometries, projection, transfer);
+    projected_linear_depth->Schedule(project_linear_depth_pipeline, std::move(args),
+                                     /*parents=*/std::vector<DagOperation *>{dependent_op});
+
+    return projected_linear_depth;
 }
 
 } // namespace e8
