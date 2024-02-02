@@ -1,9 +1,10 @@
 # e8yes-terrain
 
 ## OS
-Ubuntu 21.10 (Groovy Gorilla)
+Ubuntu 23.10 (Mantic Minotaur)
+Windows 11
 
-## Software 
+## Ubuntu Software 
 ### Qt & Qt Creator IDE
 Installation command ```apt install -y qt-creator```
 
@@ -24,3 +25,11 @@ Installation command ```apt install -y libglew-dev libglfw3-dev```
 
 ### Shaderc
 Git repository & download page https://github.com/google/shaderc
+
+## Windows Software
+### MSYS2
+Download page https://github.com/msys2/msys2-installer
+
+## Tested on Devices
+AMD Ryzen 5 5600G with Radeon Graphics
+NVIDIA GeForce RTX 4060 Ti
