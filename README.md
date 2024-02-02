@@ -1,10 +1,6 @@
 # e8yes-terrain
 
-## OS
-Ubuntu 23.10 (Mantic Minotaur)
-Windows 11
-
-## Ubuntu Software 
+## Build Prerequistes on Ubuntu 23.10 (Mantic Minotaur)
 ### Qt & Qt Creator IDE
 Installation command ```apt install -y qt-creator```
 
@@ -20,13 +16,13 @@ Installation command ```apt install -y libsdl2-dev```
 ### Vulkan Driver & SDK
 Installation guide https://vulkan.lunarg.com/doc/view/latest/linux/getting_started_ubuntu.html
 
-## GLEW & GLFW
+### GLEW & GLFW
 Installation command ```apt install -y libglew-dev libglfw3-dev```
 
 ### Shaderc
 Git repository & download page https://github.com/google/shaderc
 
-## Windows Software
+## Build Prerequistes on Windows 11
 ### MSYS2
 Download page https://github.com/msys2/msys2-installer
 
