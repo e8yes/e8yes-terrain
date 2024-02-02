@@ -26,6 +26,9 @@ Git repository & download page https://github.com/google/shaderc
 ### MSYS2
 Download page https://github.com/msys2/msys2-installer
 
+### Qt & Qt Creator IDE
+Installation command `pacman -S mingw-w64-x86_64-qt-creator`
+
 ## Tested on Devices
 AMD Ryzen 5 5600G with Radeon Graphics
 NVIDIA GeForce RTX 4060 Ti
