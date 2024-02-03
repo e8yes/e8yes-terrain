@@ -35,6 +35,12 @@ Installation command `pacman -S mingw-w64-x86_64-toolchain`
 ### Qt & Qt Creator IDE
 Installation command `pacman -S mingw-w64-x86_64-qt-creator`
 
+### Boost Log & Thread
+Installation command `pacman -S mingw-w64-x86_64-boost`
+
+### C++ Protocol Buffer
+Installation command `pacman -S mingw-w64-x86_64-protobuf`
+
 ## Tested on Devices
 AMD Ryzen 5 5600G with Radeon Graphics
 NVIDIA GeForce RTX 4060 Ti
