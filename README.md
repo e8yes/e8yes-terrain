@@ -41,6 +41,9 @@ Installation command `pacman -S mingw-w64-x86_64-boost`
 ### C++ Protocol Buffer
 Installation command `pacman -S mingw-w64-x86_64-protobuf`
 
+### SDL2
+Installation command `pacman -S mingw-w64-x86_64-SDL2`
+
 ## Tested on Devices
 AMD Ryzen 5 5600G with Radeon Graphics
 NVIDIA GeForce RTX 4060 Ti
