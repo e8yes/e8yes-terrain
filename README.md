@@ -5,7 +5,7 @@
 Installation command `apt install -y build-essential`
 
 ### Qt & Qt Creator IDE
-Installation command ```apt install -y qt-creator``` (Ubuntu 23.10) ```apt install -y qtcreator``` (Raspbian 12)
+Installation command ```apt install -y qt-creator``` (Ubuntu 23.10), ```apt install -y qtcreator``` (Raspbian 12)
 
 ### Boost Log & Thread
 Installation command ```apt install -y libboost-log-dev libboost-thread-dev```
