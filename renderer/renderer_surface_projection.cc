@@ -25,6 +25,8 @@
 #include "renderer/basic/projection.h"
 #include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
+#include "renderer/dag/frame_resource_allocator.h"
+#include "renderer/dag/graphics_pipeline_output_common.h"
 #include "renderer/drawable/collection.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/renderer.h"
@@ -38,29 +40,24 @@ namespace e8 {
 
 class SurfaceProjectionRenderer::SurfaceProjectionRendererImpl {
   public:
-    SurfaceProjectionRendererImpl(std::unique_ptr<DagOperation> &&final_color_image,
-                                  VulkanContext *context);
+    SurfaceProjectionRendererImpl(VulkanContext *context);
     ~SurfaceProjectionRendererImpl();
 
     DagContext dag_context;
     TransferContext transfer_context;
-
-    std::unique_ptr<DagOperation> final_color_image;
-
+    FrameResourceAllocator frame_resource_allocator;
     RendererConfiguration config;
 };
 
 SurfaceProjectionRenderer::SurfaceProjectionRendererImpl::SurfaceProjectionRendererImpl(
-    std::unique_ptr<DagOperation> &&final_color_image, VulkanContext *context)
-    : dag_context(context), transfer_context(context),
-      final_color_image(std::move(final_color_image)) {}
+    VulkanContext *context)
+    : dag_context(context), transfer_context(context), frame_resource_allocator(context) {}
 
 SurfaceProjectionRenderer::SurfaceProjectionRendererImpl::~SurfaceProjectionRendererImpl() {}
 
 SurfaceProjectionRenderer::SurfaceProjectionRenderer(VulkanContext *context)
     : RendererInterface(/*num_stages=*/1, context),
-      pimpl_(std::make_unique<SurfaceProjectionRendererImpl>(
-          RendererInterface::FinalColorImageStage(), context)) {}
+      pimpl_(std::make_unique<SurfaceProjectionRendererImpl>(context)) {}
 
 SurfaceProjectionRenderer::~SurfaceProjectionRenderer() {}
 
@@ -72,16 +69,17 @@ void SurfaceProjectionRenderer::DrawFrame(Scene *scene, ResourceAccessor *resour
 
     DagContext::Session session = pimpl_->dag_context.CreateSession();
 
-    DagOperation *first_stage = this->DoFirstStage();
-    DagOperationInstance surface_projection =
-        DoProjectSurface(&drawable_collection, camera_projection, first_stage,
-                         &pimpl_->transfer_context, &pimpl_->dag_context);
-    DoVisualizeSurfaceProjection(pimpl_->config.light_inputs_renderer_params().input_to_visualize(),
-                                 surface_projection, &pimpl_->transfer_context,
-                                 pimpl_->final_color_image.get());
-    DagOperation *final_stage = this->DoFinalStage(first_stage, pimpl_->final_color_image.get());
-
-    final_stage->Fulfill(pimpl_->transfer_context.vulkan_context);
+    std::shared_ptr<SwapChainOutput> final_color_image =
+        this->AcquireFinalColorImage(&pimpl_->frame_resource_allocator);
+    DagOperationInstance surface_projection = DoProjectSurface(
+        &drawable_collection, camera_projection, final_color_image->Width(),
+        final_color_image->Height(), &pimpl_->transfer_context, &pimpl_->dag_context);
+    DagOperationInstance visualized_surface = DoVisualizeSurfaceProjection(
+        pimpl_->config.light_inputs_renderer_params().input_to_visualize(), surface_projection,
+        final_color_image, &pimpl_->transfer_context, &pimpl_->dag_context);
+    std::vector<GpuPromise *> final_waits =
+        visualized_surface->Fulfill(/*wait=*/false, &pimpl_->frame_resource_allocator, context);
+    this->PresentFinalColorImage(*final_color_image, final_waits);
 }
 
 void SurfaceProjectionRenderer::ApplyConfiguration(RendererConfiguration const &config) {

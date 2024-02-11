@@ -20,7 +20,9 @@
 
 #include <memory>
 
+#include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
+#include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/transfer/context.h"
 
@@ -33,11 +35,14 @@ namespace e8 {
  * @param parameter_to_visualize Selects the surface parameter to be visualized.
  * @param surface_projection The surface parameter maps to select parameter from.
  * @param transfer_context Transfer context.
- * @param target The target stage which stores a map of lighting parameters (light inputs).
+ * @param dag DAG context.
+ * @return The target operation which visualizes the specified lighting parameter (light inputs).
  */
-void DoVisualizeSurfaceProjection(LightInputsRendererParameters::InputType parameter_to_visualize,
-                                  DagOperation *surface_projection,
-                                  TransferContext *transfer_context, DagOperation *target);
+DagOperationInstance DoVisualizeSurfaceProjection(
+    LightInputsRendererParameters::InputType parameter_to_visualize,
+    DagOperationInstance surface_projection,
+    std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output,
+    TransferContext *transfer_context, DagContext *dag);
 
 } // namespace e8
 

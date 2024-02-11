@@ -25,10 +25,12 @@
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
+#include "renderer/basic/command_buffer.h"
+#include "renderer/dag/graphics_pipeline.h"
 #include "renderer/dag/graphics_pipeline_output.h"
-#include "renderer/dag/promise.h"
 #include "renderer/render_pass/rasterize.h"
 #include "renderer/space_screen/screen_space_processor.h"
+#include "renderer/transfer/context.h"
 #include "renderer/transfer/descriptor_set.h"
 
 namespace e8 {
@@ -83,8 +85,9 @@ UniformLayout(unsigned input_image_count, unsigned push_constant_size, VulkanCon
 
 void ConfigureViewportDimensionUniformVariable(ShaderUniformLayout const &uniform_layout,
                                                DescriptorSet const &viewport_dimension_desc_set,
-                                               VkCommandBuffer cmds) {
-    vkCmdBindDescriptorSets(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
+                                               CommandBuffer *command_buffer) {
+    vkCmdBindDescriptorSets(command_buffer->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                            uniform_layout.layout,
                             /*firstSet=*/DescriptorSetType::DST_PER_FRAME,
                             /*descriptorSetCount=*/1, &viewport_dimension_desc_set.descriptor_set,
                             /*dynamicOffsetCount=*/0,
@@ -96,12 +99,12 @@ void ConfigureCustomUniformVariables(ScreenSpaceConfiguratorInterface const &con
                                      DescriptorSet const &input_images_desc_set,
                                      ImageSampler const &input_image_sampler,
                                      std::vector<VkImageView> *past_input_images,
-                                     VulkanContext *context, VkCommandBuffer cmds) {
+                                     VulkanContext *context, CommandBuffer *command_buffer) {
     if (uniform_layout.push_constant_range.has_value()) {
         std::vector<uint8_t> push_constants(uniform_layout.push_constant_range->size);
         configurator.PushConstants(&push_constants);
 
-        vkCmdPushConstants(cmds, uniform_layout.layout,
+        vkCmdPushConstants(command_buffer->buffer, uniform_layout.layout,
                            /*stageFlags=*/VK_SHADER_STAGE_FRAGMENT_BIT,
                            /*offset=*/0,
                            /*size=*/push_constants.size(), push_constants.data());
@@ -121,7 +124,8 @@ void ConfigureCustomUniformVariables(ScreenSpaceConfiguratorInterface const &con
     }
 
     if (!current_input_images.empty()) {
-        vkCmdBindDescriptorSets(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
+        vkCmdBindDescriptorSets(command_buffer->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                uniform_layout.layout,
                                 /*firstSet=*/DescriptorSetType::DST_PER_PASS,
                                 /*descriptorSetCount=*/1, &input_images_desc_set.descriptor_set,
                                 /*dynamicOffsetCount=*/0,
@@ -221,29 +225,24 @@ ScreenSpaceProcessorPipeline::~ScreenSpaceProcessorPipeline() {}
 
 PipelineKey ScreenSpaceProcessorPipeline::Key() const { return pimpl_->key; }
 
-Fulfillment
-ScreenSpaceProcessorPipeline::Launch(GraphicsPipelineArgumentsInterface const &generic_args,
-                                     std::vector<GpuPromise *> const &prerequisites,
-                                     unsigned completion_signal_count,
-                                     GraphicsPipelineOutputInterface *output) {
-    VkCommandBuffer cmds =
-        StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), context_);
-
+void ScreenSpaceProcessorPipeline::Launch(GraphicsPipelineArgumentsInterface const &generic_args,
+                                          GraphicsPipelineOutputInterface *output,
+                                          CommandBuffer *command_buffer) {
+    StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), command_buffer);
     ScreenSpaceConfiguratorInterface const &configurator =
         static_cast<ScreenSpaceConfiguratorInterface const &>(generic_args);
-
     PostProcess(
         *pipeline_, *uniform_layout_,
-        [this, &configurator](ShaderUniformLayout const &uniform_layout, VkCommandBuffer cmds) {
-            ConfigureViewportDimensionUniformVariable(uniform_layout,
-                                                      *pimpl_->viewport_dimension_desc_set, cmds);
+        [this, &configurator](ShaderUniformLayout const &uniform_layout,
+                              CommandBuffer *command_buffer) {
+            ConfigureViewportDimensionUniformVariable(
+                uniform_layout, *pimpl_->viewport_dimension_desc_set, command_buffer);
             ConfigureCustomUniformVariables(
                 configurator, uniform_layout, *pimpl_->input_images_desc_set,
-                *pimpl_->input_image_sampler, &pimpl_->past_input_images, context_, cmds);
+                *pimpl_->input_image_sampler, &pimpl_->past_input_images, context_, command_buffer);
         },
-        cmds);
-
-    return FinishRenderPass(cmds, completion_signal_count, prerequisites, context_);
+        command_buffer);
+    FinishRenderPass(command_buffer);
 }
 
 } // namespace e8

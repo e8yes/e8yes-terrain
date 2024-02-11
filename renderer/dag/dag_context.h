@@ -42,7 +42,7 @@ class DagContext {
      * @brief DagContext Constructs a DAG graph under the specified Vulkan context.
      */
     DagContext(VulkanContext *context);
-    ~DagContext() = default;
+    ~DagContext();
 
     using DagOperationKey = std::string;
     using CreateDagOperationFn =

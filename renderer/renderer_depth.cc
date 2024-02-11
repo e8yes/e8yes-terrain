@@ -25,7 +25,8 @@
 #include "renderer/basic/projection.h"
 #include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
-#include "renderer/dag/graphics_pipeline_output.h"
+#include "renderer/dag/frame_resource_allocator.h"
+#include "renderer/dag/graphics_pipeline_output_common.h"
 #include "renderer/drawable/collection.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/renderer.h"
@@ -44,12 +45,13 @@ class DepthRenderer::DepthRendererImpl {
 
     DagContext dag_context;
     TransferContext transfer_context;
+    FrameResourceAllocator frame_resource_allocator;
 
     RendererConfiguration config;
 };
 
 DepthRenderer::DepthRendererImpl::DepthRendererImpl(VulkanContext *context)
-    : dag_context(context), transfer_context(context) {}
+    : dag_context(context), transfer_context(context), frame_resource_allocator(context) {}
 
 DepthRenderer::DepthRendererImpl::~DepthRendererImpl() {}
 
@@ -65,21 +67,18 @@ void DepthRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor)
     DrawableCollection drawables_collection(*scene->SceneEntityStructure(), resource_accessor);
 
     DagContext::Session session = pimpl_->dag_context.CreateSession();
-    DagOperation *first_stage = this->DoFirstStage();
 
+    std::shared_ptr<SwapChainOutput> final_color_image =
+        this->AcquireFinalColorImage(&pimpl_->frame_resource_allocator);
     DagOperationInstance ndc_depth_map =
-        DoProjectNdcDepth(&drawables_collection, projection, first_stage, &pimpl_->transfer_context,
-                          &pimpl_->dag_context);
-
-    std::shared_ptr<GraphicsPipelineOutputInterface> final_color_output =
-        RendererInterface::FinalColorImage();
+        DoProjectNdcDepth(&drawables_collection, projection, /*dependent_op=*/nullptr,
+                          &pimpl_->transfer_context, &pimpl_->dag_context);
     DagOperationInstance visualized_color_map = DoVisualizeDepthProjection(
         pimpl_->config.depth_renderer_params().alpha(), projection, ndc_depth_map,
-        final_color_output, &pimpl_->transfer_context, &pimpl_->dag_context);
-
-    DagOperation *final_stage = this->DoFinalStage(first_stage, visualized_color_map);
-
-    final_stage->Fulfill(context);
+        final_color_image, &pimpl_->transfer_context, &pimpl_->dag_context);
+    std::vector<GpuPromise *> final_waits =
+        visualized_color_map->Fulfill(/*wait=*/false, &pimpl_->frame_resource_allocator, context);
+    this->PresentFinalColorImage(*final_color_image, final_waits);
 }
 
 void DepthRenderer::ApplyConfiguration(RendererConfiguration const &config) {

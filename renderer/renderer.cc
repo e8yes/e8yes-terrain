@@ -30,8 +30,7 @@
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
-#include "renderer/dag/dag_operation.h"
-#include "renderer/dag/graphics_pipeline.h"
+#include "renderer/dag/frame_resource_allocator.h"
 #include "renderer/dag/graphics_pipeline_output_common.h"
 #include "renderer/dag/promise.h"
 #include "renderer/proto/renderer.pb.h"
@@ -48,132 +47,6 @@ constexpr char const *kRendererConfigFileName = "renderer.rpb";
 
 float Alpha(unsigned window_width) { return 1.0f - std::pow(1 - 0.95f, 1.0f / window_width); }
 
-PipelineKey const kAcquireImagePipeline = "AcquireImage";
-PipelineKey const kPresentImagePipeline = "PresentImage";
-
-/**
- * @brief The AcquireImagePipeline class
- */
-class AcquireImagePipeline : public GraphicsPipelineInterface {
-  public:
-    explicit AcquireImagePipeline(VulkanContext *context);
-    ~AcquireImagePipeline();
-
-    PipelineKey Key() const override;
-
-    Fulfillment Launch(GraphicsPipelineArgumentsInterface const &generic_args,
-                       std::vector<GpuPromise *> const &prerequisites,
-                       unsigned completion_signal_count,
-                       GraphicsPipelineOutputInterface *output) override;
-};
-
-AcquireImagePipeline::AcquireImagePipeline(VulkanContext *context)
-    : GraphicsPipelineInterface(context) {}
-
-AcquireImagePipeline::~AcquireImagePipeline() {}
-
-PipelineKey AcquireImagePipeline::Key() const { return kAcquireImagePipeline; }
-
-Fulfillment
-AcquireImagePipeline::Launch(GraphicsPipelineArgumentsInterface const & /*generic_args*/,
-                             std::vector<GpuPromise *> const &prerequisites,
-                             unsigned completion_signal_count,
-                             GraphicsPipelineOutputInterface *output) {
-    assert(prerequisites.empty());
-    assert(output != nullptr);
-
-    // Waits for v-sync.
-    auto acquisition_signal = std::make_unique<CpuPromise>(context_);
-    unsigned swap_chain_image_index;
-    assert(VK_SUCCESS == vkAcquireNextImageKHR(context_->device, context_->swap_chain,
-                                               /*timeout=*/std::numeric_limits<uint64_t>::max(),
-                                               /*semaphore=*/VK_NULL_HANDLE,
-                                               /*fence=*/acquisition_signal->signal,
-                                               &swap_chain_image_index));
-    acquisition_signal->Wait();
-    static_cast<SwapChainOutput *>(output)->SetSwapChainImageIndex(swap_chain_image_index);
-
-    // Dispatches signals to all child stages.
-    Fulfillment fulfillment(/*cmds=*/VK_NULL_HANDLE, context_);
-
-    std::vector<VkSemaphore> signals(completion_signal_count);
-    for (unsigned i = 0; i < completion_signal_count; ++i) {
-        GpuPromise promise(context_);
-        signals[i] = promise.signal;
-        fulfillment.child_operations_signal.emplace_back(std::move(promise));
-    }
-
-    VkSubmitInfo submit{};
-    submit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submit.pSignalSemaphores = signals.data();
-    submit.signalSemaphoreCount = signals.size();
-
-    assert(VK_SUCCESS == vkQueueSubmit(context_->graphics_queue, /*submitCount=*/1, &submit,
-                                       fulfillment.completion.signal));
-
-    return fulfillment;
-}
-
-struct PresentImageArguments : public GraphicsPipelineArgumentsInterface {
-    PresentImageArguments(SwapChainOutput *output) : output(output) {}
-
-    SwapChainOutput *output;
-};
-
-/**
- * @brief The PresentImagePipeline class
- */
-class PresentImagePipeline : public GraphicsPipelineInterface {
-  public:
-    PresentImagePipeline(VulkanContext *context);
-    ~PresentImagePipeline();
-
-    PipelineKey Key() const override;
-
-    Fulfillment Launch(GraphicsPipelineArgumentsInterface const &generic_args,
-                       std::vector<GpuPromise *> const &prerequisites,
-                       unsigned completion_signal_count,
-                       GraphicsPipelineOutputInterface *output) override;
-};
-
-PresentImagePipeline::PresentImagePipeline(VulkanContext *context)
-    : GraphicsPipelineInterface(context) {}
-
-PresentImagePipeline::~PresentImagePipeline() {}
-
-PipelineKey PresentImagePipeline::Key() const { return kPresentImagePipeline; }
-
-Fulfillment PresentImagePipeline::Launch(GraphicsPipelineArgumentsInterface const &generic_args,
-                                         std::vector<GpuPromise *> const &prerequisites,
-                                         unsigned completion_signal_count,
-                                         GraphicsPipelineOutputInterface *output) {
-    assert(completion_signal_count == 0);
-    assert(!prerequisites.empty());
-    assert(output == nullptr);
-
-    PresentImageArguments const &args = static_cast<PresentImageArguments const &>(generic_args);
-
-    unsigned swap_chain_image_index = args.output->SwapChainImageIndex();
-
-    std::vector<VkSemaphore> parent_signals(prerequisites.size());
-    for (unsigned i = 0; i < prerequisites.size(); ++i) {
-        parent_signals[i] = prerequisites[i]->signal;
-    }
-
-    VkPresentInfoKHR present_info{};
-    present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-    present_info.pSwapchains = &context_->swap_chain;
-    present_info.swapchainCount = 1;
-    present_info.pImageIndices = &swap_chain_image_index;
-    present_info.pWaitSemaphores = parent_signals.data();
-    present_info.waitSemaphoreCount = parent_signals.size();
-
-    assert(VK_SUCCESS == vkQueuePresentKHR(context_->present_queue, &present_info));
-
-    Fulfillment empty_fulfillment(/*cmds=*/VK_NULL_HANDLE, context_);
-    return empty_fulfillment;
-}
-
 } // namespace
 
 RendererInterface::StagePerformance::StagePerformance()
@@ -184,7 +57,6 @@ RendererInterface::StagePerformance::~StagePerformance() {}
 RendererInterface::RendererInterface(unsigned num_stages, VulkanContext *context)
     : context(context), stage_performance_(num_stages + 2),
       final_output_(std::make_shared<SwapChainOutput>(/*with_depth_buffer=*/false, context)),
-      first_stage_(final_output_), final_stage_(/*output=*/nullptr),
       mu_(std::make_unique<std::mutex>()) {}
 
 RendererInterface::~RendererInterface() {}
@@ -194,46 +66,41 @@ std::vector<RendererInterface::StagePerformance> RendererInterface::GetPerforman
     return stage_performance_;
 }
 
-DagOperation *RendererInterface::DoFirstStage() {
-    GraphicsPipelineInterface *pipeline = first_stage_.WithPipeline(
-        kAcquireImagePipeline, [this](GraphicsPipelineOutputInterface * /*output*/) {
-            return std::make_unique<AcquireImagePipeline>(this->context);
-        });
+std::shared_ptr<SwapChainOutput>
+RendererInterface::AcquireFinalColorImage(FrameResourceAllocator *frame_resource_allocator) {
+    CpuPromise acquisition_signal(context);
+    unsigned swap_chain_image_index;
+    assert(VK_SUCCESS == vkAcquireNextImageKHR(context->device, context->swap_chain,
+                                               /*timeout=*/std::numeric_limits<uint64_t>::max(),
+                                               /*semaphore=*/VK_NULL_HANDLE,
+                                               /*fence=*/acquisition_signal.signal,
+                                               &swap_chain_image_index));
+    acquisition_signal.Wait();
 
-    first_stage_.Schedule(pipeline,
-                          /*args=*/std::make_unique<GraphicsPipelineArgumentsInterface>(),
-                          /*parents=*/std::vector<DagOperation *>{});
-
-    return &first_stage_;
-}
-
-DagOperation *RendererInterface::DoFinalStage(DagOperation *first_stage,
-                                              DagOperation *final_color_image_stage,
-                                              std::vector<DagOperation *> const &dangling_stages) {
-    GraphicsPipelineInterface *pipeline = final_stage_.WithPipeline(
-        kPresentImagePipeline, [this](GraphicsPipelineOutputInterface * /*output*/) {
-            return std::make_unique<PresentImagePipeline>(this->context);
-        });
-
-    auto args = std::make_unique<PresentImageArguments>(
-        static_cast<SwapChainOutput *>(first_stage->Output()));
-
-    std::vector<DagOperation *> dependent_parents{first_stage, final_color_image_stage};
-    for (auto dangling_stage : dangling_stages) {
-        dependent_parents.push_back(dangling_stage);
-    }
-
-    final_stage_.Schedule(pipeline, std::move(args), dependent_parents);
-
-    return &final_stage_;
-}
-
-std::shared_ptr<SwapChainOutput> RendererInterface::FinalColorImage() const {
+    final_output_->SetSwapChainImageIndex(swap_chain_image_index);
+    frame_resource_allocator->SetSwapChainImageIndex(swap_chain_image_index);
     return final_output_;
 }
 
-std::unique_ptr<DagOperation> RendererInterface::FinalColorImageStage() const {
-    return std::make_unique<DagOperation>(final_output_);
+void RendererInterface::PresentFinalColorImage(SwapChainOutput const &output,
+                                               std::vector<GpuPromise *> const &final_waits) {
+    unsigned swap_chain_image_index = output.SwapChainImageIndex();
+
+    std::vector<VkSemaphore> dependent_signals;
+    dependent_signals.reserve(final_waits.size());
+    for (auto const &final_wait : final_waits) {
+        dependent_signals.push_back(final_wait->signal);
+    }
+
+    VkPresentInfoKHR present_info{};
+    present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    present_info.pSwapchains = &context->swap_chain;
+    present_info.swapchainCount = 1;
+    present_info.pImageIndices = &swap_chain_image_index;
+    present_info.pWaitSemaphores = dependent_signals.data();
+    present_info.waitSemaphoreCount = dependent_signals.size();
+
+    assert(VK_SUCCESS == vkQueuePresentKHR(context->present_queue, &present_info));
 }
 
 void RendererInterface::BeginStage(unsigned index, std::string const &name) {

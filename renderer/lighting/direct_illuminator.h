@@ -46,9 +46,8 @@ namespace e8 {
  * the direct illumination computation.
  */
 DagOperationInstance DoComputeDirectIllumination(DrawableCollection *drawable_collection,
-                                                 DagOperation *projected_surface,
+                                                 DagOperationInstance projected_surface,
                                                  PerspectiveProjection const &projection,
-                                                 DagOperation *first_stage,
                                                  TransferContext *transfer_context,
                                                  DagContext *dag);
 

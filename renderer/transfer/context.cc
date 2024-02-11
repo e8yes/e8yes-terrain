@@ -15,8 +15,10 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "renderer/transfer/context.h"
+#include <vulkan/vulkan.h>
+
 #include "common/device.h"
+#include "renderer/transfer/context.h"
 #include "renderer/transfer/descriptor_set.h"
 #include "renderer/transfer/descriptor_set_texture.h"
 #include "renderer/transfer/vram_geometry.h"
@@ -29,6 +31,6 @@ TransferContext::TransferContext(VulkanContext *context)
       texture_descriptor_set_cache(&descriptor_set_allocator), geometry_vram_transfer(context),
       texture_vram_transfer(context) {}
 
-TransferContext::~TransferContext() {}
+TransferContext::~TransferContext() { vkDeviceWaitIdle(vulkan_context->device); }
 
 } // namespace e8

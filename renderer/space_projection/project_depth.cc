@@ -27,6 +27,7 @@
 #include "common/device.h"
 #include "common/tensor.h"
 #include "renderer/basic/attachment.h"
+#include "renderer/basic/command_buffer.h"
 #include "renderer/basic/fixed_function.h"
 #include "renderer/basic/frame_buffer.h"
 #include "renderer/basic/pipeline.h"
@@ -39,7 +40,6 @@
 #include "renderer/dag/graphics_pipeline.h"
 #include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/dag/graphics_pipeline_output_common.h"
-#include "renderer/dag/promise.h"
 #include "renderer/drawable/collection.h"
 #include "renderer/drawable/drawable_instance.h"
 #include "renderer/render_pass/configurator.h"
@@ -209,21 +209,16 @@ class ProjectDepthPipeline final : public GraphicsPipelineInterface {
 
     PipelineKey Key() const override { return kProjectDepthPipeline; }
 
-    Fulfillment Launch(GraphicsPipelineArgumentsInterface const &generic_args,
-                       std::vector<GpuPromise *> const &prerequisites,
-                       unsigned completion_signal_count,
-                       GraphicsPipelineOutputInterface *output) override {
+    void Launch(GraphicsPipelineArgumentsInterface const &generic_args,
+                GraphicsPipelineOutputInterface *output, CommandBuffer *command_buffer) override {
         ProjectDepthArguments const &args =
             static_cast<ProjectDepthArguments const &>(generic_args);
 
-        VkCommandBuffer cmds =
-            StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), context_);
-
+        StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), command_buffer);
         ProjectDepthConfigurator configurator(*args.projection);
         RenderDrawables(args.drawables, *pipeline_, *uniform_layout_, configurator,
-                        args.transfer_context, cmds);
-
-        return FinishRenderPass(cmds, completion_signal_count, prerequisites, context_);
+                        args.transfer_context, command_buffer);
+        FinishRenderPass(command_buffer);
     }
 };
 
@@ -255,21 +250,16 @@ class ProjectLinearDepthPipeline final : public GraphicsPipelineInterface {
 
     PipelineKey Key() const override { return kProjectLinearDepthPipeline; }
 
-    Fulfillment Launch(GraphicsPipelineArgumentsInterface const &generic_args,
-                       std::vector<GpuPromise *> const &prerequisites,
-                       unsigned completion_signal_count,
-                       GraphicsPipelineOutputInterface *output) override {
+    void Launch(GraphicsPipelineArgumentsInterface const &generic_args,
+                GraphicsPipelineOutputInterface *output, CommandBuffer *command_buffer) override {
         ProjectDepthArguments const &args =
             static_cast<ProjectDepthArguments const &>(generic_args);
 
-        VkCommandBuffer cmds =
-            StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), context_);
-
+        StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), command_buffer);
         ProjectDepthConfigurator configurator(*args.projection);
         RenderDrawables(args.drawables, *pipeline_, *uniform_layout_, configurator,
-                        args.transfer_context, cmds);
-
-        return FinishRenderPass(cmds, completion_signal_count, prerequisites, context_);
+                        args.transfer_context, command_buffer);
+        FinishRenderPass(command_buffer);
     }
 };
 

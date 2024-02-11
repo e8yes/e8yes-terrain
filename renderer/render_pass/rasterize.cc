@@ -24,12 +24,10 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
-#include "common/device.h"
 #include "renderer/basic/frame_buffer.h"
 #include "renderer/basic/pipeline.h"
 #include "renderer/basic/render_pass.h"
 #include "renderer/basic/uniform_layout.h"
-#include "renderer/dag/promise.h"
 #include "renderer/drawable/drawable_instance.h"
 #include "renderer/render_pass/configurator.h"
 #include "renderer/render_pass/rasterize.h"
@@ -82,23 +80,7 @@ UploadResources(std::vector<DrawableInstance> const &drawables,
 } // namespace
 
 VkCommandBuffer StartRenderPass(RenderPass const &render_pass, FrameBuffer const &frame_buffer,
-                                VulkanContext *context) {
-    // Allocates a new command buffer for storing commands from this render pass.
-    VkCommandBufferAllocateInfo cmds_allocation_info{};
-    cmds_allocation_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    cmds_allocation_info.commandPool = context->command_pool;
-    cmds_allocation_info.commandBufferCount = 1;
-    cmds_allocation_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-
-    VkCommandBuffer cmds;
-    assert(VK_SUCCESS == vkAllocateCommandBuffers(context->device, &cmds_allocation_info, &cmds));
-
-    VkCommandBufferBeginInfo command_buffer_begin_info{};
-    command_buffer_begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    command_buffer_begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-    assert(VK_SUCCESS == vkBeginCommandBuffer(cmds, &command_buffer_begin_info));
-
+                                CommandBuffer *command_buffer) {
     // Sets the frame buffer and makes preparation for this render pass.
     VkRenderPassBeginInfo render_pass_begin_info{};
     render_pass_begin_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -111,60 +93,26 @@ VkCommandBuffer StartRenderPass(RenderPass const &render_pass, FrameBuffer const
         render_pass_begin_info.clearValueCount = frame_buffer.clear_values.size();
     }
 
-    vkCmdBeginRenderPass(cmds, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdBeginRenderPass(command_buffer->buffer, &render_pass_begin_info,
+                         VK_SUBPASS_CONTENTS_INLINE);
 
-    return cmds;
+    return command_buffer->buffer;
 }
 
-Fulfillment FinishRenderPass(VkCommandBuffer cmds, unsigned completion_signal_count,
-                             std::vector<GpuPromise *> const &prerequisites,
-                             VulkanContext *context) {
-    // Finalizes the render pass and command buffers.
-    vkCmdEndRenderPass(cmds);
-    assert(VK_SUCCESS == vkEndCommandBuffer(cmds));
-
-    // For render pass synchronization.
-    std::vector<VkSemaphore> waits(prerequisites.size());
-    for (unsigned i = 0; i < prerequisites.size(); ++i) {
-        waits[i] = prerequisites[i]->signal;
-    }
-
-    Fulfillment fulfillment(cmds, context);
-
-    std::vector<VkSemaphore> signals(completion_signal_count);
-    for (unsigned i = 0; i < completion_signal_count; ++i) {
-        GpuPromise promise(context);
-        signals[i] = promise.signal;
-        fulfillment.child_operations_signal.emplace_back(std::move(promise));
-    }
-
-    // Submit command buffers.
-    VkSubmitInfo submit{};
-    submit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    submit.pWaitSemaphores = waits.data();
-    submit.waitSemaphoreCount = waits.size();
-    submit.pWaitDstStageMask = &wait_stage;
-    submit.pSignalSemaphores = signals.data();
-    submit.signalSemaphoreCount = signals.size();
-    submit.pCommandBuffers = &cmds;
-    submit.commandBufferCount = 1;
-
-    assert(VK_SUCCESS == vkQueueSubmit(context->graphics_queue, /*submitCount=*/1, &submit,
-                                       fulfillment.completion.signal));
-
-    return fulfillment;
+void FinishRenderPass(CommandBuffer *command_buffer) {
+    // Finalizes the render pass.
+    vkCmdEndRenderPass(command_buffer->buffer);
 }
 
 void RenderDrawables(std::vector<DrawableInstance> const &drawables,
                      GraphicsPipeline const &pipeline, ShaderUniformLayout const &uniform_layout,
                      RenderPassConfiguratorInterface const &configurator,
-                     TransferContext *transfer_context, VkCommandBuffer cmds) {
+                     TransferContext *transfer_context, CommandBuffer *command_buffer) {
     std::unordered_set<DrawableInstance const *> excluded =
         UploadResources(drawables, configurator, transfer_context);
 
     // Sends drawable instances through the graphics pipeline.
-    vkCmdBindPipeline(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline);
+    vkCmdBindPipeline(command_buffer->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline);
     for (auto const &instance : drawables) {
         if (excluded.find(&instance) != excluded.end()) {
             continue;
@@ -196,7 +144,8 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
         if (texture_group.id != kNullUuid) {
             DescriptorSet *desc_set =
                 transfer_context->texture_descriptor_set_cache.DescriptorSetFor(texture_group);
-            vkCmdBindDescriptorSets(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
+            vkCmdBindDescriptorSets(command_buffer->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                    uniform_layout.layout,
                                     /*firstSet=*/DescriptorSetType::DST_PER_DRAWABLE,
                                     /*descriptorSetCount=*/1, &desc_set->descriptor_set,
                                     /*dynamicOffsetCount=*/0,
@@ -205,32 +154,32 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
 
         std::vector<uint8_t> push_constant = configurator.PushConstantOf(instance);
         if (uniform_layout.push_constant_range.has_value() && !push_constant.empty()) {
-            vkCmdPushConstants(cmds, uniform_layout.layout,
+            vkCmdPushConstants(command_buffer->buffer, uniform_layout.layout,
                                /*stageFlags=*/uniform_layout.push_constant_range->stageFlags,
                                /*offset=*/0, push_constant.size(), push_constant.data());
         }
 
         VkDeviceSize offset = 0;
-        vkCmdBindVertexBuffers(cmds, /*firstBinding=*/0, /*bindingCount=*/1,
+        vkCmdBindVertexBuffers(command_buffer->buffer, /*firstBinding=*/0, /*bindingCount=*/1,
                                &gpu_geometry.vertex_buffer->buffer,
                                /*pOffsets=*/&offset);
-        vkCmdBindIndexBuffer(cmds, gpu_geometry.index_buffer->buffer, /*offset=*/0,
-                             gpu_geometry.index_element_type);
+        vkCmdBindIndexBuffer(command_buffer->buffer, gpu_geometry.index_buffer->buffer,
+                             /*offset=*/0, gpu_geometry.index_element_type);
 
         // Draw call.
-        vkCmdDrawIndexed(cmds, instance.geometry->indices.index_count,
+        vkCmdDrawIndexed(command_buffer->buffer, instance.geometry->indices.index_count,
                          /*instanceCount=*/1, /*firstIndex=*/0, /*vertexOffset=*/0,
                          /*firstInstance=*/0);
     }
 }
 
 void PostProcess(GraphicsPipeline const &pipeline, ShaderUniformLayout const &uniform_layout,
-                 SetPostProcessorUniformsFn const &set_uniforms_fn, VkCommandBuffer cmds) {
-    vkCmdBindPipeline(cmds, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline);
+                 SetPostProcessorUniformsFn const &set_uniforms_fn, CommandBuffer *command_buffer) {
+    vkCmdBindPipeline(command_buffer->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline);
 
-    set_uniforms_fn(uniform_layout, cmds);
+    set_uniforms_fn(uniform_layout, command_buffer);
 
-    vkCmdDraw(cmds, /*vertex_count=*/3, /*instanceCount=*/2, /*firstVertex=*/0,
+    vkCmdDraw(command_buffer->buffer, /*vertex_count=*/3, /*instanceCount=*/2, /*firstVertex=*/0,
               /*firstInstance=*/0);
 }
 

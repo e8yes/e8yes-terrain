@@ -20,7 +20,9 @@
 
 #include <memory>
 
+#include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
+#include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {
@@ -31,10 +33,15 @@ namespace e8 {
  *
  * @param ldr_image An LDR RGB image where the alpha channel is populated with the color's
  * luminance value.
+ * @param color_image_output The output which stores the anti-aliased image.
  * @param transfer_context Transfer context.
- * @param target The target stage which stores the anti-aliased LDR color image.
+ * @param dag DAG context.
+ * @return The operation which performs anti-aliasing to the LDR color image.
  */
-void DoFxaa(DagOperation *ldr_image, TransferContext *transfer_context, DagOperation *target);
+DagOperationInstance
+DoFxaa(DagOperationInstance ldr_image,
+       const std::shared_ptr<GraphicsPipelineOutputInterface> &color_image_output,
+       TransferContext *transfer_context, DagContext *dag);
 
 } // namespace e8
 

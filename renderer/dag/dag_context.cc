@@ -21,6 +21,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vulkan/vulkan.h>
 
 #include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
@@ -29,13 +30,16 @@
 namespace e8 {
 namespace {
 
-uint64_t const kMaxSessionAndUsageCountDifference = 10;
+uint64_t const kMaxSessionAndUsageCountDifference = 1000;
 
 } // namespace
 
-DagContext::DagContext(VulkanContext *context) : context_(context), in_session_(false) {
+DagContext::DagContext(VulkanContext *context)
+    : context_(context), session_count_(0), in_session_(false) {
     assert(context != nullptr);
 }
+
+DagContext::~DagContext() { vkDeviceWaitIdle(context_->device); }
 
 DagContext::Session::Session(DagContext *dag_context) : self_(dag_context) {
     ++self_->session_count_;

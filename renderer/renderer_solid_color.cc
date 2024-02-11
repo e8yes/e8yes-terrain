@@ -18,6 +18,7 @@
 #include <chrono>
 #include <memory>
 #include <optional>
+#include <vector>
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
@@ -25,7 +26,8 @@
 #include "content/scene.h"
 #include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
-#include "renderer/dag/graphics_pipeline_output.h"
+#include "renderer/dag/frame_resource_allocator.h"
+#include "renderer/dag/graphics_pipeline_output_common.h"
 #include "renderer/proto/renderer.pb.h"
 #include "renderer/renderer.h"
 #include "renderer/renderer_solid_color.h"
@@ -39,10 +41,11 @@ struct SolidColorRenderer::SolidColorRendererImpl {
     ~SolidColorRendererImpl();
 
     DagContext dag_context;
+    FrameResourceAllocator frame_resource_allocator;
 };
 
 SolidColorRenderer::SolidColorRendererImpl::SolidColorRendererImpl(VulkanContext *context)
-    : dag_context(context) {}
+    : dag_context(context), frame_resource_allocator(context) {}
 
 SolidColorRenderer::SolidColorRendererImpl::~SolidColorRendererImpl() {}
 
@@ -56,14 +59,13 @@ void SolidColorRenderer::DrawFrame(Scene *scene, ResourceAccessor * /*resource_a
 
     DagContext::Session session = pimpl_->dag_context.CreateSession();
 
-    DagOperation *first_stage = this->DoFirstStage();
-    std::shared_ptr<GraphicsPipelineOutputInterface> final_color_output =
-        RendererInterface::FinalColorImage();
-    DagOperationInstance filled_image = DoFillColor(
-        scene->background_color, first_stage, final_color_output, context, &pimpl_->dag_context);
-    DagOperation *final_stage = this->DoFinalStage(first_stage, filled_image);
-
-    final_stage->Fulfill(context);
+    std::shared_ptr<SwapChainOutput> final_color_image =
+        this->AcquireFinalColorImage(&pimpl_->frame_resource_allocator);
+    DagOperationInstance filled_image =
+        DoFillColor(scene->background_color, final_color_image, context, &pimpl_->dag_context);
+    std::vector<GpuPromise *> final_waits =
+        filled_image->Fulfill(/*wait=*/false, &pimpl_->frame_resource_allocator, context);
+    this->PresentFinalColorImage(*final_color_image, final_waits);
 }
 
 void SolidColorRenderer::ApplyConfiguration(RendererConfiguration const & /*config*/) {}

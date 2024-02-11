@@ -20,32 +20,11 @@
 
 #include <memory>
 
-#include "common/device.h"
+#include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {
-
-/**
- * @brief CreateLogLuminaneStage Creates a log luminance stage with a 16-bit float image output in
- * the specified dimension.
- *
- * @param width The width of the log luminance map.
- * @param height The height of the log luminance map.
- * @param context Contextual Vulkan handles.
- * @return A pipeline stage created with the 16-bit float image output.
- */
-std::unique_ptr<DagOperation> CreateLogLuminaneStage(unsigned width, unsigned height,
-                                                     VulkanContext *context);
-
-/**
- * @brief CreateExposureStage Creates an exposure stage with a 1 by 1 16-bit float image output for
- * storing the exposure value.
- *
- * @param context Contextual Vulkan handles.
- * @return A pipeline stage created with the 1 by 1 16-bit float image output.
- */
-std::unique_ptr<DagOperation> CreateExposureStage(VulkanContext *context);
 
 /**
  * @brief DoEstimateExposure Estimates the exposure of a radiance map. Precisely, it transforms the
@@ -54,11 +33,13 @@ std::unique_ptr<DagOperation> CreateExposureStage(VulkanContext *context);
  *
  * @param radiance_map The raw radiance image to estimate exposure for.
  * @param transfer_context Transfer context.
+ * @param dag DAG context.
  * @param log_luminance_map The target stage which stores the logarithmic luminance values.
  * @param log_exposure The target stage which stares the logarithmic exposure value.
  */
-void DoEstimateExposure(DagOperation *radiance_map, TransferContext *transfer_context,
-                        DagOperation *log_luminance_map, DagOperation *log_exposure);
+void DoEstimateExposure(DagOperationInstance radiance_map, TransferContext *transfer_context,
+                        DagContext *dag, DagOperationInstance *log_luminance_map,
+                        DagOperationInstance *log_exposure);
 
 } // namespace e8
 

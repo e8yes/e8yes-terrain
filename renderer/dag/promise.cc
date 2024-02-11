@@ -62,6 +62,10 @@ void CpuPromise::Wait() {
                                          /*timeout=*/std::numeric_limits<uint64_t>::max()));
 }
 
+void CpuPromise::Reset() {
+    assert(VK_SUCCESS == vkResetFences(context_->device, /*fenceCount=*/1, &signal));
+}
+
 GpuPromise::GpuPromise(VulkanContext *context) : context_(context) {
     VkSemaphoreCreateInfo semaphore_info{};
     semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -86,27 +90,6 @@ GpuPromise &GpuPromise::operator=(GpuPromise &&other) {
     return *this;
 }
 
-Fulfillment::Fulfillment(VkCommandBuffer cmds, VulkanContext *context)
-    : cmds(cmds), completion(context), context_(context) {}
-
-Fulfillment::Fulfillment(Fulfillment &&other)
-    : cmds(VK_NULL_HANDLE), completion(/*context=*/nullptr), context_(nullptr) {
-    *this = std::move(other);
-}
-
-Fulfillment &Fulfillment::operator=(Fulfillment &&other) {
-    std::swap(cmds, other.cmds);
-    std::swap(completion, other.completion);
-    std::swap(child_operations_signal, other.child_operations_signal);
-    context_ = other.context_;
-    return *this;
-}
-
-Fulfillment::~Fulfillment() {
-    if (cmds != VK_NULL_HANDLE) {
-        vkFreeCommandBuffers(context_->device, context_->command_pool, /*commandBufferCount=*/1,
-                             &cmds);
-    }
-}
+void GpuPromise::Reset() {}
 
 } // namespace e8

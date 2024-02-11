@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "common/device.h"
+#include "renderer/dag/frame_resource_allocator.h"
 #include "renderer/dag/graphics_pipeline.h"
 #include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/dag/promise.h"
@@ -91,9 +92,12 @@ class DagOperation {
      * stage because, typically, the final stage is a v-sync that has to be resolved in the next
      * frame.
      *
+     * @param wait
+     * @param promise_allocator
      * @param context Contextual Vulkan handles.
      */
-    void Fulfill(VulkanContext *context);
+    std::vector<GpuPromise *> Fulfill(bool wait, FrameResourceAllocator *frame_resource_allocator,
+                                      VulkanContext *context);
 
   private:
     using ChildId = unsigned;
@@ -102,15 +106,34 @@ class DagOperation {
     struct ParentStage;
     struct PipelineSchedule;
     struct PipelineAndSchedules;
+
+    struct Fulfillment {
+        Fulfillment(CpuPromise *completion, std::vector<GpuPromise *> child_operations_signal);
+
+        // A host signal for notifying when the operation associated with this fulfillment is
+        // resolved.
+        CpuPromise *completion;
+
+        // For signaling child operations. Each child operation should index into this array to find
+        // its signal.
+        std::vector<GpuPromise *> child_operations_signal;
+    };
+
     ChildId AllocateChild();
 
     std::unordered_set<DagOperation *> UniqueParents();
 
+    std::vector<GpuPromise *> PickUpChildOperationsSignal(std::optional<unsigned> child_id) const;
+
     Fulfillment LaunchSchedule(GraphicsPipelineInterface *pipeline,
                                PipelineSchedule const &schedule, unsigned child_count,
-                               GraphicsPipelineOutputInterface *output);
+                               GraphicsPipelineOutputInterface *output,
+                               FrameResourceAllocator *frame_resource_allocator,
+                               VulkanContext *context);
 
-    std::vector<GpuPromise *> LaunchSchedulesAs(std::optional<ChildId> child_id);
+    std::vector<GpuPromise *> LaunchSchedulesAs(std::optional<ChildId> child_id,
+                                                FrameResourceAllocator *frame_resource_allocator,
+                                                VulkanContext *context);
 
     void Reset();
 

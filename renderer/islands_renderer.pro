@@ -9,10 +9,13 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 
 QMAKE_CXXFLAGS += -std=c++17
 QMAKE_CXXFLAGS += -DBOOST_LOG_DYN_LINK
+QMAKE_CXXFLAGS_DEBUG += -Og
+QMAKE_CXXFLAGS_DEBUG += -fsanitize=address
 QMAKE_CXXFLAGS_RELEASE -= -O2
-QMAKE_CXXFLAGS_RELEASE += -O3 -flto -march=native
+QMAKE_CXXFLAGS_RELEASE += -O3 -flto=auto -march=native
+QMAKE_LFLAGS_DEBUG += -fsanitize=address
 QMAKE_LFLAGS_RELEASE -= -Wl,-O1
-QMAKE_LFLAGS_RELEASE += -O3 -flto -march=native
+QMAKE_LFLAGS_RELEASE += -O3 -flto=auto -march=native
 
 INCLUDEPATH += ../
 
@@ -26,6 +29,7 @@ macx {
 
 SOURCES += \
     basic/attachment.cc \
+    basic/command_buffer.cc \
     basic/fixed_function.cc \
     basic/frame_buffer.cc \
     basic/mipmap.cc \
@@ -39,6 +43,7 @@ SOURCES += \
     basic/vertex_input.cc \
     dag/dag_context.cc \
     dag/dag_operation.cc \
+    dag/frame_resource_allocator.cc \
     dag/graphics_pipeline.cc \
     dag/graphics_pipeline_output.cc \
     dag/graphics_pipeline_output_common.cc \
@@ -78,6 +83,7 @@ SOURCES += \
 
 HEADERS += \
     basic/attachment.h \
+    basic/command_buffer.h \
     basic/fixed_function.h \
     basic/frame_buffer.h \
     basic/mipmap.h \
@@ -91,6 +97,7 @@ HEADERS += \
     basic/vertex_input.h \
     dag/dag_context.h \
     dag/dag_operation.h \
+    dag/frame_resource_allocator.h \
     dag/graphics_pipeline.h \
     dag/graphics_pipeline_output.h \
     dag/graphics_pipeline_output_common.h \

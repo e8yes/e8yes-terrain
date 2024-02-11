@@ -23,10 +23,11 @@
 #include <mutex>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "common/device.h"
 #include "content/scene.h"
-#include "renderer/dag/dag_operation.h"
+#include "renderer/dag/frame_resource_allocator.h"
 #include "renderer/dag/graphics_pipeline_output_common.h"
 #include "renderer/proto/renderer.pb.h"
 #include "resource/accessor.h"
@@ -102,36 +103,18 @@ class RendererInterface {
 
   protected:
     /**
-     * @brief DoFirstStage Creates the first stage of the current frame. The first stage waits for
-     * the v-sync.
+     * @brief AcquireFinalColorImage Waits until a swapchain image is available.
      */
-    DagOperation *DoFirstStage();
+    std::shared_ptr<SwapChainOutput>
+    AcquireFinalColorImage(FrameResourceAllocator *frame_resource_allocator);
 
     /**
-     * @brief DoFinalStage Creates the final stage of the current frame. The final stage presents
-     * the color map to the screen.
-     *
-     * @param first_stage Returned by RendererInterface::DoFirstStage().
-     * @param final_color_image_stage Returned by RendererInterface::ColorMapStage().
-     * @param dangling_stages Additional stages that potentially don't connect to the
-     * final_color_image_stage.
-     * @return The final stage.
+     * @brief PresentFinalColorImage Presents the specified color image to the screen.
+     * @param output The color image to be presented.
+     * @param waits A set of signals of operations which must finish prior the presentation.
      */
-    DagOperation *DoFinalStage(
-        DagOperation *first_stage, DagOperation *final_color_image_stage,
-        std::vector<DagOperation *> const &dangling_stages = std::vector<DagOperation *>());
-
-    /**
-     * @brief FinalColorImage Returns the final color image output, which stores the final rendering
-     * result.
-     */
-    std::shared_ptr<SwapChainOutput> FinalColorImage() const;
-
-    /**
-     * @brief FinalColorImageStage Creates a color map stage. A color map is an image which will be
-     * presented as the final rendering result. It's also the last customizable pipeline stage.
-     */
-    std::unique_ptr<DagOperation> FinalColorImageStage() const;
+    void PresentFinalColorImage(SwapChainOutput const &output,
+                                std::vector<GpuPromise *> const &final_waits);
 
     /**
      * @brief BeginStage Marks the beginning of a stage.
@@ -150,8 +133,6 @@ class RendererInterface {
   private:
     std::vector<StagePerformance> stage_performance_;
     std::shared_ptr<SwapChainOutput> final_output_;
-    DagOperation first_stage_;
-    DagOperation final_stage_;
     std::unique_ptr<std::mutex> mu_;
 };
 

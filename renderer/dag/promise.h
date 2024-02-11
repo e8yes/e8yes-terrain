@@ -20,6 +20,7 @@
 
 #include <memory>
 #include <utility>
+#include <vector>
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
@@ -49,6 +50,11 @@ struct CpuPromise {
      */
     void Wait();
 
+    /**
+     * @brief Reset
+     */
+    void Reset();
+
     // The task's CPU signal.
     VkFence signal;
 
@@ -75,41 +81,13 @@ struct GpuPromise {
 
     GpuPromise &operator=(GpuPromise &&other);
 
+    /**
+     * @brief Reset
+     */
+    void Reset();
+
     // Task's signal.
     VkSemaphore signal;
-
-    // Contextual Vulkan handles.
-    VulkanContext *context_;
-};
-
-/**
- * @brief The Fulfillment struct A promise-like abstraction of an asychronous GPU operation.
- */
-struct Fulfillment {
-    /**
-     * @brief Fulfillment Constructs an empty fulfillment. Completion signal and child operations'
-     * signal need to be assigned after the construction.
-     *
-     * @param cmds Optional. The GPU commands (task) that are running asynchronously. This class
-     * manages the lifecycle of the command buffer.
-     * @param context Contextual Vulkan handles.
-     */
-    Fulfillment(VkCommandBuffer cmds, VulkanContext *context);
-    Fulfillment(Fulfillment const &) = delete;
-    Fulfillment(Fulfillment &&other);
-    ~Fulfillment();
-
-    Fulfillment &operator=(Fulfillment &&other);
-
-    // Optional. The GPU commands (task) that are running asynchronously.
-    VkCommandBuffer cmds;
-
-    // A host signal for notifying when the operation associated with this fulfillment is resolved.
-    CpuPromise completion;
-
-    // For signaling child operations. Each child operation should index into this array to find its
-    // signal.
-    std::vector<GpuPromise> child_operations_signal;
 
     // Contextual Vulkan handles.
     VulkanContext *context_;

@@ -20,6 +20,7 @@
 
 #include <memory>
 
+#include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/drawable/light_source.h"
 #include "renderer/transfer/context.h"
@@ -38,14 +39,15 @@ namespace e8 {
  * source's perspective. Each depth map corresponds to one of the light source's region
  * (see LightVolume). When it is specified, this function computes the radiance based on the
  * occlusion factor. Otherwise, the radiance penetrates all objects.
- * @param cleared_radiance_map A zeroed-out radiance map.
  * @param transfer_context Transfer context.
- * @param target The target stage which stores the radiance map in an HDR color image.
+ * @param dag DAG context.
+ * @return The operation which computes the radiance map in an HDR color image.
  */
-void DoComputeRadiance(LightSourceInstance const &instance, DagOperation *projected_surface,
-                       frustum const &projection, std::vector<DagOperation *> const &shadow_maps,
-                       DagOperation *cleared_radiance_map, TransferContext *transfer_context,
-                       DagOperation *target);
+DagOperationInstance DoComputeRadiance(LightSourceInstance const &instance,
+                                       DagOperationInstance projected_surface,
+                                       frustum const &projection,
+                                       std::vector<DagOperationInstance> const &shadow_maps,
+                                       TransferContext *transfer_context, DagContext *dag);
 
 } // namespace e8
 

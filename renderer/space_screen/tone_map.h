@@ -18,25 +18,11 @@
 #ifndef ISLANDS_RENDERER_SPACE_SCREEN_TONE_MAP_H
 #define ISLANDS_RENDERER_SPACE_SCREEN_TONE_MAP_H
 
-#include <memory>
-
-#include "common/device.h"
+#include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {
-
-/**
- * @brief CreateLdrImageStage Creates an LDR (low dynamic range) image stage with a 32-bit RGBA
- * color image output in the specified dimension.
- *
- * @param width The width of the color image.
- * @param height The height of the color image.
- * @param context Contextual Vulkan handles.
- * @return An LDR image stage with a color image output.
- */
-std::unique_ptr<DagOperation> CreateLdrImageStage(unsigned width, unsigned height,
-                                                  VulkanContext *context);
 
 /**
  * @brief DoToneMapping Maps radiance values to the displayable color range. Besides that, it also
@@ -47,11 +33,11 @@ std::unique_ptr<DagOperation> CreateLdrImageStage(unsigned width, unsigned heigh
  * @param exposure Optional. It only uses the ACES tone mapper when the exposure value is provided.
  * Otherwise, it simply clamps the radiance value into the [0, 1] range.
  * @param transfer_context Transfer context.
- * @param target The target stage which stores the tone mapped LDR color image. It should be created
- * through CreateLdrImageStage().
+ * @param dag DAG context.
+ * @return The target which tone maps the radiance map to an LDR color image.
  */
-void DoToneMapping(DagOperation *radiance_map, DagOperation *exposure,
-                   TransferContext *transfer_context, DagOperation *target);
+DagOperationInstance DoToneMapping(DagOperationInstance radiance_map, DagOperationInstance exposure,
+                                   TransferContext *transfer_context, DagContext *dag);
 
 } // namespace e8
 

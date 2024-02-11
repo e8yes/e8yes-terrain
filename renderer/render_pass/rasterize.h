@@ -24,12 +24,11 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
-#include "common/device.h"
+#include "renderer/basic/command_buffer.h"
 #include "renderer/basic/frame_buffer.h"
 #include "renderer/basic/pipeline.h"
 #include "renderer/basic/render_pass.h"
 #include "renderer/basic/uniform_layout.h"
-#include "renderer/dag/promise.h"
 #include "renderer/drawable/drawable_instance.h"
 #include "renderer/render_pass/configurator.h"
 #include "renderer/transfer/context.h"
@@ -37,30 +36,21 @@
 namespace e8 {
 
 /**
- * @brief StartRenderPass Allocates a command buffer and makes preparation for the render pass.
+ * @brief StartRenderPass Makes preparation for the render pass.
  *
  * @param pass The render pass to run.
  * @param frame_buffer The frame buffer to store the output of this render pass.
- * @param context Contextual Vulkan handles.
- * @return The allocated command buffer.
+ * @return cmds Command buffer.
  */
 VkCommandBuffer StartRenderPass(RenderPass const &pass, FrameBuffer const &frame_buffer,
-                                VulkanContext *context);
+                                CommandBuffer *command_buffer);
 
 /**
- * @brief FinishRenderPass Submits the command buffer to the graphics queue to have it been
- * executed asynchronously and returns a fulfillment which represents the state of the execution.
+ * @brief FinishRenderPass Marks the completion of a render pass.
  *
- * @param cmds The command buffer to be submitted.
- * @param completion_signal_count The number of completion signals to generate once it completes the
- * execution of the commands.
- * @param prerequisites Dependent signals to wait upon before executing the commands.
- * @param context Contextual Vulkan handles.
- * @return The fulfillment which represents the state of the asynchronous command execution.
+ * @param cmds Command buffer.
  */
-Fulfillment FinishRenderPass(VkCommandBuffer cmds, unsigned completion_signal_count,
-                             std::vector<GpuPromise *> const &prerequisites,
-                             VulkanContext *context);
+void FinishRenderPass(CommandBuffer *command_buffer);
 
 /**
  * @brief RenderDrawables Renders an array of drawables with the specified graphics pipeline. Note,
@@ -75,11 +65,11 @@ Fulfillment FinishRenderPass(VkCommandBuffer cmds, unsigned completion_signal_co
 void RenderDrawables(std::vector<DrawableInstance> const &drawables,
                      GraphicsPipeline const &pipeline, ShaderUniformLayout const &uniform_layout,
                      RenderPassConfiguratorInterface const &configurator,
-                     TransferContext *transfer_context, VkCommandBuffer cmds);
+                     TransferContext *transfer_context, CommandBuffer *command_buffer);
 
 // Represents a function which sets the value of uniform variables for screen space processing.
 using SetPostProcessorUniformsFn =
-    std::function<void(ShaderUniformLayout const &uniform_layout, VkCommandBuffer cmds)>;
+    std::function<void(ShaderUniformLayout const &uniform_layout, CommandBuffer *command_buffer)>;
 
 /**
  * @brief PostProcess Renders a quad that fills the pipeline output.
@@ -90,7 +80,7 @@ using SetPostProcessorUniformsFn =
  * @param cmds The command buffer to which draw commands will be added.
  */
 void PostProcess(GraphicsPipeline const &pipeline, ShaderUniformLayout const &uniform_layout,
-                 SetPostProcessorUniformsFn const &set_uniforms_fn, VkCommandBuffer cmds);
+                 SetPostProcessorUniformsFn const &set_uniforms_fn, CommandBuffer *command_buffer);
 
 } // namespace e8
 

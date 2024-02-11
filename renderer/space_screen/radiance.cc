@@ -22,7 +22,9 @@
 #include "common/tensor.h"
 #include "content/proto/light_source.pb.h"
 #include "renderer/basic/shader.h"
+#include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
+#include "renderer/dag/graphics_pipeline_output_common.h"
 #include "renderer/drawable/light_source.h"
 #include "renderer/space_projection/project_surface.h"
 #include "renderer/space_screen/radiance.h"
@@ -32,6 +34,7 @@
 namespace e8 {
 namespace {
 
+PipelineKey const kRadiancePipeline = "Radiance";
 PipelineKey const kSunLightPipeline = "Sun Light";
 PipelineKey const kPointLightPipeline = "Point Light";
 PipelineKey const kSpotLightPipeline = "Spot Light";
@@ -199,12 +202,29 @@ void SpotLightPostProcessorConfigurator::PushConstants(std::vector<uint8_t> *pus
     parameters->rec_z_b = light_inputs_frustum_.ZUnprojectionConstantB();
 }
 
+std::unique_ptr<DagOperation> CreateRadianceOp(unsigned width, unsigned height,
+                                               VulkanContext *context) {
+    auto output =
+        std::make_shared<HdrColorOutput>(width, height, /*with_depth_buffer=*/false, context);
+    return std::make_unique<DagOperation>(output);
+}
+
 } // namespace
 
-void DoComputeRadiance(LightSourceInstance const &instance, DagOperation *projected_surface,
-                       frustum const &projection, std::vector<DagOperation *> const &shadow_maps,
-                       DagOperation *cleared_radiance_map, TransferContext *transfer_context,
-                       DagOperation *target) {
+DagOperationInstance DoComputeRadiance(LightSourceInstance const &instance,
+                                       DagOperationInstance projected_surface,
+                                       frustum const &projection,
+                                       std::vector<DagOperationInstance> const &shadow_maps,
+                                       TransferContext *transfer_context, DagContext *dag) {
+    DagContext::DagOperationKey op_key =
+        CreateDagOperationKey(kRadiancePipeline, projected_surface->Output()->Width(),
+                              projected_surface->Output()->Height());
+    DagOperationInstance target =
+        dag->WithOperation(op_key, [projected_surface](VulkanContext *context) {
+            return CreateRadianceOp(projected_surface->Output()->Width(),
+                                    projected_surface->Output()->Height(), context);
+        });
+
     GraphicsPipelineInterface *pipeline;
     std::unique_ptr<ScreenSpaceConfiguratorInterface> configurator;
 
@@ -262,12 +282,13 @@ void DoComputeRadiance(LightSourceInstance const &instance, DagOperation *projec
     }
     }
 
-    std::vector<DagOperation *> depending_parents{projected_surface, cleared_radiance_map};
+    std::vector<DagOperationInstance> depending_parents{projected_surface};
     for (auto shadow_map : shadow_maps) {
         depending_parents.push_back(shadow_map);
     }
 
     target->Schedule(pipeline, std::move(configurator), depending_parents);
+    return target;
 }
 
 } // namespace e8

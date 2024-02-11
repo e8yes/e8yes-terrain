@@ -18,10 +18,12 @@
 #include <memory>
 
 #include "renderer/basic/shader.h"
+#include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/space_screen/fxaa.h"
 #include "renderer/space_screen/screen_space_processor.h"
+#include "renderer/transfer/context.h"
 
 namespace e8 {
 namespace {
@@ -51,7 +53,16 @@ void FxaaPipelineConfigurator::InputImages(std::vector<VkImageView> *input_image
 
 } // namespace
 
-void DoFxaa(DagOperation *ldr_image, TransferContext *transfer_context, DagOperation *target) {
+DagOperationInstance
+DoFxaa(DagOperationInstance ldr_image,
+       const std::shared_ptr<GraphicsPipelineOutputInterface> &color_image_output,
+       TransferContext *transfer_context, DagContext *dag) {
+    DagContext::DagOperationKey op_key = CreateDagOperationKey(
+        kFxaaPipeline, ldr_image->Output()->Width(), ldr_image->Output()->Height());
+    DagOperationInstance target = dag->WithOperation(op_key, [color_image_output](VulkanContext *) {
+        return std::make_unique<DagOperation>(color_image_output);
+    });
+
     GraphicsPipelineInterface *pipeline = target->WithPipeline(
         kFxaaPipeline, [transfer_context](GraphicsPipelineOutputInterface *aa_output) {
             return std::make_unique<ScreenSpaceProcessorPipeline>(
@@ -62,6 +73,8 @@ void DoFxaa(DagOperation *ldr_image, TransferContext *transfer_context, DagOpera
     auto configurator = std::make_unique<FxaaPipelineConfigurator>(*ldr_image->Output());
     target->Schedule(pipeline, std::move(configurator),
                      /*parents=*/std::vector<DagOperation *>{ldr_image});
+
+    return target;
 }
 
 } // namespace e8

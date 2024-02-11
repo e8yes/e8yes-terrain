@@ -22,13 +22,13 @@
 
 #include "common/device.h"
 #include "common/tensor.h"
+#include "renderer/basic/command_buffer.h"
 #include "renderer/basic/frame_buffer.h"
 #include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/dag/graphics_pipeline.h"
 #include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/dag/graphics_pipeline_output_common.h"
-#include "renderer/dag/promise.h"
 #include "renderer/render_pass/rasterize.h"
 #include "renderer/space_screen/fill_color.h"
 
@@ -45,38 +45,25 @@ struct FillColorArguments : public GraphicsPipelineArgumentsInterface {
 
 class FillColorPipeline : public GraphicsPipelineInterface {
   public:
-    FillColorPipeline(VulkanContext *context);
-    ~FillColorPipeline() override;
+    FillColorPipeline(VulkanContext *context) : GraphicsPipelineInterface(context) {}
+    ~FillColorPipeline() override = default;
 
-    PipelineKey Key() const override;
+    PipelineKey Key() const override { return kFillColorPipeline; }
 
-    Fulfillment Launch(GraphicsPipelineArgumentsInterface const &generic_args,
-                       std::vector<GpuPromise *> const &prerequisites,
-                       unsigned completion_signal_count,
-                       GraphicsPipelineOutputInterface *output) override;
+    void Launch(GraphicsPipelineArgumentsInterface const &generic_args,
+                GraphicsPipelineOutputInterface *output, CommandBuffer *command_buffer) override {
+        FillColorArguments const &args = static_cast<FillColorArguments const &>(generic_args);
+
+        FrameBuffer *frame_buffer = output->GetFrameBuffer();
+
+        frame_buffer->clear_values[0].color.float32[0] = args.color(0);
+        frame_buffer->clear_values[0].color.float32[1] = args.color(1);
+        frame_buffer->clear_values[0].color.float32[2] = args.color(2);
+
+        StartRenderPass(output->GetRenderPass(), *frame_buffer, command_buffer);
+        FinishRenderPass(command_buffer);
+    }
 };
-
-FillColorPipeline::FillColorPipeline(VulkanContext *context) : GraphicsPipelineInterface(context) {}
-
-FillColorPipeline::~FillColorPipeline() {}
-
-PipelineKey FillColorPipeline::Key() const { return kFillColorPipeline; }
-
-Fulfillment FillColorPipeline::Launch(GraphicsPipelineArgumentsInterface const &generic_args,
-                                      std::vector<GpuPromise *> const &prerequisites,
-                                      unsigned completion_signal_count,
-                                      GraphicsPipelineOutputInterface *output) {
-    FillColorArguments const &args = static_cast<FillColorArguments const &>(generic_args);
-
-    FrameBuffer *frame_buffer = output->GetFrameBuffer();
-
-    frame_buffer->clear_values[0].color.float32[0] = args.color(0);
-    frame_buffer->clear_values[0].color.float32[1] = args.color(1);
-    frame_buffer->clear_values[0].color.float32[2] = args.color(2);
-
-    VkCommandBuffer cmds = StartRenderPass(output->GetRenderPass(), *frame_buffer, context_);
-    return FinishRenderPass(cmds, completion_signal_count, prerequisites, context_);
-}
 
 std::unique_ptr<DagOperation> CreateFillColorOp(unsigned width, unsigned height, bool hdr,
                                                 VulkanContext *context) {
@@ -92,44 +79,46 @@ std::unique_ptr<DagOperation> CreateFillColorOp(unsigned width, unsigned height,
     return std::make_unique<DagOperation>(output);
 }
 
-void ConfigureFillColorOp(vec3 const &color, DagOperationInstance frame, VulkanContext *context,
-                          DagOperationInstance filled_image) {
+void ConfigureFillColorOp(vec3 const &color, DagOperationInstance dependent_op,
+                          VulkanContext *context, DagOperationInstance filled_image) {
     GraphicsPipelineInterface *pipeline = filled_image->WithPipeline(
         kFillColorPipeline, [context](GraphicsPipelineOutputInterface * /*output*/) {
             return std::make_unique<FillColorPipeline>(context);
         });
     auto args = std::make_unique<FillColorArguments>(color);
     filled_image->Schedule(pipeline, std::move(args),
-                           /*parents=*/std::vector<DagOperation *>{frame});
+                           /*parents=*/std::vector<DagOperation *>{dependent_op});
 }
 
 } // namespace
 
 DagOperationInstance
-DoFillColor(vec3 const &color, DagOperationInstance frame,
+DoFillColor(vec3 const &color,
             std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output,
             VulkanContext *context, DagContext *dag) {
     DagContext::DagOperationKey key = CreateDagOperationKey(
-        kFillColorPipeline, frame->Output()->Width(), frame->Output()->Height());
+        kFillColorPipeline, color_image_output->Width(), color_image_output->Height());
     DagOperationInstance filled_image =
         dag->WithOperation(key, [color_image_output](VulkanContext *) {
             return std::make_unique<DagOperation>(color_image_output);
         });
 
-    ConfigureFillColorOp(color, frame, context, filled_image);
+    ConfigureFillColorOp(color, /*dependent_op=*/nullptr, context, filled_image);
     return filled_image;
 }
 
-DagOperationInstance DoFillColor(vec3 const &color, bool hdr, DagOperation *frame,
+DagOperationInstance DoFillColor(vec3 const &color, bool hdr, DagOperationInstance image,
                                  VulkanContext *context, DagContext *dag) {
+    assert(image != nullptr);
+
     DagContext::DagOperationKey key = CreateDagOperationKey(
-        kFillColorPipeline, frame->Output()->Width(), frame->Output()->Height());
+        kFillColorPipeline, image->Output()->Width(), image->Output()->Height());
     DagOperationInstance filled_image = dag->WithOperation(key, [hdr,
-                                                                 frame](VulkanContext *context) {
-        return CreateFillColorOp(frame->Output()->Width(), frame->Output()->Height(), hdr, context);
+                                                                 image](VulkanContext *context) {
+        return CreateFillColorOp(image->Output()->Width(), image->Output()->Height(), hdr, context);
     });
 
-    ConfigureFillColorOp(color, frame, context, filled_image);
+    ConfigureFillColorOp(color, image, context, filled_image);
     return filled_image;
 }
 

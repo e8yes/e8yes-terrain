@@ -81,9 +81,18 @@ void SurfaceProjectionVisualizerPostProcessorConfigurator::PushConstants(
 
 } // namespace
 
-void DoVisualizeSurfaceProjection(LightInputsRendererParameters::InputType parameter_to_visualize,
-                                  DagOperation *surface_projection,
-                                  TransferContext *transfer_context, DagOperation *target) {
+DagOperationInstance DoVisualizeSurfaceProjection(
+    LightInputsRendererParameters::InputType parameter_to_visualize,
+    DagOperationInstance surface_projection,
+    std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output,
+    TransferContext *transfer_context, DagContext *dag) {
+    DagContext::DagOperationKey op_key = CreateDagOperationKey(
+        kSurfaceProjectionVisualizerPipeline, surface_projection->Output()->Width(),
+        surface_projection->Output()->Height());
+    DagOperationInstance target = dag->WithOperation(op_key, [color_image_output](VulkanContext *) {
+        return std::make_unique<DagOperation>(color_image_output);
+    });
+
     GraphicsPipelineInterface *pipeline = target->WithPipeline(
         kSurfaceProjectionVisualizerPipeline,
         [transfer_context](GraphicsPipelineOutputInterface *visualizer_output) {
@@ -98,6 +107,8 @@ void DoVisualizeSurfaceProjection(LightInputsRendererParameters::InputType param
         parameter_to_visualize, *surface_projection->Output());
     target->Schedule(pipeline, std::move(configurator),
                      /*parents=*/std::vector<DagOperation *>{surface_projection});
+
+    return target;
 }
 
 } // namespace e8

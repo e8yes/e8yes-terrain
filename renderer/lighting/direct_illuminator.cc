@@ -25,7 +25,6 @@
 #include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/drawable/light_source.h"
-#include "renderer/lighting/direct_illuminator.h"
 #include "renderer/space_projection/project_depth.h"
 #include "renderer/space_screen/fill_color.h"
 #include "renderer/space_screen/gaussian_blur.h"
@@ -41,25 +40,23 @@ GaussianBlurLevel kSpotLightBlurringKernelSize = GaussianBlurLevel::GBL_1X1;
 
 DagOperationInstance DoGenerateSpotLightShadowMap(SpotLightVolume const &spot_light_region,
                                                   DrawableCollection *drawable_collection,
-                                                  DagOperation *first_stage,
                                                   TransferContext *transfer_context,
                                                   DagContext *dag) {
     DagOperationInstance projected_linear_depth = DoProjectLinearDepth(
         drawable_collection, spot_light_region.projection, kSpotLightShadowMapWidth,
-        kSpotLightShadowMapHeight, first_stage, transfer_context, dag);
+        kSpotLightShadowMapHeight, /*dependent_op=*/nullptr, transfer_context, dag);
     return projected_linear_depth;
 }
 
 std::vector<DagOperationInstance> DoGenerateShadowMaps(LightSourceInstance const &light_source,
                                                        DrawableCollection *drawable_collection,
-                                                       DagOperation *first_stage,
                                                        TransferContext *transfer_context,
                                                        DagContext *dag) {
 
     if (light_source.light_volume.spot_light_region.has_value()) {
         DagOperationInstance shadow_map =
             DoGenerateSpotLightShadowMap(*light_source.light_volume.spot_light_region,
-                                         drawable_collection, first_stage, transfer_context, dag);
+                                         drawable_collection, transfer_context, dag);
         // TODO: Blur the shadow map with kSpotLightBlurringKernelSize.
         return std::vector<DagOperationInstance>({shadow_map});
     } else {
@@ -71,30 +68,22 @@ std::vector<DagOperationInstance> DoGenerateShadowMaps(LightSourceInstance const
 } // namespace
 
 DagOperationInstance DoComputeDirectIllumination(DrawableCollection *drawable_collection,
-                                                 DagOperation *projected_surface,
+                                                 DagOperationInstance projected_surface,
                                                  PerspectiveProjection const &projection,
-                                                 DagOperation *first_stage,
                                                  TransferContext *transfer_context,
                                                  DagContext *dag) {
-    DagOperationInstance radiance_map =
-        DoFillColor(/*color=*/vec3{0.0f, 0.0f, 0.0f}, /*hdr=*/true, first_stage,
-                    transfer_context->vulkan_context, dag);
 
     std::vector<LightSourceInstance> light_sources =
         drawable_collection->ObservableLightSources(projection);
     if (light_sources.empty()) {
-        return radiance_map;
+        return DoFillColor(/*color=*/vec3{0.0f, 0.0f, 0.0f}, /*hdr=*/true, projected_surface,
+                           transfer_context->vulkan_context, dag);
+        ;
     }
 
-    for (auto const &light_source : light_sources) {
-        std::vector<DagOperationInstance> shadow_maps = DoGenerateShadowMaps(
-            light_source, drawable_collection, first_stage, transfer_context, dag);
-
-        DoComputeRadiance(light_source, projected_surface, projection.Frustum(), shadow_maps,
-                          first_stage, transfer_context, radiance_map);
-    }
-
-    return radiance_map;
+    return DoComputeRadiance(light_sources[0], projected_surface, projection.Frustum(),
+                             /*shadow_maps=*/std::vector<DagOperationInstance>(), transfer_context,
+                             dag);
 }
 
 } // namespace e8

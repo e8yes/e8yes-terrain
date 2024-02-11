@@ -24,6 +24,8 @@
 #include "content/scene.h"
 #include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
+#include "renderer/dag/frame_resource_allocator.h"
+#include "renderer/dag/graphics_pipeline_output_common.h"
 #include "renderer/drawable/collection.h"
 #include "renderer/lighting/direct_illuminator.h"
 #include "renderer/proto/renderer.pb.h"
@@ -39,36 +41,23 @@
 namespace e8 {
 
 struct RadianceRenderer::RadianceRendererImpl {
-    RadianceRendererImpl(std::unique_ptr<DagOperation> &&final_color_image, VulkanContext *context);
+    RadianceRendererImpl(VulkanContext *context);
     ~RadianceRendererImpl();
 
-    DagContext dag_context;
     TransferContext transfer_context;
-
-    std::unique_ptr<DagOperation> log_luminance_map;
-    std::unique_ptr<DagOperation> log_exposure_value;
-    std::unique_ptr<DagOperation> ldr_image;
-    std::unique_ptr<DagOperation> final_color_image;
-
+    DagContext dag_context;
+    FrameResourceAllocator frame_resource_allocator;
     RendererConfiguration config;
 };
 
-RadianceRenderer::RadianceRendererImpl::RadianceRendererImpl(
-    std::unique_ptr<DagOperation> &&final_color_image, VulkanContext *context)
-    : dag_context(context), transfer_context(context),
-      log_luminance_map(CreateLogLuminaneStage(context->swap_chain_image_extent.width,
-                                               context->swap_chain_image_extent.height, context)),
-      log_exposure_value(CreateExposureStage(context)),
-      ldr_image(CreateLdrImageStage(context->swap_chain_image_extent.width,
-                                    context->swap_chain_image_extent.height, context)),
-      final_color_image(std::move(final_color_image)) {}
+RadianceRenderer::RadianceRendererImpl::RadianceRendererImpl(VulkanContext *context)
+    : transfer_context(context), dag_context(context), frame_resource_allocator(context) {}
 
 RadianceRenderer::RadianceRendererImpl::~RadianceRendererImpl() {}
 
 RadianceRenderer::RadianceRenderer(VulkanContext *context)
     : RendererInterface(/*num_stages=*/1, context),
-      pimpl_(std::make_unique<RadianceRendererImpl>(RendererInterface::FinalColorImageStage(),
-                                                    context)) {}
+      pimpl_(std::make_unique<RadianceRendererImpl>(context)) {}
 
 RadianceRenderer::~RadianceRenderer() {}
 
@@ -80,28 +69,27 @@ void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_access
     // Render passes.
     DagContext::Session session = pimpl_->dag_context.CreateSession();
 
-    DagOperation *first_stage = this->DoFirstStage();
-    DagOperationInstance projected_surface =
-        DoProjectSurface(&drawable_collection, projection, first_stage, &pimpl_->transfer_context,
-                         &pimpl_->dag_context);
+    std::shared_ptr<SwapChainOutput> final_color_image =
+        this->AcquireFinalColorImage(&pimpl_->frame_resource_allocator);
+    DagOperationInstance projected_surface = DoProjectSurface(
+        &drawable_collection, projection, final_color_image->Width(), final_color_image->Height(),
+        &pimpl_->transfer_context, &pimpl_->dag_context);
     DagOperationInstance radiance_map =
         DoComputeDirectIllumination(&drawable_collection, projected_surface, projection,
-                                    first_stage, &pimpl_->transfer_context, &pimpl_->dag_context);
+                                    &pimpl_->transfer_context, &pimpl_->dag_context);
 
-    DoEstimateExposure(radiance_map, &pimpl_->transfer_context, pimpl_->log_luminance_map.get(),
-                       pimpl_->log_exposure_value.get());
-    DoToneMapping(radiance_map, pimpl_->log_exposure_value.get(), &pimpl_->transfer_context,
-                  pimpl_->ldr_image.get());
-    DoFxaa(pimpl_->ldr_image.get(), &pimpl_->transfer_context, pimpl_->final_color_image.get());
+    DagOperationInstance log_luminance_map;
+    DagOperationInstance log_exposure_value;
+    DoEstimateExposure(radiance_map, &pimpl_->transfer_context, &pimpl_->dag_context,
+                       &log_luminance_map, &log_exposure_value);
+    DagOperationInstance ldr_image = DoToneMapping(radiance_map, log_exposure_value,
+                                                   &pimpl_->transfer_context, &pimpl_->dag_context);
+    DagOperationInstance final_result =
+        DoFxaa(ldr_image, final_color_image, &pimpl_->transfer_context, &pimpl_->dag_context);
+    std::vector<GpuPromise *> final_waits =
+        final_result->Fulfill(/*wait=*/false, &pimpl_->frame_resource_allocator, context);
 
-    DagOperation *final_stage =
-        this->DoFinalStage(first_stage, pimpl_->final_color_image.get(),
-                           /*dangling_stages=*/
-                           std::vector<DagOperationInstance>{projected_surface});
-
-    this->BeginStage(1, "FULFILL");
-    final_stage->Fulfill(pimpl_->transfer_context.vulkan_context);
-    this->EndStage(1);
+    this->PresentFinalColorImage(*final_color_image, final_waits);
 }
 
 void RadianceRenderer::ApplyConfiguration(RendererConfiguration const &config) {

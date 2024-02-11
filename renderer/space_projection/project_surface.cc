@@ -25,6 +25,7 @@
 
 #include "common/device.h"
 #include "renderer/basic/attachment.h"
+#include "renderer/basic/command_buffer.h"
 #include "renderer/basic/fixed_function.h"
 #include "renderer/basic/frame_buffer.h"
 #include "renderer/basic/pipeline.h"
@@ -36,7 +37,6 @@
 #include "renderer/basic/vertex_input.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/dag/graphics_pipeline_output.h"
-#include "renderer/dag/promise.h"
 #include "renderer/drawable/collection.h"
 #include "renderer/drawable/drawable_instance.h"
 #include "renderer/render_pass/configurator.h"
@@ -296,37 +296,29 @@ class ProjectSurfacePipeline final : public GraphicsPipelineInterface {
 
     PipelineKey Key() const override { return kProjectSurfacePipeline; }
 
-    Fulfillment Launch(GraphicsPipelineArgumentsInterface const &generic_args,
-                       std::vector<GpuPromise *> const &prerequisites,
-                       unsigned completion_signal_count,
-                       GraphicsPipelineOutputInterface *output) override {
-        VkCommandBuffer cmds =
-            StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), context_);
-
+    void Launch(GraphicsPipelineArgumentsInterface const &generic_args,
+                GraphicsPipelineOutputInterface *output, CommandBuffer *command_buffer) override {
+        StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), command_buffer);
         ProjectSurfaceArgument const &args =
             static_cast<ProjectSurfaceArgument const &>(generic_args);
-
         ProjectSurfaceConfigurator configurator(args.projection, *texture_sampler_);
         RenderDrawables(args.drawables, *pipeline_, *uniform_layout_, configurator,
-                        args.transfer_context, cmds);
-
-        return FinishRenderPass(cmds, completion_signal_count, prerequisites, context_);
+                        args.transfer_context, command_buffer);
+        FinishRenderPass(command_buffer);
     }
 };
 
 } // namespace
 
 DagOperationInstance DoProjectSurface(DrawableCollection *drawable_collection,
-                                      PerspectiveProjection const &projection,
-                                      DagOperationInstance const frame,
-                                      TransferContext *transfer_context, DagContext *dag) {
-    unsigned frame_width = frame->Output()->Width();
-    unsigned frame_height = frame->Output()->Height();
+                                      PerspectiveProjection const &projection, unsigned width,
+                                      unsigned height, TransferContext *transfer_context,
+                                      DagContext *dag) {
     DagContext::DagOperationKey target_key =
-        CreateDagOperationKey(kProjectSurfacePipeline, frame_width, frame_height);
+        CreateDagOperationKey(kProjectSurfacePipeline, width, height);
     DagOperationInstance target =
-        dag->WithOperation(target_key, [frame_width, frame_height](VulkanContext *context) {
-            return CreateProjectSurfaceOp(frame_width, frame_height, context);
+        dag->WithOperation(target_key, [width, height](VulkanContext *context) {
+            return CreateProjectSurfaceOp(width, height, context);
         });
 
     GraphicsPipelineInterface *pipeline = target->WithPipeline(
@@ -344,7 +336,7 @@ DagOperationInstance DoProjectSurface(DrawableCollection *drawable_collection,
     auto args = std::make_unique<ProjectSurfaceArgument>(observable_geometries, projection,
                                                          transfer_context);
     target->Schedule(pipeline, std::move(args),
-                     /*parents=*/std::vector<DagOperation *>{frame});
+                     /*parents=*/std::vector<DagOperationInstance>());
 
     return target;
 }

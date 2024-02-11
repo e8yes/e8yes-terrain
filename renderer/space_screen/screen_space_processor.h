@@ -25,9 +25,9 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
+#include "renderer/basic/command_buffer.h"
 #include "renderer/dag/graphics_pipeline.h"
 #include "renderer/dag/graphics_pipeline_output.h"
-#include "renderer/dag/promise.h"
 #include "renderer/transfer/context.h"
 
 namespace e8 {
@@ -82,10 +82,8 @@ class ScreenSpaceProcessorPipeline final : public GraphicsPipelineInterface {
 
     PipelineKey Key() const override;
 
-    Fulfillment Launch(GraphicsPipelineArgumentsInterface const &generic_args,
-                       std::vector<GpuPromise *> const &prerequisites,
-                       unsigned completion_signal_count,
-                       GraphicsPipelineOutputInterface *output) override;
+    void Launch(GraphicsPipelineArgumentsInterface const &generic_args,
+                GraphicsPipelineOutputInterface *output, CommandBuffer *command_buffer) override;
 
   private:
     struct PostProcessorPipelineImpl;

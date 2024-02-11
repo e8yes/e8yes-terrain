@@ -21,8 +21,10 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <vulkan/vulkan.h>
 
 #include "common/device.h"
+#include "renderer/basic/command_buffer.h"
 #include "renderer/basic/fixed_function.h"
 #include "renderer/basic/pipeline.h"
 #include "renderer/basic/sampler.h"
@@ -30,7 +32,6 @@
 #include "renderer/basic/uniform_layout.h"
 #include "renderer/basic/vertex_input.h"
 #include "renderer/dag/graphics_pipeline_output.h"
-#include "renderer/dag/promise.h"
 
 namespace e8 {
 
@@ -64,16 +65,12 @@ class GraphicsPipelineInterface {
      * @brief Launch Launches a graphics pipeline, and let it run asynchronously on the GPU.
      *
      * @param generic_args Arguments passed to this launch.
-     * @param prerequisites The set of promises that need to be resolved before running this
-     * pipeline.
-     * @param completion_signal_count The number of signals to emit when the pipeline is complete.
      * @param output Stores the output of this pipeline.
-     * @return The GPU operation's promised fulfillment.
+     * @param command_buffer An empty commmand buffer. The pipeline fills it with GPU commands which
+     * will be run in arbitrary orders.
      */
-    virtual Fulfillment Launch(GraphicsPipelineArgumentsInterface const &generic_args,
-                               std::vector<GpuPromise *> const &prerequisites,
-                               unsigned completion_signal_count,
-                               GraphicsPipelineOutputInterface *output) = 0;
+    virtual void Launch(GraphicsPipelineArgumentsInterface const &generic_args,
+                        GraphicsPipelineOutputInterface *output, CommandBuffer *command_buffer) = 0;
 
   protected:
     // Contextual Vulkan handles.

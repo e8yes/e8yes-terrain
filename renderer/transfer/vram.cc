@@ -205,8 +205,9 @@ void VramTransfer::EndUpload(VkCommandBuffer cmds) {
            vkQueueSubmit(context_->graphics_queue, /*submitCount=*/1, &submit, fence_));
 
     // Waits for the copying to complete and releases the command buffer.
-    assert(VK_SUCCESS == vkWaitForFences(context_->device, /*fenceCount=*/1, &fence_,
-                                         /*waitAll=*/VK_TRUE, kUploadTimeout.count()));
+    VkResult result = vkWaitForFences(context_->device, /*fenceCount=*/1, &fence_,
+                                      /*waitAll=*/VK_TRUE, kUploadTimeout.count());
+    assert(VK_SUCCESS == result);
     assert(VK_SUCCESS == vkResetFences(context_->device, /*fenceCount=*/1, &fence_));
 
     vkFreeCommandBuffers(context_->device, context_->command_pool, /*commandBufferCount=*/1, &cmds);

@@ -34,12 +34,12 @@ namespace e8 {
  *
  * @param color The color to fill to the target.
  * @param hdr Whether to create an HDR target, or otherwise an LDR target.
- * @param frame The frame's first stage.
+ * @param image The that needs to be filled.
  * @param context Contextual Vulkan handles.
  * @param dag DAG context.
  * @return The operation which stores the image filled with the specified color.
  */
-DagOperationInstance DoFillColor(vec3 const &color, bool hdr, DagOperationInstance frame,
+DagOperationInstance DoFillColor(vec3 const &color, bool hdr, DagOperationInstance image,
                                  VulkanContext *context, DagContext *dag);
 
 /**
@@ -47,7 +47,7 @@ DagOperationInstance DoFillColor(vec3 const &color, bool hdr, DagOperationInstan
  * it writes to the specified color image output instead of creating a new image.
  */
 DagOperationInstance
-DoFillColor(vec3 const &color, DagOperationInstance frame,
+DoFillColor(vec3 const &color,
             std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output,
             VulkanContext *context, DagContext *dag);
 
