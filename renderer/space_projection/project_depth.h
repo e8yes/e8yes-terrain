@@ -37,16 +37,16 @@ namespace e8 {
  * @param drawable_collection A collection of drawables to project to screen space to find the
  * nearest depth.
  * @param projection Defines how drawables should be projected to the depth map.
- * @param frame The frame's first operation.
+ * @param width
+ * @param height
  * @param transfer Transfer context.
  * @param dag DAG context.
  * @return The operation which stores the rendered depth map. The output of the operation contains a
  * depth attachment only.
  */
 DagOperationInstance DoProjectNdcDepth(DrawableCollection *drawable_collection,
-                                       PerspectiveProjection const &projection,
-                                       DagOperationInstance const frame, TransferContext *transfer,
-                                       DagContext *dag);
+                                       PerspectiveProjection const &projection, unsigned width,
+                                       unsigned height, TransferContext *transfer, DagContext *dag);
 
 /**
  * @brief DoProjectLinearDepth Schedules a graphics pipeline for rendering a linear depth map (A

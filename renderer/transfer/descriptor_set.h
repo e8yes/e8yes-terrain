@@ -60,7 +60,8 @@ struct DescriptorSet {
      * @brief DescriptorSets Should be created only by calling DescriptorSetAllocator::Allocate() or
      * MaterialDescriptorSetAllocator::DescriptorSetFor().
      */
-    DescriptorSet(VkDescriptorSet descriptor_set, descriptor_set_internal::DescriptorPool *pool);
+    DescriptorSet(VkDescriptorSet descriptor_set,
+                  std::shared_ptr<descriptor_set_internal::DescriptorPool> const &pool);
     DescriptorSet(DescriptorSet const &) = delete;
     DescriptorSet(DescriptorSet &&other);
     ~DescriptorSet();
@@ -71,7 +72,7 @@ struct DescriptorSet {
     VkDescriptorSet descriptor_set;
 
     // The pool the descriptor was allocated from.
-    descriptor_set_internal::DescriptorPool *pool;
+    std::shared_ptr<descriptor_set_internal::DescriptorPool> pool;
 };
 
 /**

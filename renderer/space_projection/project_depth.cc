@@ -266,11 +266,9 @@ class ProjectLinearDepthPipeline final : public GraphicsPipelineInterface {
 } // namespace
 
 DagOperationInstance DoProjectNdcDepth(DrawableCollection *drawable_collection,
-                                       PerspectiveProjection const &projection,
-                                       DagOperationInstance const frame, TransferContext *transfer,
+                                       PerspectiveProjection const &projection, unsigned width,
+                                       unsigned height, TransferContext *transfer,
                                        DagContext *dag) {
-    unsigned width = frame->Output()->Width();
-    unsigned height = frame->Output()->Height();
     DagContext::DagOperationKey key = CreateDagOperationKey(kProjectDepthPipeline, width, height);
     DagOperationInstance projected_ndc_depth =
         dag->WithOperation(key, [width, height](VulkanContext *context) {
@@ -290,7 +288,7 @@ DagOperationInstance DoProjectNdcDepth(DrawableCollection *drawable_collection,
     auto args =
         std::make_unique<ProjectDepthArguments>(observable_geometries, projection, transfer);
     projected_ndc_depth->Schedule(project_depth_pipeline, std::move(args),
-                                  /*parents=*/std::vector<DagOperation *>{frame});
+                                  /*parents=*/std::vector<DagOperationInstance>{});
 
     return projected_ndc_depth;
 }

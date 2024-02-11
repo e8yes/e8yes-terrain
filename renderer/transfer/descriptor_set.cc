@@ -106,85 +106,77 @@ void DescriptorPool::Free() {
 
 class DescriptorPools {
   public:
-    DescriptorPools();
-    ~DescriptorPools();
+    DescriptorPools() = default;
+    ~DescriptorPools() = default;
 
-    void Init(DescriptorType type, VulkanContext *context);
-    std::unique_ptr<DescriptorSet> Allocate(VkDescriptorSetLayout layout);
-
-  private:
-    std::unique_ptr<DescriptorSet> AllocateFromExistingPools(VkDescriptorSetLayout layout);
-
-    DescriptorType type_;
-    VulkanContext *context_;
-    std::deque<std::unique_ptr<DescriptorPool>> pools_;
-};
-
-std::unique_ptr<DescriptorSet>
-DescriptorPools::AllocateFromExistingPools(VkDescriptorSetLayout layout) {
-    if (pools_.empty()) {
-        return nullptr;
+    void Init(DescriptorType type, VulkanContext *context) {
+        type_ = type;
+        context_ = context;
     }
 
-    VkDescriptorSet descriptor_set = VK_NULL_HANDLE;
-    std::deque<std::unique_ptr<DescriptorPool>>::iterator spacious_pool_it;
-
-    for (spacious_pool_it = pools_.begin(); spacious_pool_it != pools_.end(); ++spacious_pool_it) {
-        VkDescriptorSetAllocateInfo desc_set_alloc_info{};
-        desc_set_alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-        desc_set_alloc_info.descriptorPool = spacious_pool_it->get()->pool;
-        desc_set_alloc_info.pSetLayouts = &layout;
-        desc_set_alloc_info.descriptorSetCount = 1;
-
-        VkResult result =
-            vkAllocateDescriptorSets(context_->device, &desc_set_alloc_info, &descriptor_set);
-
-        if (result == VK_SUCCESS) {
-            break;
+    std::unique_ptr<DescriptorSet> Allocate(VkDescriptorSetLayout layout) {
+        std::unique_ptr<DescriptorSet> result = this->AllocateFromExistingPools(layout);
+        if (result != nullptr) {
+            return result;
         }
 
-        assert(result == VK_ERROR_OUT_OF_POOL_MEMORY);
-    }
+        pools_.push_front(
+            std::make_unique<DescriptorPool>(kDescriptorPoolCapacity, type_, context_));
+        result = this->AllocateFromExistingPools(layout);
+        assert(result != nullptr);
 
-    if (descriptor_set == VK_NULL_HANDLE) {
-        // All allocation attempts failed.
-        return nullptr;
-    }
-
-    if (spacious_pool_it != pools_.begin()) {
-        // Moves the spacious pool to the front of the queue to make next allocation faster.
-        std::swap(*pools_.begin(), *spacious_pool_it);
-    }
-
-    return std::make_unique<DescriptorSet>(descriptor_set, spacious_pool_it->get());
-}
-
-DescriptorPools::DescriptorPools() {}
-
-DescriptorPools::~DescriptorPools() {}
-
-void DescriptorPools::Init(DescriptorType type, VulkanContext *context) {
-    type_ = type;
-    context_ = context;
-}
-
-std::unique_ptr<DescriptorSet> DescriptorPools::Allocate(VkDescriptorSetLayout layout) {
-    std::unique_ptr<DescriptorSet> result = this->AllocateFromExistingPools(layout);
-    if (result != nullptr) {
         return result;
     }
 
-    pools_.push_front(std::make_unique<DescriptorPool>(kDescriptorPoolCapacity, type_, context_));
-    result = this->AllocateFromExistingPools(layout);
-    assert(result != nullptr);
+  private:
+    std::unique_ptr<DescriptorSet> AllocateFromExistingPools(VkDescriptorSetLayout layout) {
+        if (pools_.empty()) {
+            return nullptr;
+        }
 
-    return result;
-}
+        VkDescriptorSet descriptor_set = VK_NULL_HANDLE;
+        std::deque<std::shared_ptr<DescriptorPool>>::iterator spacious_pool_it;
+
+        for (spacious_pool_it = pools_.begin(); spacious_pool_it != pools_.end();
+             ++spacious_pool_it) {
+            VkDescriptorSetAllocateInfo desc_set_alloc_info{};
+            desc_set_alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+            desc_set_alloc_info.descriptorPool = spacious_pool_it->get()->pool;
+            desc_set_alloc_info.pSetLayouts = &layout;
+            desc_set_alloc_info.descriptorSetCount = 1;
+
+            VkResult result =
+                vkAllocateDescriptorSets(context_->device, &desc_set_alloc_info, &descriptor_set);
+
+            if (result == VK_SUCCESS) {
+                break;
+            }
+
+            assert(result == VK_ERROR_OUT_OF_POOL_MEMORY);
+        }
+
+        if (descriptor_set == VK_NULL_HANDLE) {
+            // All allocation attempts failed.
+            return nullptr;
+        }
+
+        if (spacious_pool_it != pools_.begin()) {
+            // Moves the spacious pool to the front of the queue to make next allocation faster.
+            std::swap(*pools_.begin(), *spacious_pool_it);
+        }
+
+        return std::make_unique<DescriptorSet>(descriptor_set, *spacious_pool_it);
+    }
+
+    DescriptorType type_;
+    VulkanContext *context_;
+    std::deque<std::shared_ptr<DescriptorPool>> pools_;
+};
 
 } // namespace descriptor_set_internal
 
 DescriptorSet::DescriptorSet(VkDescriptorSet descriptor_set,
-                             descriptor_set_internal::DescriptorPool *pool)
+                             std::shared_ptr<descriptor_set_internal::DescriptorPool> const &pool)
     : descriptor_set(descriptor_set), pool(pool) {}
 
 DescriptorSet::DescriptorSet(DescriptorSet &&other)

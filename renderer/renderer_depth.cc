@@ -70,9 +70,9 @@ void DepthRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor)
 
     std::shared_ptr<SwapChainOutput> final_color_image =
         this->AcquireFinalColorImage(&pimpl_->frame_resource_allocator);
-    DagOperationInstance ndc_depth_map =
-        DoProjectNdcDepth(&drawables_collection, projection, /*dependent_op=*/nullptr,
-                          &pimpl_->transfer_context, &pimpl_->dag_context);
+    DagOperationInstance ndc_depth_map = DoProjectNdcDepth(
+        &drawables_collection, projection, final_color_image->Width(), final_color_image->Height(),
+        &pimpl_->transfer_context, &pimpl_->dag_context);
     DagOperationInstance visualized_color_map = DoVisualizeDepthProjection(
         pimpl_->config.depth_renderer_params().alpha(), projection, ndc_depth_map,
         final_color_image, &pimpl_->transfer_context, &pimpl_->dag_context);
