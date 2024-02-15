@@ -21,8 +21,8 @@
 #include <memory>
 #include <optional>
 
+#include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
-#include "renderer/transfer/context.h"
 
 namespace e8 {
 
@@ -31,15 +31,15 @@ namespace e8 {
  * float map. It scales the float map into the [0, 1] range, so it can be displayed as a grayscale
  * image.
  *
- * @param float_map_stage The float map to be visualized. The floating point values are assumed to
- * be stored in the color attachment.
+ * @param float_map The float map to be visualized. The floating point values are assumed to be
+ * stored in the color attachment.
  * @param min_value Values that are less than min_value are clamped to 0.
  * @param max_value Values that are greater than min_value are clamped to 1.
- * @param transfer_context Transfer context.
- * @param target The target stage which stores the visualized grayscale image.
+ * @param dag
+ * @return The target operation which visualizes the float map as a grayscale image.
  */
-void DoVisualizeFloat(DagOperation *float_map_stage, float min_value, float max_value,
-                      TransferContext *transfer_context, DagOperation *target);
+DagOperationInstance DoVisualizeFloat(DagOperationInstance float_map, float min_value,
+                                      float max_value, DagContext *dag);
 
 } // namespace e8
 

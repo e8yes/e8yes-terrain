@@ -21,8 +21,10 @@
 #include <vulkan/vulkan.h>
 
 #include "renderer/basic/shader.h"
+#include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/dag/graphics_pipeline_output.h"
+#include "renderer/dag/graphics_pipeline_output_common.h"
 #include "renderer/space_screen/float_map_visualizer.h"
 #include "renderer/space_screen/screen_space_processor.h"
 #include "renderer/transfer/context.h"
@@ -63,23 +65,44 @@ class FloatMapVisualizerConfigurator : public ScreenSpaceConfiguratorInterface {
     float const max_value_;
 };
 
+std::unique_ptr<DagOperation> CreateFloatVisualizationOp(unsigned width, unsigned height,
+                                                         TransferContext *transfer_context,
+                                                         VulkanContext *vulkan_context) {
+    auto output = std::make_shared<LdrColorOutput>(width, height, /*with_depth_buffer=*/false,
+                                                   vulkan_context);
+    return std::make_unique<DagOperation>(output, transfer_context, vulkan_context);
+}
+
 } // namespace
 
-void DoVisualizeFloat(DagOperation *float_map_stage, float min_value, float max_value,
-                      TransferContext *transfer_context, DagOperation *target) {
+DagOperationInstance DoVisualizeFloat(DagOperationInstance float_map, float min_value,
+                                      float max_value, DagContext *dag) {
+    DagContext::DagOperationKey op_key = CreateDagOperationKey(
+        kFloatMapVisualizerPipeline, float_map->Output()->Width(), float_map->Output()->Height());
+    DagOperationInstance target = dag->WithOperation(
+        op_key, [float_map](TransferContext *transfer_context, VulkanContext *vulkan_context) {
+            return CreateFloatVisualizationOp(float_map->Output()->Width(),
+                                              float_map->Output()->Height(), transfer_context,
+                                              vulkan_context);
+        });
+
     GraphicsPipelineInterface *pipeline = target->WithPipeline(
-        kFloatMapVisualizerPipeline, [transfer_context](GraphicsPipelineOutputInterface *output) {
+        kFloatMapVisualizerPipeline,
+        [](GraphicsPipelineOutputInterface *output, TransferContext *transfer_context,
+           VulkanContext *vulkan_context) {
             return std::make_unique<ScreenSpaceProcessorPipeline>(
                 kFloatMapVisualizerPipeline, kFragmentShaderFilePathFloatMapVisualizer,
                 /*input_image_count=*/1,
                 /*push_constant_size=*/sizeof(FloatMapVisualizerParameters), output,
-                transfer_context);
+                transfer_context, vulkan_context);
         });
 
-    auto configurator = std::make_unique<FloatMapVisualizerConfigurator>(*float_map_stage->Output(),
+    auto configurator = std::make_unique<FloatMapVisualizerConfigurator>(*float_map->Output(),
                                                                          min_value, max_value);
     target->Schedule(pipeline, std::move(configurator),
-                     /*parents=*/std::vector<DagOperation *>{float_map_stage});
+                     /*parents=*/std::vector<DagOperationInstance>{float_map});
+
+    return target;
 }
 
 } // namespace e8

@@ -25,7 +25,6 @@
 #include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/drawable/collection.h"
-#include "renderer/transfer/context.h"
 
 namespace e8 {
 
@@ -39,14 +38,13 @@ namespace e8 {
  * @param projection Defines how drawables should be projected to the depth map.
  * @param width
  * @param height
- * @param transfer Transfer context.
  * @param dag DAG context.
  * @return The operation which stores the rendered depth map. The output of the operation contains a
  * depth attachment only.
  */
 DagOperationInstance DoProjectNdcDepth(DrawableCollection *drawable_collection,
                                        PerspectiveProjection const &projection, unsigned width,
-                                       unsigned height, TransferContext *transfer, DagContext *dag);
+                                       unsigned height, DagContext *dag);
 
 /**
  * @brief DoProjectLinearDepth Schedules a graphics pipeline for rendering a linear depth map (A
@@ -58,7 +56,6 @@ DagOperationInstance DoProjectNdcDepth(DrawableCollection *drawable_collection,
  * @param width The width of the depth map.
  * @param height The height of the depth map.
  * @param dependent_op Some dependent operation.
- * @param transfer Transfer context.
  * @param dag DAG context.
  * @return The operation which stores the rendered linear depth map. The output of the operation
  * contains both a depth attachment and a color attachment. The depth attachment stores the NDC
@@ -67,7 +64,7 @@ DagOperationInstance DoProjectNdcDepth(DrawableCollection *drawable_collection,
 DagOperationInstance DoProjectLinearDepth(DrawableCollection *drawable_collection,
                                           PerspectiveProjection const &projection, unsigned width,
                                           unsigned height, DagOperationInstance const dependent_op,
-                                          TransferContext *transfer, DagContext *dag);
+                                          DagContext *dag);
 
 } // namespace e8
 

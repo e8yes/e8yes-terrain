@@ -26,6 +26,7 @@
 #include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/dag/graphics_pipeline.h"
+#include "renderer/transfer/context.h"
 
 namespace e8 {
 namespace {
@@ -35,11 +36,12 @@ uint64_t const kMaxSessionAndUsageCountDifference = 1000;
 } // namespace
 
 DagContext::DagContext(VulkanContext *context)
-    : context_(context), session_count_(0), in_session_(false) {
+    : vulkan_context_(context), transfer_context_(TransferContext(context)), session_count_(0),
+      in_session_(false) {
     assert(context != nullptr);
 }
 
-DagContext::~DagContext() { vkDeviceWaitIdle(context_->device); }
+DagContext::~DagContext() { vkDeviceWaitIdle(vulkan_context_->device); }
 
 DagContext::Session::Session(DagContext *dag_context) : self_(dag_context) {
     ++self_->session_count_;
@@ -75,7 +77,7 @@ DagOperationInstance DagContext::WithOperation(DagOperationKey const &key,
     auto it = dag_ops_.find(key);
     if (it == dag_ops_.end()) {
         DagOperationWithUsage dag_with_usage;
-        dag_with_usage.dag_op = create_fn(context_);
+        dag_with_usage.dag_op = create_fn(&transfer_context_, vulkan_context_);
 
         it = dag_ops_.insert(std::make_pair(key, std::move(dag_with_usage))).first;
     }

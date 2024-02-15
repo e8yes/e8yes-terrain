@@ -192,7 +192,6 @@ DescriptorSet::~DescriptorSet() {
     vkFreeDescriptorSets(pool->context->device, pool->pool, /*descriptorSetCount=*/1,
                          &descriptor_set);
     descriptor_set = VK_NULL_HANDLE;
-    pool = nullptr;
 }
 
 DescriptorSet &DescriptorSet::operator=(DescriptorSet &&other) {

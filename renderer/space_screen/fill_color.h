@@ -40,7 +40,7 @@ namespace e8 {
  * @return The operation which stores the image filled with the specified color.
  */
 DagOperationInstance DoFillColor(vec3 const &color, bool hdr, DagOperationInstance image,
-                                 VulkanContext *context, DagContext *dag);
+                                 DagContext *dag);
 
 /**
  * @brief DoFillColor Like the function above, it fills an image with the specified color. However,
@@ -49,7 +49,7 @@ DagOperationInstance DoFillColor(vec3 const &color, bool hdr, DagOperationInstan
 DagOperationInstance
 DoFillColor(vec3 const &color,
             std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output,
-            VulkanContext *context, DagContext *dag);
+            DagContext *dag);
 
 } // namespace e8
 

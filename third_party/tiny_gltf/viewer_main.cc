@@ -270,7 +270,7 @@ static void SetupMeshState(tinygltf::Model &model, GLuint progId) {
             int sparse_accessor = -1;
             for (size_t a_i = 0; a_i < model.accessors.size(); ++a_i) {
                 const auto &accessor = model.accessors[a_i];
-                if (accessor.bufferView == i) {
+                if (accessor.bufferView == static_cast<int64_t>(i)) {
                     std::cout << i << " is used by accessor " << a_i << std::endl;
                     if (accessor.sparse.isSparse) {
                         std::cout << "WARN: this bufferView has at least one sparse accessor to "
@@ -313,8 +313,7 @@ static void SetupMeshState(tinygltf::Model &model, GLuint progId) {
                     model.bufferViews[accessor.sparse.values.bufferView];
                 const auto &values_buffer = model.buffers[values_buffer_view.buffer];
 
-                for (size_t sparse_index = 0; sparse_index < accessor.sparse.count;
-                     ++sparse_index) {
+                for (int sparse_index = 0; sparse_index < accessor.sparse.count; ++sparse_index) {
                     int index = 0;
                     // std::cout << "accessor.sparse.indices.componentType = " <<
                     // accessor.sparse.indices.componentType << std::endl;
@@ -796,13 +795,13 @@ static void DrawNode(tinygltf::Model &model, const tinygltf::Node &node) {
     // FIXME(syoyo): Refactor.
     // DrawCurves(scene, it->second);
     if (node.mesh > -1) {
-        assert(node.mesh < model.meshes.size());
+        assert(node.mesh < static_cast<int64_t>(model.meshes.size()));
         DrawMesh(model, model.meshes[node.mesh]);
     }
 
     // Draw child nodes.
     for (size_t i = 0; i < node.children.size(); i++) {
-        assert(node.children[i] < model.nodes.size());
+        assert(node.children[i] < static_cast<int64_t>(model.nodes.size()));
         DrawNode(model, model.nodes[node.children[i]]);
     }
 

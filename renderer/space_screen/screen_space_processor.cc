@@ -149,8 +149,34 @@ struct ScreenSpaceProcessorPipeline::PostProcessorPipelineImpl {
     PostProcessorPipelineImpl(PipelineKey key, unsigned input_image_count,
                               ShaderUniformLayout const &uniform_layout,
                               GraphicsPipelineOutputInterface *output,
-                              TransferContext *transfer_context);
-    ~PostProcessorPipelineImpl();
+                              TransferContext *transfer_context, VulkanContext *vulkan_context)
+        : key(key), past_input_images(input_image_count) {
+        // Sets up the viewport dimension uniform variable.
+        viewport_dimension_desc_set = transfer_context->descriptor_set_allocator.Allocate(
+            DescriptorType::DT_UNIFORM_BUFFER, uniform_layout.per_frame_desc_set);
+
+        viewport_dimension_ubo =
+            CreateUniformBuffer(/*size=*/sizeof(ViewportDimension), vulkan_context);
+
+        ViewportDimension dimension;
+        dimension.viewport_width = output->Width();
+        dimension.viewport_height = output->Height();
+
+        WriteUniformBufferDescriptor(&dimension, *viewport_dimension_ubo,
+                                     *viewport_dimension_desc_set,
+                                     /*binding=*/0, vulkan_context);
+
+        // Sets up the input image uniform variables.
+        input_images_desc_set = transfer_context->descriptor_set_allocator.Allocate(
+            DescriptorType::DT_COMBINED_IMAGE_SAMPLER, uniform_layout.per_pass_desc_set);
+        input_image_sampler = CreateContinuousSampler(vulkan_context);
+
+        for (auto &past_input_image : past_input_images) {
+            past_input_image = VK_NULL_HANDLE;
+        }
+    }
+
+    ~PostProcessorPipelineImpl() = default;
 
     PipelineKey key;
 
@@ -162,43 +188,11 @@ struct ScreenSpaceProcessorPipeline::PostProcessorPipelineImpl {
     std::vector<VkImageView> past_input_images;
 };
 
-ScreenSpaceProcessorPipeline::PostProcessorPipelineImpl::PostProcessorPipelineImpl(
-    PipelineKey key, unsigned input_image_count, ShaderUniformLayout const &uniform_layout,
-    GraphicsPipelineOutputInterface *output, TransferContext *transfer_context)
-    : key(key), past_input_images(input_image_count) {
-    // Sets up the viewport dimension uniform variable.
-    viewport_dimension_desc_set = transfer_context->descriptor_set_allocator.Allocate(
-        DescriptorType::DT_UNIFORM_BUFFER, uniform_layout.per_frame_desc_set);
-
-    viewport_dimension_ubo =
-        CreateUniformBuffer(/*size=*/sizeof(ViewportDimension), transfer_context->vulkan_context);
-
-    ViewportDimension dimension;
-    dimension.viewport_width = output->Width();
-    dimension.viewport_height = output->Height();
-
-    WriteUniformBufferDescriptor(&dimension, *viewport_dimension_ubo, *viewport_dimension_desc_set,
-                                 /*binding=*/0, transfer_context->vulkan_context);
-
-    // Sets up the input image uniform variables.
-    input_images_desc_set = transfer_context->descriptor_set_allocator.Allocate(
-        DescriptorType::DT_COMBINED_IMAGE_SAMPLER, uniform_layout.per_pass_desc_set);
-    input_image_sampler = CreateContinuousSampler(transfer_context->vulkan_context);
-
-    for (auto &past_input_image : past_input_images) {
-        past_input_image = VK_NULL_HANDLE;
-    }
-}
-
-ScreenSpaceProcessorPipeline::PostProcessorPipelineImpl::~PostProcessorPipelineImpl() {}
-
-ScreenSpaceProcessorPipeline::ScreenSpaceProcessorPipeline(PipelineKey const &key,
-                                                           std::string const &fragment_shader,
-                                                           unsigned input_image_count,
-                                                           unsigned push_constant_size,
-                                                           GraphicsPipelineOutputInterface *output,
-                                                           TransferContext *transfer_context)
-    : GraphicsPipelineInterface(transfer_context->vulkan_context) {
+ScreenSpaceProcessorPipeline::ScreenSpaceProcessorPipeline(
+    PipelineKey const &key, std::string const &fragment_shader, unsigned input_image_count,
+    unsigned push_constant_size, GraphicsPipelineOutputInterface *output,
+    TransferContext *transfer_context, VulkanContext *vulkan_context)
+    : GraphicsPipelineInterface(vulkan_context) {
     shader_stages_ = CreateShaderStages(
         /*vertex_shader_file_path=*/kVertexShaderFilePathPostProcessor,
         /*fragment_shader_file_path=*/fragment_shader, transfer_context->vulkan_context);
@@ -218,7 +212,7 @@ ScreenSpaceProcessorPipeline::ScreenSpaceProcessorPipeline(PipelineKey const &ke
 
     // Sets up additional states for defining the uniform variables.
     pimpl_ = std::make_unique<PostProcessorPipelineImpl>(key, input_image_count, *uniform_layout_,
-                                                         output, transfer_context);
+                                                         output, transfer_context, vulkan_context);
 }
 
 ScreenSpaceProcessorPipeline::~ScreenSpaceProcessorPipeline() {}
@@ -227,6 +221,7 @@ PipelineKey ScreenSpaceProcessorPipeline::Key() const { return pimpl_->key; }
 
 void ScreenSpaceProcessorPipeline::Launch(GraphicsPipelineArgumentsInterface const &generic_args,
                                           GraphicsPipelineOutputInterface *output,
+                                          TransferContext * /*transfer_context*/,
                                           CommandBuffer *command_buffer) {
     StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), command_buffer);
     ScreenSpaceConfiguratorInterface const &configurator =

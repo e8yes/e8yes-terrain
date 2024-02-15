@@ -53,14 +53,12 @@ enum SurfaceProjectionColorOutput {
  * @param projection Defines how drawables should be projected to the light parameter map.
  * @param width
  * @param height
- * @param transfer_context Transfer context.
  * @param dag DAG context.
  * @return The operation which stores the rendered light inputs.
  */
 DagOperationInstance DoProjectSurface(DrawableCollection *drawable_collection,
                                       PerspectiveProjection const &projection, unsigned width,
-                                      unsigned height, TransferContext *transfer_context,
-                                      DagContext *dag);
+                                      unsigned height, DagContext *dag);
 
 } // namespace e8
 

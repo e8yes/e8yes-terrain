@@ -32,6 +32,7 @@
 #include "renderer/basic/uniform_layout.h"
 #include "renderer/basic/vertex_input.h"
 #include "renderer/dag/graphics_pipeline_output.h"
+#include "renderer/transfer/context.h"
 
 namespace e8 {
 
@@ -66,11 +67,13 @@ class GraphicsPipelineInterface {
      *
      * @param generic_args Arguments passed to this launch.
      * @param output Stores the output of this pipeline.
+     * @param transfer_context
      * @param command_buffer An empty commmand buffer. The pipeline fills it with GPU commands which
      * will be run in arbitrary orders.
      */
     virtual void Launch(GraphicsPipelineArgumentsInterface const &generic_args,
-                        GraphicsPipelineOutputInterface *output, CommandBuffer *command_buffer) = 0;
+                        GraphicsPipelineOutputInterface *output, TransferContext *transfer_context,
+                        CommandBuffer *command_buffer) = 0;
 
   protected:
     // Contextual Vulkan handles.

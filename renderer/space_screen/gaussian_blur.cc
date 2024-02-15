@@ -125,7 +125,7 @@ std::string VerticalGaussianBlurShader(GaussianBlurLevel blur_level) {
 std::unique_ptr<GraphicsPipelineInterface>
 CreateGaussianBlurPipeline(bool horizontal, GaussianBlurLevel blur_level,
                            GraphicsPipelineOutputInterface *blurred_output,
-                           TransferContext *transfer_context) {
+                           TransferContext *transfer_context, VulkanContext *vulkan_context) {
     PipelineKey pipeline_key;
     std::string shader;
 
@@ -139,47 +139,64 @@ CreateGaussianBlurPipeline(bool horizontal, GaussianBlurLevel blur_level,
 
     return std::make_unique<ScreenSpaceProcessorPipeline>(
         pipeline_key, shader, /*input_image_count=*/1,
-        /*push_constant_size=*/0, blurred_output, transfer_context);
+        /*push_constant_size=*/0, blurred_output, transfer_context, vulkan_context);
 }
 
 } // namespace
 
-void CreateGaussianBlurStages(unsigned width, unsigned height, VulkanContext *context,
-                              std::unique_ptr<DagOperation> *h_blurred,
-                              std::unique_ptr<DagOperation> *hv_blurred) {
-    auto h_blurred_output =
-        std::make_shared<FloatOutput>(width, height, /*with_depth_buffer=*/false, context);
-    auto hv_blurred_output =
-        std::make_shared<FloatOutput>(width, height, /*with_depth_buffer=*/false, context);
-
-    *h_blurred = std::make_unique<DagOperation>(h_blurred_output);
-    *hv_blurred = std::make_unique<DagOperation>(hv_blurred_output);
+std::unique_ptr<DagOperation> CreateGaussianBlurOp(unsigned width, unsigned height,
+                                                   TransferContext *transfer_context,
+                                                   VulkanContext *vulkan_context) {
+    auto blurred_output =
+        std::make_shared<FloatOutput>(width, height, /*with_depth_buffer=*/false, vulkan_context);
+    return std::make_unique<DagOperation>(blurred_output, transfer_context, vulkan_context);
 }
 
-void DoGaussianBlur(DagOperation *image, GaussianBlurLevel blur_level,
-                    TransferContext *transfer_context, DagOperation *h_blurred,
-                    DagOperation *hv_blurred) {
+DagOperationInstance DoGaussianBlur(DagOperationInstance image, GaussianBlurLevel blur_level,
+                                    DagContext *dag) {
+    PipelineKey horizontal_blur_pipeline_key = HorizontalGaussianBlurPipelineKey(blur_level);
+    DagContext::DagOperationKey horizontal_op_key = CreateDagOperationKey(
+        horizontal_blur_pipeline_key, image->Output()->Width(), image->Output()->Height());
+    DagOperationInstance h_blurred =
+        dag->WithOperation(horizontal_op_key, [image](TransferContext *transfer_context,
+                                                      VulkanContext *vulkan_context) {
+            return CreateGaussianBlurOp(image->Output()->Width(), image->Output()->Height(),
+                                        transfer_context, vulkan_context);
+        });
+
+    PipelineKey final_blur_pipeline_key = VerticalGaussianBlurPipelineKey(blur_level);
+    DagContext::DagOperationKey final_op_key = CreateDagOperationKey(
+        final_blur_pipeline_key, image->Output()->Width(), image->Output()->Height());
+    DagOperationInstance hv_blurred = dag->WithOperation(
+        final_op_key, [image](TransferContext *transfer_context, VulkanContext *vulkan_context) {
+            return CreateGaussianBlurOp(image->Output()->Width(), image->Output()->Height(),
+                                        transfer_context, vulkan_context);
+        });
+
     GraphicsPipelineInterface *h_blur_pipeline = h_blurred->WithPipeline(
         HorizontalGaussianBlurPipelineKey(blur_level),
-        [blur_level, transfer_context](GraphicsPipelineOutputInterface *blurred_output) {
+        [blur_level](GraphicsPipelineOutputInterface *blurred_output,
+                     TransferContext *transfer_context, VulkanContext *vulkan_context) {
             return CreateGaussianBlurPipeline(/*horizontal=*/true, blur_level, blurred_output,
-                                              transfer_context);
+                                              transfer_context, vulkan_context);
         });
     GraphicsPipelineInterface *v_blur_pipeline = hv_blurred->WithPipeline(
         VerticalGaussianBlurPipelineKey(blur_level),
-        [blur_level, transfer_context](GraphicsPipelineOutputInterface *blurred_output) {
+        [blur_level](GraphicsPipelineOutputInterface *blurred_output,
+                     TransferContext *transfer_context, VulkanContext *vulkan_context) {
             return CreateGaussianBlurPipeline(/*horizontal=*/false, blur_level, blurred_output,
-                                              transfer_context);
+                                              transfer_context, vulkan_context);
         });
 
     auto h_blur_configurator = std::make_unique<GaussianBlurPipelineConfigurator>(*image->Output());
     h_blurred->Schedule(h_blur_pipeline, std::move(h_blur_configurator),
                         /*parents=*/std::vector<DagOperation *>{image});
-
     auto v_blur_configurator =
         std::make_unique<GaussianBlurPipelineConfigurator>(*h_blurred->Output());
     hv_blurred->Schedule(v_blur_pipeline, std::move(v_blur_configurator),
                          /*parents=*/std::vector<DagOperation *>{h_blurred});
+
+    return hv_blurred;
 }
 
 } // namespace e8

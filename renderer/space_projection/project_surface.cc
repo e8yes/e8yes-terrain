@@ -116,9 +116,10 @@ class ProjectSurfaceOutput final : public GraphicsPipelineOutputInterface {
  * @return The light input stage.
  */
 std::unique_ptr<DagOperation> CreateProjectSurfaceOp(unsigned width, unsigned height,
-                                                     VulkanContext *context) {
-    auto output = std::make_shared<ProjectSurfaceOutput>(width, height, context);
-    return std::make_unique<DagOperation>(output);
+                                                     TransferContext *transfer_context,
+                                                     VulkanContext *vulkan_context) {
+    auto output = std::make_shared<ProjectSurfaceOutput>(width, height, vulkan_context);
+    return std::make_unique<DagOperation>(output, transfer_context, vulkan_context);
 }
 
 struct PushConstants {
@@ -255,8 +256,8 @@ class ProjectSurfaceConfigurator final : public RenderPassConfiguratorInterface 
  */
 struct ProjectSurfaceArgument : public GraphicsPipelineArgumentsInterface {
     ProjectSurfaceArgument(std::vector<DrawableInstance> const &drawables,
-                           ProjectionInterface const &projection, TransferContext *transfer_context)
-        : drawables(drawables), projection(projection), transfer_context(transfer_context) {}
+                           ProjectionInterface const &projection)
+        : drawables(drawables), projection(projection) {}
 
     std::vector<DrawableInstance> drawables;
     ProjectionInterface const &projection;
@@ -297,13 +298,14 @@ class ProjectSurfacePipeline final : public GraphicsPipelineInterface {
     PipelineKey Key() const override { return kProjectSurfacePipeline; }
 
     void Launch(GraphicsPipelineArgumentsInterface const &generic_args,
-                GraphicsPipelineOutputInterface *output, CommandBuffer *command_buffer) override {
+                GraphicsPipelineOutputInterface *output, TransferContext *transfer_context,
+                CommandBuffer *command_buffer) override {
         StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), command_buffer);
         ProjectSurfaceArgument const &args =
             static_cast<ProjectSurfaceArgument const &>(generic_args);
         ProjectSurfaceConfigurator configurator(args.projection, *texture_sampler_);
         RenderDrawables(args.drawables, *pipeline_, *uniform_layout_, configurator,
-                        args.transfer_context, command_buffer);
+                        transfer_context, command_buffer);
         FinishRenderPass(command_buffer);
     }
 };
@@ -312,19 +314,20 @@ class ProjectSurfacePipeline final : public GraphicsPipelineInterface {
 
 DagOperationInstance DoProjectSurface(DrawableCollection *drawable_collection,
                                       PerspectiveProjection const &projection, unsigned width,
-                                      unsigned height, TransferContext *transfer_context,
-                                      DagContext *dag) {
+                                      unsigned height, DagContext *dag) {
     DagContext::DagOperationKey target_key =
         CreateDagOperationKey(kProjectSurfacePipeline, width, height);
     DagOperationInstance target =
-        dag->WithOperation(target_key, [width, height](VulkanContext *context) {
-            return CreateProjectSurfaceOp(width, height, context);
+        dag->WithOperation(target_key, [width, height](TransferContext *transfer_context,
+                                                       VulkanContext *vulkan_context) {
+            return CreateProjectSurfaceOp(width, height, transfer_context, vulkan_context);
         });
 
-    GraphicsPipelineInterface *pipeline = target->WithPipeline(
-        kProjectSurfacePipeline, [transfer_context](GraphicsPipelineOutputInterface *output) {
-            return std::make_unique<ProjectSurfacePipeline>(output,
-                                                            transfer_context->vulkan_context);
+    GraphicsPipelineInterface *pipeline =
+        target->WithPipeline(kProjectSurfacePipeline, [](GraphicsPipelineOutputInterface *output,
+                                                         TransferContext * /*transfer_context*/,
+                                                         VulkanContext *vulkan_context) {
+            return std::make_unique<ProjectSurfacePipeline>(output, vulkan_context);
         });
 
     ResourceLoadingOption loading_option;
@@ -333,8 +336,7 @@ DagOperationInstance DoProjectSurface(DrawableCollection *drawable_collection,
     std::vector<DrawableInstance> observable_geometries =
         drawable_collection->ObservableGeometries(projection, loading_option);
 
-    auto args = std::make_unique<ProjectSurfaceArgument>(observable_geometries, projection,
-                                                         transfer_context);
+    auto args = std::make_unique<ProjectSurfaceArgument>(observable_geometries, projection);
     target->Schedule(pipeline, std::move(args),
                      /*parents=*/std::vector<DagOperationInstance>());
 

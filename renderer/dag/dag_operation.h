@@ -31,6 +31,7 @@
 #include "renderer/dag/graphics_pipeline.h"
 #include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/dag/promise.h"
+#include "renderer/transfer/context.h"
 
 namespace e8 {
 
@@ -44,12 +45,14 @@ class DagOperation {
     // A graphics pipeline's construction is often paired with an output. This function standarized
     // the creation of a complete graphics pipeline.
     using CompilePipelineFn = std::function<std::unique_ptr<GraphicsPipelineInterface>(
-        GraphicsPipelineOutputInterface *output)>;
+        GraphicsPipelineOutputInterface *output, TransferContext *transfer_context,
+        VulkanContext *vulkan_context)>;
 
     /**
      * @brief DagOperation Constructs a pipeline stage attached with an optional output.
      */
-    explicit DagOperation(std::shared_ptr<GraphicsPipelineOutputInterface> const &output);
+    DagOperation(std::shared_ptr<GraphicsPipelineOutputInterface> const &output,
+                 TransferContext *transfer_context, VulkanContext *vulkan_context);
     DagOperation(DagOperation const &) = delete;
     ~DagOperation();
 
@@ -96,8 +99,7 @@ class DagOperation {
      * @param promise_allocator
      * @param context Contextual Vulkan handles.
      */
-    std::vector<GpuPromise *> Fulfill(bool wait, FrameResourceAllocator *frame_resource_allocator,
-                                      VulkanContext *context);
+    std::vector<GpuPromise *> Fulfill(bool wait, FrameResourceAllocator *frame_resource_allocator);
 
   private:
     using ChildId = unsigned;

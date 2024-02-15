@@ -166,32 +166,22 @@ struct ComputeAveragePipelineArguments : public GraphicsPipelineArgumentsInterfa
  */
 class ComputeAveragePipeline : public GraphicsPipelineInterface {
   public:
-    ComputeAveragePipeline(VulkanContext *context);
-    ~ComputeAveragePipeline() override;
+    ComputeAveragePipeline(VulkanContext *context) : GraphicsPipelineInterface(context) {}
+    ~ComputeAveragePipeline() override = default;
 
-    PipelineKey Key() const override;
+    PipelineKey Key() const override { return kComputeAveragePipeline; }
 
     void Launch(GraphicsPipelineArgumentsInterface const &generic_args,
-                GraphicsPipelineOutputInterface *output, CommandBuffer *command_buffer) override;
+                GraphicsPipelineOutputInterface *exposure_output,
+                TransferContext * /*transfer_context*/, CommandBuffer *command_buffer) override {
+        ComputeAveragePipelineArguments const &args =
+            static_cast<ComputeAveragePipelineArguments const &>(generic_args);
+
+        AverageValueOf(args.log_luminance_map.ColorAttachments()[0]->image,
+                       args.log_luminance_map.Width(), args.log_luminance_map.Height(),
+                       command_buffer->buffer, exposure_output->ColorAttachments()[0]->image);
+    }
 };
-
-ComputeAveragePipeline::ComputeAveragePipeline(VulkanContext *context)
-    : GraphicsPipelineInterface(context) {}
-
-ComputeAveragePipeline::~ComputeAveragePipeline() {}
-
-PipelineKey ComputeAveragePipeline::Key() const { return kComputeAveragePipeline; }
-
-void ComputeAveragePipeline::Launch(GraphicsPipelineArgumentsInterface const &generic_args,
-                                    GraphicsPipelineOutputInterface *exposure_output,
-                                    CommandBuffer *command_buffer) {
-    ComputeAveragePipelineArguments const &args =
-        static_cast<ComputeAveragePipelineArguments const &>(generic_args);
-
-    AverageValueOf(args.log_luminance_map.ColorAttachments()[0]->image,
-                   args.log_luminance_map.Width(), args.log_luminance_map.Height(),
-                   command_buffer->buffer, exposure_output->ColorAttachments()[0]->image);
-}
 
 /**
  * @brief CreateLogLuminanceOp Creates a log luminance operation with a 16-bit float image output in
@@ -203,9 +193,10 @@ void ComputeAveragePipeline::Launch(GraphicsPipelineArgumentsInterface const &ge
  * @return A pipeline stage created with the 16-bit float image output.
  */
 std::unique_ptr<DagOperation> CreateLogLuminanceOp(unsigned width, unsigned height,
-                                                   VulkanContext *context) {
-    auto output = std::make_shared<LogLuminancePipelineOutput>(width, height, context);
-    return std::make_unique<DagOperation>(output);
+                                                   TransferContext *transfer_context,
+                                                   VulkanContext *vulkan_context) {
+    auto output = std::make_shared<LogLuminancePipelineOutput>(width, height, vulkan_context);
+    return std::make_unique<DagOperation>(output, transfer_context, vulkan_context);
 }
 
 /**
@@ -215,58 +206,58 @@ std::unique_ptr<DagOperation> CreateLogLuminanceOp(unsigned width, unsigned heig
  * @param context Contextual Vulkan handles.
  * @return A pipeline stage created with the 1 by 1 16-bit float image output.
  */
-std::unique_ptr<DagOperation> CreateExposureValueOp(VulkanContext *context) {
-    auto output = std::make_shared<ExposureEstimationPipelineOutput>(context);
-    return std::make_unique<DagOperation>(output);
+std::unique_ptr<DagOperation> CreateExposureValueOp(TransferContext *transfer_context,
+                                                    VulkanContext *vulkan_context) {
+    auto output = std::make_shared<ExposureEstimationPipelineOutput>(vulkan_context);
+    return std::make_unique<DagOperation>(output, transfer_context, vulkan_context);
 }
 
 } // namespace
 
-void DoEstimateExposure(DagOperationInstance radiance_map, TransferContext *transfer_context,
-                        DagContext *dag, DagOperationInstance *log_luminance_map,
-                        DagOperationInstance *log_exposure) {
+DagOperationInstance DoEstimateExposure(DagOperationInstance radiance_map, DagContext *dag) {
     DagContext::DagOperationKey log_luminance_key =
         CreateDagOperationKey(kLogarithmicLuminancePipeline, radiance_map->Output()->Width(),
                               radiance_map->Output()->Height());
     DagContext::DagOperationKey compute_average_key =
         CreateDagOperationKey(kComputeAveragePipeline, /*width=*/1, /*height=*/1);
-    *log_luminance_map =
-        dag->WithOperation(log_luminance_key, [radiance_map](VulkanContext *context) {
+    DagOperationInstance log_luminance_map =
+        dag->WithOperation(log_luminance_key, [radiance_map](TransferContext *transfer_context,
+                                                             VulkanContext *vulkan_context) {
             return CreateLogLuminanceOp(radiance_map->Output()->Width(),
-                                        radiance_map->Output()->Height(), context);
+                                        radiance_map->Output()->Height(), transfer_context,
+                                        vulkan_context);
         });
-    *log_exposure = dag->WithOperation(
-        compute_average_key, [](VulkanContext *context) { return CreateExposureValueOp(context); });
+    DagOperationInstance log_exposure = dag->WithOperation(
+        compute_average_key, [](TransferContext *transfer_context, VulkanContext *vulkan_context) {
+            return CreateExposureValueOp(transfer_context, vulkan_context);
+        });
 
-    GraphicsPipelineInterface *log_luminance_pipeline =
-        (*log_luminance_map)
-            ->WithPipeline(
-                kLogarithmicLuminancePipeline,
-                [transfer_context](GraphicsPipelineOutputInterface *log_luminance_output) {
-                    return std::make_unique<ScreenSpaceProcessorPipeline>(
-                        kLogarithmicLuminancePipeline, kFragmentShaderFilePathLogLuminance,
-                        /*input_image_count=*/1, /*push_constant_size=*/0, log_luminance_output,
-                        transfer_context);
-                });
-    GraphicsPipelineInterface *compute_average_pipeline =
-        (*log_exposure)
-            ->WithPipeline(
-                kComputeAveragePipeline,
-                [transfer_context](GraphicsPipelineOutputInterface * /*exposure_output*/) {
-                    return std::make_unique<ComputeAveragePipeline>(
-                        transfer_context->vulkan_context);
-                });
+    GraphicsPipelineInterface *log_luminance_pipeline = log_luminance_map->WithPipeline(
+        kLogarithmicLuminancePipeline,
+        [](GraphicsPipelineOutputInterface *log_luminance_output, TransferContext *transfer_context,
+           VulkanContext *vulkan_context) {
+            return std::make_unique<ScreenSpaceProcessorPipeline>(
+                kLogarithmicLuminancePipeline, kFragmentShaderFilePathLogLuminance,
+                /*input_image_count=*/1, /*push_constant_size=*/0, log_luminance_output,
+                transfer_context, vulkan_context);
+        });
+    GraphicsPipelineInterface *compute_average_pipeline = log_exposure->WithPipeline(
+        kComputeAveragePipeline,
+        [](GraphicsPipelineOutputInterface * /*exposure_output*/,
+           TransferContext * /*transfer_context*/, VulkanContext *vulkan_context) {
+            return std::make_unique<ComputeAveragePipeline>(vulkan_context);
+        });
 
     auto configurator = std::make_unique<LogLuminanceConfigurator>(*radiance_map->Output());
-    (*log_luminance_map)
-        ->Schedule(log_luminance_pipeline, std::move(configurator),
-                   /*parents=*/std::vector<DagOperationInstance>{radiance_map});
+    log_luminance_map->Schedule(log_luminance_pipeline, std::move(configurator),
+                                /*parents=*/std::vector<DagOperationInstance>{radiance_map});
 
     auto compute_average_args =
-        std::make_unique<ComputeAveragePipelineArguments>(*(*log_luminance_map)->Output());
-    (*log_exposure)
-        ->Schedule(compute_average_pipeline, std::move(compute_average_args),
-                   /*parents=*/std::vector<DagOperationInstance>{*log_luminance_map});
+        std::make_unique<ComputeAveragePipelineArguments>(*log_luminance_map->Output());
+    log_exposure->Schedule(compute_average_pipeline, std::move(compute_average_args),
+                           /*parents=*/std::vector<DagOperationInstance>{log_luminance_map});
+
+    return log_exposure;
 }
 
 } // namespace e8

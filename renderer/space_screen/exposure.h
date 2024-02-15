@@ -22,7 +22,6 @@
 
 #include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
-#include "renderer/transfer/context.h"
 
 namespace e8 {
 
@@ -34,12 +33,9 @@ namespace e8 {
  * @param radiance_map The raw radiance image to estimate exposure for.
  * @param transfer_context Transfer context.
  * @param dag DAG context.
- * @param log_luminance_map The target stage which stores the logarithmic luminance values.
- * @param log_exposure The target stage which stares the logarithmic exposure value.
+ * @return The target stage which stares the logarithmic exposure value.
  */
-void DoEstimateExposure(DagOperationInstance radiance_map, TransferContext *transfer_context,
-                        DagContext *dag, DagOperationInstance *log_luminance_map,
-                        DagOperationInstance *log_exposure);
+DagOperationInstance DoEstimateExposure(DagOperationInstance radiance_map, DagContext *dag);
 
 } // namespace e8
 

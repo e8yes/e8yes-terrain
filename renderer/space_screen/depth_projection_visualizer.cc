@@ -20,6 +20,7 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
+#include "common/device.h"
 #include "renderer/basic/projection.h"
 #include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
@@ -88,23 +89,26 @@ void DepthProjectionPostProcessorConfigurator::PushConstants(
 DagOperationInstance DoVisualizeDepthProjection(
     float alpha, std::optional<PerspectiveProjection> projection,
     DagOperationInstance ndc_depth_map,
-    std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output,
-    TransferContext *transfer_context, DagContext *dag) {
+    std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output, DagContext *dag) {
     DagContext::DagOperationKey key =
         CreateDagOperationKey(kDepthProjectionVisualizerPipeline, ndc_depth_map->Output()->Width(),
                               ndc_depth_map->Output()->Height());
-    DagOperationInstance target = dag->WithOperation(key, [color_image_output](VulkanContext *) {
-        return std::make_unique<DagOperation>(color_image_output);
-    });
+    DagOperationInstance target =
+        dag->WithOperation(key, [color_image_output](TransferContext *transfer_context,
+                                                     VulkanContext *vulkan_context) {
+            return std::make_unique<DagOperation>(color_image_output, transfer_context,
+                                                  vulkan_context);
+        });
 
     GraphicsPipelineInterface *pipeline = target->WithPipeline(
         kDepthProjectionVisualizerPipeline,
-        [transfer_context](GraphicsPipelineOutputInterface *output) {
+        [](GraphicsPipelineOutputInterface *output, TransferContext *transfer_context,
+           VulkanContext *vulkan_context) {
             return std::make_unique<ScreenSpaceProcessorPipeline>(
                 kDepthProjectionVisualizerPipeline, kFragmentShaderFilePathDepthMapVisualizer,
                 /*input_image_count=*/1,
                 /*push_constant_size=*/sizeof(DepthProjectionVisualizerParameters), output,
-                transfer_context);
+                transfer_context, vulkan_context);
         });
 
     auto configurator = std::make_unique<DepthProjectionPostProcessorConfigurator>(

@@ -21,8 +21,8 @@
 #include <memory>
 
 #include "common/device.h"
+#include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
-#include "renderer/transfer/context.h"
 
 namespace e8 {
 
@@ -59,9 +59,8 @@ void CreateGaussianBlurStages(unsigned width, unsigned height, VulkanContext *co
  * @param h_blurred The horizontally blurred temporary output.
  * @param hv_blurred The final output with both horizontal and vertical blurring.
  */
-void DoGaussianBlur(DagOperation *image, GaussianBlurLevel blur_level,
-                    TransferContext *transfer_context, DagOperation *h_blurred,
-                    DagOperation *hv_blurred);
+DagOperationInstance DoGaussianBlur(DagOperationInstance image, GaussianBlurLevel blur_level,
+                                    DagContext *dag);
 
 } // namespace e8
 

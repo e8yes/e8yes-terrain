@@ -20,7 +20,6 @@
 
 #include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
-#include "renderer/transfer/context.h"
 
 namespace e8 {
 
@@ -37,7 +36,7 @@ namespace e8 {
  * @return The target which tone maps the radiance map to an LDR color image.
  */
 DagOperationInstance DoToneMapping(DagOperationInstance radiance_map, DagOperationInstance exposure,
-                                   TransferContext *transfer_context, DagContext *dag);
+                                   DagContext *dag);
 
 } // namespace e8
 

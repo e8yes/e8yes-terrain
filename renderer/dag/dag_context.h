@@ -27,6 +27,7 @@
 #include "common/device.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/dag/graphics_pipeline.h"
+#include "renderer/transfer/context.h"
 
 namespace e8 {
 
@@ -45,8 +46,8 @@ class DagContext {
     ~DagContext();
 
     using DagOperationKey = std::string;
-    using CreateDagOperationFn =
-        std::function<std::unique_ptr<DagOperation>(VulkanContext *context)>;
+    using CreateDagOperationFn = std::function<std::unique_ptr<DagOperation>(
+        TransferContext *transfer_context, VulkanContext *vulkan_context)>;
 
     class Session {
       public:
@@ -82,7 +83,8 @@ class DagContext {
         uint64_t usage_count = 0;
     };
 
-    VulkanContext *context_;
+    VulkanContext *vulkan_context_;
+    TransferContext transfer_context_;
     std::unordered_map<DagOperationKey, DagOperationWithUsage> dag_ops_;
     std::unordered_map<DagOperationKey, AllocationCounter> alloc_counters_;
     uint64_t session_count_;

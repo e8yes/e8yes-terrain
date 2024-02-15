@@ -203,10 +203,11 @@ void SpotLightPostProcessorConfigurator::PushConstants(std::vector<uint8_t> *pus
 }
 
 std::unique_ptr<DagOperation> CreateRadianceOp(unsigned width, unsigned height,
-                                               VulkanContext *context) {
-    auto output =
-        std::make_shared<HdrColorOutput>(width, height, /*with_depth_buffer=*/false, context);
-    return std::make_unique<DagOperation>(output);
+                                               TransferContext *transfer_context,
+                                               VulkanContext *vulkan_context) {
+    auto output = std::make_shared<HdrColorOutput>(width, height, /*with_depth_buffer=*/false,
+                                                   vulkan_context);
+    return std::make_unique<DagOperation>(output, transfer_context, vulkan_context);
 }
 
 } // namespace
@@ -215,14 +216,16 @@ DagOperationInstance DoComputeRadiance(LightSourceInstance const &instance,
                                        DagOperationInstance projected_surface,
                                        frustum const &projection,
                                        std::vector<DagOperationInstance> const &shadow_maps,
-                                       TransferContext *transfer_context, DagContext *dag) {
+                                       DagContext *dag) {
     DagContext::DagOperationKey op_key =
         CreateDagOperationKey(kRadiancePipeline, projected_surface->Output()->Width(),
                               projected_surface->Output()->Height());
     DagOperationInstance target =
-        dag->WithOperation(op_key, [projected_surface](VulkanContext *context) {
+        dag->WithOperation(op_key, [projected_surface](TransferContext *transfer_context,
+                                                       VulkanContext *vulkan_context) {
             return CreateRadianceOp(projected_surface->Output()->Width(),
-                                    projected_surface->Output()->Height(), context);
+                                    projected_surface->Output()->Height(), transfer_context,
+                                    vulkan_context);
         });
 
     GraphicsPipelineInterface *pipeline;
@@ -232,13 +235,14 @@ DagOperationInstance DoComputeRadiance(LightSourceInstance const &instance,
     case LightSource::ModelCase::kSunLight: {
         pipeline = target->WithPipeline(
             kSunLightPipeline,
-            [transfer_context](GraphicsPipelineOutputInterface *radiance_output) {
+            [](GraphicsPipelineOutputInterface *radiance_output, TransferContext *transfer_context,
+               VulkanContext *vulkan_context) {
                 return std::make_unique<ScreenSpaceProcessorPipeline>(
                     kSunLightPipeline, kFragmentShaderFilePathRadianceSunLight,
                     /*input_image_count=*/
                     SurfaceProjectionColorOutput::LightInputsColorOutputCount + 1,
                     /*push_constant_size=*/sizeof(SunLightParameters), radiance_output,
-                    transfer_context);
+                    transfer_context, vulkan_context);
             });
 
         configurator = std::make_unique<SunLightPostProcessorConfigurator>(
@@ -248,13 +252,14 @@ DagOperationInstance DoComputeRadiance(LightSourceInstance const &instance,
     case LightSource::ModelCase::kPointLight: {
         pipeline = target->WithPipeline(
             kPointLightPipeline,
-            [transfer_context](GraphicsPipelineOutputInterface *radiance_output) {
+            [](GraphicsPipelineOutputInterface *radiance_output, TransferContext *transfer_context,
+               VulkanContext *vulkan_context) {
                 return std::make_unique<ScreenSpaceProcessorPipeline>(
                     kPointLightPipeline, kFragmentShaderFilePathRadiancePointLight,
                     /*input_image_count=*/
                     SurfaceProjectionColorOutput::LightInputsColorOutputCount + 1,
                     /*push_constant_size=*/sizeof(PointLightParameters), radiance_output,
-                    transfer_context);
+                    transfer_context, vulkan_context);
             });
 
         configurator = std::make_unique<PointLightPostProcessorConfigurator>(
@@ -264,13 +269,14 @@ DagOperationInstance DoComputeRadiance(LightSourceInstance const &instance,
     case LightSource::ModelCase::kSpotLight: {
         pipeline = target->WithPipeline(
             kSpotLightPipeline,
-            [transfer_context](GraphicsPipelineOutputInterface *radiance_output) {
+            [](GraphicsPipelineOutputInterface *radiance_output, TransferContext *transfer_context,
+               VulkanContext *vulkan_context) {
                 return std::make_unique<ScreenSpaceProcessorPipeline>(
                     kSpotLightPipeline, kFragmentShaderFilePathRadianceSpotLight,
                     /*input_image_count=*/
                     SurfaceProjectionColorOutput::LightInputsColorOutputCount + 1,
                     /*push_constant_size=*/sizeof(SpotLightParameters), radiance_output,
-                    transfer_context);
+                    transfer_context, vulkan_context);
             });
 
         configurator = std::make_unique<SpotLightPostProcessorConfigurator>(

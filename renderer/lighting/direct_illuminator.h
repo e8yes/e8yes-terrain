@@ -26,7 +26,6 @@
 #include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/drawable/collection.h"
-#include "renderer/transfer/context.h"
 
 namespace e8 {
 
@@ -48,7 +47,6 @@ namespace e8 {
 DagOperationInstance DoComputeDirectIllumination(DrawableCollection *drawable_collection,
                                                  DagOperationInstance projected_surface,
                                                  PerspectiveProjection const &projection,
-                                                 TransferContext *transfer_context,
                                                  DagContext *dag);
 
 } // namespace e8

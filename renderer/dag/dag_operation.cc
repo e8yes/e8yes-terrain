@@ -34,6 +34,7 @@
 #include "renderer/dag/graphics_pipeline.h"
 #include "renderer/dag/graphics_pipeline_output.h"
 #include "renderer/dag/promise.h"
+#include "renderer/transfer/context.h"
 
 namespace e8 {
 
@@ -70,19 +71,24 @@ struct DagOperation::PipelineAndSchedules {
 };
 
 struct DagOperation::DagOperationImpl {
-    DagOperationImpl(std::shared_ptr<GraphicsPipelineOutputInterface> const &output)
-        : output(output), num_child_stages(0) {}
+    DagOperationImpl(std::shared_ptr<GraphicsPipelineOutputInterface> const &output,
+                     TransferContext *transfer_context, VulkanContext *vulkan_context)
+        : output(output), transfer_context_(transfer_context), vulkan_context_(vulkan_context),
+          num_child_stages(0) {}
 
     ~DagOperationImpl() = default;
 
     std::shared_ptr<GraphicsPipelineOutputInterface> output;
+    TransferContext *transfer_context_;
+    VulkanContext *vulkan_context_;
     std::unordered_map<PipelineKey, PipelineAndSchedules> pipelines;
     unsigned num_child_stages;
     std::vector<Fulfillment> fulfillment_cache;
 };
 
-DagOperation::DagOperation(std::shared_ptr<GraphicsPipelineOutputInterface> const &output)
-    : pimpl_(std::make_unique<DagOperationImpl>(output)) {}
+DagOperation::DagOperation(std::shared_ptr<GraphicsPipelineOutputInterface> const &output,
+                           TransferContext *transfer_context, VulkanContext *vulkan_context)
+    : pimpl_(std::make_unique<DagOperationImpl>(output, transfer_context, vulkan_context)) {}
 
 DagOperation::~DagOperation() {}
 
@@ -142,7 +148,7 @@ DagOperation::LaunchSchedule(GraphicsPipelineInterface *pipeline, PipelineSchedu
     // Runs the pipeline.
     CommandBuffer *command_buffer = frame_resource_allocator->AllocateCommandBuffer();
     BeginCommandBuffer(command_buffer);
-    pipeline->Launch(*schedule.args, output, command_buffer);
+    pipeline->Launch(*schedule.args, output, pimpl_->transfer_context_, command_buffer);
     EndCommandBuffer(command_buffer);
 
     std::vector<VkSemaphore> waits;
@@ -206,7 +212,8 @@ GraphicsPipelineInterface *DagOperation::WithPipeline(PipelineKey const &key,
         return it->second.pipeline.get();
     }
 
-    std::unique_ptr<GraphicsPipelineInterface> pipeline = compile_fn(pimpl_->output.get());
+    std::unique_ptr<GraphicsPipelineInterface> pipeline =
+        compile_fn(pimpl_->output.get(), pimpl_->transfer_context_, pimpl_->vulkan_context_);
     it = pimpl_->pipelines.insert(std::make_pair(key, PipelineAndSchedules(std::move(pipeline))))
              .first;
 
@@ -246,10 +253,9 @@ GraphicsPipelineOutputInterface const *DagOperation::Output() const { return pim
 GraphicsPipelineOutputInterface *DagOperation::Output() { return pimpl_->output.get(); }
 
 std::vector<GpuPromise *> DagOperation::Fulfill(bool wait,
-                                                FrameResourceAllocator *frame_resource_allocator,
-                                                VulkanContext *context) {
-    std::vector<GpuPromise *> signals =
-        this->LaunchSchedulesAs(/*child_id=*/std::nullopt, frame_resource_allocator, context);
+                                                FrameResourceAllocator *frame_resource_allocator) {
+    std::vector<GpuPromise *> signals = this->LaunchSchedulesAs(
+        /*child_id=*/std::nullopt, frame_resource_allocator, pimpl_->vulkan_context_);
 
     if (wait) {
         std::vector<VkFence> fences;
@@ -257,7 +263,8 @@ std::vector<GpuPromise *> DagOperation::Fulfill(bool wait,
             fences.push_back(fulfillment.completion->signal);
         }
 
-        assert(VK_SUCCESS == vkWaitForFences(context->device, fences.size(), fences.data(),
+        assert(VK_SUCCESS == vkWaitForFences(pimpl_->vulkan_context_->device, fences.size(),
+                                             fences.data(),
                                              /*waitAll=*/VK_TRUE,
                                              /*timeout=*/std::numeric_limits<uint64_t>::max()));
     }

@@ -84,23 +84,26 @@ void SurfaceProjectionVisualizerPostProcessorConfigurator::PushConstants(
 DagOperationInstance DoVisualizeSurfaceProjection(
     LightInputsRendererParameters::InputType parameter_to_visualize,
     DagOperationInstance surface_projection,
-    std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output,
-    TransferContext *transfer_context, DagContext *dag) {
+    std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output, DagContext *dag) {
     DagContext::DagOperationKey op_key = CreateDagOperationKey(
         kSurfaceProjectionVisualizerPipeline, surface_projection->Output()->Width(),
         surface_projection->Output()->Height());
-    DagOperationInstance target = dag->WithOperation(op_key, [color_image_output](VulkanContext *) {
-        return std::make_unique<DagOperation>(color_image_output);
-    });
+    DagOperationInstance target =
+        dag->WithOperation(op_key, [color_image_output](TransferContext *transfer_context,
+                                                        VulkanContext *vulkan_context) {
+            return std::make_unique<DagOperation>(color_image_output, transfer_context,
+                                                  vulkan_context);
+        });
 
     GraphicsPipelineInterface *pipeline = target->WithPipeline(
         kSurfaceProjectionVisualizerPipeline,
-        [transfer_context](GraphicsPipelineOutputInterface *visualizer_output) {
+        [](GraphicsPipelineOutputInterface *visualizer_output, TransferContext *transfer_context,
+           VulkanContext *vulkan_context) {
             return std::make_unique<ScreenSpaceProcessorPipeline>(
                 kSurfaceProjectionVisualizerPipeline, kFragmentShaderFilePathLightInputsVisualizer,
                 /*input_image_count=*/SurfaceProjectionColorOutput::LightInputsColorOutputCount,
                 /*push_constant_size=*/sizeof(SurfaceProjectionVisualizerParameters),
-                visualizer_output, transfer_context);
+                visualizer_output, transfer_context, vulkan_context);
         });
 
     auto configurator = std::make_unique<SurfaceProjectionVisualizerPostProcessorConfigurator>(

@@ -25,6 +25,7 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
+#include "common/device.h"
 #include "renderer/basic/command_buffer.h"
 #include "renderer/dag/graphics_pipeline.h"
 #include "renderer/dag/graphics_pipeline_output.h"
@@ -73,17 +74,19 @@ class ScreenSpaceProcessorPipeline final : public GraphicsPipelineInterface {
      * requires.
      * @param output To receive output from the screen space processor.
      * @param transfer_context Transfer context.
+     * @param vulkan_context
      */
     ScreenSpaceProcessorPipeline(PipelineKey const &key, std::string const &fragment_shader,
                                  unsigned input_image_count, unsigned push_constant_size,
                                  GraphicsPipelineOutputInterface *output,
-                                 TransferContext *transfer_context);
+                                 TransferContext *transfer_context, VulkanContext *vulkan_context);
     ~ScreenSpaceProcessorPipeline() override;
 
     PipelineKey Key() const override;
 
     void Launch(GraphicsPipelineArgumentsInterface const &generic_args,
-                GraphicsPipelineOutputInterface *output, CommandBuffer *command_buffer) override;
+                GraphicsPipelineOutputInterface *output, TransferContext *transfer_context,
+                CommandBuffer *command_buffer) override;
 
   private:
     struct PostProcessorPipelineImpl;

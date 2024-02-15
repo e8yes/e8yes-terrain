@@ -78,23 +78,25 @@ void ToneMapPostProcessorConfigurator::InputImages(std::vector<VkImageView> *inp
  * @return An LDR image stage with a color image output.
  */
 std::unique_ptr<DagOperation> CreateLdrImageStage(unsigned width, unsigned height,
-                                                  VulkanContext *context) {
+                                                  TransferContext *transfer_context,
+                                                  VulkanContext *vulkan_context) {
     auto output = std::make_shared<LdrColorOutput>(width, height,
-                                                   /*with_depth_buffer=*/false, context);
-    return std::make_unique<DagOperation>(output);
+                                                   /*with_depth_buffer=*/false, vulkan_context);
+    return std::make_unique<DagOperation>(output, transfer_context, vulkan_context);
 }
 
 } // namespace
 
 DagOperationInstance DoToneMapping(DagOperationInstance radiance_map, DagOperationInstance exposure,
-                                   TransferContext *transfer_context, DagContext *dag) {
+                                   DagContext *dag) {
     DagContext::DagOperationKey op_key = CreateDagOperationKey(
         exposure != nullptr ? kAcesToneMapPipeline : kClampedLinearToneMapPipeline,
         radiance_map->Output()->Width(), radiance_map->Output()->Height());
-    DagOperationInstance target =
-        dag->WithOperation(op_key, [radiance_map](VulkanContext *context) {
+    DagOperationInstance target = dag->WithOperation(
+        op_key, [radiance_map](TransferContext *transfer_context, VulkanContext *vulkan_context) {
             return CreateLdrImageStage(radiance_map->Output()->Width(),
-                                       radiance_map->Output()->Height(), context);
+                                       radiance_map->Output()->Height(), transfer_context,
+                                       vulkan_context);
         });
 
     GraphicsPipelineInterface *pipeline;
@@ -102,19 +104,21 @@ DagOperationInstance DoToneMapping(DagOperationInstance radiance_map, DagOperati
     if (exposure != nullptr) {
         pipeline = target->WithPipeline(
             kAcesToneMapPipeline,
-            [transfer_context](GraphicsPipelineOutputInterface *tone_map_output) {
+            [](GraphicsPipelineOutputInterface *tone_map_output, TransferContext *transfer_context,
+               VulkanContext *vulkan_context) {
                 return std::make_unique<ScreenSpaceProcessorPipeline>(
                     kAcesToneMapPipeline, kFragmentShaderFilePathHdrAces, /*input_image_count=*/2,
-                    /*push_constant_size=*/0, tone_map_output, transfer_context);
+                    /*push_constant_size=*/0, tone_map_output, transfer_context, vulkan_context);
             });
     } else {
         pipeline = target->WithPipeline(
             kClampedLinearToneMapPipeline,
-            [transfer_context](GraphicsPipelineOutputInterface *tone_map_output) {
+            [](GraphicsPipelineOutputInterface *tone_map_output, TransferContext *transfer_context,
+               VulkanContext *vulkan_context) {
                 return std::make_unique<ScreenSpaceProcessorPipeline>(
                     kClampedLinearToneMapPipeline, kFragmentShaderFilePathHdrClamp,
                     /*input_image_count=*/1, /*push_constant_size=*/0, tone_map_output,
-                    transfer_context);
+                    transfer_context, vulkan_context);
             });
     }
 

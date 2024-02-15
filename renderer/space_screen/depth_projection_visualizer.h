@@ -25,7 +25,6 @@
 #include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/dag/graphics_pipeline_output.h"
-#include "renderer/transfer/context.h"
 
 namespace e8 {
 
@@ -40,15 +39,13 @@ namespace e8 {
  * @param ndc_depth_map The depth map to be visualized. The depth information is assumed to be
  * stored in the depth attachment.
  * @param color_image_output The output which stores the visualized depth map grayscale image.
- * @param transfer_context Transfer context.
  * @param dag DAG context.
  * @return The target operations which visualizes the depth map.
  */
 DagOperationInstance DoVisualizeDepthProjection(
     float alpha, std::optional<PerspectiveProjection> projection,
     DagOperationInstance ndc_depth_map,
-    std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output,
-    TransferContext *transfer_context, DagContext *dag);
+    std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output, DagContext *dag);
 
 } // namespace e8
 
