@@ -21,7 +21,6 @@
 #include <memory>
 #include <vector>
 
-#include "common/device.h"
 #include "common/tensor.h"
 #include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
@@ -36,11 +35,11 @@ namespace e8 {
  * @param hdr Whether to create an HDR target, or otherwise an LDR target.
  * @param image The that needs to be filled.
  * @param context Contextual Vulkan handles.
- * @param dag DAG context.
+ * @param session The DAG session.
  * @return The operation which stores the image filled with the specified color.
  */
 DagOperationInstance DoFillColor(vec3 const &color, bool hdr, DagOperationInstance image,
-                                 DagContext *dag);
+                                 DagContext::Session *session);
 
 /**
  * @brief DoFillColor Like the function above, it fills an image with the specified color. However,
@@ -49,7 +48,7 @@ DagOperationInstance DoFillColor(vec3 const &color, bool hdr, DagOperationInstan
 DagOperationInstance
 DoFillColor(vec3 const &color,
             std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output,
-            DagContext *dag);
+            DagContext::Session *session);
 
 } // namespace e8
 

@@ -216,17 +216,10 @@ DagOperationInstance DoComputeRadiance(LightSourceInstance const &instance,
                                        DagOperationInstance projected_surface,
                                        frustum const &projection,
                                        std::vector<DagOperationInstance> const &shadow_maps,
-                                       DagContext *dag) {
-    DagContext::DagOperationKey op_key =
-        CreateDagOperationKey(kRadiancePipeline, projected_surface->Output()->Width(),
-                              projected_surface->Output()->Height());
+                                       DagContext::Session *session) {
     DagOperationInstance target =
-        dag->WithOperation(op_key, [projected_surface](TransferContext *transfer_context,
-                                                       VulkanContext *vulkan_context) {
-            return CreateRadianceOp(projected_surface->Output()->Width(),
-                                    projected_surface->Output()->Height(), transfer_context,
-                                    vulkan_context);
-        });
+        session->WithOperation(kRadiancePipeline, projected_surface->Output()->Width(),
+                               projected_surface->Output()->Height(), CreateRadianceOp);
 
     GraphicsPipelineInterface *pipeline;
     std::unique_ptr<ScreenSpaceConfiguratorInterface> configurator;

@@ -314,14 +314,9 @@ class ProjectSurfacePipeline final : public GraphicsPipelineInterface {
 
 DagOperationInstance DoProjectSurface(DrawableCollection *drawable_collection,
                                       PerspectiveProjection const &projection, unsigned width,
-                                      unsigned height, DagContext *dag) {
-    DagContext::DagOperationKey target_key =
-        CreateDagOperationKey(kProjectSurfacePipeline, width, height);
+                                      unsigned height, DagContext::Session *session) {
     DagOperationInstance target =
-        dag->WithOperation(target_key, [width, height](TransferContext *transfer_context,
-                                                       VulkanContext *vulkan_context) {
-            return CreateProjectSurfaceOp(width, height, transfer_context, vulkan_context);
-        });
+        session->WithOperation(kProjectSurfacePipeline, width, height, CreateProjectSurfaceOp);
 
     GraphicsPipelineInterface *pipeline =
         target->WithPipeline(kProjectSurfacePipeline, [](GraphicsPipelineOutputInterface *output,

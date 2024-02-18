@@ -39,7 +39,8 @@ namespace e8 {
 DagOperationInstance DoVisualizeSurfaceProjection(
     LightInputsRendererParameters::InputType parameter_to_visualize,
     DagOperationInstance surface_projection,
-    std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output, DagContext *dag);
+    std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output,
+    DagContext::Session *session);
 
 } // namespace e8
 

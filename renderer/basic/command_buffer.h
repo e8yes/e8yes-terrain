@@ -27,7 +27,8 @@
 namespace e8 {
 
 /**
- * @brief The CommandBuffer class
+ * @brief The CommandBuffer struct A command buffer records then submits a set of GPU commands. It
+ * will clean up the command buffer resource by the end of its lifecycle.
  */
 struct CommandBuffer {
     /**
@@ -46,34 +47,42 @@ struct CommandBuffer {
 };
 
 /**
- * @brief CreateCommandBuffer
- * @param context
- * @return
+ * @brief CreateCommandBuffer Creates a command buffer for recording and submitting GPU commands.
+ * This function will always return a valid CommandBuffer structure. Any failure occurs during the
+ * command buffer creation will make it fail.
+ *
+ * @param context Contextual Vulkan handles.
+ * @return A valid unique pointer to the CommandBuffer structure.
  */
 std::unique_ptr<CommandBuffer> CreateCommandBuffer(VulkanContext *context);
 
 /**
- * @brief ResetCommandBuffer
+ * @brief ResetCommandBuffer Reset a command buffer to the initial state. Any primary command buffer
+ * that is in the recording or executable state and has commandBuffer recorded into it, becomes
+ * invalid.
  */
 void ResetCommandBuffer(CommandBuffer *command_buffer);
 
 /**
- * @brief BeginCommandBuffer
+ * @brief BeginCommandBuffer Start recording a command buffer.
  */
 void BeginCommandBuffer(CommandBuffer *command_buffer);
 
 /**
- * @brief EndCommandBuffer
+ * @brief EndCommandBuffer Finish recording a command buffer.
  */
 void EndCommandBuffer(CommandBuffer *command_buffer);
 
 /**
- * @brief SubmitCommandBuffer
- * @param command_buffer
- * @param gpu_waits
- * @param gpu_signals
- * @param cpu_signal
- * @param context
+ * @brief SubmitCommandBuffer Submits a sequence of semaphores or command buffers to the graphics
+ * queue. The device can only start running the submitted commands after receiving all the gpu_waits
+ * signals. The commands are guarenteed to be executed once the gpu_signals and cpu_signal are sent.
+ *
+ * @param command_buffer The command buffer to be submitted.
+ * @param gpu_waits The GPU signals to be waiting for before the start of the commands execution.
+ * @param gpu_signals The set of GPU signals to be sent on the completion of the commands execution.
+ * @param cpu_signal The CPU signal to be sent on the completion of the commands execution.
+ * @param context Contextual Vulkan handles.
  */
 void SubmitCommandBuffer(CommandBuffer const &command_buffer,
                          std::vector<VkSemaphore> const &gpu_waits,

@@ -73,10 +73,10 @@ void SurfaceProjectionRenderer::DrawFrame(Scene *scene, ResourceAccessor *resour
         this->AcquireFinalColorImage(&pimpl_->frame_resource_allocator);
     DagOperationInstance surface_projection =
         DoProjectSurface(&drawable_collection, camera_projection, final_color_image->Width(),
-                         final_color_image->Height(), &pimpl_->dag_context);
+                         final_color_image->Height(), &session);
     DagOperationInstance visualized_surface = DoVisualizeSurfaceProjection(
         pimpl_->config.light_inputs_renderer_params().input_to_visualize(), surface_projection,
-        final_color_image, &pimpl_->dag_context);
+        final_color_image, &session);
     std::vector<GpuPromise *> final_waits =
         visualized_surface->Fulfill(/*wait=*/false, &pimpl_->frame_resource_allocator);
     this->PresentFinalColorImage(*final_color_image, final_waits);

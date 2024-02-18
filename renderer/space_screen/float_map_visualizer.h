@@ -35,11 +35,11 @@ namespace e8 {
  * stored in the color attachment.
  * @param min_value Values that are less than min_value are clamped to 0.
  * @param max_value Values that are greater than min_value are clamped to 1.
- * @param dag
+ * @param session The DAG session.
  * @return The target operation which visualizes the float map as a grayscale image.
  */
 DagOperationInstance DoVisualizeFloat(DagOperationInstance float_map, float min_value,
-                                      float max_value, DagContext *dag);
+                                      float max_value, DagContext::Session *session);
 
 } // namespace e8
 

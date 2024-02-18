@@ -36,15 +36,15 @@ namespace e8 {
  * @param drawable_collection A collection of drawables to project to screen space to find the
  * nearest depth.
  * @param projection Defines how drawables should be projected to the depth map.
- * @param width
- * @param height
- * @param dag DAG context.
+ * @param width The width of the projected NDC depth map in pixels.
+ * @param height The height of the projected NDC depth map in pixels.
+ * @param session The DAG session.
  * @return The operation which stores the rendered depth map. The output of the operation contains a
  * depth attachment only.
  */
 DagOperationInstance DoProjectNdcDepth(DrawableCollection *drawable_collection,
                                        PerspectiveProjection const &projection, unsigned width,
-                                       unsigned height, DagContext *dag);
+                                       unsigned height, DagContext::Session *session);
 
 /**
  * @brief DoProjectLinearDepth Schedules a graphics pipeline for rendering a linear depth map (A
@@ -53,10 +53,10 @@ DagOperationInstance DoProjectNdcDepth(DrawableCollection *drawable_collection,
  * @param drawable_collection A collection of drawables to project to screen space to find the
  * nearest depth.
  * @param projection Defines how drawables should be projected to the depth map.
- * @param width The width of the depth map.
- * @param height The height of the depth map.
+ * @param width The width of the projected NDC depth map in pixels.
+ * @param height The height of the projected NDC depth map in pixels.
  * @param dependent_op Some dependent operation.
- * @param dag DAG context.
+ * @param session The DAG session.
  * @return The operation which stores the rendered linear depth map. The output of the operation
  * contains both a depth attachment and a color attachment. The depth attachment stores the NDC
  * depth whereas the color attachment stores the linear depth.
@@ -64,7 +64,7 @@ DagOperationInstance DoProjectNdcDepth(DrawableCollection *drawable_collection,
 DagOperationInstance DoProjectLinearDepth(DrawableCollection *drawable_collection,
                                           PerspectiveProjection const &projection, unsigned width,
                                           unsigned height, DagOperationInstance const dependent_op,
-                                          DagContext *dag);
+                                          DagContext::Session *session);
 
 } // namespace e8
 

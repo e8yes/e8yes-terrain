@@ -31,23 +31,21 @@ namespace e8 {
 
 /**
  * @brief DoComputeDirectIllumination Computes the direct illumination from a list of light
- * sources on a map of lighting parameters. Note, it doesn't use the lighting parameter stage
- * when there isn't any light.
+ * sources on a map of lighting parameters.
  *
  * @param drawable_collection Light sources and geometries for which direct illumination needs
  * to be resolved.
  * @param projected_surface Lighting parameters projected to the screen.
  * @param projection The perspective projection setup which generated the surface parameter
  * map.
- * @param first_stage The frame's first stage.
- * @param transfer_context Transfer context.
+ * @param session The DAG session.
  * @return The direct illumination result. Note, the radiance map is cleared to black prior to
  * the direct illumination computation.
  */
 DagOperationInstance DoComputeDirectIllumination(DrawableCollection *drawable_collection,
                                                  DagOperationInstance projected_surface,
                                                  PerspectiveProjection const &projection,
-                                                 DagContext *dag);
+                                                 DagContext::Session *session);
 
 } // namespace e8
 

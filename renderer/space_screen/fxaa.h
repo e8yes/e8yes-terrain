@@ -33,12 +33,13 @@ namespace e8 {
  * @param ldr_image An LDR RGB image where the alpha channel is populated with the color's
  * luminance value.
  * @param color_image_output The output which stores the anti-aliased image.
- * @param transfer_context Transfer context.
+ * @param session The DAG context.
  * @return The operation which performs anti-aliasing to the LDR color image.
  */
 DagOperationInstance
 DoFxaa(DagOperationInstance ldr_image,
-       const std::shared_ptr<GraphicsPipelineOutputInterface> &color_image_output, DagContext *dag);
+       const std::shared_ptr<GraphicsPipelineOutputInterface> &color_image_output,
+       DagContext::Session *session);
 
 } // namespace e8
 

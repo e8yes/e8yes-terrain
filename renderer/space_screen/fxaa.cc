@@ -56,12 +56,11 @@ void FxaaPipelineConfigurator::InputImages(std::vector<VkImageView> *input_image
 DagOperationInstance
 DoFxaa(DagOperationInstance ldr_image,
        const std::shared_ptr<GraphicsPipelineOutputInterface> &color_image_output,
-       DagContext *dag) {
-    DagContext::DagOperationKey op_key = CreateDagOperationKey(
-        kFxaaPipeline, ldr_image->Output()->Width(), ldr_image->Output()->Height());
-    DagOperationInstance target =
-        dag->WithOperation(op_key, [color_image_output](TransferContext *transfer_context,
-                                                        VulkanContext *vulkan_context) {
+       DagContext::Session *session) {
+    DagOperationInstance target = session->WithOperation(
+        kFxaaPipeline, ldr_image->Output()->Width(), ldr_image->Output()->Height(),
+        [color_image_output](unsigned /*width*/, unsigned /*height*/,
+                             TransferContext *transfer_context, VulkanContext *vulkan_context) {
             return std::make_unique<DagOperation>(color_image_output, transfer_context,
                                                   vulkan_context);
         });

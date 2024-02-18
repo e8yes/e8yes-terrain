@@ -15,12 +15,11 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ISLANDS_RENDERER_SPACE_SCREEN_SHADOW_MAP_H
-#define ISLANDS_RENDERER_SPACE_SCREEN_SHADOW_MAP_H
+#ifndef ISLANDS_RENDERER_SPACE_SCREEN_GAUSSIAN_BLUR_H
+#define ISLANDS_RENDERER_SPACE_SCREEN_GAUSSIAN_BLUR_H
 
 #include <memory>
 
-#include "common/device.h"
 #include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
 
@@ -36,32 +35,17 @@ enum GaussianBlurLevel {
 };
 
 /**
- * @brief CreateGaussianBlurStages Creates a pair of separated Gaussian blurring post-processor
- * stages with 32-bit floating point outputs in the specified dimension.
- *
- * @param width The width of the Gaussian blurred float map output.
- * @param height The height of the Gaussian blurred float map output.
- * @param context Contextual Vulkan handles.
- * @param h_blurred The horizontally blurred temporary output.
- * @param hv_blurred The final output with both horizontal and vertical blurring.
- */
-void CreateGaussianBlurStages(unsigned width, unsigned height, VulkanContext *context,
-                              std::unique_ptr<DagOperation> *h_blurred,
-                              std::unique_ptr<DagOperation> *hv_blurred);
-
-/**
  * @brief DoGaussianBlur Schedules a screen space processing graphics pipeline to Gaussian blur a
  * float map.
  *
  * @param image The floating point image to be blurred.
  * @param blur_level The size of the Gaussian blurring kernel.
- * @param transfer_context Transfer context.
- * @param h_blurred The horizontally blurred temporary output.
- * @param hv_blurred The final output with both horizontal and vertical blurring.
+ * @param session The DAG session.
+ * @return The operation which performs Gaussian blurring off of the input image.
  */
 DagOperationInstance DoGaussianBlur(DagOperationInstance image, GaussianBlurLevel blur_level,
-                                    DagContext *dag);
+                                    DagContext::Session *session);
 
 } // namespace e8
 
-#endif // ISLANDS_RENDERER_SPACE_SCREEN_SHADOW_MAP_H
+#endif // ISLANDS_RENDERER_SPACE_SCREEN_GAUSSIAN_BLUR_H

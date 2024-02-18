@@ -45,9 +45,9 @@ class DagContext {
     DagContext(VulkanContext *context);
     ~DagContext();
 
-    using DagOperationKey = std::string;
     using CreateDagOperationFn = std::function<std::unique_ptr<DagOperation>(
-        TransferContext *transfer_context, VulkanContext *vulkan_context)>;
+        unsigned output_width, unsigned output_height, TransferContext *transfer_context,
+        VulkanContext *vulkan_context)>;
 
     class Session {
       public:
@@ -55,6 +55,24 @@ class DagContext {
         Session(Session const &) = delete;
         Session(Session &&other);
         ~Session();
+
+        /**
+         * @brief WithOperation Adds a DagOperation to the inherited context if it hasn't been. The
+         * operation is identified through the tuple (graphics_pipeline_key, output_width,
+         * output_height, sessional_allocation_counter). This means effectively the same DAG
+         * operation of the same pipeline and output size will be fetched in the next session,
+         * avoiding re-creation. This identification method also allows multiple operations with the
+         * same format to be created within a session.
+         *
+         * @param pipeline_key A unique key which identifies the DagOperation.
+         * @param output_width The output width of the pipeline.
+         * @param output_height The output height of the pipeline.
+         * @param create_fn The DagOperation's constructor.
+         * @return The DagOperation associated with the key. Always not none.
+         */
+        DagOperationInstance WithOperation(PipelineKey const &keypipeline_key,
+                                           unsigned output_width, unsigned output_height,
+                                           CreateDagOperationFn create_fn);
 
       private:
         DagContext *self_;
@@ -65,40 +83,34 @@ class DagContext {
      */
     Session CreateSession();
 
-    /**
-     * @brief WithOperation Adds a DagOperation to this context if it hasn't been. This function can
-     * only be called in a session (See CreateSession() above).
-     *
-     * @param key A unique key which identifies the DagOperation.
-     * @param create_fn The DagOperation's constructor.
-     * @return The DagOperation associated with the key. Always not none.
-     */
-    DagOperationInstance WithOperation(DagOperationKey const &key, CreateDagOperationFn create_fn);
-
   private:
-    using AllocationCounter = unsigned;
+    using SessionalAllocationCounter = unsigned;
+    using DagOperationKeyPrefix = std::string;
+    using DagOperationKey = std::string;
 
     struct DagOperationWithUsage {
         std::unique_ptr<DagOperation> dag_op;
         uint64_t usage_count = 0;
     };
 
+    static DagOperationKeyPrefix CreateKeyPrefix(PipelineKey const &pipeline_key,
+                                                 unsigned output_width, unsigned output_height);
+    DagOperationKey AllocateSessionalKey(DagOperationKeyPrefix const &key_prefix);
+    DagOperationInstance FetchDagOperation(DagOperationKey const &sessional_op_key,
+                                           unsigned output_width, unsigned output_height,
+                                           CreateDagOperationFn create_fn);
+    void ResetKeyAllocation();
+    void DeleteUnusedDagOperations();
+
     VulkanContext *vulkan_context_;
     TransferContext transfer_context_;
+
     std::unordered_map<DagOperationKey, DagOperationWithUsage> dag_ops_;
-    std::unordered_map<DagOperationKey, AllocationCounter> alloc_counters_;
+    std::unordered_map<DagOperationKeyPrefix, SessionalAllocationCounter> sess_alloc_counters_;
+
     uint64_t session_count_;
     bool in_session_;
 };
-
-/**
- * @brief CreateDagOperationKey A common way to identify a DagOperation is through the triplet
- * (graphics_pipeline_key, output_width, output_height). This utility function generates a unique
- * key for a DagOperation deterministically by concatenating the triplet into a string.
- */
-DagContext::DagOperationKey CreateDagOperationKey(PipelineKey const &key,
-                                                  unsigned const output_width,
-                                                  unsigned const output_height);
 
 } // namespace e8
 

@@ -89,13 +89,13 @@ void DepthProjectionPostProcessorConfigurator::PushConstants(
 DagOperationInstance DoVisualizeDepthProjection(
     float alpha, std::optional<PerspectiveProjection> projection,
     DagOperationInstance ndc_depth_map,
-    std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output, DagContext *dag) {
-    DagContext::DagOperationKey key =
-        CreateDagOperationKey(kDepthProjectionVisualizerPipeline, ndc_depth_map->Output()->Width(),
-                              ndc_depth_map->Output()->Height());
-    DagOperationInstance target =
-        dag->WithOperation(key, [color_image_output](TransferContext *transfer_context,
-                                                     VulkanContext *vulkan_context) {
+    std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output,
+    DagContext::Session *session) {
+    DagOperationInstance target = session->WithOperation(
+        kDepthProjectionVisualizerPipeline, ndc_depth_map->Output()->Width(),
+        ndc_depth_map->Output()->Height(),
+        [color_image_output](unsigned /*width*/, unsigned /*height*/,
+                             TransferContext *transfer_context, VulkanContext *vulkan_context) {
             return std::make_unique<DagOperation>(color_image_output, transfer_context,
                                                   vulkan_context);
         });

@@ -84,13 +84,13 @@ void SurfaceProjectionVisualizerPostProcessorConfigurator::PushConstants(
 DagOperationInstance DoVisualizeSurfaceProjection(
     LightInputsRendererParameters::InputType parameter_to_visualize,
     DagOperationInstance surface_projection,
-    std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output, DagContext *dag) {
-    DagContext::DagOperationKey op_key = CreateDagOperationKey(
+    std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output,
+    DagContext::Session *session) {
+    DagOperationInstance target = session->WithOperation(
         kSurfaceProjectionVisualizerPipeline, surface_projection->Output()->Width(),
-        surface_projection->Output()->Height());
-    DagOperationInstance target =
-        dag->WithOperation(op_key, [color_image_output](TransferContext *transfer_context,
-                                                        VulkanContext *vulkan_context) {
+        surface_projection->Output()->Height(),
+        [color_image_output](unsigned /*width*/, unsigned /*height*/,
+                             TransferContext *transfer_context, VulkanContext *vulkan_context) {
             return std::make_unique<DagOperation>(color_image_output, transfer_context,
                                                   vulkan_context);
         });

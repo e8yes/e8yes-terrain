@@ -72,10 +72,10 @@ void DepthRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor)
         this->AcquireFinalColorImage(&pimpl_->frame_resource_allocator);
     DagOperationInstance ndc_depth_map =
         DoProjectNdcDepth(&drawables_collection, projection, final_color_image->Width(),
-                          final_color_image->Height(), &pimpl_->dag_context);
+                          final_color_image->Height(), &session);
     DagOperationInstance visualized_color_map =
         DoVisualizeDepthProjection(pimpl_->config.depth_renderer_params().alpha(), projection,
-                                   ndc_depth_map, final_color_image, &pimpl_->dag_context);
+                                   ndc_depth_map, final_color_image, &session);
     std::vector<GpuPromise *> final_waits =
         visualized_color_map->Fulfill(/*wait=*/false, &pimpl_->frame_resource_allocator);
     this->PresentFinalColorImage(*final_color_image, final_waits);

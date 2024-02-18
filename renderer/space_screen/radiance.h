@@ -38,14 +38,14 @@ namespace e8 {
  * source's perspective. Each depth map corresponds to one of the light source's region
  * (see LightVolume). When it is specified, this function computes the radiance based on the
  * occlusion factor. Otherwise, the radiance penetrates all objects.
- * @param dag DAG context.
+ * @param session The DAG session.
  * @return The operation which computes the radiance map in an HDR color image.
  */
 DagOperationInstance DoComputeRadiance(LightSourceInstance const &instance,
                                        DagOperationInstance projected_surface,
                                        frustum const &projection,
                                        std::vector<DagOperationInstance> const &shadow_maps,
-                                       DagContext *dag);
+                                       DagContext::Session *session);
 
 } // namespace e8
 

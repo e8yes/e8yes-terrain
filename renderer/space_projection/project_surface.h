@@ -24,7 +24,6 @@
 #include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/drawable/collection.h"
-#include "renderer/transfer/context.h"
 
 namespace e8 {
 
@@ -51,14 +50,14 @@ enum SurfaceProjectionColorOutput {
  * @param drawable_collection A collection of drawables to project to screen space to encode surface
  * information.
  * @param projection Defines how drawables should be projected to the light parameter map.
- * @param width
- * @param height
- * @param dag DAG context.
+ * @param width The width of the projected surface map in pixels.
+ * @param height The height of the projected surface map in pixels.
+ * @param session The DAG session.
  * @return The operation which stores the rendered light inputs.
  */
 DagOperationInstance DoProjectSurface(DrawableCollection *drawable_collection,
                                       PerspectiveProjection const &projection, unsigned width,
-                                      unsigned height, DagContext *dag);
+                                      unsigned height, DagContext::Session *session);
 
 } // namespace e8
 

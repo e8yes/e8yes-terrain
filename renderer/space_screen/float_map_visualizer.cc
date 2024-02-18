@@ -76,15 +76,10 @@ std::unique_ptr<DagOperation> CreateFloatVisualizationOp(unsigned width, unsigne
 } // namespace
 
 DagOperationInstance DoVisualizeFloat(DagOperationInstance float_map, float min_value,
-                                      float max_value, DagContext *dag) {
-    DagContext::DagOperationKey op_key = CreateDagOperationKey(
-        kFloatMapVisualizerPipeline, float_map->Output()->Width(), float_map->Output()->Height());
-    DagOperationInstance target = dag->WithOperation(
-        op_key, [float_map](TransferContext *transfer_context, VulkanContext *vulkan_context) {
-            return CreateFloatVisualizationOp(float_map->Output()->Width(),
-                                              float_map->Output()->Height(), transfer_context,
-                                              vulkan_context);
-        });
+                                      float max_value, DagContext::Session *session) {
+    DagOperationInstance target =
+        session->WithOperation(kFloatMapVisualizerPipeline, float_map->Output()->Width(),
+                               float_map->Output()->Height(), CreateFloatVisualizationOp);
 
     GraphicsPipelineInterface *pipeline = target->WithPipeline(
         kFloatMapVisualizerPipeline,

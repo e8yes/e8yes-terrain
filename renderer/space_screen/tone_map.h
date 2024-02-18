@@ -32,11 +32,11 @@ namespace e8 {
  * @param exposure Optional. It only uses the ACES tone mapper when the exposure value is provided.
  * Otherwise, it simply clamps the radiance value into the [0, 1] range.
  * @param transfer_context Transfer context.
- * @param dag DAG context.
+ * @param session The DAG session.
  * @return The target which tone maps the radiance map to an LDR color image.
  */
 DagOperationInstance DoToneMapping(DagOperationInstance radiance_map, DagOperationInstance exposure,
-                                   DagContext *dag);
+                                   DagContext::Session *session);
 
 } // namespace e8
 

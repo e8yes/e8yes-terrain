@@ -270,12 +270,9 @@ class ProjectLinearDepthPipeline final : public GraphicsPipelineInterface {
 
 DagOperationInstance DoProjectNdcDepth(DrawableCollection *drawable_collection,
                                        PerspectiveProjection const &projection, unsigned width,
-                                       unsigned height, DagContext *dag) {
-    DagContext::DagOperationKey key = CreateDagOperationKey(kProjectDepthPipeline, width, height);
-    DagOperationInstance projected_ndc_depth = dag->WithOperation(
-        key, [width, height](TransferContext *transfer_context, VulkanContext *vulkan_context) {
-            return CreateProjectNdcDepthOp(width, height, transfer_context, vulkan_context);
-        });
+                                       unsigned height, DagContext::Session *session) {
+    DagOperationInstance projected_ndc_depth =
+        session->WithOperation(kProjectDepthPipeline, width, height, CreateProjectNdcDepthOp);
     GraphicsPipelineInterface *project_depth_pipeline = projected_ndc_depth->WithPipeline(
         kProjectDepthPipeline,
         [](GraphicsPipelineOutputInterface *output, TransferContext * /*transfer_context*/,
@@ -299,12 +296,9 @@ DagOperationInstance DoProjectNdcDepth(DrawableCollection *drawable_collection,
 DagOperationInstance DoProjectLinearDepth(DrawableCollection *drawable_collection,
                                           PerspectiveProjection const &projection, unsigned width,
                                           unsigned height, DagOperationInstance const dependent_op,
-                                          DagContext *dag) {
-    DagContext::DagOperationKey key = CreateDagOperationKey(kProjectDepthPipeline, width, height);
-    DagOperationInstance projected_linear_depth = dag->WithOperation(
-        key, [width, height](TransferContext *transfer_context, VulkanContext *vulkan_context) {
-            return CreateProjectLinearDepthOp(width, height, transfer_context, vulkan_context);
-        });
+                                          DagContext::Session *session) {
+    DagOperationInstance projected_linear_depth =
+        session->WithOperation(kProjectDepthPipeline, width, height, CreateProjectLinearDepthOp);
     GraphicsPipelineInterface *project_linear_depth_pipeline = projected_linear_depth->WithPipeline(
         kProjectLinearDepthPipeline,
         [](GraphicsPipelineOutputInterface *output, TransferContext * /*transfer_context*/,

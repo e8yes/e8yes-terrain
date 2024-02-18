@@ -214,21 +214,15 @@ std::unique_ptr<DagOperation> CreateExposureValueOp(TransferContext *transfer_co
 
 } // namespace
 
-DagOperationInstance DoEstimateExposure(DagOperationInstance radiance_map, DagContext *dag) {
-    DagContext::DagOperationKey log_luminance_key =
-        CreateDagOperationKey(kLogarithmicLuminancePipeline, radiance_map->Output()->Width(),
-                              radiance_map->Output()->Height());
-    DagContext::DagOperationKey compute_average_key =
-        CreateDagOperationKey(kComputeAveragePipeline, /*width=*/1, /*height=*/1);
+DagOperationInstance DoEstimateExposure(DagOperationInstance radiance_map,
+                                        DagContext::Session *session) {
     DagOperationInstance log_luminance_map =
-        dag->WithOperation(log_luminance_key, [radiance_map](TransferContext *transfer_context,
-                                                             VulkanContext *vulkan_context) {
-            return CreateLogLuminanceOp(radiance_map->Output()->Width(),
-                                        radiance_map->Output()->Height(), transfer_context,
-                                        vulkan_context);
-        });
-    DagOperationInstance log_exposure = dag->WithOperation(
-        compute_average_key, [](TransferContext *transfer_context, VulkanContext *vulkan_context) {
+        session->WithOperation(kLogarithmicLuminancePipeline, radiance_map->Output()->Width(),
+                               radiance_map->Output()->Height(), CreateLogLuminanceOp);
+    DagOperationInstance log_exposure = session->WithOperation(
+        kComputeAveragePipeline, /*width=*/1, /*height=*/1,
+        [](unsigned /*width*/, unsigned /*height*/, TransferContext *transfer_context,
+           VulkanContext *vulkan_context) {
             return CreateExposureValueOp(transfer_context, vulkan_context);
         });
 

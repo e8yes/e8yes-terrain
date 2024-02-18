@@ -62,7 +62,7 @@ void SolidColorRenderer::DrawFrame(Scene *scene, ResourceAccessor * /*resource_a
     std::shared_ptr<SwapChainOutput> final_color_image =
         this->AcquireFinalColorImage(&pimpl_->frame_resource_allocator);
     DagOperationInstance filled_image =
-        DoFillColor(scene->background_color, final_color_image, &pimpl_->dag_context);
+        DoFillColor(scene->background_color, final_color_image, &session);
     std::vector<GpuPromise *> final_waits =
         filled_image->Fulfill(/*wait=*/false, &pimpl_->frame_resource_allocator);
     this->PresentFinalColorImage(*final_color_image, final_waits);

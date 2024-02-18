@@ -71,15 +71,14 @@ void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_access
         this->AcquireFinalColorImage(&pimpl_->frame_resource_allocator);
     DagOperationInstance projected_surface =
         DoProjectSurface(&drawable_collection, projection, final_color_image->Width(),
-                         final_color_image->Height(), &pimpl_->dag_context);
-    DagOperationInstance radiance_map = DoComputeDirectIllumination(
-        &drawable_collection, projected_surface, projection, &pimpl_->dag_context);
+                         final_color_image->Height(), &session);
+    DagOperationInstance radiance_map =
+        DoComputeDirectIllumination(&drawable_collection, projected_surface, projection, &session);
 
-    DagOperationInstance log_exposure_value =
-        DoEstimateExposure(radiance_map, &pimpl_->dag_context);
-    DagOperationInstance ldr_image =
-        DoToneMapping(radiance_map, log_exposure_value, &pimpl_->dag_context);
-    DagOperationInstance final_result = DoFxaa(ldr_image, final_color_image, &pimpl_->dag_context);
+    //    DagOperationInstance log_exposure_value =
+    //        DoEstimateExposure(radiance_map, &pimpl_->dag_context);
+    DagOperationInstance ldr_image = DoToneMapping(radiance_map, nullptr, &session);
+    DagOperationInstance final_result = DoFxaa(ldr_image, final_color_image, &session);
     std::vector<GpuPromise *> final_waits =
         final_result->Fulfill(/*wait=*/false, &pimpl_->frame_resource_allocator);
 

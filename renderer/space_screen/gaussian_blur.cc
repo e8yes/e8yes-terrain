@@ -153,25 +153,16 @@ std::unique_ptr<DagOperation> CreateGaussianBlurOp(unsigned width, unsigned heig
 }
 
 DagOperationInstance DoGaussianBlur(DagOperationInstance image, GaussianBlurLevel blur_level,
-                                    DagContext *dag) {
+                                    DagContext::Session *session) {
     PipelineKey horizontal_blur_pipeline_key = HorizontalGaussianBlurPipelineKey(blur_level);
-    DagContext::DagOperationKey horizontal_op_key = CreateDagOperationKey(
-        horizontal_blur_pipeline_key, image->Output()->Width(), image->Output()->Height());
-    DagOperationInstance h_blurred =
-        dag->WithOperation(horizontal_op_key, [image](TransferContext *transfer_context,
-                                                      VulkanContext *vulkan_context) {
-            return CreateGaussianBlurOp(image->Output()->Width(), image->Output()->Height(),
-                                        transfer_context, vulkan_context);
-        });
+    PipelineKey veritical_blur_pipeline_key = VerticalGaussianBlurPipelineKey(blur_level);
 
-    PipelineKey final_blur_pipeline_key = VerticalGaussianBlurPipelineKey(blur_level);
-    DagContext::DagOperationKey final_op_key = CreateDagOperationKey(
-        final_blur_pipeline_key, image->Output()->Width(), image->Output()->Height());
-    DagOperationInstance hv_blurred = dag->WithOperation(
-        final_op_key, [image](TransferContext *transfer_context, VulkanContext *vulkan_context) {
-            return CreateGaussianBlurOp(image->Output()->Width(), image->Output()->Height(),
-                                        transfer_context, vulkan_context);
-        });
+    DagOperationInstance h_blurred =
+        session->WithOperation(horizontal_blur_pipeline_key, image->Output()->Width(),
+                               image->Output()->Height(), CreateGaussianBlurOp);
+    DagOperationInstance hv_blurred =
+        session->WithOperation(veritical_blur_pipeline_key, image->Output()->Width(),
+                               image->Output()->Height(), CreateGaussianBlurOp);
 
     GraphicsPipelineInterface *h_blur_pipeline = h_blurred->WithPipeline(
         HorizontalGaussianBlurPipelineKey(blur_level),

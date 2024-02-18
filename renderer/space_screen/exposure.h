@@ -32,10 +32,11 @@ namespace e8 {
  *
  * @param radiance_map The raw radiance image to estimate exposure for.
  * @param transfer_context Transfer context.
- * @param dag DAG context.
+ * @param session The DAG session.
  * @return The target stage which stares the logarithmic exposure value.
  */
-DagOperationInstance DoEstimateExposure(DagOperationInstance radiance_map, DagContext *dag);
+DagOperationInstance DoEstimateExposure(DagOperationInstance radiance_map,
+                                        DagContext::Session *session);
 
 } // namespace e8
 

@@ -100,12 +100,11 @@ void ConfigureFillColorOp(vec3 const &color, DagOperationInstance dependent_op,
 DagOperationInstance
 DoFillColor(vec3 const &color,
             std::shared_ptr<GraphicsPipelineOutputInterface> const &color_image_output,
-            DagContext *dag) {
-    DagContext::DagOperationKey key = CreateDagOperationKey(
-        kFillColorPipeline, color_image_output->Width(), color_image_output->Height());
-    DagOperationInstance filled_image =
-        dag->WithOperation(key, [color_image_output](TransferContext *transfer_context,
-                                                     VulkanContext *vulkan_context) {
+            DagContext::Session *session) {
+    DagOperationInstance filled_image = session->WithOperation(
+        kFillColorPipeline, color_image_output->Width(), color_image_output->Height(),
+        [color_image_output](unsigned /*width*/, unsigned /*height*/,
+                             TransferContext *transfer_context, VulkanContext *vulkan_context) {
             return std::make_unique<DagOperation>(color_image_output, transfer_context,
                                                   vulkan_context);
         });
@@ -115,15 +114,14 @@ DoFillColor(vec3 const &color,
 }
 
 DagOperationInstance DoFillColor(vec3 const &color, bool hdr, DagOperationInstance image,
-                                 DagContext *dag) {
+                                 DagContext::Session *session) {
     assert(image != nullptr);
 
-    DagContext::DagOperationKey key = CreateDagOperationKey(
-        kFillColorPipeline, image->Output()->Width(), image->Output()->Height());
-    DagOperationInstance filled_image = dag->WithOperation(
-        key, [hdr, image](TransferContext *transfer_context, VulkanContext *vulkan_context) {
-            return CreateFillColorOp(image->Output()->Width(), image->Output()->Height(), hdr,
-                                     transfer_context, vulkan_context);
+    DagOperationInstance filled_image = session->WithOperation(
+        kFillColorPipeline, image->Output()->Width(), image->Output()->Height(),
+        [hdr](unsigned width, unsigned height, TransferContext *transfer_context,
+              VulkanContext *vulkan_context) {
+            return CreateFillColorOp(width, height, hdr, transfer_context, vulkan_context);
         });
 
     ConfigureFillColorOp(color, image, filled_image);

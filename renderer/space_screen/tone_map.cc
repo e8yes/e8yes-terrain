@@ -77,7 +77,7 @@ void ToneMapPostProcessorConfigurator::InputImages(std::vector<VkImageView> *inp
  * @param context Contextual Vulkan handles.
  * @return An LDR image stage with a color image output.
  */
-std::unique_ptr<DagOperation> CreateLdrImageStage(unsigned width, unsigned height,
+std::unique_ptr<DagOperation> CreateToneMappingOp(unsigned width, unsigned height,
                                                   TransferContext *transfer_context,
                                                   VulkanContext *vulkan_context) {
     auto output = std::make_shared<LdrColorOutput>(width, height,
@@ -88,19 +88,14 @@ std::unique_ptr<DagOperation> CreateLdrImageStage(unsigned width, unsigned heigh
 } // namespace
 
 DagOperationInstance DoToneMapping(DagOperationInstance radiance_map, DagOperationInstance exposure,
-                                   DagContext *dag) {
-    DagContext::DagOperationKey op_key = CreateDagOperationKey(
-        exposure != nullptr ? kAcesToneMapPipeline : kClampedLinearToneMapPipeline,
-        radiance_map->Output()->Width(), radiance_map->Output()->Height());
-    DagOperationInstance target = dag->WithOperation(
-        op_key, [radiance_map](TransferContext *transfer_context, VulkanContext *vulkan_context) {
-            return CreateLdrImageStage(radiance_map->Output()->Width(),
-                                       radiance_map->Output()->Height(), transfer_context,
-                                       vulkan_context);
-        });
+                                   DagContext::Session *session) {
+    PipelineKey pipeline_key =
+        exposure != nullptr ? kAcesToneMapPipeline : kClampedLinearToneMapPipeline;
+    DagOperationInstance target =
+        session->WithOperation(pipeline_key, radiance_map->Output()->Width(),
+                               radiance_map->Output()->Height(), CreateToneMappingOp);
 
     GraphicsPipelineInterface *pipeline;
-
     if (exposure != nullptr) {
         pipeline = target->WithPipeline(
             kAcesToneMapPipeline,

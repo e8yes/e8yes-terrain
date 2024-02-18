@@ -38,20 +38,20 @@ GaussianBlurLevel kSpotLightBlurringKernelSize = GaussianBlurLevel::GBL_1X1;
 
 DagOperationInstance DoGenerateSpotLightShadowMap(SpotLightVolume const &spot_light_region,
                                                   DrawableCollection *drawable_collection,
-                                                  DagContext *dag) {
+                                                  DagContext::Session *session) {
     DagOperationInstance projected_linear_depth = DoProjectLinearDepth(
         drawable_collection, spot_light_region.projection, kSpotLightShadowMapWidth,
-        kSpotLightShadowMapHeight, /*dependent_op=*/nullptr, dag);
+        kSpotLightShadowMapHeight, /*dependent_op=*/nullptr, session);
     return projected_linear_depth;
 }
 
 std::vector<DagOperationInstance> DoGenerateShadowMaps(LightSourceInstance const &light_source,
                                                        DrawableCollection *drawable_collection,
-                                                       DagContext *dag) {
+                                                       DagContext::Session *session) {
 
     if (light_source.light_volume.spot_light_region.has_value()) {
         DagOperationInstance shadow_map = DoGenerateSpotLightShadowMap(
-            *light_source.light_volume.spot_light_region, drawable_collection, dag);
+            *light_source.light_volume.spot_light_region, drawable_collection, session);
         // TODO: Blur the shadow map with kSpotLightBlurringKernelSize.
         return std::vector<DagOperationInstance>({shadow_map});
     } else {
@@ -65,17 +65,18 @@ std::vector<DagOperationInstance> DoGenerateShadowMaps(LightSourceInstance const
 DagOperationInstance DoComputeDirectIllumination(DrawableCollection *drawable_collection,
                                                  DagOperationInstance projected_surface,
                                                  PerspectiveProjection const &projection,
-                                                 DagContext *dag) {
+                                                 DagContext::Session *session) {
 
     std::vector<LightSourceInstance> light_sources =
         drawable_collection->ObservableLightSources(projection);
     if (light_sources.empty()) {
-        return DoFillColor(/*color=*/vec3{0.0f, 0.0f, 0.0f}, /*hdr=*/true, projected_surface, dag);
+        return DoFillColor(/*color=*/vec3{0.0f, 0.0f, 0.0f}, /*hdr=*/true, projected_surface,
+                           session);
         ;
     }
 
     return DoComputeRadiance(light_sources[0], projected_surface, projection.Frustum(),
-                             /*shadow_maps=*/std::vector<DagOperationInstance>(), dag);
+                             /*shadow_maps=*/std::vector<DagOperationInstance>(), session);
 }
 
 } // namespace e8
