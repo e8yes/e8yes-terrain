@@ -57,7 +57,7 @@ RendererInterface::StagePerformance::~StagePerformance() {}
 RendererInterface::RendererInterface(unsigned num_stages, VulkanContext *context)
     : context(context), stage_performance_(num_stages + 2),
       final_output_(std::make_shared<SwapChainOutput>(/*with_depth_buffer=*/false, context)),
-      mu_(std::make_unique<std::mutex>()) {}
+      acquisition_signal_(context), mu_(std::make_unique<std::mutex>()) {}
 
 RendererInterface::~RendererInterface() {}
 
@@ -68,14 +68,14 @@ std::vector<RendererInterface::StagePerformance> RendererInterface::GetPerforman
 
 std::shared_ptr<SwapChainOutput>
 RendererInterface::AcquireFinalColorImage(FrameResourceAllocator *frame_resource_allocator) {
-    CpuPromise acquisition_signal(context);
+    acquisition_signal_.Reset();
     unsigned swap_chain_image_index;
     assert(VK_SUCCESS == vkAcquireNextImageKHR(context->device, context->swap_chain,
                                                /*timeout=*/std::numeric_limits<uint64_t>::max(),
                                                /*semaphore=*/VK_NULL_HANDLE,
-                                               /*fence=*/acquisition_signal.signal,
+                                               /*fence=*/acquisition_signal_.signal,
                                                &swap_chain_image_index));
-    acquisition_signal.Wait();
+    acquisition_signal_.Wait();
 
     final_output_->SetSwapChainImageIndex(swap_chain_image_index);
     frame_resource_allocator->SetSwapChainImageIndex(swap_chain_image_index);

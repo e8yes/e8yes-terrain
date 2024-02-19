@@ -60,6 +60,9 @@ RadianceRenderer::RadianceRenderer(VulkanContext *context)
 RadianceRenderer::~RadianceRenderer() {}
 
 void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor) {
+    std::shared_ptr<SwapChainOutput> render_output =
+        this->AcquireFinalColorImage(&pimpl_->frame_resource_allocator);
+
     Scene::ReadAccess read_access = scene->GainReadAccess();
     PerspectiveProjection projection(scene->camera);
     DrawableCollection drawable_collection(*scene->SceneEntityStructure(), resource_accessor);
@@ -67,22 +70,20 @@ void RadianceRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_access
     // Render passes.
     DagContext::Session session = pimpl_->dag_context.CreateSession();
 
-    std::shared_ptr<SwapChainOutput> final_color_image =
-        this->AcquireFinalColorImage(&pimpl_->frame_resource_allocator);
     DagOperationInstance projected_surface =
-        DoProjectSurface(&drawable_collection, projection, final_color_image->Width(),
-                         final_color_image->Height(), &session);
+        DoProjectSurface(&drawable_collection, projection, render_output->Width(),
+                         render_output->Height(), &session);
     DagOperationInstance radiance_map =
         DoComputeDirectIllumination(&drawable_collection, projected_surface, projection, &session);
 
     //    DagOperationInstance log_exposure_value =
     //        DoEstimateExposure(radiance_map, &pimpl_->dag_context);
     DagOperationInstance ldr_image = DoToneMapping(radiance_map, nullptr, &session);
-    DagOperationInstance final_result = DoFxaa(ldr_image, final_color_image, &session);
+    DagOperationInstance final_result = DoFxaa(ldr_image, render_output, &session);
     std::vector<GpuPromise *> final_waits =
         final_result->Fulfill(/*wait=*/false, &pimpl_->frame_resource_allocator);
 
-    this->PresentFinalColorImage(*final_color_image, final_waits);
+    this->PresentFinalColorImage(*render_output, final_waits);
 }
 
 void RadianceRenderer::ApplyConfiguration(RendererConfiguration const &config) {

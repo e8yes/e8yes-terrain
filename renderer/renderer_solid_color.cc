@@ -55,17 +55,17 @@ SolidColorRenderer::SolidColorRenderer(VulkanContext *context)
 SolidColorRenderer::~SolidColorRenderer() {}
 
 void SolidColorRenderer::DrawFrame(Scene *scene, ResourceAccessor * /*resource_accessor*/) {
+    std::shared_ptr<SwapChainOutput> render_output =
+        this->AcquireFinalColorImage(&pimpl_->frame_resource_allocator);
+
     Scene::ReadAccess read_access = scene->GainReadAccess();
 
     DagContext::Session session = pimpl_->dag_context.CreateSession();
-
-    std::shared_ptr<SwapChainOutput> final_color_image =
-        this->AcquireFinalColorImage(&pimpl_->frame_resource_allocator);
     DagOperationInstance filled_image =
-        DoFillColor(scene->background_color, final_color_image, &session);
+        DoFillColor(scene->background_color, render_output, &session);
     std::vector<GpuPromise *> final_waits =
         filled_image->Fulfill(/*wait=*/false, &pimpl_->frame_resource_allocator);
-    this->PresentFinalColorImage(*final_color_image, final_waits);
+    this->PresentFinalColorImage(*render_output, final_waits);
 }
 
 void SolidColorRenderer::ApplyConfiguration(RendererConfiguration const & /*config*/) {}

@@ -62,23 +62,24 @@ DepthRenderer::DepthRenderer(VulkanContext *context)
 DepthRenderer::~DepthRenderer() {}
 
 void DepthRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor) {
+    std::shared_ptr<SwapChainOutput> render_output =
+        this->AcquireFinalColorImage(&pimpl_->frame_resource_allocator);
+
     Scene::ReadAccess read_access = scene->GainReadAccess();
     PerspectiveProjection projection(scene->camera);
     DrawableCollection drawables_collection(*scene->SceneEntityStructure(), resource_accessor);
 
     DagContext::Session session = pimpl_->dag_context.CreateSession();
 
-    std::shared_ptr<SwapChainOutput> final_color_image =
-        this->AcquireFinalColorImage(&pimpl_->frame_resource_allocator);
     DagOperationInstance ndc_depth_map =
-        DoProjectNdcDepth(&drawables_collection, projection, final_color_image->Width(),
-                          final_color_image->Height(), &session);
+        DoProjectNdcDepth(&drawables_collection, projection, render_output->Width(),
+                          render_output->Height(), &session);
     DagOperationInstance visualized_color_map =
         DoVisualizeDepthProjection(pimpl_->config.depth_renderer_params().alpha(), projection,
-                                   ndc_depth_map, final_color_image, &session);
+                                   ndc_depth_map, render_output, &session);
     std::vector<GpuPromise *> final_waits =
         visualized_color_map->Fulfill(/*wait=*/false, &pimpl_->frame_resource_allocator);
-    this->PresentFinalColorImage(*final_color_image, final_waits);
+    this->PresentFinalColorImage(*render_output, final_waits);
 }
 
 void DepthRenderer::ApplyConfiguration(RendererConfiguration const &config) {

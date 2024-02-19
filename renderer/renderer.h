@@ -133,6 +133,7 @@ class RendererInterface {
   private:
     std::vector<StagePerformance> stage_performance_;
     std::shared_ptr<SwapChainOutput> final_output_;
+    CpuPromise acquisition_signal_;
     std::unique_ptr<std::mutex> mu_;
 };
 

@@ -35,6 +35,7 @@ void FrameResourceAllocator::SetSwapChainImageIndex(unsigned swap_chain_image_in
     assert(swap_chain_image_index < frames_.size());
 
     for (auto &cpu_promise : frames_[swap_chain_image_index].cpu_promises) {
+        cpu_promise->Wait();
         cpu_promise->Reset();
     }
     for (auto &gpu_promise : frames_[swap_chain_image_index].gpu_promises) {

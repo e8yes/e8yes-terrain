@@ -62,24 +62,24 @@ SurfaceProjectionRenderer::SurfaceProjectionRenderer(VulkanContext *context)
 SurfaceProjectionRenderer::~SurfaceProjectionRenderer() {}
 
 void SurfaceProjectionRenderer::DrawFrame(Scene *scene, ResourceAccessor *resource_accessor) {
-    Scene::ReadAccess read_access = scene->GainReadAccess();
+    std::shared_ptr<SwapChainOutput> render_output =
+        this->AcquireFinalColorImage(&pimpl_->frame_resource_allocator);
 
+    Scene::ReadAccess read_access = scene->GainReadAccess();
     PerspectiveProjection camera_projection(scene->camera);
     DrawableCollection drawable_collection(*scene->SceneEntityStructure(), resource_accessor);
 
     DagContext::Session session = pimpl_->dag_context.CreateSession();
 
-    std::shared_ptr<SwapChainOutput> final_color_image =
-        this->AcquireFinalColorImage(&pimpl_->frame_resource_allocator);
     DagOperationInstance surface_projection =
-        DoProjectSurface(&drawable_collection, camera_projection, final_color_image->Width(),
-                         final_color_image->Height(), &session);
+        DoProjectSurface(&drawable_collection, camera_projection, render_output->Width(),
+                         render_output->Height(), &session);
     DagOperationInstance visualized_surface = DoVisualizeSurfaceProjection(
         pimpl_->config.light_inputs_renderer_params().input_to_visualize(), surface_projection,
-        final_color_image, &session);
+        render_output, &session);
     std::vector<GpuPromise *> final_waits =
         visualized_surface->Fulfill(/*wait=*/false, &pimpl_->frame_resource_allocator);
-    this->PresentFinalColorImage(*final_color_image, final_waits);
+    this->PresentFinalColorImage(*render_output, final_waits);
 }
 
 void SurfaceProjectionRenderer::ApplyConfiguration(RendererConfiguration const &config) {
