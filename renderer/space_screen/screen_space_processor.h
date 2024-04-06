@@ -53,6 +53,14 @@ class ScreenSpaceConfiguratorInterface : public GraphicsPipelineArgumentsInterfa
      * processing pipeline.
      */
     virtual void PushConstants(std::vector<uint8_t> *push_constants) const;
+
+    /**
+     * @brief UniformBufferConstants
+     * @param binding
+     * @param push_constants
+     */
+    virtual void UniformBufferConstants(unsigned binding,
+                                        std::vector<uint8_t> *uniform_buffer_constants) const;
 };
 
 /**

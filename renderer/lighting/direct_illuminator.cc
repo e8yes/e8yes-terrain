@@ -15,6 +15,7 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cassert>
 #include <memory>
 #include <unordered_set>
 #include <vector>
@@ -72,11 +73,36 @@ DagOperationInstance DoComputeDirectIllumination(DrawableCollection *drawable_co
     if (light_sources.empty()) {
         return DoFillColor(/*color=*/vec3{0.0f, 0.0f, 0.0f}, /*hdr=*/true, projected_surface,
                            session);
-        ;
     }
 
-    return DoComputeRadiance(light_sources[0], projected_surface, projection.Frustum(),
-                             /*shadow_maps=*/std::vector<DagOperationInstance>(), session);
+    std::optional<LightSourceInstance> sun_light;
+    std::vector<LightSourceInstance> spot_lights;
+    std::vector<LightSourceInstance> point_lights;
+
+    for (auto const &light : light_sources) {
+        switch (light.light_source.model_case()) {
+        case LightSource::ModelCase::kSunLight: {
+            *sun_light = light;
+            break;
+        }
+        case LightSource::ModelCase::kPointLight: {
+            point_lights.push_back(light);
+            break;
+        }
+        case LightSource::ModelCase::kSpotLight: {
+            spot_lights.push_back(light);
+            break;
+        }
+        default: {
+            assert(false);
+        }
+        }
+    }
+
+    return DoComputeRadiance(projected_surface, projection.Frustum(),
+                             /*shadowed_sunlight=*/std::nullopt,
+                             /*shadowed_spot_lights=*/std::vector<ShadowedSpotLight>(), spot_lights,
+                             point_lights, session);
 }
 
 } // namespace e8

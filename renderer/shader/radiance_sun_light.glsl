@@ -17,31 +17,21 @@
 
 // Vertex Stage: post_processor.vert
 
-#version 450
+#ifndef RADIANCE_SUN_LIGHT_GLSL
+#define RADIANCE_SUN_LIGHT_GLSL
 
-#include "light_inputs_decoder.glsl"
-#include "post_processor.glsl"
 #include "radiance.glsl"
 
-layout (push_constant) uniform PerLightConstants {
-    vec4 direction;
-    vec4 intensity;
-} plc;
-
-layout (location = 0) out vec4 out_radiance;
-
-void main() {
-    vec2 screen_tex_coord = ScreenTexCoord();
-
-    vec3 albedo = DecodeAlbedo(screen_tex_coord);
-    vec3 normal = DecodeNormal(screen_tex_coord);
-    float roughness = DecodeRoughness(screen_tex_coord);
-    float metallic = DecodeMetallic(screen_tex_coord);
-
-    vec3 incident_intensity = vec3(plc.intensity);
-    vec3 incident_ray = -vec3(plc.direction);
-    vec3 radiance = Radiance(incident_intensity, incident_ray, normal,
-                             albedo, metallic, roughness);
-
-    out_radiance = vec4(radiance, 1.0);
+vec3 SunLightRadiance(vec3 direction,
+                      vec3 intensity,
+                      vec3 normal,
+                      vec3 albedo,
+                      float roughness,
+                      float metallic) {
+    vec3 incident_intensity = vec3(intensity);
+    vec3 incident_ray = -vec3(direction);
+    return Radiance(incident_intensity, incident_ray, normal,
+                    albedo, metallic, roughness);
 }
+
+#endif // RADIANCE_SUN_LIGHT_GLSL

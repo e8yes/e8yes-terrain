@@ -15,23 +15,27 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-// Vertex Stage: radiance.vert
+#ifndef OCCLUSION_SPOT_LIGHT_GLSL
+#define OCCLUSION_SPOT_LIGHT_GLSL
 
-#version 450
+float SpotLightOcclusion(vec3 hit_point, mat4 to_light_space, sampler2D shadow_map) {
+    vec4 light_space_position = to_light_space*vec4(hit_point, 1.0);
 
-#include "post_processor.glsl"
+    vec2 query_location = light_space_position.xy/light_space_position.w;
+    if (abs(query_location.x) > 1.0 ||
+            abs(query_location.y) > 1.0 ||
+            light_space_position.w < 0.0) {
+        return 0.0;
+    }
 
-layout(set = 2, binding = 0) uniform sampler2D direct_radiance_map;
-layout(set = 2, binding = 1) uniform sampler2D indirect_radiance_map;
+    float occluder_depth = texture(shadow_map, query_location).x;
+    float query_depth = light_space_position.w;
 
-layout (location = 0) out vec4 out_radiance;
-
-void main() {
-    vec2 screen_tex_coord = ScreenTexCoord();
-
-    vec3 direct_radiance = texture(direct_radiance_map, screen_tex_coord).xyz;
-    vec3 indirect_radiance = texture(indirect_radiance_map, screen_tex_coord).xyz;
-
-    vec3 final_radiance = direct_radiance + indirect_radiance;
-    out_radiance = vec4(final_radiance, 1.0f);
+    if (occluder_depth < query_depth) {
+        return 1.0;
+    } else {
+        return 0.0;
+    }
 }
+
+#endif // OCCLUSION_SPOT_LIGHT_GLSL

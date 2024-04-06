@@ -172,3 +172,6 @@ unix {
 }
 !isEmpty(target.path): INSTALLS += target
 
+DISTFILES += \
+    shader/radiance_deferred.frag
+

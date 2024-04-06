@@ -17,6 +17,7 @@
 
 #include <cmath>
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include "common/tensor.h"
@@ -212,10 +213,12 @@ std::unique_ptr<DagOperation> CreateRadianceOp(unsigned width, unsigned height,
 
 } // namespace
 
-DagOperationInstance DoComputeRadiance(LightSourceInstance const &instance,
-                                       DagOperationInstance projected_surface,
+DagOperationInstance DoComputeRadiance(DagOperationInstance projected_surface,
                                        frustum const &projection,
-                                       std::vector<DagOperationInstance> const &shadow_maps,
+                                       std::optional<ShadowedSunLight> const &shadowed_sunlight,
+                                       std::vector<ShadowedSpotLight> const &shadowed_spot_lights,
+                                       std::vector<LightSourceInstance> const &spot_lights,
+                                       std::vector<LightSourceInstance> const &point_lights,
                                        DagContext::Session *session) {
     DagOperationInstance target =
         session->WithOperation(kRadiancePipeline, projected_surface->Output()->Width(),

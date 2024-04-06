@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 mkdir -p bin
 
 # Protobuf code compilation.
@@ -16,9 +18,13 @@ protoc --cpp_out=../renderer/proto \
        `find ../renderer/proto -name "*.proto"`
 
 # Shader code compilation.
-find ../renderer/shader -type f -name "*.vert" -exec glslc {} -o {}.spv \;
-find ../renderer/shader -type f -name "*.frag" -exec glslc {} -o {}.spv \;
-mv ../renderer/shader/*.spv ./bin
+shaders=$(find ../renderer/shader -type f -name "*.vert" -or -name "*.frag")
+for shader in $shaders
+do
+    shader_name=$(basename $shader)
+    echo "Compiling $shader_name"
+    glslc "$shader" -o "bin/$shader_name.spv"
+done
 
 # C++ code compilation.
 qmake ../e8islands.pro

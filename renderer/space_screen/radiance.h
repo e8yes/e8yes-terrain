@@ -19,12 +19,29 @@
 #define ISLANDS_RENDERER_SPACE_SCREEN_RADIANCE_H
 
 #include <memory>
+#include <optional>
+#include <vector>
 
 #include "renderer/dag/dag_context.h"
 #include "renderer/dag/dag_operation.h"
 #include "renderer/drawable/light_source.h"
 
 namespace e8 {
+
+struct ShadowedSunLight {
+    ShadowedSunLight(LightSourceInstance &sun_light,
+                     std::vector<DagOperationInstance> const &cascaded_shadow_maps);
+
+    LightSourceInstance sun_light;
+    std::vector<DagOperationInstance> cascaded_shadow_maps;
+};
+
+struct ShadowedSpotLight {
+    ShadowedSpotLight(LightSourceInstance &spot_light, DagOperationInstance const &shadow_map);
+
+    LightSourceInstance spot_light;
+    DagOperationInstance shadow_map;
+};
 
 /**
  * @brief DoComputeRadiance Computes the radiance produced by the specified light source based on
@@ -41,10 +58,12 @@ namespace e8 {
  * @param session The DAG session.
  * @return The operation which computes the radiance map in an HDR color image.
  */
-DagOperationInstance DoComputeRadiance(LightSourceInstance const &instance,
-                                       DagOperationInstance projected_surface,
+DagOperationInstance DoComputeRadiance(DagOperationInstance projected_surface,
                                        frustum const &projection,
-                                       std::vector<DagOperationInstance> const &shadow_maps,
+                                       std::optional<ShadowedSunLight> const &shadowed_sunlight,
+                                       std::vector<ShadowedSpotLight> const &shadowed_spot_lights,
+                                       std::vector<LightSourceInstance> const &spot_lights,
+                                       std::vector<LightSourceInstance> const &point_lights,
                                        DagContext::Session *session);
 
 } // namespace e8

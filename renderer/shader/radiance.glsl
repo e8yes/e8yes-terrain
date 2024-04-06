@@ -15,6 +15,9 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef RADIANCE_GLSL
+#define RADIANCE_GLSL
+
 #include "brdf.glsl"
 
 const vec3 DIELETRIC_R0 = vec3(0.04f);
@@ -45,3 +48,5 @@ vec3 Radiance(vec3 incident_intensity,
 
     return incident_intensity * final_brdf * cos_n_i;
 }
+
+#endif // RADIANCE_GLSL
