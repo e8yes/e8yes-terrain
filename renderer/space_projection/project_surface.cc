@@ -261,7 +261,6 @@ struct ProjectSurfaceArgument : public GraphicsPipelineArgumentsInterface {
 
     std::vector<DrawableInstance> drawables;
     ProjectionInterface const &projection;
-    TransferContext *transfer_context;
 };
 
 /**

@@ -52,6 +52,7 @@ SOURCES += \
     render_pass/configurator.cc \
     render_pass/rasterize.cc \
     space_projection/project_depth.cc \
+    space_projection/project_radiance.cc \
     space_projection/project_surface.cc \
     space_screen/depth_projection_visualizer.cc \
     space_screen/exposure.cc \
@@ -106,6 +107,7 @@ HEADERS += \
     render_pass/configurator.h \
     render_pass/rasterize.h \
     space_projection/project_depth.h \
+    space_projection/project_radiance.h \
     space_projection/project_surface.h \
     space_screen/depth_projection_visualizer.h \
     space_screen/exposure.h \
@@ -172,6 +174,5 @@ unix {
 }
 !isEmpty(target.path): INSTALLS += target
 
-DISTFILES += \
-    shader/radiance_deferred.frag
+DISTFILES +=
 
