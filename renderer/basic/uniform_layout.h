@@ -27,6 +27,9 @@
 
 namespace e8 {
 
+//
+using ShaderUniformPackageBindings = std::vector<VkDescriptorSetLayoutBinding>;
+
 /**
  * @brief The ShaderUniformLayoutInfo struct Stores a Vulkan object describing the layout of the
  * uniform variables declared in the shader programs in a graphics pipeline. It will clean up layout
@@ -45,16 +48,8 @@ struct ShaderUniformLayout {
     // Push constant setup.
     std::optional<VkPushConstantRange> push_constant_range;
 
-    // descriptor set layout designed for low mutation frequency (changes every frame) uniform data.
-    VkDescriptorSetLayout per_frame_desc_set;
-
-    // A descriptor set layout designed for mid mutation frequency (changes every render pass)
-    // uniform data.
-    VkDescriptorSetLayout per_pass_desc_set;
-
-    // A descriptor set layout designed for high mutation frequency (changes every drawable) uniform
-    // data.
-    VkDescriptorSetLayout per_drawable_desc_set;
+    // Descriptor set layouts designed for different packages of uniform data.
+    std::vector<VkDescriptorSetLayout> descriptor_set_layouts;
 
     // A full Vulkan object storing the layout of shader uniform variables.
     VkPipelineLayout layout;
@@ -73,21 +68,15 @@ struct ShaderUniformLayout {
  * layout creation will make it fail.
  *
  * @param push_constant Specifies the push-constant layout.
- * @param per_frame_desc_set A descriptor set layout designed for low mutation frequency (changes
- * every frame) uniform data.
- * @param per_pass_desc_set A descriptor set layout designed for mid mutation frequency (changes
- * every render pass) uniform data.
- * @param per_drawable_desc_est A descriptor set layout designed for high mutation frequency
- * (changes every drawable) uniform data.
+ * @param uniform_packages_bindings Descriptor set layouts designed for different packages of
+ * uniform data.
  * @param context Contextual Vulkan handles.
  * @return A valid unique pointer to the ShaderUniformLayout structure.
  */
-std::unique_ptr<ShaderUniformLayout>
-CreateShaderUniformLayout(std::optional<VkPushConstantRange> const &push_constant,
-                          std::vector<VkDescriptorSetLayoutBinding> const &per_frame_desc_set,
-                          std::vector<VkDescriptorSetLayoutBinding> const &per_pass_desc_set,
-                          std::vector<VkDescriptorSetLayoutBinding> const &per_drawable_desc_set,
-                          VulkanContext *context);
+std::unique_ptr<ShaderUniformLayout> CreateShaderUniformLayout(
+    std::optional<VkPushConstantRange> const &push_constant,
+    std::vector<ShaderUniformPackageBindings> const &uniform_packages_bindings,
+    VulkanContext *context);
 
 } // namespace e8
 

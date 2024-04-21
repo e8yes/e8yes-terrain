@@ -16,31 +16,26 @@
  */
 
 #include <cstdint>
-#include <vector>
 
-#include "renderer/drawable/drawable_instance.h"
 #include "renderer/render_pass/configurator.h"
-#include "renderer/transfer/texture_group.h"
-#include "resource/common.h"
+#include "renderer/transfer/vram_uniform.h"
 
 namespace e8 {
 
-RenderPassConfiguratorInterface::RenderPassConfiguratorInterface() {}
+RenderPassUniformsInterface::RenderPassUniformsInterface(
+    UniformVramTransfer::TransferId render_pass_id, unsigned package_slot_index)
+    : render_pass_id(render_pass_id), package_slot_index(package_slot_index) {}
 
-RenderPassConfiguratorInterface::~RenderPassConfiguratorInterface() {}
+RenderPassUniformsInterface::~RenderPassUniformsInterface() = default;
 
-bool RenderPassConfiguratorInterface::IncludeDrawable(DrawableInstance const & /*drawable*/) const {
-    return true;
-}
+MaterialUniformsInterface::MaterialUniformsInterface(unsigned package_slot_index)
+    : package_slot_index(package_slot_index) {}
 
-std::vector<uint8_t>
-RenderPassConfiguratorInterface::PushConstantOf(DrawableInstance const & /*drawable*/) const {
-    return std::vector<uint8_t>();
-}
+MaterialUniformsInterface::~MaterialUniformsInterface() = default;
 
-TextureSelector
-RenderPassConfiguratorInterface::TexturesOf(DrawableInstance const & /*drawable*/) const {
-    return TextureSelector(kNullUuid);
-}
+DrawableUniformsInterface::DrawableUniformsInterface(unsigned package_slot_index)
+    : package_slot_index(package_slot_index) {}
+
+DrawableUniformsInterface::~DrawableUniformsInterface() = default;
 
 } // namespace e8

@@ -31,7 +31,7 @@
 #include "renderer/render_pass/rasterize.h"
 #include "renderer/space_screen/screen_space_processor.h"
 #include "renderer/transfer/context.h"
-#include "renderer/transfer/descriptor_set.h"
+#include "renderer/transfer/uniform_promise.h"
 
 namespace e8 {
 namespace {

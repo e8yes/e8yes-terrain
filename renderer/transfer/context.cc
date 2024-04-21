@@ -19,16 +19,14 @@
 
 #include "common/device.h"
 #include "renderer/transfer/context.h"
-#include "renderer/transfer/descriptor_set.h"
-#include "renderer/transfer/descriptor_set_texture.h"
 #include "renderer/transfer/vram_geometry.h"
 #include "renderer/transfer/vram_texture.h"
+#include "renderer/transfer/vram_uniform.h"
 
 namespace e8 {
 
 TransferContext::TransferContext(VulkanContext *context)
-    : vulkan_context(context), descriptor_set_allocator(context),
-      texture_descriptor_set_cache(&descriptor_set_allocator), geometry_vram_transfer(context),
+    : vulkan_context(context), uniform_vram_transfer(context), geometry_vram_transfer(context),
       texture_vram_transfer(context) {}
 
 TransferContext::~TransferContext() { vkDeviceWaitIdle(vulkan_context->device); }

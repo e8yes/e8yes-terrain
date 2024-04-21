@@ -22,33 +22,100 @@
 #include <vector>
 
 #include "renderer/drawable/drawable_instance.h"
-#include "renderer/transfer/texture_group.h"
+#include "renderer/transfer/vram_uniform.h"
+#include "resource/material.h"
 
 namespace e8 {
 
 /**
- * @brief The RenderPassConfiguratorInterface class For configuring what resources go in a render
- * pass and what shader uniform setup to apply to each drawable.
+ * @brief The UniformPackage class
  */
-class RenderPassConfiguratorInterface {
+struct UniformPackage {
+    //
+    std::vector<StagingUniformBuffer> buffers;
+
+    //
+    std::vector<StagingUniformImagePack> texture_packs;
+
+    //
+    std::vector<UniformImagePack> image_packs;
+};
+
+/**
+ * @brief The RenderPassUniformsInterface class For configuring the shader uniforms going in a
+ * render pass
+ */
+class RenderPassUniformsInterface {
   public:
-    RenderPassConfiguratorInterface();
-    virtual ~RenderPassConfiguratorInterface();
+    /**
+     * @brief RenderPassUniformsInterface
+     */
+    RenderPassUniformsInterface(UniformVramTransfer::TransferId render_pass_id,
+                                unsigned package_slot_index);
+    virtual ~RenderPassUniformsInterface();
 
     /**
-     * @brief IncludeDrawable Whether to include the specified drawable to the render pass?
+     * @brief The UniformPackage class
      */
-    virtual bool IncludeDrawable(DrawableInstance const &drawable) const;
 
     /**
-     * @brief PushConstantOf A byte array containing push constant data of the specified drawable.
+     * @brief uniforms
+     * @return
      */
-    virtual std::vector<uint8_t> PushConstantOf(DrawableInstance const &drawable) const;
+    virtual UniformPackage Uniforms() const = 0;
+
+  public:
+    UniformVramTransfer::TransferId const render_pass_id;
+    unsigned const package_slot_index;
+};
+
+/**
+ * @brief The MaterialUniformsInterface class For configuring the shader uniform setup applying to
+ * each material.
+ */
+class MaterialUniformsInterface {
+  public:
+    /**
+     * @brief MaterialUniformsInterface
+     */
+    MaterialUniformsInterface(unsigned package_slot_index);
+    virtual ~MaterialUniformsInterface();
 
     /**
-     * @brief TexturesOf Textures of the specified drawable needed by the render pass.
+     * @brief uniformsOf
+     * @param material
+     * @return
      */
-    virtual TextureSelector TexturesOf(DrawableInstance const &drawable) const;
+    virtual UniformPackage UniformsOf(Material const *material) const = 0;
+
+  public:
+    unsigned const package_slot_index;
+};
+
+/**
+ * @brief The DrawableUniformsInterface class For configuring the shader uniform setup applying to
+ * each drawable.
+ */
+class DrawableUniformsInterface {
+  public:
+    /**
+     * @brief DrawableUniformsInterface
+     */
+    DrawableUniformsInterface(unsigned package_slot_index);
+    virtual ~DrawableUniformsInterface();
+
+    /**
+     * @brief UniformsOf
+     */
+    virtual UniformPackage UniformsOf(DrawableInstance const &drawable) const = 0;
+
+    /**
+     * @brief UniformPushConstantsOf
+     */
+    virtual std::vector<uint8_t> UniformPushConstantsOf(DrawableInstance const &drawable) const = 0;
+
+  public:
+    unsigned const package_slot_index;
 };
 
 } // namespace e8

@@ -24,7 +24,6 @@
 #include "common/cache.h"
 #include "common/device.h"
 #include "renderer/basic/mipmap.h"
-#include "renderer/transfer/texture_group.h"
 #include "renderer/transfer/vram.h"
 #include "renderer/transfer/vram_texture.h"
 #include "resource/buffer_texture.h"
@@ -203,16 +202,13 @@ void TextureVramTransfer::Upload(std::vector<StagingTextureBuffer const *> const
     VramTransfer::EndUpload(cmds);
 }
 
-std::array<VramTransfer::GpuTexture *, TEXTURE_TYPE_COUNT> TextureVramTransfer::Find(
-    std::array<StagingTextureBuffer const *, TEXTURE_TYPE_COUNT> const &textures) {
-    std::array<VramTransfer::GpuTexture *, TEXTURE_TYPE_COUNT> result;
+std::vector<VramTransfer::GpuTexture *>
+TextureVramTransfer::Find(std::vector<StagingTextureBuffer const *> const &textures) {
+    std::vector<VramTransfer::GpuTexture *> result;
+    result.reserve(textures.size());
 
-    for (unsigned i = 0; i < TEXTURE_TYPE_COUNT; ++i) {
-        if (textures[i] != nullptr) {
-            result[i] = texture_cache_.Find(textures[i]);
-        } else {
-            result[i] = nullptr;
-        }
+    for (auto texture : textures) {
+        result.push_back(texture_cache_.Find(texture));
     }
 
     return result;

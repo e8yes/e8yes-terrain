@@ -32,49 +32,145 @@
 #include "renderer/render_pass/configurator.h"
 #include "renderer/render_pass/rasterize.h"
 #include "renderer/transfer/context.h"
-#include "renderer/transfer/descriptor_set.h"
-#include "renderer/transfer/texture_group.h"
+#include "renderer/transfer/uniform_promise.h"
+#include "renderer/transfer/vram_geometry.h"
+#include "renderer/transfer/vram_texture.h"
+#include "renderer/transfer/vram_uniform.h"
 #include "resource/buffer_texture.h"
 #include "resource/common.h"
 #include "resource/geometry.h"
+#include "resource/light_map.h"
+#include "resource/material.h"
 
 namespace e8 {
 namespace {
 
-std::unordered_set<DrawableInstance const *>
-UploadResources(std::vector<DrawableInstance> const &drawables,
-                RenderPassConfiguratorInterface const &configurator,
-                TransferContext *transfer_context) {
-    std::unordered_set<DrawableInstance const *> excluded;
+struct UniformPackageWithLayout {
+    UniformPackage uniform_package;
+    VkDescriptorSetLayout layout;
+};
 
-    std::vector<Geometry const *> geometries;
-    std::vector<StagingTextureBuffer const *> textures;
+void UploadGeometries(std::unordered_set<Geometry const *> const &geometries,
+                      GeometryVramTransfer *geometry_vram) {
+    std::vector<Geometry const *> geo_vec;
+    geo_vec.reserve(geometries.size());
 
-    for (auto const &drawable : drawables) {
-        if (!configurator.IncludeDrawable(drawable)) {
-            excluded.insert(&drawable);
-            continue;
-        }
-
-        if (!drawable.geometry->Valid()) {
-            excluded.insert(&drawable);
-            continue;
-        }
-
-        TextureSelector texture_selector = configurator.TexturesOf(drawable);
-        if (!texture_selector.Valid()) {
-            excluded.insert(&drawable);
-            continue;
-        }
-
-        geometries.push_back(drawable.geometry);
-        texture_selector.AppendTo(&textures);
+    for (auto geometry : geometries) {
+        geo_vec.push_back(geometry);
     }
 
-    transfer_context->geometry_vram_transfer.Upload(geometries);
-    transfer_context->texture_vram_transfer.Upload(textures);
+    geometry_vram->Upload(geo_vec);
+}
 
-    return excluded;
+void UploadTextures(
+    std::unordered_map<UniformVramTransfer::TransferId, UniformPackageWithLayout> uniform_packages,
+    TextureVramTransfer *texture_vram) {
+    std::vector<StagingTextureBuffer const *> texture_vec;
+    texture_vec.reserve(uniform_packages.size());
+
+    for (auto const &[transfer_id, package] : uniform_packages) {
+        for (auto const &texture_pack : package.uniform_package.texture_packs) {
+            for (auto const &texture_image : texture_pack.images) {
+                texture_vec.push_back(texture_image);
+            }
+        }
+    }
+
+    texture_vram->Upload(texture_vec);
+}
+
+std::vector<UniformImagePack>
+FetchTexturePacks(std::vector<StagingUniformImagePack> const &texture_packs,
+                  TextureVramTransfer *texture_vram) {
+    std::vector<UniformImagePack> result;
+    result.reserve(texture_packs.size());
+
+    for (auto const &staging_texture_pack : texture_packs) {
+        std::vector<VramTransfer::GpuTexture *> gpu_textures =
+            texture_vram->Find(staging_texture_pack.images);
+        std::vector<VkImageView> gpu_image_views;
+        gpu_image_views.reserve(gpu_textures.size());
+        for (auto gpu_texture : gpu_textures) {
+            assert(gpu_texture->Valid());
+            gpu_image_views.push_back(gpu_texture->view);
+        }
+
+        UniformImagePack gpu_texture_pack(staging_texture_pack.binding, gpu_image_views,
+                                          staging_texture_pack.image_sampler);
+        result.push_back(gpu_texture_pack);
+    }
+
+    return result;
+}
+
+void UploadUniforms(
+    std::unordered_map<UniformVramTransfer::TransferId, UniformPackageWithLayout> uniform_packages,
+    TextureVramTransfer *texture_vram, UniformVramTransfer *uniform_vram) {
+    for (auto const &[transfer_id, package] : uniform_packages) {
+        std::vector<UniformImagePack> image_pack =
+            FetchTexturePacks(package.uniform_package.texture_packs, texture_vram);
+
+        uniform_vram->Upload(transfer_id, package.uniform_package.buffers, image_pack,
+                             package.layout);
+    }
+}
+
+void UploadRenderPassUniforms(ShaderUniformLayout const &uniform_layout,
+                              RenderPassUniformsInterface const &render_pass_uniforms,
+                              UniformVramTransfer *uniform_vram) {
+    UniformPackage uniform_package = render_pass_uniforms.Uniforms();
+    uniform_vram->Upload(
+        render_pass_uniforms.render_pass_id, uniform_package.buffers, uniform_package.image_packs,
+        uniform_layout.descriptor_set_layouts[render_pass_uniforms.package_slot_index]);
+}
+
+void UploadResources(std::vector<DrawableInstance> const &drawables,
+                     ShaderUniformLayout const &uniform_layout,
+                     RenderPassUniformsInterface const &render_pass_uniforms,
+                     MaterialUniformsInterface const &material_uniforms,
+                     DrawableUniformsInterface const &drawable_uniforms,
+                     TransferContext *transfer_context) {
+    UploadRenderPassUniforms(uniform_layout, render_pass_uniforms,
+                             &transfer_context->uniform_vram_transfer);
+
+    std::unordered_set<Geometry const *> geometries;
+    std::unordered_map<UniformVramTransfer::TransferId, UniformPackageWithLayout> uniform_packages;
+    geometries.reserve(drawables.size());
+    uniform_packages.reserve(2 * drawables.size());
+
+    for (auto const &drawable : drawables) {
+        if (drawable.geometry != nullptr) {
+            geometries.insert(drawable.geometry);
+        }
+
+        if (drawable.material != nullptr &&
+            uniform_packages.find(drawable.material->id) == uniform_packages.end()) {
+            UniformPackage material_package = material_uniforms.UniformsOf(drawable.material);
+            UniformPackageWithLayout material_package_with_layout{
+                .uniform_package = std::move(material_package),
+                .layout =
+                    uniform_layout.descriptor_set_layouts[material_uniforms.package_slot_index],
+            };
+            uniform_packages.insert(
+                std::make_pair(drawable.material->id, std::move(material_package_with_layout)));
+        }
+
+        if (uniform_packages.find(drawable.id) != uniform_packages.end()) {
+            UniformPackage drawable_package = drawable_uniforms.UniformsOf(drawable);
+            UniformPackageWithLayout drawable_package_with_layout{
+                .uniform_package = std::move(drawable_package),
+                .layout =
+                    uniform_layout.descriptor_set_layouts[drawable_uniforms.package_slot_index],
+            };
+            uniform_packages.insert(
+                std::make_pair(drawable.id, std::move(drawable_package_with_layout)));
+        }
+    }
+
+    UploadGeometries(geometries, &transfer_context->geometry_vram_transfer);
+    UploadTextures(uniform_packages, &transfer_context->texture_vram_transfer);
+    UploadUniforms(uniform_packages, &transfer_context->texture_vram_transfer,
+                   &transfer_context->uniform_vram_transfer);
 }
 
 } // namespace
@@ -106,16 +202,47 @@ void FinishRenderPass(CommandBuffer *command_buffer) {
 
 void RenderDrawables(std::vector<DrawableInstance> const &drawables,
                      GraphicsPipeline const &pipeline, ShaderUniformLayout const &uniform_layout,
-                     RenderPassConfiguratorInterface const &configurator,
+                     RenderPassUniformsInterface const &render_pass_uniforms,
+                     MaterialUniformsInterface const &material_uniforms,
+                     DrawableUniformsInterface const &drawable_uniforms,
                      TransferContext *transfer_context, CommandBuffer *command_buffer) {
-    std::unordered_set<DrawableInstance const *> excluded =
-        UploadResources(drawables, configurator, transfer_context);
+    UploadResources(drawables, uniform_layout, render_pass_uniforms, material_uniforms,
+                    drawable_uniforms, transfer_context);
 
     // Sends drawable instances through the graphics pipeline.
     vkCmdBindPipeline(command_buffer->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline);
     for (auto const &instance : drawables) {
-        if (excluded.find(&instance) != excluded.end()) {
-            continue;
+        // Sets uniforms.
+        GpuUniformPromise *drawable_uniform_promise =
+            transfer_context->uniform_vram_transfer.Find(instance.id);
+        if (drawable_uniform_promise != nullptr) {
+            vkCmdBindDescriptorSets(
+                command_buffer->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
+                /*firstSet=*/drawable_uniforms.package_slot_index,
+                /*descriptorSetCount=*/1, &drawable_uniform_promise->descriptor_set,
+                /*dynamicOffsetCount=*/0,
+                /*pDynamicOffsets=*/nullptr);
+        }
+
+        if (instance.material != nullptr) {
+            GpuUniformPromise *material_uniform_promise =
+                transfer_context->uniform_vram_transfer.Find(instance.material->id);
+            if (material_uniform_promise != nullptr) {
+                vkCmdBindDescriptorSets(
+                    command_buffer->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
+                    /*firstSet=*/material_uniforms.package_slot_index,
+                    /*descriptorSetCount=*/1, &material_uniform_promise->descriptor_set,
+                    /*dynamicOffsetCount=*/0,
+                    /*pDynamicOffsets=*/nullptr);
+            }
+        }
+
+        std::vector<uint8_t> push_constant = drawable_uniforms.UniformPushConstantsOf(instance);
+        if (!push_constant.empty()) {
+            assert(uniform_layout.push_constant_range.has_value());
+            vkCmdPushConstants(command_buffer->buffer, uniform_layout.layout,
+                               /*stageFlags=*/uniform_layout.push_constant_range->stageFlags,
+                               /*offset=*/0, push_constant.size(), push_constant.data());
         }
 
         // Fetches GPU geometry data.
@@ -125,40 +252,7 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
             continue;
         }
 
-        // Fetches GPU texture data.
-        TextureSelector texture_selector = configurator.TexturesOf(instance);
-
-        TextureGroup texture_group;
-        texture_group.id = texture_selector.id;
-        texture_group.layout = uniform_layout.per_drawable_desc_set;
-        texture_group.sampler = texture_selector.sampler;
-        texture_group.textures =
-            transfer_context->texture_vram_transfer.Find(texture_selector.textures);
-        texture_group.bindings = texture_selector.bindings;
-
-        if (!texture_group.Valid()) {
-            continue;
-        }
-
-        // Prepares for the draw call.
-        if (texture_group.id != kNullUuid) {
-            DescriptorSet *desc_set =
-                transfer_context->texture_descriptor_set_cache.DescriptorSetFor(texture_group);
-            vkCmdBindDescriptorSets(command_buffer->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                                    uniform_layout.layout,
-                                    /*firstSet=*/DescriptorSetType::DST_PER_DRAWABLE,
-                                    /*descriptorSetCount=*/1, &desc_set->descriptor_set,
-                                    /*dynamicOffsetCount=*/0,
-                                    /*pDynamicOffsets=*/nullptr);
-        }
-
-        std::vector<uint8_t> push_constant = configurator.PushConstantOf(instance);
-        if (uniform_layout.push_constant_range.has_value() && !push_constant.empty()) {
-            vkCmdPushConstants(command_buffer->buffer, uniform_layout.layout,
-                               /*stageFlags=*/uniform_layout.push_constant_range->stageFlags,
-                               /*offset=*/0, push_constant.size(), push_constant.data());
-        }
-
+        // Sets geometry.
         VkDeviceSize offset = 0;
         vkCmdBindVertexBuffers(command_buffer->buffer, /*firstBinding=*/0, /*bindingCount=*/1,
                                &gpu_geometry.vertex_buffer->buffer,

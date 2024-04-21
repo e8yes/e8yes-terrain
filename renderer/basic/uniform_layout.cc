@@ -27,78 +27,48 @@
 namespace e8 {
 
 ShaderUniformLayout::ShaderUniformLayout(VulkanContext *context)
-    : per_frame_desc_set(VK_NULL_HANDLE), per_pass_desc_set(VK_NULL_HANDLE),
-      per_drawable_desc_set(VK_NULL_HANDLE), layout(VK_NULL_HANDLE), context_(context) {}
+    : layout(VK_NULL_HANDLE), context_(context) {}
 
 ShaderUniformLayout::~ShaderUniformLayout() {
-    vkDestroyDescriptorSetLayout(context_->device, per_drawable_desc_set,
-                                 /*pAllocator=*/nullptr);
-    vkDestroyDescriptorSetLayout(context_->device, per_pass_desc_set,
-                                 /*pAllocator=*/nullptr);
-    vkDestroyDescriptorSetLayout(context_->device, per_frame_desc_set,
-                                 /*pAllocator=*/nullptr);
+    for (auto &descriptor_set_layout : descriptor_set_layouts) {
+        vkDestroyDescriptorSetLayout(context_->device, descriptor_set_layout,
+                                     /*pAllocator=*/nullptr);
+    }
 
     vkDestroyPipelineLayout(context_->device, layout, /*pAllocator=*/nullptr);
 }
 
-std::unique_ptr<ShaderUniformLayout>
-CreateShaderUniformLayout(std::optional<VkPushConstantRange> const &push_constant,
-                          std::vector<VkDescriptorSetLayoutBinding> const &per_frame_desc_set,
-                          std::vector<VkDescriptorSetLayoutBinding> const &per_pass_desc_set,
-                          std::vector<VkDescriptorSetLayoutBinding> const &per_drawable_desc_set,
-                          VulkanContext *context) {
+std::unique_ptr<ShaderUniformLayout> CreateShaderUniformLayout(
+    std::optional<VkPushConstantRange> const &push_constant,
+    std::vector<ShaderUniformPackageBindings> const &uniform_packages_bindings,
+    VulkanContext *context) {
     auto info = std::make_unique<ShaderUniformLayout>(context);
+
+    // Creates descriptor set layouts for the uniform packages.
+    info->descriptor_set_layouts.resize(uniform_packages_bindings.size());
+    for (unsigned i = 0; i < uniform_packages_bindings.size(); ++i) {
+        VkDescriptorSetLayoutCreateInfo desc_set_info{};
+        desc_set_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        desc_set_info.pBindings = uniform_packages_bindings[i].data();
+        desc_set_info.bindingCount = uniform_packages_bindings[i].size();
+
+        assert(VK_SUCCESS == vkCreateDescriptorSetLayout(context->device, &desc_set_info,
+                                                         /*pAllocator=*/nullptr,
+                                                         &info->descriptor_set_layouts[i]));
+    }
 
     VkPipelineLayoutCreateInfo layout_info{};
     layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 
     // Sets push constant layout.
     info->push_constant_range = push_constant;
-    if (push_constant.has_value()) {
-        layout_info.pPushConstantRanges = &push_constant.value();
+    if (info->push_constant_range.has_value()) {
+        layout_info.pPushConstantRanges = &info->push_constant_range.value();
         layout_info.pushConstantRangeCount = 1;
     }
 
-    // Creates descriptor set layouts.
-    VkDescriptorSetLayoutCreateInfo per_frame_desc_set_info{};
-    per_frame_desc_set_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    if (!per_frame_desc_set.empty()) {
-        per_frame_desc_set_info.pBindings = per_frame_desc_set.data();
-        per_frame_desc_set_info.bindingCount = per_frame_desc_set.size();
-    }
-    assert(VK_SUCCESS == vkCreateDescriptorSetLayout(context->device, &per_frame_desc_set_info,
-                                                     /*pAllocator=*/nullptr,
-                                                     &info->per_frame_desc_set));
-
-    VkDescriptorSetLayoutCreateInfo per_pass_desc_set_info{};
-    per_pass_desc_set_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    if (!per_pass_desc_set.empty()) {
-        per_pass_desc_set_info.pBindings = per_pass_desc_set.data();
-        per_pass_desc_set_info.bindingCount = per_pass_desc_set.size();
-    }
-    assert(VK_SUCCESS == vkCreateDescriptorSetLayout(context->device, &per_pass_desc_set_info,
-                                                     /*pAllocator=*/nullptr,
-                                                     &info->per_pass_desc_set));
-
-    VkDescriptorSetLayoutCreateInfo per_drawable_desc_set_info{};
-    per_drawable_desc_set_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    if (!per_drawable_desc_set.empty()) {
-        per_drawable_desc_set_info.pBindings = per_drawable_desc_set.data();
-        per_drawable_desc_set_info.bindingCount = per_drawable_desc_set.size();
-    }
-    assert(VK_SUCCESS == vkCreateDescriptorSetLayout(context->device, &per_drawable_desc_set_info,
-                                                     /*pAllocator=*/nullptr,
-                                                     &info->per_drawable_desc_set));
-
-    // Informs the pipeline about the descriptor set layouts.
-    std::vector<VkDescriptorSetLayout> desc_set_layouts{
-        info->per_frame_desc_set,
-        info->per_pass_desc_set,
-        info->per_drawable_desc_set,
-    };
-
-    layout_info.pSetLayouts = desc_set_layouts.data();
-    layout_info.setLayoutCount = desc_set_layouts.size();
+    layout_info.pSetLayouts = info->descriptor_set_layouts.data();
+    layout_info.setLayoutCount = info->descriptor_set_layouts.size();
 
     assert(VK_SUCCESS == vkCreatePipelineLayout(context->device, &layout_info,
                                                 /*pAllocator=*/nullptr, &info->layout));

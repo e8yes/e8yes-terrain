@@ -58,13 +58,17 @@ void FinishRenderPass(CommandBuffer *command_buffer);
  *
  * @param drawables The array of drawables to be rendered.
  * @param pipeline The graphics pipeline to use for the rendering.
- * @param configurator Specifies how to set up the rendering.
+ * @param render_pass_uniforms For configuring the shader uniforms going in a render pass.
+ * @param material_uniforms For configuring the shader uniform setup applying to each material.
+ * @param drawable_uniforms For configuring the shader uniform setup applying to each drawable.
  * @param transfer_context Transfer context.
  * @param cmds The command buffer to which draw commands will be added.
  */
 void RenderDrawables(std::vector<DrawableInstance> const &drawables,
                      GraphicsPipeline const &pipeline, ShaderUniformLayout const &uniform_layout,
-                     RenderPassConfiguratorInterface const &configurator,
+                     RenderPassUniformsInterface const &render_pass_uniforms,
+                     MaterialUniformsInterface const &material_uniforms,
+                     DrawableUniformsInterface const &drawable_uniforms,
                      TransferContext *transfer_context, CommandBuffer *command_buffer);
 
 // Represents a function which sets the value of uniform variables for screen space processing.
