@@ -20,6 +20,7 @@
 
 #include <cstdint>
 #include <google/protobuf/repeated_field.h>
+#include <string>
 
 #include "common/tensor.h"
 #include "resource/proto/primitive.pb.h"
@@ -37,6 +38,12 @@ Uuid const kNullUuid = 0;
  * @brief GenerateUuid Generates a unique ID for every function call. This function is thread-safe.
  */
 Uuid GenerateUuid();
+
+/**
+ * @brief GenerateUuidFor Generates a unique ID corresponding to the specified string. The string to
+ * ID association is not unique on every program run. This function is thread-safe.
+ */
+Uuid GenerateUuidFor(std::string const &s);
 
 /**
  * @brief ToProto Converts a 2D vector to a protobuf array.

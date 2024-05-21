@@ -30,26 +30,19 @@ namespace {
 
 PipelineKey const &kFxaaPipeline = "FXAA";
 
-class FxaaPipelineConfigurator : public ScreenSpaceConfiguratorInterface {
+class FxaaUniforms : public ScreenSpaceUniformsInterface {
   public:
-    FxaaPipelineConfigurator(GraphicsPipelineOutputInterface const &ldr_color_input);
-    ~FxaaPipelineConfigurator() override;
+    FxaaUniforms(GraphicsPipelineOutputInterface const *ldr_color_input)
+        : ldr_color_input_(ldr_color_input) {}
+    ~FxaaUniforms() override = default;
 
-    void InputImages(std::vector<VkImageView> *input_images) const override;
+    void InputImages(std::vector<VkImageView> *input_images) const override {
+        input_images->at(0) = ldr_color_input_->ColorAttachments()[0]->view;
+    }
 
   private:
-    GraphicsPipelineOutputInterface const &ldr_color_input_;
+    GraphicsPipelineOutputInterface const *ldr_color_input_;
 };
-
-FxaaPipelineConfigurator::FxaaPipelineConfigurator(
-    GraphicsPipelineOutputInterface const &ldr_color_input)
-    : ldr_color_input_(ldr_color_input) {}
-
-FxaaPipelineConfigurator::~FxaaPipelineConfigurator() {}
-
-void FxaaPipelineConfigurator::InputImages(std::vector<VkImageView> *input_images) const {
-    input_images->at(0) = ldr_color_input_.ColorAttachments()[0]->view;
-}
 
 } // namespace
 
@@ -73,9 +66,9 @@ DoFxaa(DagOperationInstance ldr_image,
                 /*push_constant_size=*/0, aa_output, transfer_context, vulkan_context);
         });
 
-    auto configurator = std::make_unique<FxaaPipelineConfigurator>(*ldr_image->Output());
-    target->Schedule(pipeline, std::move(configurator),
-                     /*parents=*/std::vector<DagOperation *>{ldr_image});
+    auto uniforms = std::make_unique<FxaaUniforms>(ldr_image->Output());
+    target->Schedule(pipeline, std::move(uniforms),
+                     /*parents=*/std::vector<DagOperationInstance>{ldr_image});
 
     return target;
 }

@@ -22,7 +22,7 @@ mv ../renderer/shader/*.spv ./bin
 
 # C++ code compilation.
 qmake ../e8islands.pro
-make
+make -j `nproc`
 
 find . -name "*.so*" -not -path "./bin/*" -exec cp -P {} bin/ \;
 find . -name "*.dylib*" -not -path "./bin/*" -exec cp -P {} bin/ \;

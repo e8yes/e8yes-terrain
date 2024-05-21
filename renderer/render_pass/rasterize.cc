@@ -19,6 +19,7 @@
 #include <cassert>
 #include <cstdint>
 #include <functional>
+#include <limits>
 #include <memory>
 #include <unordered_set>
 #include <vector>
@@ -62,9 +63,9 @@ void UploadGeometries(std::unordered_set<Geometry const *> const &geometries,
     geometry_vram->Upload(geo_vec);
 }
 
-void UploadTextures(
-    std::unordered_map<UniformVramTransfer::TransferId, UniformPackageWithLayout> uniform_packages,
-    TextureVramTransfer *texture_vram) {
+void UploadTextures(std::unordered_map<UniformVramTransfer::TransferId,
+                                       UniformPackageWithLayout> const &uniform_packages,
+                    TextureVramTransfer *texture_vram) {
     std::vector<StagingTextureBuffer const *> texture_vec;
     texture_vec.reserve(uniform_packages.size());
 
@@ -103,9 +104,9 @@ FetchTexturePacks(std::vector<StagingUniformImagePack> const &texture_packs,
     return result;
 }
 
-void UploadUniforms(
-    std::unordered_map<UniformVramTransfer::TransferId, UniformPackageWithLayout> uniform_packages,
-    TextureVramTransfer *texture_vram, UniformVramTransfer *uniform_vram) {
+void UploadUniforms(std::unordered_map<UniformVramTransfer::TransferId,
+                                       UniformPackageWithLayout> const &uniform_packages,
+                    TextureVramTransfer *texture_vram, UniformVramTransfer *uniform_vram) {
     for (auto const &[transfer_id, package] : uniform_packages) {
         std::vector<UniformImagePack> image_pack =
             FetchTexturePacks(package.uniform_package.texture_packs, texture_vram);
@@ -115,8 +116,17 @@ void UploadUniforms(
     }
 }
 
-void UploadRenderPassUniforms(ShaderUniformLayout const &uniform_layout,
-                              RenderPassUniformsInterface const &render_pass_uniforms,
+void UploadFrameUniforms(FrameUniformsInterface const &frame_uniforms,
+                         ShaderUniformLayout const &uniform_layout,
+                         UniformVramTransfer *uniform_vram) {
+    UniformPackage uniform_package = frame_uniforms.Uniforms();
+    uniform_vram->Upload(
+        /*transfer_id=*/0, uniform_package.buffers, uniform_package.image_packs,
+        uniform_layout.descriptor_set_layouts[frame_uniforms.package_slot_index]);
+}
+
+void UploadRenderPassUniforms(RenderPassUniformsInterface const &render_pass_uniforms,
+                              ShaderUniformLayout const &uniform_layout,
                               UniformVramTransfer *uniform_vram) {
     UniformPackage uniform_package = render_pass_uniforms.Uniforms();
     uniform_vram->Upload(
@@ -130,7 +140,7 @@ void UploadResources(std::vector<DrawableInstance> const &drawables,
                      MaterialUniformsInterface const &material_uniforms,
                      DrawableUniformsInterface const &drawable_uniforms,
                      TransferContext *transfer_context) {
-    UploadRenderPassUniforms(uniform_layout, render_pass_uniforms,
+    UploadRenderPassUniforms(render_pass_uniforms, uniform_layout,
                              &transfer_context->uniform_vram_transfer);
 
     std::unordered_set<Geometry const *> geometries;
@@ -205,19 +215,31 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
                      RenderPassUniformsInterface const &render_pass_uniforms,
                      MaterialUniformsInterface const &material_uniforms,
                      DrawableUniformsInterface const &drawable_uniforms,
-                     TransferContext *transfer_context, CommandBuffer *command_buffer) {
+                     TransferContext *transfer_context, CommandBuffer *cmds) {
     UploadResources(drawables, uniform_layout, render_pass_uniforms, material_uniforms,
                     drawable_uniforms, transfer_context);
 
     // Sends drawable instances through the graphics pipeline.
-    vkCmdBindPipeline(command_buffer->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline);
+    vkCmdBindPipeline(cmds->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline);
+
+    GpuUniformPromise *render_pass_uniform_promise =
+        transfer_context->uniform_vram_transfer.Find(render_pass_uniforms.render_pass_id);
+    if (render_pass_uniform_promise != nullptr) {
+        vkCmdBindDescriptorSets(
+            cmds->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
+            /*firstSet=*/render_pass_uniforms.package_slot_index,
+            /*descriptorSetCount=*/1, &render_pass_uniform_promise->descriptor_set,
+            /*dynamicOffsetCount=*/0,
+            /*pDynamicOffsets=*/nullptr);
+    }
+
     for (auto const &instance : drawables) {
         // Sets uniforms.
         GpuUniformPromise *drawable_uniform_promise =
             transfer_context->uniform_vram_transfer.Find(instance.id);
         if (drawable_uniform_promise != nullptr) {
             vkCmdBindDescriptorSets(
-                command_buffer->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
+                cmds->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
                 /*firstSet=*/drawable_uniforms.package_slot_index,
                 /*descriptorSetCount=*/1, &drawable_uniform_promise->descriptor_set,
                 /*dynamicOffsetCount=*/0,
@@ -229,7 +251,7 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
                 transfer_context->uniform_vram_transfer.Find(instance.material->id);
             if (material_uniform_promise != nullptr) {
                 vkCmdBindDescriptorSets(
-                    command_buffer->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
+                    cmds->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
                     /*firstSet=*/material_uniforms.package_slot_index,
                     /*descriptorSetCount=*/1, &material_uniform_promise->descriptor_set,
                     /*dynamicOffsetCount=*/0,
@@ -240,7 +262,7 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
         std::vector<uint8_t> push_constant = drawable_uniforms.UniformPushConstantsOf(instance);
         if (!push_constant.empty()) {
             assert(uniform_layout.push_constant_range.has_value());
-            vkCmdPushConstants(command_buffer->buffer, uniform_layout.layout,
+            vkCmdPushConstants(cmds->buffer, uniform_layout.layout,
                                /*stageFlags=*/uniform_layout.push_constant_range->stageFlags,
                                /*offset=*/0, push_constant.size(), push_constant.data());
         }
@@ -254,26 +276,49 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
 
         // Sets geometry.
         VkDeviceSize offset = 0;
-        vkCmdBindVertexBuffers(command_buffer->buffer, /*firstBinding=*/0, /*bindingCount=*/1,
+        vkCmdBindVertexBuffers(cmds->buffer, /*firstBinding=*/0, /*bindingCount=*/1,
                                &gpu_geometry.vertex_buffer->buffer,
                                /*pOffsets=*/&offset);
-        vkCmdBindIndexBuffer(command_buffer->buffer, gpu_geometry.index_buffer->buffer,
+        vkCmdBindIndexBuffer(cmds->buffer, gpu_geometry.index_buffer->buffer,
                              /*offset=*/0, gpu_geometry.index_element_type);
 
         // Draw call.
-        vkCmdDrawIndexed(command_buffer->buffer, instance.geometry->indices.index_count,
+        vkCmdDrawIndexed(cmds->buffer, instance.geometry->indices.index_count,
                          /*instanceCount=*/1, /*firstIndex=*/0, /*vertexOffset=*/0,
                          /*firstInstance=*/0);
     }
 }
 
 void PostProcess(GraphicsPipeline const &pipeline, ShaderUniformLayout const &uniform_layout,
-                 SetPostProcessorUniformsFn const &set_uniforms_fn, CommandBuffer *command_buffer) {
-    vkCmdBindPipeline(command_buffer->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline);
+                 FrameUniformsInterface const &frame_uniforms,
+                 RenderPassUniformsInterface const &render_pass_uniforms,
+                 TransferContext *transfer_context, CommandBuffer *cmds) {
+    UploadFrameUniforms(frame_uniforms, uniform_layout, &transfer_context->uniform_vram_transfer);
+    UploadRenderPassUniforms(render_pass_uniforms, uniform_layout,
+                             &transfer_context->uniform_vram_transfer);
 
-    set_uniforms_fn(uniform_layout, command_buffer);
+    vkCmdBindPipeline(cmds->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline);
 
-    vkCmdDraw(command_buffer->buffer, /*vertex_count=*/3, /*instanceCount=*/2, /*firstVertex=*/0,
+    GpuUniformPromise *render_pass_uniform_promise =
+        transfer_context->uniform_vram_transfer.Find(render_pass_uniforms.render_pass_id);
+    if (render_pass_uniform_promise != nullptr) {
+        vkCmdBindDescriptorSets(
+            cmds->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
+            /*firstSet=*/render_pass_uniforms.package_slot_index,
+            /*descriptorSetCount=*/1, &render_pass_uniform_promise->descriptor_set,
+            /*dynamicOffsetCount=*/0,
+            /*pDynamicOffsets=*/nullptr);
+    }
+
+    std::vector<uint8_t> push_constant = render_pass_uniforms.UniformPushConstants();
+    if (!push_constant.empty()) {
+        assert(uniform_layout.push_constant_range.has_value());
+        vkCmdPushConstants(cmds->buffer, uniform_layout.layout,
+                           /*stageFlags=*/uniform_layout.push_constant_range->stageFlags,
+                           /*offset=*/0, push_constant.size(), push_constant.data());
+    }
+
+    vkCmdDraw(cmds->buffer, /*vertex_count=*/3, /*instanceCount=*/2, /*firstVertex=*/0,
               /*firstInstance=*/0);
 }
 

@@ -1,7 +1,7 @@
 /**
- * e8yes demo web.
+ * e8yes islands.
  *
- * <p>Copyright (C) 2020 Chifeng Wen {daviesx66@gmail.com}
+ * <p>Copyright (C) 2024 Chifeng Wen {daviesx66@gmail.com}
  *
  * <p>This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -19,6 +19,7 @@
 #define ISLANDS_RENDER_PASS_CONFIGURATOR_H
 
 #include <cstdint>
+#include <limits>
 #include <vector>
 
 #include "renderer/drawable/drawable_instance.h"
@@ -26,6 +27,9 @@
 #include "resource/material.h"
 
 namespace e8 {
+
+//
+unsigned const kNullPackageSlot = std::numeric_limits<unsigned>::max();
 
 /**
  * @brief The UniformPackage class
@@ -42,6 +46,34 @@ struct UniformPackage {
 };
 
 /**
+ * @brief The FrameUniformsInterface class For configuring the shader uniforms pertaining to a
+ * frame.
+ */
+class FrameUniformsInterface {
+  public:
+    /**
+     * @brief FrameUniformsInterface
+     */
+    FrameUniformsInterface(unsigned package_slot_index);
+    virtual ~FrameUniformsInterface();
+
+    /**
+     * @brief Uniforms
+     * @return
+     */
+    virtual UniformPackage Uniforms() const;
+
+    /**
+     * @brief Empty
+     * @return
+     */
+    static FrameUniformsInterface Empty();
+
+  public:
+    unsigned const package_slot_index;
+};
+
+/**
  * @brief The RenderPassUniformsInterface class For configuring the shader uniforms going in a
  * render pass
  */
@@ -55,14 +87,22 @@ class RenderPassUniformsInterface {
     virtual ~RenderPassUniformsInterface();
 
     /**
-     * @brief The UniformPackage class
-     */
-
-    /**
-     * @brief uniforms
+     * @brief Uniforms
      * @return
      */
-    virtual UniformPackage Uniforms() const = 0;
+    virtual UniformPackage Uniforms() const;
+
+    /**
+     * @brief Uniforms
+     * @return
+     */
+    virtual std::vector<uint8_t> UniformPushConstants() const;
+
+    /**
+     * @brief Empty
+     * @return
+     */
+    static RenderPassUniformsInterface Empty();
 
   public:
     UniformVramTransfer::TransferId const render_pass_id;
@@ -82,11 +122,17 @@ class MaterialUniformsInterface {
     virtual ~MaterialUniformsInterface();
 
     /**
-     * @brief uniformsOf
+     * @brief UniformsOf
      * @param material
      * @return
      */
-    virtual UniformPackage UniformsOf(Material const *material) const = 0;
+    virtual UniformPackage UniformsOf(Material const *material) const;
+
+    /**
+     * @brief Empty
+     * @return
+     */
+    static MaterialUniformsInterface Empty();
 
   public:
     unsigned const package_slot_index;
@@ -107,12 +153,18 @@ class DrawableUniformsInterface {
     /**
      * @brief UniformsOf
      */
-    virtual UniformPackage UniformsOf(DrawableInstance const &drawable) const = 0;
+    virtual UniformPackage UniformsOf(DrawableInstance const &drawable) const;
 
     /**
      * @brief UniformPushConstantsOf
      */
-    virtual std::vector<uint8_t> UniformPushConstantsOf(DrawableInstance const &drawable) const = 0;
+    virtual std::vector<uint8_t> UniformPushConstantsOf(DrawableInstance const &drawable) const;
+
+    /**
+     * @brief Empty
+     * @return
+     */
+    static DrawableUniformsInterface Empty();
 
   public:
     unsigned const package_slot_index;

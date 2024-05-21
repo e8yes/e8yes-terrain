@@ -34,13 +34,13 @@
 namespace e8 {
 
 /**
- * @brief The ScreenSpaceConfiguratorInterface class For configuring what shader uniform setup to
+ * @brief The ScreenSpaceUniformsInterface class For configuring what shader uniform setup to
  * apply to the screen space processing pipeline.
  */
-class ScreenSpaceConfiguratorInterface : public GraphicsPipelineArgumentsInterface {
+class ScreenSpaceUniformsInterface : public GraphicsPipelineArgumentsInterface {
   public:
-    ScreenSpaceConfiguratorInterface();
-    virtual ~ScreenSpaceConfiguratorInterface();
+    ScreenSpaceUniformsInterface();
+    virtual ~ScreenSpaceUniformsInterface();
 
     /**
      * @brief InputImages Returns the input images to the screen space processor. The input_images
@@ -66,7 +66,7 @@ class ScreenSpaceProcessorPipeline final : public GraphicsPipelineInterface {
     /**
      * @brief ScreenSpaceProcessorPipeline Constructs a custom screen space processor.
      *
-     * @param key A unique key assigned to this screen space processing pipeline.
+     * @param pipeline_key A unique key assigned to this screen space processing pipeline.
      * @param fragment_shader The fragment shader to create the desired screen space processing
      * effect.
      * @param input_image_count The number of input images the screen space processor requires.
@@ -76,10 +76,11 @@ class ScreenSpaceProcessorPipeline final : public GraphicsPipelineInterface {
      * @param transfer_context Transfer context.
      * @param vulkan_context
      */
-    ScreenSpaceProcessorPipeline(PipelineKey const &key, std::string const &fragment_shader,
-                                 unsigned input_image_count, unsigned push_constant_size,
+    ScreenSpaceProcessorPipeline(PipelineKey const &pipeline_key,
+                                 std::string const &fragment_shader, unsigned input_image_count,
+                                 unsigned push_constant_size,
                                  GraphicsPipelineOutputInterface *output,
-                                 TransferContext *transfer_context, VulkanContext *vulkan_context);
+                                 VulkanContext *vulkan_context);
     ~ScreenSpaceProcessorPipeline() override;
 
     PipelineKey Key() const override;

@@ -170,7 +170,7 @@ std::vector<VkVertexInputAttributeDescription> VertexShaderInputAttributes() {
         tex_coord_attribute};
 }
 
-std::vector<VkDescriptorSetLayoutBinding> DescriptorSetBindings() {
+std::vector<ShaderUniformPackageBindings> DescriptorSetBindings() {
     VkDescriptorSetLayoutBinding albedo_map_binding{};
     albedo_map_binding.binding = 0;
     albedo_map_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -195,27 +195,46 @@ std::vector<VkDescriptorSetLayoutBinding> DescriptorSetBindings() {
     metallic_map_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     metallic_map_binding.descriptorCount = 1;
 
-    return std::vector<VkDescriptorSetLayoutBinding>{albedo_map_binding, normal_map_binding,
-                                                     roughness_map_binding, metallic_map_binding};
+    return std::vector<ShaderUniformPackageBindings>{ShaderUniformPackageBindings{
+        albedo_map_binding, normal_map_binding, roughness_map_binding, metallic_map_binding}};
 }
 
-/**
- * @brief The ProjectSurfaceConfigurator class For setting up the light inputs shader's uniform
- * variables.
- */
-class ProjectSurfaceConfigurator final : public RenderPassConfiguratorInterface {
+class MaterialUniforms final : public MaterialUniformsInterface {
   public:
-    ProjectSurfaceConfigurator(ProjectionInterface const &projection,
-                               ImageSampler const &texture_sampler)
-        : projection_(projection), texture_sampler_(texture_sampler) {}
+    MaterialUniforms(ImageSampler const *texture_sampler)
+        : MaterialUniformsInterface(/*package_slot_index=*/2), texture_sampler_(texture_sampler) {}
 
-    ~ProjectSurfaceConfigurator() = default;
+    UniformPackage UniformsOf(Material const *material) const override {
+        UniformPackage result;
 
-    bool IncludeDrawable(DrawableInstance const &drawable) const override {
-        return drawable.material != nullptr;
+        result.texture_packs.push_back(StagingUniformImagePack(
+            /*binding=*/0, /*images=*/std::vector<StagingTextureBuffer const *>{&material->albedo},
+            texture_sampler_));
+        result.texture_packs.push_back(StagingUniformImagePack(
+            /*binding=*/1, /*images=*/std::vector<StagingTextureBuffer const *>{&material->normal},
+            texture_sampler_));
+        result.texture_packs.push_back(StagingUniformImagePack(
+            /*binding=*/2,
+            /*images=*/std::vector<StagingTextureBuffer const *>{&material->roughness},
+            texture_sampler_));
+        result.texture_packs.push_back(StagingUniformImagePack(
+            /*binding=*/3,
+            /*images=*/std::vector<StagingTextureBuffer const *>{&material->metallic},
+            texture_sampler_));
+
+        return result;
     }
 
-    std::vector<uint8_t> PushConstantOf(DrawableInstance const &drawable) const override {
+    ImageSampler const *texture_sampler_;
+};
+
+class DrawableUniforms final : public DrawableUniformsInterface {
+  public:
+    DrawableUniforms(PerspectiveProjection const &projection)
+        : DrawableUniformsInterface(/*package_slot_index=*/kNullPackageSlot),
+          projection_(projection) {}
+
+    std::vector<uint8_t> UniformPushConstantsOf(DrawableInstance const &drawable) const override {
         std::vector<uint8_t> bytes(sizeof(PushConstants));
 
         PushConstants *push_constants = reinterpret_cast<PushConstants *>(bytes.data());
@@ -226,29 +245,8 @@ class ProjectSurfaceConfigurator final : public RenderPassConfiguratorInterface 
         return bytes;
     }
 
-    TextureSelector TexturesOf(DrawableInstance const &drawable) const override {
-        TextureSelector selector(drawable.material->id);
-
-        selector.sampler = &texture_sampler_;
-
-        selector.textures[TextureType::TT_ALBEDO] = &drawable.material->albedo;
-        selector.bindings[TextureType::TT_ALBEDO] = 0;
-
-        selector.textures[TextureType::TT_NORMAL] = &drawable.material->normal;
-        selector.bindings[TextureType::TT_NORMAL] = 1;
-
-        selector.textures[TextureType::TT_ROUGHNESS] = &drawable.material->roughness;
-        selector.bindings[TextureType::TT_ROUGHNESS] = 2;
-
-        selector.textures[TextureType::TT_METALLIC] = &drawable.material->metallic;
-        selector.bindings[TextureType::TT_METALLIC] = 3;
-
-        return selector;
-    }
-
   private:
-    ProjectionInterface const &projection_;
-    ImageSampler const &texture_sampler_;
+    PerspectiveProjection const projection_;
 };
 
 /**
@@ -256,11 +254,11 @@ class ProjectSurfaceConfigurator final : public RenderPassConfiguratorInterface 
  */
 struct ProjectSurfaceArgument : public GraphicsPipelineArgumentsInterface {
     ProjectSurfaceArgument(std::vector<DrawableInstance> const &drawables,
-                           ProjectionInterface const &projection)
+                           PerspectiveProjection const &projection)
         : drawables(drawables), projection(projection) {}
 
     std::vector<DrawableInstance> drawables;
-    ProjectionInterface const &projection;
+    PerspectiveProjection projection;
     TransferContext *transfer_context;
 };
 
@@ -271,11 +269,8 @@ class ProjectSurfacePipeline final : public GraphicsPipelineInterface {
   public:
     ProjectSurfacePipeline(GraphicsPipelineOutputInterface *output, VulkanContext *context)
         : GraphicsPipelineInterface(context) {
-        uniform_layout_ = CreateShaderUniformLayout(
-            PushConstantLayout(),
-            /*per_frame_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
-            /*per_pass_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
-            /*per_drawable_desc_set=*/DescriptorSetBindings(), context);
+        uniform_layout_ =
+            CreateShaderUniformLayout(PushConstantLayout(), DescriptorSetBindings(), context);
         shader_stages_ = CreateShaderStages(
             /*vertex_shader_file_path=*/kVertexShaderFilePathLightInputs,
             /*fragment_shader_file_path=*/kFragmentShaderFilePathLightInputs, context);
@@ -301,11 +296,15 @@ class ProjectSurfacePipeline final : public GraphicsPipelineInterface {
                 GraphicsPipelineOutputInterface *output, TransferContext *transfer_context,
                 CommandBuffer *command_buffer) override {
         StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), command_buffer);
+
         ProjectSurfaceArgument const &args =
             static_cast<ProjectSurfaceArgument const &>(generic_args);
-        ProjectSurfaceConfigurator configurator(args.projection, *texture_sampler_);
-        RenderDrawables(args.drawables, *pipeline_, *uniform_layout_, configurator,
+        MaterialUniforms material_uniforms(texture_sampler_.get());
+        DrawableUniforms drawable_uniforms(args.projection);
+        RenderDrawables(args.drawables, *pipeline_, *uniform_layout_,
+                        RenderPassUniformsInterface::Empty(), material_uniforms, drawable_uniforms,
                         transfer_context, command_buffer);
+
         FinishRenderPass(command_buffer);
     }
 };

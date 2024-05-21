@@ -58,6 +58,7 @@ void FinishRenderPass(CommandBuffer *command_buffer);
  *
  * @param drawables The array of drawables to be rendered.
  * @param pipeline The graphics pipeline to use for the rendering.
+ * @param uniform_layout
  * @param render_pass_uniforms For configuring the shader uniforms going in a render pass.
  * @param material_uniforms For configuring the shader uniform setup applying to each material.
  * @param drawable_uniforms For configuring the shader uniform setup applying to each drawable.
@@ -69,7 +70,7 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
                      RenderPassUniformsInterface const &render_pass_uniforms,
                      MaterialUniformsInterface const &material_uniforms,
                      DrawableUniformsInterface const &drawable_uniforms,
-                     TransferContext *transfer_context, CommandBuffer *command_buffer);
+                     TransferContext *transfer_context, CommandBuffer *cmds);
 
 // Represents a function which sets the value of uniform variables for screen space processing.
 using SetPostProcessorUniformsFn =
@@ -79,12 +80,16 @@ using SetPostProcessorUniformsFn =
  * @brief PostProcess Renders a quad that fills the pipeline output.
  *
  * @param pipeline The graphics pipeline to use for the screen space processing.
- * @param set_uniforms_fn A custom function to set uniform variables for the screen space processing
- * fragment shader.
+ * @param uniform_layout
+ * @param frame_uniforms
+ * @param render_pass_uniforms
+ * @param transfer_context
  * @param cmds The command buffer to which draw commands will be added.
  */
 void PostProcess(GraphicsPipeline const &pipeline, ShaderUniformLayout const &uniform_layout,
-                 SetPostProcessorUniformsFn const &set_uniforms_fn, CommandBuffer *command_buffer);
+                 FrameUniformsInterface const &frame_uniforms,
+                 RenderPassUniformsInterface const &render_pass_uniforms,
+                 TransferContext *transfer_context, CommandBuffer *cmds);
 
 } // namespace e8
 
