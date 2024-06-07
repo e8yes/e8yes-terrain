@@ -35,38 +35,31 @@ namespace {
 PipelineKey const kClampedLinearToneMapPipeline = "Clamped Linear Tone Map";
 PipelineKey const kAcesToneMapPipeline = "ACES Tone Map";
 
-class ToneMapPostProcessorConfigurator : public ScreenSpaceConfiguratorInterface {
+class ToneMapPostProcessorUniforms : public ScreenSpaceUniformsInterface {
   public:
-    ToneMapPostProcessorConfigurator(DagOperation const &radiance_map_stage,
-                                     DagOperation *exposure_stage);
-    ~ToneMapPostProcessorConfigurator() override;
+    ToneMapPostProcessorUniforms(DagOperationInstance radiance_map, DagOperationInstance exposure)
+        : radiance_(radiance_map->Output()) {
+        if (exposure != nullptr) {
+            exposure_ = exposure->Output();
+        } else {
+            exposure_ = nullptr;
+        }
+    }
 
-    void InputImages(std::vector<VkImageView> *input_images) const override;
+    ~ToneMapPostProcessorUniforms() override = default;
+
+    void InputImages(std::vector<VkImageView> *input_images) const override {
+        input_images->at(0) = radiance_->ColorAttachments()[0]->view;
+
+        if (exposure_ != nullptr) {
+            input_images->at(1) = exposure_->ColorAttachments()[0]->view;
+        }
+    }
 
   private:
-    GraphicsPipelineOutputInterface const &radiance_;
+    GraphicsPipelineOutputInterface const *radiance_;
     GraphicsPipelineOutputInterface const *exposure_;
 };
-
-ToneMapPostProcessorConfigurator::ToneMapPostProcessorConfigurator(
-    DagOperation const &radiance_map_stage, DagOperation *exposure_stage)
-    : radiance_(*radiance_map_stage.Output()) {
-    if (exposure_stage != nullptr) {
-        exposure_ = exposure_stage->Output();
-    } else {
-        exposure_ = nullptr;
-    }
-}
-
-ToneMapPostProcessorConfigurator::~ToneMapPostProcessorConfigurator() {}
-
-void ToneMapPostProcessorConfigurator::InputImages(std::vector<VkImageView> *input_images) const {
-    input_images->at(0) = radiance_.ColorAttachments()[0]->view;
-
-    if (exposure_ != nullptr) {
-        input_images->at(1) = exposure_->ColorAttachments()[0]->view;
-    }
-}
 
 /**
  * @brief CreateLdrImageStage Creates an LDR (low dynamic range) image stage with a 32-bit RGBA
@@ -99,27 +92,25 @@ DagOperationInstance DoToneMapping(DagOperationInstance radiance_map, DagOperati
     if (exposure != nullptr) {
         pipeline = target->WithPipeline(
             kAcesToneMapPipeline,
-            [](GraphicsPipelineOutputInterface *tone_map_output, TransferContext *transfer_context,
-               VulkanContext *vulkan_context) {
+            [](GraphicsPipelineOutputInterface *tone_map_output, VulkanContext *vulkan_context) {
                 return std::make_unique<ScreenSpaceProcessorPipeline>(
                     kAcesToneMapPipeline, kFragmentShaderFilePathHdrAces, /*input_image_count=*/2,
-                    /*push_constant_size=*/0, tone_map_output, transfer_context, vulkan_context);
+                    /*push_constant_size=*/0, tone_map_output, vulkan_context);
             });
     } else {
         pipeline = target->WithPipeline(
             kClampedLinearToneMapPipeline,
-            [](GraphicsPipelineOutputInterface *tone_map_output, TransferContext *transfer_context,
-               VulkanContext *vulkan_context) {
+            [](GraphicsPipelineOutputInterface *tone_map_output, VulkanContext *vulkan_context) {
                 return std::make_unique<ScreenSpaceProcessorPipeline>(
                     kClampedLinearToneMapPipeline, kFragmentShaderFilePathHdrClamp,
                     /*input_image_count=*/1, /*push_constant_size=*/0, tone_map_output,
-                    transfer_context, vulkan_context);
+                    vulkan_context);
             });
     }
 
-    auto configurator = std::make_unique<ToneMapPostProcessorConfigurator>(*radiance_map, exposure);
+    auto configurator = std::make_unique<ToneMapPostProcessorUniforms>(radiance_map, exposure);
     target->Schedule(pipeline, std::move(configurator),
-                     /*parents=*/std::vector<DagOperation *>{radiance_map, exposure});
+                     /*parents=*/std::vector<DagOperationInstance>{radiance_map, exposure});
 
     return target;
 }

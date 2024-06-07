@@ -202,7 +202,8 @@ std::vector<ShaderUniformPackageBindings> DescriptorSetBindings() {
 class MaterialUniforms final : public MaterialUniformsInterface {
   public:
     MaterialUniforms(ImageSampler const *texture_sampler)
-        : MaterialUniformsInterface(/*package_slot_index=*/2), texture_sampler_(texture_sampler) {}
+        : MaterialUniformsInterface(/*package_slot_index=*/2, /*reuse_upload=*/true),
+          texture_sampler_(texture_sampler) {}
 
     UniformPackage UniformsOf(Material const *material) const override {
         UniformPackage result;
@@ -231,7 +232,7 @@ class MaterialUniforms final : public MaterialUniformsInterface {
 class DrawableUniforms final : public DrawableUniformsInterface {
   public:
     DrawableUniforms(PerspectiveProjection const &projection)
-        : DrawableUniformsInterface(/*package_slot_index=*/kNullPackageSlot),
+        : DrawableUniformsInterface(/*package_slot_index=*/kNullPackageSlot, /*reuse_upload=*/true),
           projection_(projection) {}
 
     std::vector<uint8_t> UniformPushConstantsOf(DrawableInstance const &drawable) const override {
@@ -319,7 +320,6 @@ DagOperationInstance DoProjectSurface(DrawableCollection *drawable_collection,
 
     GraphicsPipelineInterface *pipeline =
         target->WithPipeline(kProjectSurfacePipeline, [](GraphicsPipelineOutputInterface *output,
-                                                         TransferContext * /*transfer_context*/,
                                                          VulkanContext *vulkan_context) {
             return std::make_unique<ProjectSurfacePipeline>(output, vulkan_context);
         });

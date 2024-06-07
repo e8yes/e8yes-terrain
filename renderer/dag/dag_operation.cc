@@ -213,7 +213,7 @@ GraphicsPipelineInterface *DagOperation::WithPipeline(PipelineKey const &key,
     }
 
     std::unique_ptr<GraphicsPipelineInterface> pipeline =
-        compile_fn(pimpl_->output.get(), pimpl_->transfer_context_, pimpl_->vulkan_context_);
+        compile_fn(pimpl_->output.get(), pimpl_->vulkan_context_);
     it = pimpl_->pipelines.insert(std::make_pair(key, PipelineAndSchedules(std::move(pipeline))))
              .first;
 

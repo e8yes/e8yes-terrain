@@ -106,6 +106,8 @@ StagingUniformBuffer::StagingUniformBuffer(unsigned binding, unsigned size, Vulk
     this->Allocate(size, context);
 }
 
+StagingUniformBuffer::StagingUniformBuffer(StagingUniformBuffer &&) = default;
+
 StagingUniformBuffer::~StagingUniformBuffer() = default;
 
 unsigned StagingUniformBuffer::ActualSize() const { return actual_size_; }

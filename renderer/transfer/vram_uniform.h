@@ -46,6 +46,8 @@ class StagingUniformBuffer : public StagingBuffer {
      * @param context
      */
     StagingUniformBuffer(unsigned binding, unsigned size, VulkanContext *context);
+    StagingUniformBuffer(StagingUniformBuffer const &) = delete;
+    StagingUniformBuffer(StagingUniformBuffer &&);
     ~StagingUniformBuffer();
 
     /**

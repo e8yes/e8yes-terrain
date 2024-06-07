@@ -26,9 +26,24 @@
 
 namespace e8 {
 
+FrameUniformsInterface::FrameUniformsInterface(UniformVramTransfer::TransferId frame_uniforms_id,
+                                               unsigned package_slot_index, bool reuse_upload)
+    : frame_uniforms_id(frame_uniforms_id), package_slot_index(package_slot_index),
+      reuse_upload(reuse_upload) {}
+
+FrameUniformsInterface::~FrameUniformsInterface() = default;
+
+UniformPackage FrameUniformsInterface::Uniforms() const {}
+
+FrameUniformsInterface FrameUniformsInterface::Empty() {
+    return FrameUniformsInterface(UniformVramTransfer::TransferId(), kNullPackageSlot,
+                                  /*reuse_upload=*/true);
+}
+
 RenderPassUniformsInterface::RenderPassUniformsInterface(
-    UniformVramTransfer::TransferId render_pass_id, unsigned package_slot_index)
-    : render_pass_id(render_pass_id), package_slot_index(package_slot_index) {}
+    UniformVramTransfer::TransferId render_pass_id, unsigned package_slot_index, bool reuse_upload)
+    : render_pass_id(render_pass_id), package_slot_index(package_slot_index),
+      reuse_upload(reuse_upload) {}
 
 RenderPassUniformsInterface::~RenderPassUniformsInterface() = default;
 
@@ -39,11 +54,12 @@ std::vector<uint8_t> RenderPassUniformsInterface::UniformPushConstants() const {
 }
 
 RenderPassUniformsInterface RenderPassUniformsInterface::Empty() {
-    return RenderPassUniformsInterface(UniformVramTransfer::TransferId(), kNullPackageSlot);
+    return RenderPassUniformsInterface(UniformVramTransfer::TransferId(), kNullPackageSlot,
+                                       /*reuse_upload=*/true);
 }
 
-MaterialUniformsInterface::MaterialUniformsInterface(unsigned package_slot_index)
-    : package_slot_index(package_slot_index) {}
+MaterialUniformsInterface::MaterialUniformsInterface(unsigned package_slot_index, bool reuse_upload)
+    : package_slot_index(package_slot_index), reuse_upload(reuse_upload) {}
 
 MaterialUniformsInterface::~MaterialUniformsInterface() = default;
 
@@ -52,11 +68,11 @@ UniformPackage MaterialUniformsInterface::UniformsOf(Material const *) const {
 }
 
 MaterialUniformsInterface MaterialUniformsInterface::Empty() {
-    return MaterialUniformsInterface(kNullPackageSlot);
+    return MaterialUniformsInterface(kNullPackageSlot, /*reuse_upload=*/true);
 }
 
-DrawableUniformsInterface::DrawableUniformsInterface(unsigned package_slot_index)
-    : package_slot_index(package_slot_index) {}
+DrawableUniformsInterface::DrawableUniformsInterface(unsigned package_slot_index, bool reuse_upload)
+    : package_slot_index(package_slot_index), reuse_upload(reuse_upload) {}
 
 DrawableUniformsInterface::~DrawableUniformsInterface() = default;
 
@@ -70,7 +86,7 @@ DrawableUniformsInterface::UniformPushConstantsOf(DrawableInstance const &) cons
 }
 
 DrawableUniformsInterface DrawableUniformsInterface::Empty() {
-    return DrawableUniformsInterface(kNullPackageSlot);
+    return DrawableUniformsInterface(kNullPackageSlot, /*reuse_upload=*/true);
 }
 
 } // namespace e8

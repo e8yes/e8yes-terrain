@@ -58,12 +58,12 @@ DoFxaa(DagOperationInstance ldr_image,
                                                   vulkan_context);
         });
 
-    GraphicsPipelineInterface *pipeline = target->WithPipeline(
-        kFxaaPipeline, [](GraphicsPipelineOutputInterface *aa_output,
-                          TransferContext *transfer_context, VulkanContext *vulkan_context) {
+    GraphicsPipelineInterface *pipeline =
+        target->WithPipeline(kFxaaPipeline, [](GraphicsPipelineOutputInterface *aa_output,
+                                               VulkanContext *vulkan_context) {
             return std::make_unique<ScreenSpaceProcessorPipeline>(
                 kFxaaPipeline, kFragmentShaderFilePathFxaa, /*input_image_count=*/1,
-                /*push_constant_size=*/0, aa_output, transfer_context, vulkan_context);
+                /*push_constant_size=*/0, aa_output, vulkan_context);
         });
 
     auto uniforms = std::make_unique<FxaaUniforms>(ldr_image->Output());

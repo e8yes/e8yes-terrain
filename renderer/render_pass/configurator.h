@@ -54,7 +54,8 @@ class FrameUniformsInterface {
     /**
      * @brief FrameUniformsInterface
      */
-    FrameUniformsInterface(unsigned package_slot_index);
+    FrameUniformsInterface(UniformVramTransfer::TransferId frame_uniforms_id,
+                           unsigned package_slot_index, bool reuse_upload);
     virtual ~FrameUniformsInterface();
 
     /**
@@ -70,7 +71,9 @@ class FrameUniformsInterface {
     static FrameUniformsInterface Empty();
 
   public:
+    UniformVramTransfer::TransferId const frame_uniforms_id;
     unsigned const package_slot_index;
+    bool const reuse_upload;
 };
 
 /**
@@ -83,7 +86,7 @@ class RenderPassUniformsInterface {
      * @brief RenderPassUniformsInterface
      */
     RenderPassUniformsInterface(UniformVramTransfer::TransferId render_pass_id,
-                                unsigned package_slot_index);
+                                unsigned package_slot_index, bool reuse_upload);
     virtual ~RenderPassUniformsInterface();
 
     /**
@@ -107,6 +110,7 @@ class RenderPassUniformsInterface {
   public:
     UniformVramTransfer::TransferId const render_pass_id;
     unsigned const package_slot_index;
+    bool const reuse_upload;
 };
 
 /**
@@ -118,7 +122,7 @@ class MaterialUniformsInterface {
     /**
      * @brief MaterialUniformsInterface
      */
-    MaterialUniformsInterface(unsigned package_slot_index);
+    MaterialUniformsInterface(unsigned package_slot_index, bool reuse_upload);
     virtual ~MaterialUniformsInterface();
 
     /**
@@ -136,6 +140,7 @@ class MaterialUniformsInterface {
 
   public:
     unsigned const package_slot_index;
+    bool const reuse_upload;
 };
 
 /**
@@ -147,7 +152,7 @@ class DrawableUniformsInterface {
     /**
      * @brief DrawableUniformsInterface
      */
-    DrawableUniformsInterface(unsigned package_slot_index);
+    DrawableUniformsInterface(unsigned package_slot_index, bool reuse_upload);
     virtual ~DrawableUniformsInterface();
 
     /**
@@ -168,6 +173,7 @@ class DrawableUniformsInterface {
 
   public:
     unsigned const package_slot_index;
+    bool const reuse_upload;
 };
 
 } // namespace e8

@@ -154,7 +154,8 @@ std::vector<VkVertexInputAttributeDescription> VertexShaderInputAttributes() {
 class DrawableUniforms final : public DrawableUniformsInterface {
   public:
     DrawableUniforms(ProjectionInterface const &projection)
-        : DrawableUniformsInterface(/*package_slot_index=*/2), projection_(projection) {}
+        : DrawableUniformsInterface(/*package_slot_index=*/2, /*reuse_upload=*/true),
+          projection_(projection) {}
 
     ~DrawableUniforms() = default;
 
@@ -276,8 +277,7 @@ DagOperationInstance DoProjectNdcDepth(DrawableCollection *drawable_collection,
         session->WithOperation(kProjectDepthPipeline, width, height, CreateProjectNdcDepthOp);
     GraphicsPipelineInterface *project_depth_pipeline = projected_ndc_depth->WithPipeline(
         kProjectDepthPipeline,
-        [](GraphicsPipelineOutputInterface *output, TransferContext * /*transfer_context*/,
-           VulkanContext *vulkan_context) {
+        [](GraphicsPipelineOutputInterface *output, VulkanContext *vulkan_context) {
             return std::make_unique<ProjectDepthPipeline>(
                 dynamic_cast<ProjectDepthOutput *>(output), vulkan_context);
         });
@@ -302,8 +302,7 @@ DagOperationInstance DoProjectLinearDepth(DrawableCollection *drawable_collectio
         session->WithOperation(kProjectDepthPipeline, width, height, CreateProjectLinearDepthOp);
     GraphicsPipelineInterface *project_linear_depth_pipeline = projected_linear_depth->WithPipeline(
         kProjectLinearDepthPipeline,
-        [](GraphicsPipelineOutputInterface *output, TransferContext * /*transfer_context*/,
-           VulkanContext *vulkan_context) {
+        [](GraphicsPipelineOutputInterface *output, VulkanContext *vulkan_context) {
             return std::make_unique<ProjectLinearDepthPipeline>(output, vulkan_context);
         });
 

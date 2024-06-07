@@ -86,18 +86,21 @@ UniformLayout(unsigned input_image_count, unsigned push_constant_size, VulkanCon
 class FrameUniforms : public FrameUniformsInterface {
   public:
     FrameUniforms(unsigned viewport_width, unsigned viewport_height, VulkanContext *vulkan_context)
-        : FrameUniformsInterface(kFramePackageSlot) {
-        ViewportDimension dimension;
-        dimension.viewport_width = viewport_width;
-        dimension.viewport_height = viewport_height;
+        : FrameUniformsInterface(GenerateUuid(), kFramePackageSlot, /*reuse_upload=*/true),
+          viewport_width_(viewport_width), viewport_height_(viewport_height),
+          vulkan_context_(vulkan_context) {}
 
+    UniformPackage Uniforms() const override {
+        ViewportDimension data{.viewport_width = static_cast<float>(viewport_width_),
+                               .viewport_height = static_cast<float>(viewport_height_)};
         StagingUniformBuffer viewport_dimension_uniform(
-            /*binding=*/0, /*size=*/sizeof(ViewportDimension), vulkan_context);
-        viewport_dimension_uniform.WriteObject(dimension);
-        package_.buffers.push_back(viewport_dimension_uniform);
-    }
+            /*binding=*/0, /*size=*/sizeof(data), vulkan_context_);
+        viewport_dimension_uniform.WriteObject(data);
 
-    UniformPackage Uniforms() const override { return package_; }
+        UniformPackage result;
+        result.buffers.push_back(std::move(viewport_dimension_uniform));
+        return result;
+    }
 
   private:
     struct ViewportDimension {
@@ -105,41 +108,56 @@ class FrameUniforms : public FrameUniformsInterface {
         float viewport_height;
     };
 
-    UniformPackage package_;
+    unsigned const viewport_width_;
+    unsigned const viewport_height_;
+    VulkanContext *vulkan_context_;
 };
 
 class RenderPassUniforms : public RenderPassUniformsInterface {
   public:
     RenderPassUniforms(PipelineKey const &pipeline_key, unsigned input_image_count,
                        VulkanContext *vulkan_context)
-        : RenderPassUniformsInterface(GenerateUuidFor(pipeline_key), kRenderPassPackageSlot),
+        : RenderPassUniformsInterface(GenerateUuidFor(pipeline_key), kRenderPassPackageSlot,
+                                      /*reuse_upload=*/false),
           input_image_sampler_(CreateContinuousSampler(vulkan_context)),
-          pending_uniform_data_(nullptr) {}
+          input_images_(input_image_count, VK_NULL_HANDLE), new_input_images_(false) {}
 
-    void PendUniformData(ScreenSpaceUniformsInterface const *uniform_data) {
-        pending_uniform_data_ = uniform_data;
+    void PendUniformData(ScreenSpaceUniformsInterface const &uniform_data) {
+        uniform_data.PushConstants(&push_contants_);
+
+        std::vector<VkImageView> input_images;
+        uniform_data.InputImages(&input_images);
+        if (input_images == input_images_) {
+            new_input_images_ = false;
+            return;
+        }
+
+        input_images_ = input_images;
+        new_input_images_ = true;
     }
 
     UniformPackage Uniforms() const override {
+        if (!new_input_images_) {
+            return UniformPackage();
+        }
+
         UniformPackage result;
-        if (pending_uniform_data_ == nullptr) {
-            return result;
+        for (unsigned i = 0; i < input_images_.size(); ++i) {
+            UniformImagePack input_image_pack(/*binding=*/i,
+                                              std::vector<VkImageView>{input_images_[i]},
+                                              input_image_sampler_.get());
+            result.image_packs.push_back(input_image_pack);
         }
-    }
-
-    std::vector<uint8_t> UniformPushConstants() const override {
-        std::vector<uint8_t> result;
-        if (pending_uniform_data_ == nullptr) {
-            return result;
-        }
-
-        pending_uniform_data_->PushConstants(&result);
         return result;
     }
 
+    std::vector<uint8_t> UniformPushConstants() const override { return push_contants_; }
+
   private:
     std::unique_ptr<ImageSampler> input_image_sampler_;
-    ScreenSpaceUniformsInterface const *pending_uniform_data_;
+    std::vector<uint8_t> push_contants_;
+    std::vector<VkImageView> input_images_;
+    bool new_input_images_;
 };
 
 } // namespace
@@ -200,7 +218,7 @@ void ScreenSpaceProcessorPipeline::Launch(GraphicsPipelineArgumentsInterface con
                                           TransferContext *transfer_context,
                                           CommandBuffer *command_buffer) {
     auto uniform_data = static_cast<ScreenSpaceUniformsInterface const &>(generic_args);
-    pimpl_->render_pass_uniforms.PendUniformData(&uniform_data);
+    pimpl_->render_pass_uniforms.PendUniformData(uniform_data);
 
     StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), command_buffer);
     PostProcess(*pipeline_, *uniform_layout_, pimpl_->frame_uniforms, pimpl_->render_pass_uniforms,

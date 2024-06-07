@@ -18,11 +18,7 @@
 #ifndef ISLANDS_RENDER_PASS_RASTERIZE_H
 #define ISLANDS_RENDER_PASS_RASTERIZE_H
 
-#include <array>
-#include <functional>
-#include <memory>
 #include <vector>
-#include <vulkan/vulkan.h>
 
 #include "renderer/basic/command_buffer.h"
 #include "renderer/basic/frame_buffer.h"
@@ -71,10 +67,6 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
                      MaterialUniformsInterface const &material_uniforms,
                      DrawableUniformsInterface const &drawable_uniforms,
                      TransferContext *transfer_context, CommandBuffer *cmds);
-
-// Represents a function which sets the value of uniform variables for screen space processing.
-using SetPostProcessorUniformsFn =
-    std::function<void(ShaderUniformLayout const &uniform_layout, CommandBuffer *command_buffer)>;
 
 /**
  * @brief PostProcess Renders a quad that fills the pipeline output.

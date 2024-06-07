@@ -15,12 +15,8 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <array>
 #include <cassert>
 #include <cstdint>
-#include <functional>
-#include <limits>
-#include <memory>
 #include <unordered_set>
 #include <vector>
 #include <vulkan/vulkan.h>
@@ -119,15 +115,25 @@ void UploadUniforms(std::unordered_map<UniformVramTransfer::TransferId,
 void UploadFrameUniforms(FrameUniformsInterface const &frame_uniforms,
                          ShaderUniformLayout const &uniform_layout,
                          UniformVramTransfer *uniform_vram) {
+    if (frame_uniforms.reuse_upload &&
+        uniform_vram->Find(frame_uniforms.frame_uniforms_id) != nullptr) {
+        return;
+    }
+
     UniformPackage uniform_package = frame_uniforms.Uniforms();
-    uniform_vram->Upload(
-        /*transfer_id=*/0, uniform_package.buffers, uniform_package.image_packs,
-        uniform_layout.descriptor_set_layouts[frame_uniforms.package_slot_index]);
+    uniform_vram->Upload(frame_uniforms.frame_uniforms_id, uniform_package.buffers,
+                         uniform_package.image_packs,
+                         uniform_layout.descriptor_set_layouts[frame_uniforms.package_slot_index]);
 }
 
 void UploadRenderPassUniforms(RenderPassUniformsInterface const &render_pass_uniforms,
                               ShaderUniformLayout const &uniform_layout,
                               UniformVramTransfer *uniform_vram) {
+    if (render_pass_uniforms.reuse_upload &&
+        uniform_vram->Find(render_pass_uniforms.render_pass_id) != nullptr) {
+        return;
+    }
+
     UniformPackage uniform_package = render_pass_uniforms.Uniforms();
     uniform_vram->Upload(
         render_pass_uniforms.render_pass_id, uniform_package.buffers, uniform_package.image_packs,
@@ -153,8 +159,9 @@ void UploadResources(std::vector<DrawableInstance> const &drawables,
             geometries.insert(drawable.geometry);
         }
 
-        if (drawable.material != nullptr &&
-            uniform_packages.find(drawable.material->id) == uniform_packages.end()) {
+        if (drawable.material != nullptr && uniform_packages.count(drawable.material->id) == 0 &&
+            (!material_uniforms.reuse_upload ||
+             transfer_context->uniform_vram_transfer.Find(drawable.material->id) == nullptr)) {
             UniformPackage material_package = material_uniforms.UniformsOf(drawable.material);
             UniformPackageWithLayout material_package_with_layout{
                 .uniform_package = std::move(material_package),
@@ -165,7 +172,8 @@ void UploadResources(std::vector<DrawableInstance> const &drawables,
                 std::make_pair(drawable.material->id, std::move(material_package_with_layout)));
         }
 
-        if (uniform_packages.find(drawable.id) != uniform_packages.end()) {
+        if (!drawable_uniforms.reuse_upload ||
+            transfer_context->uniform_vram_transfer.Find(drawable.id) == nullptr) {
             UniformPackage drawable_package = drawable_uniforms.UniformsOf(drawable);
             UniformPackageWithLayout drawable_package_with_layout{
                 .uniform_package = std::move(drawable_package),
