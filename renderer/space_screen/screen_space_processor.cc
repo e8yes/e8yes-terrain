@@ -25,35 +25,37 @@
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
+#include "content/common.h"
 #include "renderer/basic/command_buffer.h"
 #include "renderer/dag/graphics_pipeline.h"
 #include "renderer/dag/graphics_pipeline_output.h"
+#include "renderer/render_pass/configurator.h"
 #include "renderer/render_pass/rasterize.h"
 #include "renderer/space_screen/screen_space_processor.h"
 #include "renderer/transfer/context.h"
-#include "renderer/transfer/descriptor_set.h"
+#include "renderer/transfer/uniform_promise.h"
+#include "renderer/transfer/vram_uniform.h"
 
 namespace e8 {
 namespace {
 
-struct ViewportDimension {
-    float viewport_width;
-    float viewport_height;
-};
+unsigned const kFramePackageSlot = 0;
+unsigned const kRenderPassPackageSlot = 1;
 
-VkDescriptorSetLayoutBinding PostProcessorViewportBinding() {
+ShaderUniformPackageBindings ViewportDimensionBinding() {
     VkDescriptorSetLayoutBinding viewport_binding;
     viewport_binding.binding = 0;
     viewport_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
     viewport_binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     viewport_binding.descriptorCount = 1;
 
-    return viewport_binding;
+    return ShaderUniformPackageBindings{viewport_binding};
 }
 
 std::unique_ptr<ShaderUniformLayout>
 UniformLayout(unsigned input_image_count, unsigned push_constant_size, VulkanContext *context) {
-    std::vector<VkDescriptorSetLayoutBinding> input_images_layouts(input_image_count);
+    ShaderUniformPackageBindings input_image_bindings;
+    input_image_bindings.reserve(input_image_count);
 
     for (unsigned i = 0; i < input_image_count; ++i) {
         VkDescriptorSetLayoutBinding input_image_binding{};
@@ -62,142 +64,135 @@ UniformLayout(unsigned input_image_count, unsigned push_constant_size, VulkanCon
         input_image_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
         input_image_binding.descriptorCount = 1;
 
-        input_images_layouts[i] = input_image_binding;
+        input_image_bindings.push_back(input_image_binding);
     }
 
-    std::optional<VkPushConstantRange> push_constants;
+    std::optional<VkPushConstantRange> push_constant_range;
     if (push_constant_size > 0) {
         VkPushConstantRange range{};
         range.offset = 0;
         range.size = push_constant_size;
         range.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-        push_constants = range;
+        push_constant_range.emplace(range);
     }
 
     return CreateShaderUniformLayout(
-        push_constants,
-        /*per_frame_desc_set=*/
-        std::vector<VkDescriptorSetLayoutBinding>{PostProcessorViewportBinding()},
-        /*per_pass_desc_set=*/input_images_layouts,
-        /*per_drawable_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(), context);
+        push_constant_range,
+        std::vector<ShaderUniformPackageBindings>{ViewportDimensionBinding(), input_image_bindings},
+        context);
 }
 
-void ConfigureViewportDimensionUniformVariable(ShaderUniformLayout const &uniform_layout,
-                                               DescriptorSet const &viewport_dimension_desc_set,
-                                               CommandBuffer *command_buffer) {
-    vkCmdBindDescriptorSets(command_buffer->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                            uniform_layout.layout,
-                            /*firstSet=*/DescriptorSetType::DST_PER_FRAME,
-                            /*descriptorSetCount=*/1, &viewport_dimension_desc_set.descriptor_set,
-                            /*dynamicOffsetCount=*/0,
-                            /*pDynamicOffsets=*/nullptr);
-}
+class FrameUniforms : public FrameUniformsInterface {
+  public:
+    FrameUniforms(unsigned viewport_width, unsigned viewport_height, VulkanContext *vulkan_context)
+        : FrameUniformsInterface(GenerateUuid(), kFramePackageSlot, /*reuse_upload=*/true),
+          viewport_width_(viewport_width), viewport_height_(viewport_height),
+          vulkan_context_(vulkan_context) {}
 
-void ConfigureCustomUniformVariables(ScreenSpaceConfiguratorInterface const &configurator,
-                                     ShaderUniformLayout const &uniform_layout,
-                                     DescriptorSet const &input_images_desc_set,
-                                     ImageSampler const &input_image_sampler,
-                                     std::vector<VkImageView> *past_input_images,
-                                     VulkanContext *context, CommandBuffer *command_buffer) {
-    if (uniform_layout.push_constant_range.has_value()) {
-        std::vector<uint8_t> push_constants(uniform_layout.push_constant_range->size);
-        configurator.PushConstants(&push_constants);
+    UniformPackage Uniforms() const override {
+        ViewportDimension data{.viewport_width = static_cast<float>(viewport_width_),
+                               .viewport_height = static_cast<float>(viewport_height_)};
+        StagingUniformBuffer viewport_dimension_uniform(
+            /*binding=*/0, /*size=*/sizeof(data), vulkan_context_);
+        viewport_dimension_uniform.WriteObject(data);
 
-        vkCmdPushConstants(command_buffer->buffer, uniform_layout.layout,
-                           /*stageFlags=*/VK_SHADER_STAGE_FRAGMENT_BIT,
-                           /*offset=*/0,
-                           /*size=*/push_constants.size(), push_constants.data());
+        UniformPackage result;
+        result.buffers.push_back(std::move(viewport_dimension_uniform));
+        return result;
     }
 
-    std::vector<VkImageView> current_input_images(past_input_images->size());
-    configurator.InputImages(&current_input_images);
+  private:
+    struct ViewportDimension {
+        float viewport_width;
+        float viewport_height;
+    };
 
-    if (current_input_images != *past_input_images) {
-        *past_input_images = current_input_images;
+    unsigned const viewport_width_;
+    unsigned const viewport_height_;
+    VulkanContext *vulkan_context_;
+};
 
-        for (unsigned i = 0; i < current_input_images.size(); ++i) {
-            WriteImageDescriptor(current_input_images[i], input_image_sampler,
-                                 input_images_desc_set,
-                                 /*binding=*/i, context);
+class RenderPassUniforms : public RenderPassUniformsInterface {
+  public:
+    RenderPassUniforms(PipelineKey const &pipeline_key, unsigned input_image_count,
+                       VulkanContext *vulkan_context)
+        : RenderPassUniformsInterface(GenerateUuidFor(pipeline_key), kRenderPassPackageSlot,
+                                      /*reuse_upload=*/false),
+          input_image_sampler_(CreateContinuousSampler(vulkan_context)),
+          input_images_(input_image_count, VK_NULL_HANDLE), new_input_images_(false) {}
+
+    void PendUniformData(ScreenSpaceUniformsInterface const &uniform_data) {
+        uniform_data.PushConstants(&push_contants_);
+
+        std::vector<VkImageView> input_images;
+        uniform_data.InputImages(&input_images);
+        if (input_images == input_images_) {
+            new_input_images_ = false;
+            return;
         }
+
+        input_images_ = input_images;
+        new_input_images_ = true;
     }
 
-    if (!current_input_images.empty()) {
-        vkCmdBindDescriptorSets(command_buffer->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                                uniform_layout.layout,
-                                /*firstSet=*/DescriptorSetType::DST_PER_PASS,
-                                /*descriptorSetCount=*/1, &input_images_desc_set.descriptor_set,
-                                /*dynamicOffsetCount=*/0,
-                                /*pDynamicOffsets=*/nullptr);
+    UniformPackage Uniforms() const override {
+        if (!new_input_images_) {
+            return UniformPackage();
+        }
+
+        UniformPackage result;
+        for (unsigned i = 0; i < input_images_.size(); ++i) {
+            UniformImagePack input_image_pack(/*binding=*/i,
+                                              std::vector<VkImageView>{input_images_[i]},
+                                              input_image_sampler_.get());
+            result.image_packs.push_back(input_image_pack);
+        }
+        return result;
     }
-}
+
+    std::vector<uint8_t> UniformPushConstants() const override { return push_contants_; }
+
+  private:
+    std::unique_ptr<ImageSampler> input_image_sampler_;
+    std::vector<uint8_t> push_contants_;
+    std::vector<VkImageView> input_images_;
+    bool new_input_images_;
+};
 
 } // namespace
 
-ScreenSpaceConfiguratorInterface::ScreenSpaceConfiguratorInterface() {}
-
-ScreenSpaceConfiguratorInterface::~ScreenSpaceConfiguratorInterface() {}
-
-void ScreenSpaceConfiguratorInterface::InputImages(
-    std::vector<VkImageView> * /*input_images*/) const {}
-
-void ScreenSpaceConfiguratorInterface::PushConstants(
-    std::vector<uint8_t> * /*push_constants*/) const {}
+ScreenSpaceUniformsInterface::ScreenSpaceUniformsInterface() = default;
+ScreenSpaceUniformsInterface::~ScreenSpaceUniformsInterface() = default;
+void ScreenSpaceUniformsInterface::InputImages(std::vector<VkImageView> * /*input_images*/) const {}
+void ScreenSpaceUniformsInterface::PushConstants(std::vector<uint8_t> * /*push_constants*/) const {}
 
 struct ScreenSpaceProcessorPipeline::PostProcessorPipelineImpl {
-    PostProcessorPipelineImpl(PipelineKey key, unsigned input_image_count,
-                              ShaderUniformLayout const &uniform_layout,
+    PostProcessorPipelineImpl(PipelineKey pipeline_key, unsigned input_image_count,
                               GraphicsPipelineOutputInterface *output,
-                              TransferContext *transfer_context, VulkanContext *vulkan_context)
-        : key(key), past_input_images(input_image_count) {
-        // Sets up the viewport dimension uniform variable.
-        viewport_dimension_desc_set = transfer_context->descriptor_set_allocator.Allocate(
-            DescriptorType::DT_UNIFORM_BUFFER, uniform_layout.per_frame_desc_set);
-
-        viewport_dimension_ubo =
-            CreateUniformBuffer(/*size=*/sizeof(ViewportDimension), vulkan_context);
-
-        ViewportDimension dimension;
-        dimension.viewport_width = output->Width();
-        dimension.viewport_height = output->Height();
-
-        WriteUniformBufferDescriptor(&dimension, *viewport_dimension_ubo,
-                                     *viewport_dimension_desc_set,
-                                     /*binding=*/0, vulkan_context);
-
-        // Sets up the input image uniform variables.
-        input_images_desc_set = transfer_context->descriptor_set_allocator.Allocate(
-            DescriptorType::DT_COMBINED_IMAGE_SAMPLER, uniform_layout.per_pass_desc_set);
-        input_image_sampler = CreateContinuousSampler(vulkan_context);
-
-        for (auto &past_input_image : past_input_images) {
-            past_input_image = VK_NULL_HANDLE;
-        }
-    }
+                              VulkanContext *vulkan_context)
+        : pipeline_key(pipeline_key),
+          frame_uniforms(output->Width(), output->Height(), vulkan_context),
+          render_pass_uniforms(pipeline_key, input_image_count, vulkan_context) {}
 
     ~PostProcessorPipelineImpl() = default;
 
-    PipelineKey key;
-
-    std::unique_ptr<DescriptorSet> viewport_dimension_desc_set;
-    std::unique_ptr<UniformBuffer> viewport_dimension_ubo;
-
-    std::unique_ptr<DescriptorSet> input_images_desc_set;
-    std::unique_ptr<ImageSampler> input_image_sampler;
-    std::vector<VkImageView> past_input_images;
+    PipelineKey pipeline_key;
+    FrameUniforms frame_uniforms;
+    RenderPassUniforms render_pass_uniforms;
 };
 
-ScreenSpaceProcessorPipeline::ScreenSpaceProcessorPipeline(
-    PipelineKey const &key, std::string const &fragment_shader, unsigned input_image_count,
-    unsigned push_constant_size, GraphicsPipelineOutputInterface *output,
-    TransferContext *transfer_context, VulkanContext *vulkan_context)
+ScreenSpaceProcessorPipeline::ScreenSpaceProcessorPipeline(PipelineKey const &pipeline_key,
+                                                           std::string const &fragment_shader,
+                                                           unsigned input_image_count,
+                                                           unsigned push_constant_size,
+                                                           GraphicsPipelineOutputInterface *output,
+                                                           VulkanContext *vulkan_context)
     : GraphicsPipelineInterface(vulkan_context) {
     shader_stages_ = CreateShaderStages(
         /*vertex_shader_file_path=*/kVertexShaderFilePathPostProcessor,
-        /*fragment_shader_file_path=*/fragment_shader, transfer_context->vulkan_context);
-    uniform_layout_ =
-        UniformLayout(input_image_count, push_constant_size, transfer_context->vulkan_context);
+        /*fragment_shader_file_path=*/fragment_shader, vulkan_context);
+    uniform_layout_ = UniformLayout(input_image_count, push_constant_size, vulkan_context);
     vertex_inputs_ = CreateVertexInputState(
         /*input_attributes=*/std::vector<VkVertexInputAttributeDescription>());
     fixed_stage_config_ = CreateFixedStageConfig(/*polygon_mode=*/VK_POLYGON_MODE_FILL,
@@ -207,36 +202,27 @@ ScreenSpaceProcessorPipeline::ScreenSpaceProcessorPipeline(
 
     // Creates the screen space processing pipeline.
     pipeline_ = CreateGraphicsPipeline(output->GetRenderPass(), *shader_stages_, *uniform_layout_,
-                                       *vertex_inputs_, *fixed_stage_config_,
-                                       transfer_context->vulkan_context);
+                                       *vertex_inputs_, *fixed_stage_config_, vulkan_context);
 
     // Sets up additional states for defining the uniform variables.
-    pimpl_ = std::make_unique<PostProcessorPipelineImpl>(key, input_image_count, *uniform_layout_,
-                                                         output, transfer_context, vulkan_context);
+    pimpl_ = std::make_unique<PostProcessorPipelineImpl>(pipeline_key, input_image_count, output,
+                                                         vulkan_context);
 }
 
-ScreenSpaceProcessorPipeline::~ScreenSpaceProcessorPipeline() {}
+ScreenSpaceProcessorPipeline::~ScreenSpaceProcessorPipeline() = default;
 
-PipelineKey ScreenSpaceProcessorPipeline::Key() const { return pimpl_->key; }
+PipelineKey ScreenSpaceProcessorPipeline::Key() const { return pimpl_->pipeline_key; }
 
 void ScreenSpaceProcessorPipeline::Launch(GraphicsPipelineArgumentsInterface const &generic_args,
                                           GraphicsPipelineOutputInterface *output,
-                                          TransferContext * /*transfer_context*/,
+                                          TransferContext *transfer_context,
                                           CommandBuffer *command_buffer) {
+    auto uniform_data = static_cast<ScreenSpaceUniformsInterface const &>(generic_args);
+    pimpl_->render_pass_uniforms.PendUniformData(uniform_data);
+
     StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), command_buffer);
-    ScreenSpaceConfiguratorInterface const &configurator =
-        static_cast<ScreenSpaceConfiguratorInterface const &>(generic_args);
-    PostProcess(
-        *pipeline_, *uniform_layout_,
-        [this, &configurator](ShaderUniformLayout const &uniform_layout,
-                              CommandBuffer *command_buffer) {
-            ConfigureViewportDimensionUniformVariable(
-                uniform_layout, *pimpl_->viewport_dimension_desc_set, command_buffer);
-            ConfigureCustomUniformVariables(
-                configurator, uniform_layout, *pimpl_->input_images_desc_set,
-                *pimpl_->input_image_sampler, &pimpl_->past_input_images, context_, command_buffer);
-        },
-        command_buffer);
+    PostProcess(*pipeline_, *uniform_layout_, pimpl_->frame_uniforms, pimpl_->render_pass_uniforms,
+                transfer_context, command_buffer);
     FinishRenderPass(command_buffer);
 }
 

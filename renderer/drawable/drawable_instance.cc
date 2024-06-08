@@ -45,6 +45,8 @@ SceneEntityResources::Lod const *SelectResourceLod(SceneEntity const &scene_enti
 
 } // namespace
 
+DrawableInstance::DrawableInstance(SceneEntityId id) : id(id) {}
+
 ResourceLoadingOption::ResourceLoadingOption()
     : load_geometry(false), load_material(false), load_light_map(false),
       load_indirect_light_map(false) {}
@@ -63,7 +65,7 @@ std::vector<DrawableInstance> ToDrawables(std::vector<SceneEntity const *> const
             continue;
         }
 
-        DrawableInstance drawable;
+        DrawableInstance drawable(scene_entity->id);
         drawable.transform = &scene_entity->transform;
 
         if (option.load_geometry && lod->geometry_id() != kNullUuid) {

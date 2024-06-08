@@ -151,13 +151,15 @@ std::vector<VkVertexInputAttributeDescription> VertexShaderInputAttributes() {
     return std::vector<VkVertexInputAttributeDescription>{position_attribute};
 }
 
-class ProjectDepthConfigurator final : public RenderPassConfiguratorInterface {
+class DrawableUniforms final : public DrawableUniformsInterface {
   public:
-    ProjectDepthConfigurator(ProjectionInterface const &projection) : projection_(projection) {}
+    DrawableUniforms(ProjectionInterface const &projection)
+        : DrawableUniformsInterface(/*package_slot_index=*/2, /*reuse_upload=*/true),
+          projection_(projection) {}
 
-    ~ProjectDepthConfigurator() = default;
+    ~DrawableUniforms() = default;
 
-    std::vector<uint8_t> PushConstantOf(DrawableInstance const &drawable) const override {
+    std::vector<uint8_t> UniformPushConstantsOf(DrawableInstance const &drawable) const override {
         std::vector<uint8_t> bytes(sizeof(PushConstant));
 
         PushConstant *push_constant = reinterpret_cast<PushConstant *>(bytes.data());
@@ -188,9 +190,7 @@ class ProjectDepthPipeline final : public GraphicsPipelineInterface {
         : GraphicsPipelineInterface(context) {
         uniform_layout_ = CreateShaderUniformLayout(
             PushConstantLayout(),
-            /*per_frame_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
-            /*per_pass_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
-            /*per_drawable_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(), context);
+            /*uniform_packages_bindings=*/std::vector<ShaderUniformPackageBindings>(), context);
         shader_stages_ =
             CreateShaderStages(/*vertex_shader_file_path=*/kVertexShaderFilePathDepthMap,
                                /*fragment_shader_file_path=*/std::nullopt, context);
@@ -217,9 +217,12 @@ class ProjectDepthPipeline final : public GraphicsPipelineInterface {
             static_cast<ProjectDepthArguments const &>(generic_args);
 
         StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), command_buffer);
-        ProjectDepthConfigurator configurator(*args.projection);
-        RenderDrawables(args.drawables, *pipeline_, *uniform_layout_, configurator,
-                        transfer_context, command_buffer);
+
+        DrawableUniforms drawable_uniforms(*args.projection);
+        RenderDrawables(args.drawables, *pipeline_, *uniform_layout_,
+                        RenderPassUniformsInterface::Empty(), MaterialUniformsInterface::Empty(),
+                        drawable_uniforms, transfer_context, command_buffer);
+
         FinishRenderPass(command_buffer);
     }
 };
@@ -230,9 +233,7 @@ class ProjectLinearDepthPipeline final : public GraphicsPipelineInterface {
         : GraphicsPipelineInterface(context) {
         uniform_layout_ = CreateShaderUniformLayout(
             PushConstantLayout(),
-            /*per_frame_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
-            /*per_pass_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(),
-            /*per_drawable_desc_set=*/std::vector<VkDescriptorSetLayoutBinding>(), context);
+            /*uniform_packages_bindings=*/std::vector<ShaderUniformPackageBindings>(), context);
         shader_stages_ = CreateShaderStages(
             /*vertex_shader_file_path=*/kVertexShaderFilePathDepthMap,
             /*fragment_shader_file_path=*/kFragmentShaderFilePathDepthMapLinear, context);
@@ -259,9 +260,10 @@ class ProjectLinearDepthPipeline final : public GraphicsPipelineInterface {
             static_cast<ProjectDepthArguments const &>(generic_args);
 
         StartRenderPass(output->GetRenderPass(), *output->GetFrameBuffer(), command_buffer);
-        ProjectDepthConfigurator configurator(*args.projection);
-        RenderDrawables(args.drawables, *pipeline_, *uniform_layout_, configurator,
-                        transfer_context, command_buffer);
+        DrawableUniforms drawable_uniforms(*args.projection);
+        RenderDrawables(args.drawables, *pipeline_, *uniform_layout_,
+                        RenderPassUniformsInterface::Empty(), MaterialUniformsInterface::Empty(),
+                        drawable_uniforms, transfer_context, command_buffer);
         FinishRenderPass(command_buffer);
     }
 };
@@ -275,8 +277,7 @@ DagOperationInstance DoProjectNdcDepth(DrawableCollection *drawable_collection,
         session->WithOperation(kProjectDepthPipeline, width, height, CreateProjectNdcDepthOp);
     GraphicsPipelineInterface *project_depth_pipeline = projected_ndc_depth->WithPipeline(
         kProjectDepthPipeline,
-        [](GraphicsPipelineOutputInterface *output, TransferContext * /*transfer_context*/,
-           VulkanContext *vulkan_context) {
+        [](GraphicsPipelineOutputInterface *output, VulkanContext *vulkan_context) {
             return std::make_unique<ProjectDepthPipeline>(
                 dynamic_cast<ProjectDepthOutput *>(output), vulkan_context);
         });
@@ -301,8 +302,7 @@ DagOperationInstance DoProjectLinearDepth(DrawableCollection *drawable_collectio
         session->WithOperation(kProjectDepthPipeline, width, height, CreateProjectLinearDepthOp);
     GraphicsPipelineInterface *project_linear_depth_pipeline = projected_linear_depth->WithPipeline(
         kProjectLinearDepthPipeline,
-        [](GraphicsPipelineOutputInterface *output, TransferContext * /*transfer_context*/,
-           VulkanContext *vulkan_context) {
+        [](GraphicsPipelineOutputInterface *output, VulkanContext *vulkan_context) {
             return std::make_unique<ProjectLinearDepthPipeline>(output, vulkan_context);
         });
 

@@ -1,7 +1,7 @@
 /**
- * e8yes demo web.
+ * e8yes islands.
  *
- * <p>Copyright (C) 2020 Chifeng Wen {daviesx66@gmail.com}
+ * <p>Copyright (C) 2024 Chifeng Wen {daviesx66@gmail.com}
  *
  * <p>This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -19,36 +19,161 @@
 #define ISLANDS_RENDER_PASS_CONFIGURATOR_H
 
 #include <cstdint>
+#include <limits>
 #include <vector>
 
 #include "renderer/drawable/drawable_instance.h"
-#include "renderer/transfer/texture_group.h"
+#include "renderer/transfer/vram_uniform.h"
+#include "resource/material.h"
 
 namespace e8 {
 
+//
+unsigned const kNullPackageSlot = std::numeric_limits<unsigned>::max();
+
 /**
- * @brief The RenderPassConfiguratorInterface class For configuring what resources go in a render
- * pass and what shader uniform setup to apply to each drawable.
+ * @brief The UniformPackage class
  */
-class RenderPassConfiguratorInterface {
+struct UniformPackage {
+    //
+    std::vector<StagingUniformBuffer> buffers;
+
+    //
+    std::vector<StagingUniformImagePack> texture_packs;
+
+    //
+    std::vector<UniformImagePack> image_packs;
+};
+
+/**
+ * @brief The FrameUniformsInterface class For configuring the shader uniforms pertaining to a
+ * frame.
+ */
+class FrameUniformsInterface {
   public:
-    RenderPassConfiguratorInterface();
-    virtual ~RenderPassConfiguratorInterface();
+    /**
+     * @brief FrameUniformsInterface
+     */
+    FrameUniformsInterface(UniformVramTransfer::TransferId frame_uniforms_id,
+                           unsigned package_slot_index, bool reuse_upload);
+    virtual ~FrameUniformsInterface();
 
     /**
-     * @brief IncludeDrawable Whether to include the specified drawable to the render pass?
+     * @brief Uniforms
+     * @return
      */
-    virtual bool IncludeDrawable(DrawableInstance const &drawable) const;
+    virtual UniformPackage Uniforms() const;
 
     /**
-     * @brief PushConstantOf A byte array containing push constant data of the specified drawable.
+     * @brief Empty
+     * @return
      */
-    virtual std::vector<uint8_t> PushConstantOf(DrawableInstance const &drawable) const;
+    static FrameUniformsInterface Empty();
+
+  public:
+    UniformVramTransfer::TransferId const frame_uniforms_id;
+    unsigned const package_slot_index;
+    bool const reuse_upload;
+};
+
+/**
+ * @brief The RenderPassUniformsInterface class For configuring the shader uniforms going in a
+ * render pass
+ */
+class RenderPassUniformsInterface {
+  public:
+    /**
+     * @brief RenderPassUniformsInterface
+     */
+    RenderPassUniformsInterface(UniformVramTransfer::TransferId render_pass_id,
+                                unsigned package_slot_index, bool reuse_upload);
+    virtual ~RenderPassUniformsInterface();
 
     /**
-     * @brief TexturesOf Textures of the specified drawable needed by the render pass.
+     * @brief Uniforms
+     * @return
      */
-    virtual TextureSelector TexturesOf(DrawableInstance const &drawable) const;
+    virtual UniformPackage Uniforms() const;
+
+    /**
+     * @brief Uniforms
+     * @return
+     */
+    virtual std::vector<uint8_t> UniformPushConstants() const;
+
+    /**
+     * @brief Empty
+     * @return
+     */
+    static RenderPassUniformsInterface Empty();
+
+  public:
+    UniformVramTransfer::TransferId const render_pass_id;
+    unsigned const package_slot_index;
+    bool const reuse_upload;
+};
+
+/**
+ * @brief The MaterialUniformsInterface class For configuring the shader uniform setup applying to
+ * each material.
+ */
+class MaterialUniformsInterface {
+  public:
+    /**
+     * @brief MaterialUniformsInterface
+     */
+    MaterialUniformsInterface(unsigned package_slot_index, bool reuse_upload);
+    virtual ~MaterialUniformsInterface();
+
+    /**
+     * @brief UniformsOf
+     * @param material
+     * @return
+     */
+    virtual UniformPackage UniformsOf(Material const *material) const;
+
+    /**
+     * @brief Empty
+     * @return
+     */
+    static MaterialUniformsInterface Empty();
+
+  public:
+    unsigned const package_slot_index;
+    bool const reuse_upload;
+};
+
+/**
+ * @brief The DrawableUniformsInterface class For configuring the shader uniform setup applying to
+ * each drawable.
+ */
+class DrawableUniformsInterface {
+  public:
+    /**
+     * @brief DrawableUniformsInterface
+     */
+    DrawableUniformsInterface(unsigned package_slot_index, bool reuse_upload);
+    virtual ~DrawableUniformsInterface();
+
+    /**
+     * @brief UniformsOf
+     */
+    virtual UniformPackage UniformsOf(DrawableInstance const &drawable) const;
+
+    /**
+     * @brief UniformPushConstantsOf
+     */
+    virtual std::vector<uint8_t> UniformPushConstantsOf(DrawableInstance const &drawable) const;
+
+    /**
+     * @brief Empty
+     * @return
+     */
+    static DrawableUniformsInterface Empty();
+
+  public:
+    unsigned const package_slot_index;
+    bool const reuse_upload;
 };
 
 } // namespace e8

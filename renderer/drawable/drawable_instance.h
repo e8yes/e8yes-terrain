@@ -34,6 +34,11 @@ namespace e8 {
  * transformation. This instanced drawable is what gets rendered.
  */
 struct DrawableInstance {
+    explicit DrawableInstance(SceneEntityId id);
+
+    // Unique ID of this drawable instance.
+    SceneEntityId const id;
+
     // The geometry selected from a series of LODs.
     Geometry const *geometry;
 

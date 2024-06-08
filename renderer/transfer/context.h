@@ -19,10 +19,9 @@
 #define ISLANDS_RENDERER_TRANSFER_CONTEXT_H
 
 #include "common/device.h"
-#include "renderer/transfer/descriptor_set.h"
-#include "renderer/transfer/descriptor_set_texture.h"
 #include "renderer/transfer/vram_geometry.h"
 #include "renderer/transfer/vram_texture.h"
+#include "renderer/transfer/vram_uniform.h"
 
 namespace e8 {
 
@@ -39,10 +38,7 @@ struct TransferContext {
 
     // A generic descriptor set allocator which allows arbitrary number of descriptor set
     // allocations.
-    DescriptorSetAllocator descriptor_set_allocator;
-
-    // A descriptor set cache keyed by texture group.
-    TextureDescriptorSetCache texture_descriptor_set_cache;
+    UniformVramTransfer uniform_vram_transfer;
 
     // It encapsulates an efficient and scalable geometry data transfer from host machine to GPU
     // device via caching.

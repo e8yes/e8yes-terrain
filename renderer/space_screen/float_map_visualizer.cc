@@ -39,16 +39,16 @@ struct FloatMapVisualizerParameters {
     float max_value;
 };
 
-class FloatMapVisualizerConfigurator : public ScreenSpaceConfiguratorInterface {
+class FloatMapVisualizerUniforms : public ScreenSpaceUniformsInterface {
   public:
-    FloatMapVisualizerConfigurator(GraphicsPipelineOutputInterface const &float_map,
-                                   float min_value, float max_value)
+    FloatMapVisualizerUniforms(GraphicsPipelineOutputInterface const *float_map, float min_value,
+                               float max_value)
         : float_map_(float_map), min_value_(min_value), max_value_(max_value) {}
 
-    ~FloatMapVisualizerConfigurator() = default;
+    ~FloatMapVisualizerUniforms() = default;
 
     void InputImages(std::vector<VkImageView> *input_images) const override {
-        input_images->at(0) = float_map_.ColorAttachments()[0]->view;
+        input_images->at(0) = float_map_->ColorAttachments()[0]->view;
     }
 
     void PushConstants(std::vector<uint8_t> *push_constants) const override {
@@ -60,7 +60,7 @@ class FloatMapVisualizerConfigurator : public ScreenSpaceConfiguratorInterface {
     }
 
   private:
-    GraphicsPipelineOutputInterface const &float_map_;
+    GraphicsPipelineOutputInterface const *float_map_;
     float const min_value_;
     float const max_value_;
 };
@@ -83,17 +83,16 @@ DagOperationInstance DoVisualizeFloat(DagOperationInstance float_map, float min_
 
     GraphicsPipelineInterface *pipeline = target->WithPipeline(
         kFloatMapVisualizerPipeline,
-        [](GraphicsPipelineOutputInterface *output, TransferContext *transfer_context,
-           VulkanContext *vulkan_context) {
+        [](GraphicsPipelineOutputInterface *output, VulkanContext *vulkan_context) {
             return std::make_unique<ScreenSpaceProcessorPipeline>(
                 kFloatMapVisualizerPipeline, kFragmentShaderFilePathFloatMapVisualizer,
                 /*input_image_count=*/1,
                 /*push_constant_size=*/sizeof(FloatMapVisualizerParameters), output,
-                transfer_context, vulkan_context);
+                vulkan_context);
         });
 
-    auto configurator = std::make_unique<FloatMapVisualizerConfigurator>(*float_map->Output(),
-                                                                         min_value, max_value);
+    auto configurator =
+        std::make_unique<FloatMapVisualizerUniforms>(float_map->Output(), min_value, max_value);
     target->Schedule(pipeline, std::move(configurator),
                      /*parents=*/std::vector<DagOperationInstance>{float_map});
 

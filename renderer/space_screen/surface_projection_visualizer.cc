@@ -37,47 +37,36 @@ struct SurfaceProjectionVisualizerParameters {
     int parameter_to_visualize;
 };
 
-class SurfaceProjectionVisualizerPostProcessorConfigurator
-    : public ScreenSpaceConfiguratorInterface {
+class SurfaceProjectionVisualizerUniforms : public ScreenSpaceUniformsInterface {
   public:
-    SurfaceProjectionVisualizerPostProcessorConfigurator(
+    SurfaceProjectionVisualizerUniforms(
         LightInputsRendererParameters::InputType parameter_to_visualize,
-        GraphicsPipelineOutputInterface const &light_inputs);
-    ~SurfaceProjectionVisualizerPostProcessorConfigurator() override;
+        GraphicsPipelineOutputInterface const *light_inputs)
+        : parameter_to_visualize_(parameter_to_visualize), light_inputs_(light_inputs) {}
 
-    void InputImages(std::vector<VkImageView> *input_images) const override;
-    void PushConstants(std::vector<uint8_t> *push_constants) const override;
+    ~SurfaceProjectionVisualizerUniforms() override = default;
+
+    void InputImages(std::vector<VkImageView> *input_images) const override {
+        input_images->at(SurfaceProjectionColorOutput::LICO_NORMAL_ROUGHNESS) =
+            light_inputs_->ColorAttachments()[SurfaceProjectionColorOutput::LICO_NORMAL_ROUGHNESS]
+                ->view;
+
+        input_images->at(SurfaceProjectionColorOutput::LICO_ALBEDO_METALLIC) =
+            light_inputs_->ColorAttachments()[SurfaceProjectionColorOutput::LICO_ALBEDO_METALLIC]
+                ->view;
+    }
+
+    void PushConstants(std::vector<uint8_t> *push_constants) const override {
+        SurfaceProjectionVisualizerParameters *parameters =
+            reinterpret_cast<SurfaceProjectionVisualizerParameters *>(push_constants->data());
+
+        parameters->parameter_to_visualize = parameter_to_visualize_;
+    }
 
   private:
     LightInputsRendererParameters::InputType parameter_to_visualize_;
-    GraphicsPipelineOutputInterface const &light_inputs_;
+    GraphicsPipelineOutputInterface const *light_inputs_;
 };
-
-SurfaceProjectionVisualizerPostProcessorConfigurator::
-    SurfaceProjectionVisualizerPostProcessorConfigurator(
-        LightInputsRendererParameters::InputType parameter_to_visualize,
-        GraphicsPipelineOutputInterface const &light_inputs)
-    : parameter_to_visualize_(parameter_to_visualize), light_inputs_(light_inputs) {}
-
-SurfaceProjectionVisualizerPostProcessorConfigurator::
-    ~SurfaceProjectionVisualizerPostProcessorConfigurator() {}
-
-void SurfaceProjectionVisualizerPostProcessorConfigurator::InputImages(
-    std::vector<VkImageView> *input_images) const {
-    input_images->at(SurfaceProjectionColorOutput::LICO_NORMAL_ROUGHNESS) =
-        light_inputs_.ColorAttachments()[SurfaceProjectionColorOutput::LICO_NORMAL_ROUGHNESS]->view;
-
-    input_images->at(SurfaceProjectionColorOutput::LICO_ALBEDO_METALLIC) =
-        light_inputs_.ColorAttachments()[SurfaceProjectionColorOutput::LICO_ALBEDO_METALLIC]->view;
-}
-
-void SurfaceProjectionVisualizerPostProcessorConfigurator::PushConstants(
-    std::vector<uint8_t> *push_constants) const {
-    SurfaceProjectionVisualizerParameters *parameters =
-        reinterpret_cast<SurfaceProjectionVisualizerParameters *>(push_constants->data());
-
-    parameters->parameter_to_visualize = parameter_to_visualize_;
-}
 
 } // namespace
 
@@ -97,17 +86,16 @@ DagOperationInstance DoVisualizeSurfaceProjection(
 
     GraphicsPipelineInterface *pipeline = target->WithPipeline(
         kSurfaceProjectionVisualizerPipeline,
-        [](GraphicsPipelineOutputInterface *visualizer_output, TransferContext *transfer_context,
-           VulkanContext *vulkan_context) {
+        [](GraphicsPipelineOutputInterface *visualizer_output, VulkanContext *vulkan_context) {
             return std::make_unique<ScreenSpaceProcessorPipeline>(
                 kSurfaceProjectionVisualizerPipeline, kFragmentShaderFilePathLightInputsVisualizer,
                 /*input_image_count=*/SurfaceProjectionColorOutput::LightInputsColorOutputCount,
                 /*push_constant_size=*/sizeof(SurfaceProjectionVisualizerParameters),
-                visualizer_output, transfer_context, vulkan_context);
+                visualizer_output, vulkan_context);
         });
 
-    auto configurator = std::make_unique<SurfaceProjectionVisualizerPostProcessorConfigurator>(
-        parameter_to_visualize, *surface_projection->Output());
+    auto configurator = std::make_unique<SurfaceProjectionVisualizerUniforms>(
+        parameter_to_visualize, surface_projection->Output());
     target->Schedule(pipeline, std::move(configurator),
                      /*parents=*/std::vector<DagOperation *>{surface_projection});
 

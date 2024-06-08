@@ -40,49 +40,38 @@ struct DepthProjectionVisualizerParameters {
     float alpha;
 };
 
-class DepthProjectionPostProcessorConfigurator : public ScreenSpaceConfiguratorInterface {
+class DepthProjectionUniforms : public ScreenSpaceUniformsInterface {
   public:
-    DepthProjectionPostProcessorConfigurator(float alpha,
-                                             std::optional<PerspectiveProjection> projection,
-                                             GraphicsPipelineOutputInterface const &depth_map);
-    ~DepthProjectionPostProcessorConfigurator() override;
+    DepthProjectionUniforms(float alpha, std::optional<PerspectiveProjection> projection,
+                            GraphicsPipelineOutputInterface const *depth_map)
+        : alpha_(alpha), projection_(projection), depth_map_(depth_map) {}
 
-    void InputImages(std::vector<VkImageView> *input_images) const override;
-    void PushConstants(std::vector<uint8_t> *push_constants) const override;
+    ~DepthProjectionUniforms() override = default;
+
+    void InputImages(std::vector<VkImageView> *input_images) const override {
+        input_images->at(0) = depth_map_->DepthAttachment()->view;
+    }
+
+    void PushConstants(std::vector<uint8_t> *push_constants) const override {
+        DepthProjectionVisualizerParameters *parameters =
+            reinterpret_cast<DepthProjectionVisualizerParameters *>(push_constants->data());
+
+        parameters->alpha = alpha_;
+
+        if (projection_.has_value()) {
+            parameters->z_near = projection_->Frustum().z_near;
+            parameters->z_far = projection_->Frustum().z_far;
+        } else {
+            parameters->z_near = 1.0f;
+            parameters->z_far = 100.0f;
+        }
+    }
 
   private:
     float const alpha_;
     std::optional<PerspectiveProjection> const projection_;
-    GraphicsPipelineOutputInterface const &depth_map_;
+    GraphicsPipelineOutputInterface const *depth_map_;
 };
-
-DepthProjectionPostProcessorConfigurator::DepthProjectionPostProcessorConfigurator(
-    float alpha, std::optional<PerspectiveProjection> projection,
-    GraphicsPipelineOutputInterface const &depth_map)
-    : alpha_(alpha), projection_(projection), depth_map_(depth_map) {}
-
-DepthProjectionPostProcessorConfigurator::~DepthProjectionPostProcessorConfigurator() {}
-
-void DepthProjectionPostProcessorConfigurator::InputImages(
-    std::vector<VkImageView> *input_images) const {
-    input_images->at(0) = depth_map_.DepthAttachment()->view;
-}
-
-void DepthProjectionPostProcessorConfigurator::PushConstants(
-    std::vector<uint8_t> *push_constants) const {
-    DepthProjectionVisualizerParameters *parameters =
-        reinterpret_cast<DepthProjectionVisualizerParameters *>(push_constants->data());
-
-    parameters->alpha = alpha_;
-
-    if (projection_.has_value()) {
-        parameters->z_near = projection_->Frustum().z_near;
-        parameters->z_far = projection_->Frustum().z_far;
-    } else {
-        parameters->z_near = 1.0f;
-        parameters->z_far = 100.0f;
-    }
-}
 
 } // namespace
 
@@ -102,19 +91,18 @@ DagOperationInstance DoVisualizeDepthProjection(
 
     GraphicsPipelineInterface *pipeline = target->WithPipeline(
         kDepthProjectionVisualizerPipeline,
-        [](GraphicsPipelineOutputInterface *output, TransferContext *transfer_context,
-           VulkanContext *vulkan_context) {
+        [](GraphicsPipelineOutputInterface *output, VulkanContext *vulkan_context) {
             return std::make_unique<ScreenSpaceProcessorPipeline>(
                 kDepthProjectionVisualizerPipeline, kFragmentShaderFilePathDepthMapVisualizer,
                 /*input_image_count=*/1,
                 /*push_constant_size=*/sizeof(DepthProjectionVisualizerParameters), output,
-                transfer_context, vulkan_context);
+                vulkan_context);
         });
 
-    auto configurator = std::make_unique<DepthProjectionPostProcessorConfigurator>(
-        alpha, projection, *ndc_depth_map->Output());
+    auto configurator =
+        std::make_unique<DepthProjectionUniforms>(alpha, projection, ndc_depth_map->Output());
     target->Schedule(pipeline, std::move(configurator),
-                     /*parents=*/std::vector<DagOperation *>{ndc_depth_map});
+                     /*parents=*/std::vector<DagOperationInstance>{ndc_depth_map});
 
     return target;
 }

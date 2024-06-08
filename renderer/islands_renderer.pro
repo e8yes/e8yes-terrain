@@ -38,7 +38,6 @@ SOURCES += \
     basic/render_pass.cc \
     basic/sampler.cc \
     basic/shader.cc \
-    basic/uniform_buffer.cc \
     basic/uniform_layout.cc \
     basic/vertex_input.cc \
     dag/dag_context.cc \
@@ -74,12 +73,11 @@ SOURCES += \
     renderer_solid_color.cc \
     renderer_surface_projection.cc \
     transfer/context.cc \
-    transfer/descriptor_set.cc \
-    transfer/descriptor_set_texture.cc \
-    transfer/texture_group.cc \
+    transfer/uniform_promise.cc \
     transfer/vram.cc \
     transfer/vram_geometry.cc \
-    transfer/vram_texture.cc
+    transfer/vram_texture.cc \
+    transfer/vram_uniform.cc
 
 HEADERS += \
     basic/attachment.h \
@@ -92,7 +90,6 @@ HEADERS += \
     basic/render_pass.h \
     basic/sampler.h \
     basic/shader.h \
-    basic/uniform_buffer.h \
     basic/uniform_layout.h \
     basic/vertex_input.h \
     dag/dag_context.h \
@@ -128,12 +125,11 @@ HEADERS += \
     renderer_solid_color.h \
     renderer_surface_projection.h \
     transfer/context.h \
-    transfer/descriptor_set.h \
-    transfer/descriptor_set_texture.h \
-    transfer/texture_group.h \
+    transfer/uniform_promise.h \
     transfer/vram.h \
     transfer/vram_geometry.h \
-    transfer/vram_texture.h
+    transfer/vram_texture.h \
+    transfer/vram_uniform.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../content/release/ -lcontent
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../content/debug/ -lcontent

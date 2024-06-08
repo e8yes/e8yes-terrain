@@ -40,35 +40,30 @@ PipelineKey const kPointLightPipeline = "Point Light";
 PipelineKey const kSpotLightPipeline = "Spot Light";
 
 // Base class.
-class RadiancePostProcessorConfigurator : public ScreenSpaceConfiguratorInterface {
+class RadianceUniforms : public ScreenSpaceUniformsInterface {
   public:
-    RadiancePostProcessorConfigurator(GraphicsPipelineOutputInterface const &projected_surface);
-    ~RadiancePostProcessorConfigurator() override;
+    RadianceUniforms(GraphicsPipelineOutputInterface const *projected_surface)
+        : projected_surface_(projected_surface) {}
+    ~RadianceUniforms() override = default;
 
-    void InputImages(std::vector<VkImageView> *input_images) const override;
+    void InputImages(std::vector<VkImageView> *input_images) const override {
+        input_images->at(SurfaceProjectionColorOutput::LICO_NORMAL_ROUGHNESS) =
+            projected_surface_
+                ->ColorAttachments()[SurfaceProjectionColorOutput::LICO_NORMAL_ROUGHNESS]
+                ->view;
+
+        input_images->at(SurfaceProjectionColorOutput::LICO_ALBEDO_METALLIC) =
+            projected_surface_
+                ->ColorAttachments()[SurfaceProjectionColorOutput::LICO_ALBEDO_METALLIC]
+                ->view;
+
+        input_images->at(SurfaceProjectionColorOutput::LightInputsColorOutputCount) =
+            projected_surface_->DepthAttachment()->view;
+    }
 
   private:
-    GraphicsPipelineOutputInterface const &projected_surface_;
+    GraphicsPipelineOutputInterface const *projected_surface_;
 };
-
-RadiancePostProcessorConfigurator::RadiancePostProcessorConfigurator(
-    GraphicsPipelineOutputInterface const &projected_surface)
-    : projected_surface_(projected_surface) {}
-
-RadiancePostProcessorConfigurator::~RadiancePostProcessorConfigurator() {}
-
-void RadiancePostProcessorConfigurator::InputImages(std::vector<VkImageView> *input_images) const {
-    input_images->at(SurfaceProjectionColorOutput::LICO_NORMAL_ROUGHNESS) =
-        projected_surface_.ColorAttachments()[SurfaceProjectionColorOutput::LICO_NORMAL_ROUGHNESS]
-            ->view;
-
-    input_images->at(SurfaceProjectionColorOutput::LICO_ALBEDO_METALLIC) =
-        projected_surface_.ColorAttachments()[SurfaceProjectionColorOutput::LICO_ALBEDO_METALLIC]
-            ->view;
-
-    input_images->at(SurfaceProjectionColorOutput::LightInputsColorOutputCount) =
-        projected_surface_.DepthAttachment()->view;
-}
 
 // Sun light.
 struct SunLightParameters {
@@ -76,30 +71,25 @@ struct SunLightParameters {
     vec4 intensity;
 };
 
-class SunLightPostProcessorConfigurator : public RadiancePostProcessorConfigurator {
+class SunLightUniforms : public RadianceUniforms {
   public:
-    SunLightPostProcessorConfigurator(SunLight const &sun_light,
-                                      GraphicsPipelineOutputInterface const &projected_surface);
-    ~SunLightPostProcessorConfigurator() override;
+    SunLightUniforms(SunLight const &sun_light,
+                     GraphicsPipelineOutputInterface const *projected_surface)
+        : RadianceUniforms(projected_surface), sun_light_(sun_light) {}
 
-    void PushConstants(std::vector<uint8_t> *push_constants) const override;
+    ~SunLightUniforms() override = default;
+
+    void PushConstants(std::vector<uint8_t> *push_constants) const override {
+        SunLightParameters *parameters =
+            reinterpret_cast<SunLightParameters *>(push_constants->data());
+
+        parameters->direction = ToVec3(sun_light_.direction()).homo(0.0f);
+        parameters->intensity = ToVec3(sun_light_.intensity()).homo(1.0f);
+    }
 
   private:
     SunLight sun_light_;
 };
-
-SunLightPostProcessorConfigurator::SunLightPostProcessorConfigurator(
-    SunLight const &sun_light, GraphicsPipelineOutputInterface const &projected_surface)
-    : RadiancePostProcessorConfigurator(projected_surface), sun_light_(sun_light) {}
-
-SunLightPostProcessorConfigurator::~SunLightPostProcessorConfigurator() {}
-
-void SunLightPostProcessorConfigurator::PushConstants(std::vector<uint8_t> *push_constants) const {
-    SunLightParameters *parameters = reinterpret_cast<SunLightParameters *>(push_constants->data());
-
-    parameters->direction = ToVec3(sun_light_.direction()).homo(0.0f);
-    parameters->intensity = ToVec3(sun_light_.intensity()).homo(1.0f);
-}
 
 // Point light.
 struct PointLightParameters {
@@ -112,41 +102,32 @@ struct PointLightParameters {
     float rec_z_b;
 };
 
-class PointLightPostProcessorConfigurator : public RadiancePostProcessorConfigurator {
+class PointLightUniforms : public RadianceUniforms {
   public:
-    PointLightPostProcessorConfigurator(PointLight const &point_light,
-                                        GraphicsPipelineOutputInterface const &projected_surface,
-                                        frustum const &light_inputs_frustum);
-    ~PointLightPostProcessorConfigurator() override;
+    PointLightUniforms(PointLight const &point_light, frustum const &surface_projection,
+                       GraphicsPipelineOutputInterface const *projected_surface)
+        : RadianceUniforms(projected_surface), point_light_(point_light),
+          surface_projection_(surface_projection) {}
 
-    void PushConstants(std::vector<uint8_t> *push_constants) const override;
+    ~PointLightUniforms() override = default;
+
+    void PushConstants(std::vector<uint8_t> *push_constants) const override {
+        PointLightParameters *parameters =
+            reinterpret_cast<PointLightParameters *>(push_constants->data());
+
+        parameters->position = ToVec3(point_light_.position()).homo(1.0f);
+        parameters->intensity = ToVec3(point_light_.intensity()).homo(1.0f);
+
+        parameters->rec_x_a = surface_projection_.XUnprojectionConstant();
+        parameters->rec_y_a = surface_projection_.YUnprojectionConstant();
+        parameters->rec_z_a = surface_projection_.ZUnProjectionConstantA();
+        parameters->rec_z_b = surface_projection_.ZUnprojectionConstantB();
+    }
 
   private:
     PointLight point_light_;
-    frustum light_inputs_frustum_;
+    frustum surface_projection_;
 };
-
-PointLightPostProcessorConfigurator::PointLightPostProcessorConfigurator(
-    PointLight const &point_light, GraphicsPipelineOutputInterface const &projected_surface,
-    frustum const &light_inputs_frustum)
-    : RadiancePostProcessorConfigurator(projected_surface), point_light_(point_light),
-      light_inputs_frustum_(light_inputs_frustum) {}
-
-PointLightPostProcessorConfigurator::~PointLightPostProcessorConfigurator() {}
-
-void PointLightPostProcessorConfigurator::PushConstants(
-    std::vector<uint8_t> *push_constants) const {
-    PointLightParameters *parameters =
-        reinterpret_cast<PointLightParameters *>(push_constants->data());
-
-    parameters->position = ToVec3(point_light_.position()).homo(1.0f);
-    parameters->intensity = ToVec3(point_light_.intensity()).homo(1.0f);
-
-    parameters->rec_x_a = light_inputs_frustum_.XUnprojectionConstant();
-    parameters->rec_y_a = light_inputs_frustum_.YUnprojectionConstant();
-    parameters->rec_z_a = light_inputs_frustum_.ZUnProjectionConstantA();
-    parameters->rec_z_b = light_inputs_frustum_.ZUnprojectionConstantB();
-}
 
 // Spot light.
 struct SpotLightParameters {
@@ -162,45 +143,37 @@ struct SpotLightParameters {
     float rec_z_b;
 };
 
-class SpotLightPostProcessorConfigurator : public RadiancePostProcessorConfigurator {
+class SpotLightUniforms : public RadianceUniforms {
   public:
-    SpotLightPostProcessorConfigurator(SpotLight const &spot_light,
-                                       GraphicsPipelineOutputInterface const &light_inputs,
-                                       frustum const &light_inputs_frustum);
-    ~SpotLightPostProcessorConfigurator() override;
+    SpotLightUniforms(SpotLight const &spot_light, frustum const &surface_projection,
+                      GraphicsPipelineOutputInterface const *projected_surface)
+        : RadianceUniforms(projected_surface), spot_light_(spot_light),
+          surface_projection_(surface_projection) {}
 
-    void PushConstants(std::vector<uint8_t> *push_constants) const override;
+    ~SpotLightUniforms() override = default;
+
+    void PushConstants(std::vector<uint8_t> *push_constants) const override {
+        SpotLightParameters *parameters =
+            reinterpret_cast<SpotLightParameters *>(push_constants->data());
+
+        parameters->position = ToVec3(spot_light_.position()).homo(1.0f);
+        parameters->direction = ToVec3(spot_light_.direction()).homo(0.0f);
+        parameters->intensity = ToVec3(spot_light_.intensity()).homo(1.0f);
+        parameters->cos_outer_cone = std::cos(deg2rad(spot_light_.outer_cone_angle() / 2.0f));
+
+        float cos_inner_cone = std::cos(deg2rad(spot_light_.inner_cone_angle() / 2.0f));
+        parameters->cone_normalizer = 1.0f / (cos_inner_cone - parameters->cos_outer_cone);
+
+        parameters->rec_x_a = surface_projection_.XUnprojectionConstant();
+        parameters->rec_y_a = surface_projection_.YUnprojectionConstant();
+        parameters->rec_z_a = surface_projection_.ZUnProjectionConstantA();
+        parameters->rec_z_b = surface_projection_.ZUnprojectionConstantB();
+    }
 
   private:
     SpotLight spot_light_;
-    frustum light_inputs_frustum_;
+    frustum surface_projection_;
 };
-
-SpotLightPostProcessorConfigurator::SpotLightPostProcessorConfigurator(
-    SpotLight const &spot_light, GraphicsPipelineOutputInterface const &light_inputs,
-    frustum const &light_inputs_frustum)
-    : RadiancePostProcessorConfigurator(light_inputs), spot_light_(spot_light),
-      light_inputs_frustum_(light_inputs_frustum) {}
-
-SpotLightPostProcessorConfigurator::~SpotLightPostProcessorConfigurator() {}
-
-void SpotLightPostProcessorConfigurator::PushConstants(std::vector<uint8_t> *push_constants) const {
-    SpotLightParameters *parameters =
-        reinterpret_cast<SpotLightParameters *>(push_constants->data());
-
-    parameters->position = ToVec3(spot_light_.position()).homo(1.0f);
-    parameters->direction = ToVec3(spot_light_.direction()).homo(0.0f);
-    parameters->intensity = ToVec3(spot_light_.intensity()).homo(1.0f);
-    parameters->cos_outer_cone = std::cos(deg2rad(spot_light_.outer_cone_angle() / 2.0f));
-
-    float cos_inner_cone = std::cos(deg2rad(spot_light_.inner_cone_angle() / 2.0f));
-    parameters->cone_normalizer = 1.0f / (cos_inner_cone - parameters->cos_outer_cone);
-
-    parameters->rec_x_a = light_inputs_frustum_.XUnprojectionConstant();
-    parameters->rec_y_a = light_inputs_frustum_.YUnprojectionConstant();
-    parameters->rec_z_a = light_inputs_frustum_.ZUnProjectionConstantA();
-    parameters->rec_z_b = light_inputs_frustum_.ZUnprojectionConstantB();
-}
 
 std::unique_ptr<DagOperation> CreateRadianceOp(unsigned width, unsigned height,
                                                TransferContext *transfer_context,
@@ -222,58 +195,55 @@ DagOperationInstance DoComputeRadiance(LightSourceInstance const &instance,
                                projected_surface->Output()->Height(), CreateRadianceOp);
 
     GraphicsPipelineInterface *pipeline;
-    std::unique_ptr<ScreenSpaceConfiguratorInterface> configurator;
+    std::unique_ptr<ScreenSpaceUniformsInterface> uniforms;
 
     switch (instance.light_source.model_case()) {
     case LightSource::ModelCase::kSunLight: {
         pipeline = target->WithPipeline(
             kSunLightPipeline,
-            [](GraphicsPipelineOutputInterface *radiance_output, TransferContext *transfer_context,
-               VulkanContext *vulkan_context) {
+            [](GraphicsPipelineOutputInterface *radiance_output, VulkanContext *vulkan_context) {
                 return std::make_unique<ScreenSpaceProcessorPipeline>(
                     kSunLightPipeline, kFragmentShaderFilePathRadianceSunLight,
                     /*input_image_count=*/
                     SurfaceProjectionColorOutput::LightInputsColorOutputCount + 1,
                     /*push_constant_size=*/sizeof(SunLightParameters), radiance_output,
-                    transfer_context, vulkan_context);
+                    vulkan_context);
             });
 
-        configurator = std::make_unique<SunLightPostProcessorConfigurator>(
-            instance.light_source.sun_light(), *projected_surface->Output());
+        uniforms = std::make_unique<SunLightUniforms>(instance.light_source.sun_light(),
+                                                      projected_surface->Output());
         break;
     }
     case LightSource::ModelCase::kPointLight: {
         pipeline = target->WithPipeline(
             kPointLightPipeline,
-            [](GraphicsPipelineOutputInterface *radiance_output, TransferContext *transfer_context,
-               VulkanContext *vulkan_context) {
+            [](GraphicsPipelineOutputInterface *radiance_output, VulkanContext *vulkan_context) {
                 return std::make_unique<ScreenSpaceProcessorPipeline>(
                     kPointLightPipeline, kFragmentShaderFilePathRadiancePointLight,
                     /*input_image_count=*/
                     SurfaceProjectionColorOutput::LightInputsColorOutputCount + 1,
                     /*push_constant_size=*/sizeof(PointLightParameters), radiance_output,
-                    transfer_context, vulkan_context);
+                    vulkan_context);
             });
 
-        configurator = std::make_unique<PointLightPostProcessorConfigurator>(
-            instance.light_source.point_light(), *projected_surface->Output(), projection);
+        uniforms = std::make_unique<PointLightUniforms>(instance.light_source.point_light(),
+                                                        projection, projected_surface->Output());
         break;
     }
     case LightSource::ModelCase::kSpotLight: {
         pipeline = target->WithPipeline(
             kSpotLightPipeline,
-            [](GraphicsPipelineOutputInterface *radiance_output, TransferContext *transfer_context,
-               VulkanContext *vulkan_context) {
+            [](GraphicsPipelineOutputInterface *radiance_output, VulkanContext *vulkan_context) {
                 return std::make_unique<ScreenSpaceProcessorPipeline>(
                     kSpotLightPipeline, kFragmentShaderFilePathRadianceSpotLight,
                     /*input_image_count=*/
                     SurfaceProjectionColorOutput::LightInputsColorOutputCount + 1,
                     /*push_constant_size=*/sizeof(SpotLightParameters), radiance_output,
-                    transfer_context, vulkan_context);
+                    vulkan_context);
             });
 
-        configurator = std::make_unique<SpotLightPostProcessorConfigurator>(
-            instance.light_source.spot_light(), *projected_surface->Output(), projection);
+        uniforms = std::make_unique<SpotLightUniforms>(instance.light_source.spot_light(),
+                                                       projection, projected_surface->Output());
         break;
     }
     default: {
@@ -286,7 +256,7 @@ DagOperationInstance DoComputeRadiance(LightSourceInstance const &instance,
         depending_parents.push_back(shadow_map);
     }
 
-    target->Schedule(pipeline, std::move(configurator), depending_parents);
+    target->Schedule(pipeline, std::move(uniforms), depending_parents);
     return target;
 }
 

@@ -20,6 +20,7 @@
 #include <google/protobuf/repeated_field.h>
 #include <mutex>
 #include <string>
+#include <unordered_map>
 
 #include "common/tensor.h"
 #include "resource/common.h"
@@ -33,6 +34,9 @@ namespace {
 std::mutex gUuidGenMutex;
 bool gUuidInitialized = false;
 UUID4_STATE_T gUuidGenState;
+
+std::mutex gUuidStringAssignmentMutex;
+std::unordered_map<std::string, Uuid> gUuidStringAssignments;
 
 void CopyEncodedImageFn(void *context, void *data, int size) {
     auto texture_proto = static_cast<TextureProto *>(context);
@@ -54,6 +58,19 @@ Uuid GenerateUuid() {
     uuid4_gen(&gUuidGenState, &uuid);
 
     return uuid.qwords[0];
+}
+
+Uuid GenerateUuidFor(std::string const &s) {
+    std::lock_guard guard(gUuidStringAssignmentMutex);
+
+    auto it = gUuidStringAssignments.find(s);
+    if (it != gUuidStringAssignments.end()) {
+        return it->second;
+    }
+
+    Uuid allocated = GenerateUuid();
+    gUuidStringAssignments.insert(std::make_pair(s, allocated));
+    return allocated;
 }
 
 google::protobuf::RepeatedField<float> ToProto(vec2 const &v) {

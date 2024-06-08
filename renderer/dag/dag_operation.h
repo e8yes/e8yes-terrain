@@ -45,8 +45,7 @@ class DagOperation {
     // A graphics pipeline's construction is often paired with an output. This function standarized
     // the creation of a complete graphics pipeline.
     using CompilePipelineFn = std::function<std::unique_ptr<GraphicsPipelineInterface>(
-        GraphicsPipelineOutputInterface *output, TransferContext *transfer_context,
-        VulkanContext *vulkan_context)>;
+        GraphicsPipelineOutputInterface *output, VulkanContext *vulkan_context)>;
 
     /**
      * @brief DagOperation Constructs a pipeline stage attached with an optional output.

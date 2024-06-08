@@ -86,8 +86,7 @@ void ConfigureFillColorOp(vec3 const &color, DagOperationInstance dependent_op,
                           DagOperationInstance filled_image) {
     GraphicsPipelineInterface *pipeline = filled_image->WithPipeline(
         kFillColorPipeline,
-        [](GraphicsPipelineOutputInterface * /*output*/, TransferContext * /*transfer_context*/,
-           VulkanContext *vulkan_context) {
+        [](GraphicsPipelineOutputInterface * /*output*/, VulkanContext *vulkan_context) {
             return std::make_unique<FillColorPipeline>(vulkan_context);
         });
     auto args = std::make_unique<FillColorArguments>(color);
