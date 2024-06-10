@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <utility>
 #include <vulkan/vulkan.h>
 
 #include "common/device.h"
@@ -28,7 +29,11 @@ namespace e8 {
 StagingBuffer::StagingBuffer()
     : buffer(VK_NULL_HANDLE), allocation(VK_NULL_HANDLE), context(nullptr) {}
 
-StagingBuffer::StagingBuffer(StagingBuffer &&other) : StagingBuffer() { *this = std::move(other); }
+StagingBuffer::StagingBuffer(StagingBuffer &&other) : StagingBuffer() {
+    std::swap(buffer, other.buffer);
+    std::swap(allocation, other.allocation);
+    std::swap(context, other.context);
+}
 
 StagingBuffer::~StagingBuffer() { this->Free(); }
 

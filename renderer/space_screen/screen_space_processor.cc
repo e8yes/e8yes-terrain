@@ -125,7 +125,7 @@ class RenderPassUniforms : public RenderPassUniformsInterface {
     void PendUniformData(ScreenSpaceUniformsInterface const &uniform_data) {
         uniform_data.PushConstants(&push_contants_);
 
-        std::vector<VkImageView> input_images;
+        std::vector<VkImageView> input_images(input_images_.size());
         uniform_data.InputImages(&input_images);
         if (input_images == input_images_) {
             new_input_images_ = false;

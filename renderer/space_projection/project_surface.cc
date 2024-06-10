@@ -20,6 +20,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <vector>
 #include <vulkan/vulkan.h>
 
@@ -48,6 +49,9 @@ namespace e8 {
 namespace {
 
 PipelineKey const kProjectSurfacePipeline = "Project Surface Parameters";
+
+unsigned const kMaterialPackageSlot = 2;
+unsigned const kPackageSlotCount = 3;
 
 /**
  * @brief The ProjectSurfaceOutput class For storing a 32-bit RGBA color output containing
@@ -170,7 +174,7 @@ std::vector<VkVertexInputAttributeDescription> VertexShaderInputAttributes() {
         tex_coord_attribute};
 }
 
-std::vector<ShaderUniformPackageBindings> DescriptorSetBindings() {
+std::vector<ShaderUniformPackageBindings> UniformSlotsLayout() {
     VkDescriptorSetLayoutBinding albedo_map_binding{};
     albedo_map_binding.binding = 0;
     albedo_map_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -195,14 +199,17 @@ std::vector<ShaderUniformPackageBindings> DescriptorSetBindings() {
     metallic_map_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     metallic_map_binding.descriptorCount = 1;
 
-    return std::vector<ShaderUniformPackageBindings>{ShaderUniformPackageBindings{
-        albedo_map_binding, normal_map_binding, roughness_map_binding, metallic_map_binding}};
+    std::vector<ShaderUniformPackageBindings> result(kPackageSlotCount);
+    result[kMaterialPackageSlot] = ShaderUniformPackageBindings{
+        albedo_map_binding, normal_map_binding, roughness_map_binding, metallic_map_binding};
+    return result;
 }
 
 class MaterialUniforms final : public MaterialUniformsInterface {
   public:
     MaterialUniforms(ImageSampler const *texture_sampler)
-        : MaterialUniformsInterface(/*package_slot_index=*/2, /*reuse_upload=*/true),
+        : MaterialUniformsInterface(/*package_slot_index=*/kMaterialPackageSlot,
+                                    /*reuse_upload=*/true),
           texture_sampler_(texture_sampler) {}
 
     UniformPackage UniformsOf(Material const *material) const override {
@@ -232,7 +239,7 @@ class MaterialUniforms final : public MaterialUniformsInterface {
 class DrawableUniforms final : public DrawableUniformsInterface {
   public:
     DrawableUniforms(PerspectiveProjection const &projection)
-        : DrawableUniformsInterface(/*package_slot_index=*/kNullPackageSlot, /*reuse_upload=*/true),
+        : DrawableUniformsInterface(/*package_slot_index=*/std::nullopt, /*reuse_upload=*/true),
           projection_(projection) {}
 
     std::vector<uint8_t> UniformPushConstantsOf(DrawableInstance const &drawable) const override {
@@ -271,7 +278,7 @@ class ProjectSurfacePipeline final : public GraphicsPipelineInterface {
     ProjectSurfacePipeline(GraphicsPipelineOutputInterface *output, VulkanContext *context)
         : GraphicsPipelineInterface(context) {
         uniform_layout_ =
-            CreateShaderUniformLayout(PushConstantLayout(), DescriptorSetBindings(), context);
+            CreateShaderUniformLayout(PushConstantLayout(), UniformSlotsLayout(), context);
         shader_stages_ = CreateShaderStages(
             /*vertex_shader_file_path=*/kVertexShaderFilePathLightInputs,
             /*fragment_shader_file_path=*/kFragmentShaderFilePathLightInputs, context);

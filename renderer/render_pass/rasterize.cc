@@ -34,9 +34,7 @@
 #include "renderer/transfer/vram_texture.h"
 #include "renderer/transfer/vram_uniform.h"
 #include "resource/buffer_texture.h"
-#include "resource/common.h"
 #include "resource/geometry.h"
-#include "resource/light_map.h"
 #include "resource/material.h"
 
 namespace e8 {
@@ -104,10 +102,10 @@ void UploadUniforms(std::unordered_map<UniformVramTransfer::TransferId,
                                        UniformPackageWithLayout> const &uniform_packages,
                     TextureVramTransfer *texture_vram, UniformVramTransfer *uniform_vram) {
     for (auto const &[transfer_id, package] : uniform_packages) {
-        std::vector<UniformImagePack> image_pack =
+        std::vector<UniformImagePack> image_packs =
             FetchTexturePacks(package.uniform_package.texture_packs, texture_vram);
 
-        uniform_vram->Upload(transfer_id, package.uniform_package.buffers, image_pack,
+        uniform_vram->Upload(transfer_id, package.uniform_package.buffers, image_packs,
                              package.layout);
     }
 }
@@ -115,6 +113,9 @@ void UploadUniforms(std::unordered_map<UniformVramTransfer::TransferId,
 void UploadFrameUniforms(FrameUniformsInterface const &frame_uniforms,
                          ShaderUniformLayout const &uniform_layout,
                          UniformVramTransfer *uniform_vram) {
+    if (!frame_uniforms.package_slot_index.has_value()) {
+        return;
+    }
     if (frame_uniforms.reuse_upload &&
         uniform_vram->Find(frame_uniforms.frame_uniforms_id) != nullptr) {
         return;
@@ -123,12 +124,15 @@ void UploadFrameUniforms(FrameUniformsInterface const &frame_uniforms,
     UniformPackage uniform_package = frame_uniforms.Uniforms();
     uniform_vram->Upload(frame_uniforms.frame_uniforms_id, uniform_package.buffers,
                          uniform_package.image_packs,
-                         uniform_layout.descriptor_set_layouts[frame_uniforms.package_slot_index]);
+                         uniform_layout.descriptor_set_layouts[*frame_uniforms.package_slot_index]);
 }
 
 void UploadRenderPassUniforms(RenderPassUniformsInterface const &render_pass_uniforms,
                               ShaderUniformLayout const &uniform_layout,
                               UniformVramTransfer *uniform_vram) {
+    if (!render_pass_uniforms.package_slot_index.has_value()) {
+        return;
+    }
     if (render_pass_uniforms.reuse_upload &&
         uniform_vram->Find(render_pass_uniforms.render_pass_id) != nullptr) {
         return;
@@ -137,7 +141,7 @@ void UploadRenderPassUniforms(RenderPassUniformsInterface const &render_pass_uni
     UniformPackage uniform_package = render_pass_uniforms.Uniforms();
     uniform_vram->Upload(
         render_pass_uniforms.render_pass_id, uniform_package.buffers, uniform_package.image_packs,
-        uniform_layout.descriptor_set_layouts[render_pass_uniforms.package_slot_index]);
+        uniform_layout.descriptor_set_layouts[*render_pass_uniforms.package_slot_index]);
 }
 
 void UploadResources(std::vector<DrawableInstance> const &drawables,
@@ -160,25 +164,27 @@ void UploadResources(std::vector<DrawableInstance> const &drawables,
         }
 
         if (drawable.material != nullptr && uniform_packages.count(drawable.material->id) == 0 &&
+            material_uniforms.package_slot_index.has_value() &&
             (!material_uniforms.reuse_upload ||
              transfer_context->uniform_vram_transfer.Find(drawable.material->id) == nullptr)) {
             UniformPackage material_package = material_uniforms.UniformsOf(drawable.material);
             UniformPackageWithLayout material_package_with_layout{
                 .uniform_package = std::move(material_package),
                 .layout =
-                    uniform_layout.descriptor_set_layouts[material_uniforms.package_slot_index],
+                    uniform_layout.descriptor_set_layouts[*material_uniforms.package_slot_index],
             };
             uniform_packages.insert(
                 std::make_pair(drawable.material->id, std::move(material_package_with_layout)));
         }
 
-        if (!drawable_uniforms.reuse_upload ||
-            transfer_context->uniform_vram_transfer.Find(drawable.id) == nullptr) {
+        if (drawable_uniforms.package_slot_index.has_value() &&
+            (!drawable_uniforms.reuse_upload ||
+             transfer_context->uniform_vram_transfer.Find(drawable.id) == nullptr)) {
             UniformPackage drawable_package = drawable_uniforms.UniformsOf(drawable);
             UniformPackageWithLayout drawable_package_with_layout{
                 .uniform_package = std::move(drawable_package),
                 .layout =
-                    uniform_layout.descriptor_set_layouts[drawable_uniforms.package_slot_index],
+                    uniform_layout.descriptor_set_layouts[*drawable_uniforms.package_slot_index],
             };
             uniform_packages.insert(
                 std::make_pair(drawable.id, std::move(drawable_package_with_layout)));
@@ -232,10 +238,11 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
 
     GpuUniformPromise *render_pass_uniform_promise =
         transfer_context->uniform_vram_transfer.Find(render_pass_uniforms.render_pass_id);
-    if (render_pass_uniform_promise != nullptr) {
+    if (render_pass_uniform_promise != nullptr &&
+        render_pass_uniforms.package_slot_index.has_value()) {
         vkCmdBindDescriptorSets(
             cmds->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
-            /*firstSet=*/render_pass_uniforms.package_slot_index,
+            /*firstSet=*/*render_pass_uniforms.package_slot_index,
             /*descriptorSetCount=*/1, &render_pass_uniform_promise->descriptor_set,
             /*dynamicOffsetCount=*/0,
             /*pDynamicOffsets=*/nullptr);
@@ -245,10 +252,11 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
         // Sets uniforms.
         GpuUniformPromise *drawable_uniform_promise =
             transfer_context->uniform_vram_transfer.Find(instance.id);
-        if (drawable_uniform_promise != nullptr) {
+        if (drawable_uniform_promise != nullptr &&
+            drawable_uniforms.package_slot_index.has_value()) {
             vkCmdBindDescriptorSets(
                 cmds->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
-                /*firstSet=*/drawable_uniforms.package_slot_index,
+                /*firstSet=*/*drawable_uniforms.package_slot_index,
                 /*descriptorSetCount=*/1, &drawable_uniform_promise->descriptor_set,
                 /*dynamicOffsetCount=*/0,
                 /*pDynamicOffsets=*/nullptr);
@@ -257,10 +265,11 @@ void RenderDrawables(std::vector<DrawableInstance> const &drawables,
         if (instance.material != nullptr) {
             GpuUniformPromise *material_uniform_promise =
                 transfer_context->uniform_vram_transfer.Find(instance.material->id);
-            if (material_uniform_promise != nullptr) {
+            if (material_uniform_promise != nullptr &&
+                material_uniforms.package_slot_index.has_value()) {
                 vkCmdBindDescriptorSets(
                     cmds->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
-                    /*firstSet=*/material_uniforms.package_slot_index,
+                    /*firstSet=*/*material_uniforms.package_slot_index,
                     /*descriptorSetCount=*/1, &material_uniform_promise->descriptor_set,
                     /*dynamicOffsetCount=*/0,
                     /*pDynamicOffsets=*/nullptr);
@@ -307,12 +316,24 @@ void PostProcess(GraphicsPipeline const &pipeline, ShaderUniformLayout const &un
 
     vkCmdBindPipeline(cmds->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline);
 
+    GpuUniformPromise *frame_uniform_promise =
+        transfer_context->uniform_vram_transfer.Find(frame_uniforms.frame_uniforms_id);
+    if (frame_uniform_promise != nullptr && frame_uniforms.package_slot_index.has_value()) {
+        vkCmdBindDescriptorSets(cmds->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                uniform_layout.layout,
+                                /*firstSet=*/*frame_uniforms.package_slot_index,
+                                /*descriptorSetCount=*/1, &frame_uniform_promise->descriptor_set,
+                                /*dynamicOffsetCount=*/0,
+                                /*pDynamicOffsets=*/nullptr);
+    }
+
     GpuUniformPromise *render_pass_uniform_promise =
         transfer_context->uniform_vram_transfer.Find(render_pass_uniforms.render_pass_id);
-    if (render_pass_uniform_promise != nullptr) {
+    if (render_pass_uniform_promise != nullptr &&
+        render_pass_uniforms.package_slot_index.has_value()) {
         vkCmdBindDescriptorSets(
             cmds->buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uniform_layout.layout,
-            /*firstSet=*/render_pass_uniforms.package_slot_index,
+            /*firstSet=*/*render_pass_uniforms.package_slot_index,
             /*descriptorSetCount=*/1, &render_pass_uniform_promise->descriptor_set,
             /*dynamicOffsetCount=*/0,
             /*pDynamicOffsets=*/nullptr);

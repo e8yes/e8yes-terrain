@@ -29,7 +29,6 @@
 #include "common/device.h"
 #include "renderer/basic/sampler.h"
 #include "renderer/transfer/uniform_promise.h"
-#include "resource/buffer.h"
 #include "resource/buffer_texture.h"
 
 namespace e8 {
@@ -37,7 +36,7 @@ namespace e8 {
 /**
  * @brief The StagingUniform class
  */
-class StagingUniformBuffer : public StagingBuffer {
+class StagingUniformBuffer {
   public:
     /**
      * @brief StagingUniformBuffer
@@ -91,9 +90,18 @@ class StagingUniformBuffer : public StagingBuffer {
     //
     unsigned const binding;
 
+    //
+    VkBuffer buffer;
+
   private:
+    void *BeginAccess();
+    void EndAccess();
+
     unsigned const max_size_;
     unsigned actual_size_;
+
+    VmaAllocation allocation_;
+    VulkanContext *context_;
 };
 
 /**

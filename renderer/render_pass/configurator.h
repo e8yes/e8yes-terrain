@@ -19,7 +19,7 @@
 #define ISLANDS_RENDER_PASS_CONFIGURATOR_H
 
 #include <cstdint>
-#include <limits>
+#include <optional>
 #include <vector>
 
 #include "renderer/drawable/drawable_instance.h"
@@ -27,9 +27,6 @@
 #include "resource/material.h"
 
 namespace e8 {
-
-//
-unsigned const kNullPackageSlot = std::numeric_limits<unsigned>::max();
 
 /**
  * @brief The UniformPackage class
@@ -45,14 +42,32 @@ struct UniformPackage {
     std::vector<UniformImagePack> image_packs;
 };
 
+class UniformsInterface {
+  public:
+    UniformsInterface(std::optional<unsigned> package_slot_index, bool reuse_upload);
+    UniformsInterface(bool reuse_upload);
+
+  public:
+    std::optional<unsigned> const package_slot_index;
+    bool const reuse_upload;
+};
+
 /**
  * @brief The FrameUniformsInterface class For configuring the shader uniforms pertaining to a
  * frame.
  */
-class FrameUniformsInterface {
+class FrameUniformsInterface : public UniformsInterface {
   public:
     /**
      * @brief FrameUniformsInterface
+     */
+    FrameUniformsInterface();
+
+    /**
+     * @brief FrameUniformsInterface
+     * @param frame_uniforms_id
+     * @param package_slot_index
+     * @param reuse_upload
      */
     FrameUniformsInterface(UniformVramTransfer::TransferId frame_uniforms_id,
                            unsigned package_slot_index, bool reuse_upload);
@@ -72,21 +87,27 @@ class FrameUniformsInterface {
 
   public:
     UniformVramTransfer::TransferId const frame_uniforms_id;
-    unsigned const package_slot_index;
-    bool const reuse_upload;
 };
 
 /**
  * @brief The RenderPassUniformsInterface class For configuring the shader uniforms going in a
  * render pass
  */
-class RenderPassUniformsInterface {
+class RenderPassUniformsInterface : public UniformsInterface {
   public:
     /**
      * @brief RenderPassUniformsInterface
      */
+    RenderPassUniformsInterface();
+
+    /**
+     * @brief RenderPassUniformsInterface
+     * @param render_pass_id
+     * @param package_slot_index
+     * @param reuse_upload
+     */
     RenderPassUniformsInterface(UniformVramTransfer::TransferId render_pass_id,
-                                unsigned package_slot_index, bool reuse_upload);
+                                std::optional<unsigned> package_slot_index, bool reuse_upload);
     virtual ~RenderPassUniformsInterface();
 
     /**
@@ -109,18 +130,23 @@ class RenderPassUniformsInterface {
 
   public:
     UniformVramTransfer::TransferId const render_pass_id;
-    unsigned const package_slot_index;
-    bool const reuse_upload;
 };
 
 /**
  * @brief The MaterialUniformsInterface class For configuring the shader uniform setup applying to
  * each material.
  */
-class MaterialUniformsInterface {
+class MaterialUniformsInterface : public UniformsInterface {
   public:
     /**
      * @brief MaterialUniformsInterface
+     */
+    MaterialUniformsInterface();
+
+    /**
+     * @brief MaterialUniformsInterface
+     * @param package_slot_index
+     * @param reuse_upload
      */
     MaterialUniformsInterface(unsigned package_slot_index, bool reuse_upload);
     virtual ~MaterialUniformsInterface();
@@ -137,22 +163,25 @@ class MaterialUniformsInterface {
      * @return
      */
     static MaterialUniformsInterface Empty();
-
-  public:
-    unsigned const package_slot_index;
-    bool const reuse_upload;
 };
 
 /**
  * @brief The DrawableUniformsInterface class For configuring the shader uniform setup applying to
  * each drawable.
  */
-class DrawableUniformsInterface {
+class DrawableUniformsInterface : public UniformsInterface {
   public:
     /**
      * @brief DrawableUniformsInterface
      */
-    DrawableUniformsInterface(unsigned package_slot_index, bool reuse_upload);
+    DrawableUniformsInterface();
+
+    /**
+     * @brief DrawableUniformsInterface
+     * @param package_slot_index
+     * @param reuse_upload
+     */
+    DrawableUniformsInterface(std::optional<unsigned> package_slot_index, bool reuse_upload);
     virtual ~DrawableUniformsInterface();
 
     /**
@@ -170,10 +199,6 @@ class DrawableUniformsInterface {
      * @return
      */
     static DrawableUniformsInterface Empty();
-
-  public:
-    unsigned const package_slot_index;
-    bool const reuse_upload;
 };
 
 } // namespace e8
